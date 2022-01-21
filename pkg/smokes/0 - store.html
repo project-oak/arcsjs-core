@@ -1,0 +1,39 @@
+<!doctype html>
+<!--
+ Copyright (c) 2022 Google LLC All rights reserved.
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file.
+-->
+
+
+<script type="module">
+  import {Store} from '../js/core/Store.js';
+  import {AutomergeStore} from '../js/crdt/AutomergeStore.js';
+  // do basic Store stuff
+  const exercise = store => {
+    // set a key: value pair
+    store.set('a', 3);
+    console.log(store.pretty);
+    // set a key to undefined
+    store.set('a');
+    console.log(store.pretty);
+    // add values with random keys
+    store.push(3);
+    store.push(4);
+    store.push(5);
+    console.log(store.pretty);
+    // iterate over values
+    store.values.map((n, i) => console.log('index', i, '=', n));
+    // enumerate keys
+    console.log(store.keys);
+    console.log(store.save?.()?.length || '(n/a)', 'bytes');
+  }
+  // exercise a Store
+  console.group('Store');
+  exercise(new Store());
+  console.groupEnd();
+  // exercise an AutomergeStore
+  console.group('AutomergeStore');
+  exercise(new AutomergeStore());
+  console.groupEnd();
+</script>

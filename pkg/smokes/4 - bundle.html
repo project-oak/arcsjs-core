@@ -1,0 +1,39 @@
+<!doctype html>
+<!--
+ Copyright (c) 2022 Google LLC All rights reserved.
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file.
+-->
+
+
+<script type="module">
+  globalThis.logFlags = {
+    particles: true
+  };
+</script>
+
+<script type="module">
+  import {utils, Paths, Runtime, Host, Arc} from '../arcs.js';
+
+  const particleSpec = {
+    kind: './HelloWorld',
+    inputs: {
+      things: {}
+    }
+  };
+
+  (async () => {
+    const user = new Runtime('user');
+    //
+    const arc = new Arc('arc');
+    await user.addArc(arc);
+    //
+    const host = new Host('helloWorld');
+    await user.marshalParticle(host, particleSpec);
+    await arc.addHost(host);
+    //
+    console.log(user);
+    console.log(arc);
+    console.log(host);
+  })();
+</script>

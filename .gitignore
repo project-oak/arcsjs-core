@@ -1,0 +1,9 @@
+js
+arcs.js
+arcs.min.js
+arcs.min.js.map
+*.tsbuildinfo
+.DS_Store
+node_modules
+.firebase
+docs

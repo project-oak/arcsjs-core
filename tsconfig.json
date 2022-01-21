@@ -1,0 +1,14 @@
+{
+  "exclude": [
+    "./pkg/*.ts",
+    "./pkg/js/**/*"
+  ],
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "esnext",
+    "rootDir": "./pkg/ts",
+    "outDir": "./pkg/js",
+    "declaration": true,
+  }
+}
