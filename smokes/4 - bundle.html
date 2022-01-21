@@ -1,0 +1,33 @@
+<!doctype html>
+
+<script type="module">
+  globalThis.logFlags = {
+    particles: true
+  };
+</script>
+
+<script type="module">
+  import {Paths, Runtime, Host, Arc} from '../pkg/arcs.js';
+
+  const particleSpec = {
+    kind: './HelloWorld',
+    inputs: {
+      things: {}
+    }
+  };
+
+  (async () => {
+    const user = new Runtime('user');
+    //
+    const arc = new Arc('arc');
+    await user.addArc(arc);
+    //
+    const host = new Host('helloWorld');
+    await user.marshalParticle(host, particleSpec);
+    await arc.addHost(host);
+    //
+    console.log(user);
+    console.log(arc);
+    console.log(host);
+  })();
+</script>
