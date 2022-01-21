@@ -60,14 +60,3 @@ export const pathForKind = (kind?) => {
   }
   return '404';
 };
-
-export const maybeFetchParticleCode = async (path) => {
-  try {
-    const response = await fetch(path);
-    if (response.ok) {
-      return await response.text();
-    }
-  } catch(x) {
-    /**/
-  }
-};

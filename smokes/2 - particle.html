@@ -1,0 +1,20 @@
+<!doctype html>
+
+<script type="module">
+  globalThis.logFlags = {particles: true};
+</script>
+
+<script type="module">
+  import {Host} from '../pkg/js/core/Host.js';
+  import {Runtime} from '../pkg/js/Runtime.js';
+  import '../pkg/js/isolation/ses.js';
+  //
+  (async () => {
+    const user = new Runtime('user');
+    const p = await user.createParticle(new Host(), './HelloWorld')
+    console.log(p);
+    p.inputs = {
+      things: {}
+    };
+  })();
+</script>
