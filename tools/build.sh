@@ -10,3 +10,8 @@ echo '#### compile'
 echo '#### bundle'
 ./tools/bundle.sh
 echo '#### done.'
+echo ':: npm install'
+npm install --prefer-offline
+echo ':: npx tsc'
+npx tsc --build
+echo ':: done.'

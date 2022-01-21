@@ -9,6 +9,11 @@
     "target": "esnext",
     "rootDir": "./pkg/ts",
     "outDir": "./pkg/js",
-    "declaration": true,
+    "declaration": true
+  },
+  "typedocOptions": {
+    "entryPoints": ["./pkg/ts"],
+    "out": "./docs",
+    "name": "ArcsJs"
   }
 }

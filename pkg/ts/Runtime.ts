@@ -1,12 +1,20 @@
 /**
- * Copyright (c) 2022 Google LLC All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
+ * @license
+ * Copyright 2021 Google LLC.
+ * This code may only be used under the BSD style license found at
+ * http://polymer.github.io/LICENSE.txt
+ * Code distributed by Google as part of this project is also
+ * subject to an additional IP rights grant found at
+ * http://polymer.github.io/PATENTS.txt
  */
 import {Arc} from './core/Arc.js';
 import {Host} from './core/Host.js';
 import {Store} from './core/Store.js';
 import {EventEmitter} from './core/EventEmitter.js';
+import {Paths} from './utils/paths.js';
+import {EventEmitter} from './core/EventEmitter.js';
+import {AggregateStore} from './core/AggregateStore.js';
+import {AutomergeStore} from './crdt/AutomergeStore.js';
 import {logFactory} from './utils/log.js';
 
 const log = logFactory(logFactory.flags.runtime, 'runtime', 'forestgreen');
