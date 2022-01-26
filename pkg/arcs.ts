@@ -16,6 +16,7 @@ export * from './js/render/Composer.js';
 export * from './js/render/Surface.js';
 export * from './js/isolation/code.js';
 export * from './js/isolation/ses.js';
+export * from './js/crdt/AutomergeNetwork.js';
 
 import * as utils from './js/utils/utils.js';
 const {logFactory, Paths} = utils;
