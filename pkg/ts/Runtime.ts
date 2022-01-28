@@ -10,7 +10,6 @@ import {EventEmitter} from './core/EventEmitter.js';
 import {Paths} from './utils/paths.js';
 import {EventEmitter} from './core/EventEmitter.js';
 import {AggregateStore} from './core/AggregateStore.js';
-import {AutomergeStore} from './crdt/AutomergeStore.js';
 import {logFactory} from './utils/log.js';
 
 const log = logFactory(logFactory.flags.runtime, 'runtime', 'forestgreen');
