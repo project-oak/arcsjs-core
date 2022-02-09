@@ -7,8 +7,9 @@
 import {Paths} from '../utils/paths.js';
 import {logFactory} from '../utils/log.js';
 import {Runtime} from '../Runtime.js';
-import {requireParticleBaseCode, requireParticleImplCode} from './code.js';
+import {requireParticleBaseCode, requireParticleImplCode, pathForKind} from './code.js';
 import '../../third_party/ses/ses.umd.min.js';
+import {Generator} from '../../third_party/inlinesourcemap/inline-source-map.js';
 
 const requiredLog = logFactory(true, 'SES', 'goldenrod');
 const log = logFactory(logFactory.flags.ses, 'SES', 'goldenrod');
@@ -64,13 +65,13 @@ const requireImplFactory = async (kind, options) => {
   // if it's an object
   if (typeof factory === 'object') {
     // repackage the code to eliminate closures
-    factory = repackageImplFactory(factory);
+    factory = repackageImplFactory(factory, kind);
     log('repackaged factory:\n', factory);
   }
   return globalThis.harden(factory);
 };
 
-const repackageImplFactory = (factory) => {
+const repackageImplFactory = (factory, kind) => {
   // dictionary to array 2-tuples
   const props = Object.entries(factory);
   // filter by typeof
@@ -112,8 +113,19 @@ return harden(${proto});
 
 };
   `;
-  log('rewritten:\n\n', rewrite);
-  return particleCompartment.evaluate(rewrite);
+  // Since it is too problematic to adjust for comments and whitespace
+  // stripped by the JS parser by traversing an object and calling toString()
+  // Here we just add the generated rewritten particle as-is to the sourcemap
+  // It will appear in DevTools and allow debugging, but won't match what's on
+  // disk.
+  var gen = new Generator({ charset: 'utf-8' })
+      .addSourceContent(pathForKind(kind), rewrite)
+      .addGeneratedMappings(pathForKind(kind), rewrite, { line: 0, column: 0 });
+
+  const inlineSourceMap = gen.inlineMappingUrl();
+  const rewriteWithSourceMap = rewrite + inlineSourceMap + "\n";
+  log('rewritten:\n\n', rewriteWithSourceMap);
+  return particleCompartment.evaluate(rewriteWithSourceMap);
 };
 
 let privateCtor;

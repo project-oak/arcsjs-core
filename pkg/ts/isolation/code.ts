@@ -22,7 +22,7 @@ export const requireParticleBaseCode = async (sourcePath?) => {
     const path = Paths.resolve(sourcePath || defaultParticleBasePath);
     log('particle base code path: ', path);
     const response = await fetch(path);
-    const moduleText = await response.text();
+    const moduleText = await response.text() + "\n//# sourceURL=" + path + "\n";
     requireParticleBaseCode.source = moduleText.replace(/export /g, '');
   }
   return requireParticleBaseCode.source;

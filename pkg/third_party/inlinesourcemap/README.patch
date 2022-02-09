@@ -1,0 +1,2 @@
+Forked from https://github.com/thlorenz/inline-source-map but patched to work
+in the browser (instead of node), and fixed a bug in addSourceContent().
