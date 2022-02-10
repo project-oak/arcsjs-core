@@ -72,7 +72,7 @@ export class Arc extends EventEmitter {
     delete this.stores[storeId];
   }
   // TODO(sjmiles): 2nd param is used in overrides, make explicit
-  protected storeChanged(storeId, store) {
+  protected storeChanged(storeId/*, store*/) {
     this.log(`storeChanged: "${storeId}"`);
     values(this.hosts).forEach((host: Host) => {
       const bindings = host.meta?.bindings;
