@@ -26,6 +26,19 @@ const customLogFactory = (id: string) => logFactory(logFactory.flags.host, `Host
  * Host knows how to talk, asynchronously, to its Particle (potentially using a bus).
 **/
 
+/* TODO(sjmiles):
+Update Cycle Documented Briefly
+1. when a Store changes it invokes it's listeners
+2. when an Arc hears a Store change, it updates Hosts bound to the Store
+3. Arc updates Host by creating an `inputs` object from Stores and metadata
+   - ignores fact inputs are accumulated
+   - ignores information about which Store has updated
+4. `inputs` object is assigned to `hosts.inputs` 🙃
+5. Host does an expensive `deepEqual` equality check. Turning on `host` logging should reveal `this.log('inputs are not interesting, skipping update');` if data is caught in this trap
+   - we can use reference testing here if we are more careful
+     about using immutable data
+6. the particle.inputs are assigned (but is really a *merge*)
+*/
 export class Host {
   arc;
   composer;

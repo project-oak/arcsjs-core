@@ -10,6 +10,7 @@ import {Runtime} from '../Runtime.js';
 import {requireParticleBaseCode, requireParticleImplCode} from './code.js';
 import '../../third_party/ses/ses.umd.min.js';
 
+const requiredLog = logFactory(true, 'SES', 'goldenrod');
 const log = logFactory(logFactory.flags.ses, 'SES', 'goldenrod');
 
 const {lockdown, Compartment} = globalThis as unknown as {lockdown, Compartment};
@@ -20,10 +21,10 @@ export const initSes = (options?) => {
   if (!particleCompartment) {
     const debugOptions = {consoleTaming: 'unsafe', errorTaming: 'unsafe', errorTrapping: 'report', stackFiltering: 'verbose'};
     const prodOptions = {};
-    log.warn('LOCKDOWN');
-    console.groupCollapsed('...removing intrinics...');
+    requiredLog.log('LOCKDOWN');
+    requiredLog.groupCollapsed('...removing intrinics...');
     lockdown(debugOptions || prodOptions);
-    console.groupEnd();
+    requiredLog.groupEnd();
     particleCompartment = new Compartment({log, resolve, html, makeKey, timeout, ...options?.injections, harden: globalThis.harden});
   }
 };
