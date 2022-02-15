@@ -144,7 +144,13 @@ export class Store extends RawStore {
     this.persistor?.remove(this);
   }
   save() {
+    return this.json;
   }
   load(value) {
+    try {
+      this.data = JSON.parse(value);
+    } catch(x) {
+      //
+    }
   }
 }
