@@ -23,6 +23,9 @@ class RawStore extends EventEmitter {
   set data(data) {
     this.change(doc => doc._data = data);
   }
+  get isObject() {
+    return this.data && typeof this.data === 'object';
+  }
   get pojo() {
     return this.data;
   }

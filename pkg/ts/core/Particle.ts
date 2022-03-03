@@ -389,7 +389,6 @@ export class Particle {
       };
       const task = asyncMethod.bind(this.impl, inputs, state, {...stdlib, ...injections});
       this.outputData(await this.try(task));
-      //
       if (this.internal.$validateAfterBusy) {
         this.invalidate();
       }

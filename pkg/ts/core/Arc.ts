@@ -45,7 +45,7 @@ export class Arc extends EventEmitter {
     this.updateHost(host);
     return host;
   }
-  protected async ensureComposer() {
+  async ensureComposer() {
     if (!this.composer && this.surface) {
       // create composer
       this.composer = await this.surface.createComposer('root');
@@ -119,23 +119,25 @@ export class Arc extends EventEmitter {
     const names = keys(outputs);
     if (meta?.bindings && names.length) {
       //this.log.group(`assignOutputs(${host.id}, {${keys}})`);
-      this.log(`[start][${id}] assignOutputs({${names}})`);
+      //this.log(`[start][${id}] assignOutputs({${names}})`);
       names.forEach(name => this.assignOutput(name, this.stores, outputs[name], meta.bindings));
       //this.log.groupEnd();
-      this.log(`[end][${id}] assignOutputs({${names}})`);
+      this.log(`[end][${id}] assignOutputs:`, outputs);
     }
   }
   protected assignOutput(name, stores, output, bindings) {
     if (output !== undefined) {
       const binding = bindings[name] || name;
-      this.log(`assignOutputs: property "${name}" is bound to store "${binding}"`);
+     // this.log(`assignOutputs: property "${name}" is bound to store "${binding}"`);
       const store = stores[binding];
       if (!store) {
-        this.log.warn(`assignOutputs: no store named "${binding}"`);
+        if (bindings[name]) {
+          this.log.warn(`assignOutputs: no "${binding}" store for output "${name}"`);
+        }
       } else {
         // Note: users can mess up output data in any way they see fit, so we should
         // probably invent `outputCleansing`.
-        //this.log(`assignOutputs: "${binding}" is dirty, updating Store`, output);
+        this.log(`assignOutputs: "${name}" is dirty, updating Store "${binding}"`, output);
         store.data = output;
       }
     }
