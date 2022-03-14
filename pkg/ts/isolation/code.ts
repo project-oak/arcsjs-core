@@ -11,12 +11,6 @@ const log = logFactory(logFactory.flags.code, 'code', 'gold');
 
 const defaultParticleBasePath = '$arcs/js/core/Particle.js';
 
-export const requireParticleImplCode = async (kind, options?) => {
-  const code = options?.code || await fetchParticleCode(kind);
-  // TODO(sjmiles): brittle content processing, needs to be documented
-  return code.slice(code.indexOf('('));
-};
-
 export const requireParticleBaseCode = async (sourcePath?) => {
   if (!requireParticleBaseCode.source) {
     const path = Paths.resolve(sourcePath || defaultParticleBasePath);
@@ -29,18 +23,29 @@ export const requireParticleBaseCode = async (sourcePath?) => {
 };
 requireParticleBaseCode.source = null;
 
+export const requireParticleImplCode = async (kind, options?) => {
+  const code = options?.code || await fetchParticleCode(kind);
+  // TODO(sjmiles): brittle content processing, needs to be documented
+  return code.slice(code.indexOf('({'));
+};
+
 export const fetchParticleCode = async (kind?) => {
-  let text;
   if (kind) {
-    const path = pathForKind(Paths.resolve(kind));
-    text = await maybeFetchParticleCode(path);
-    if (!text) {
-      log.error(`could not locate implementation for particle "${kind}" [${path}]`);
-    }
-  } else {
-    log.error(`fetchParticleCode: empty 'kind'`);
+    return await maybeFetchParticleCode(kind);
   }
-  return text;
+  log.error(`fetchParticleCode: empty 'kind'`);
+};
+
+export const maybeFetchParticleCode = async (kind) => {
+  const path = pathForKind(Paths.resolve(kind));
+  try {
+    const response = await fetch(path);
+    //if (response.ok) {
+      return await response.text();
+    //}
+  } catch(x) {
+    log.error(`could not locate implementation for particle "${kind}" [${path}]`);
+  }
 };
 
 export const pathForKind = (kind?) => {

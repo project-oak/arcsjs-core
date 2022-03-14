@@ -60,8 +60,14 @@ export const createSesParticleFactory = async (kind, options?) => {
 const requireImplFactory = async (kind, options) => {
   // snatch up the custom particle code
   const implCode = await requireParticleImplCode(kind, options);
-  // evaluate in compartment
-  let factory = particleCompartment.evaluate(implCode);
+  let factory;
+  try {
+    // evaluate in compartment
+    factory = particleCompartment.evaluate(implCode);
+  } catch(x) {
+    log.error('failed to evaluate:', implCode);
+    throw x;
+  }
   // if it's an object
   if (typeof factory === 'object') {
     // repackage the code to eliminate closures
@@ -139,7 +145,7 @@ const requireParticle = async () => {
 };
 
 const createLogger = kind => {
-  const _log = logFactory(logFactory.flags.particles, kind, 'darkviolet');
+  const _log = logFactory(logFactory.flags.particles, kind, 'crimson');
   return (msg, ...args) => {
     const stack = msg?.stack?.split('\n')?.slice(1, 2) || (new Error()).stack.split('\n').slice(2, 3);
     const where = stack

@@ -154,7 +154,11 @@ export class Arc extends EventEmitter {
       host.handleEvent(eventlet);
     }
   }
-  service(host, request) {
-    return this.hostService?.(host, request);
+  async service(host, request) {
+    let result = await this.surface?.service(request);
+    if (result === undefined) {
+      result = this.hostService?.(host, request);
+    }
+    return result;
   }
 }
