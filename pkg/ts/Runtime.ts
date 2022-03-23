@@ -8,7 +8,6 @@ import {Host} from './core/Host.js';
 import {Store} from './core/Store.js';
 import {EventEmitter} from './core/EventEmitter.js';
 import {Paths} from './utils/paths.js';
-import {EventEmitter} from './core/EventEmitter.js';
 import {AggregateStore} from './core/AggregateStore.js';
 import {logFactory} from './utils/log.js';
 import {makeId} from './utils/id.js';
