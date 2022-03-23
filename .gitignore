@@ -7,3 +7,4 @@ arcs.min.js.map
 node_modules
 .firebase
 docs
+*.log
