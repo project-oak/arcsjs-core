@@ -21,5 +21,3 @@ ArcsJs is designed to work with AI models from the start.
 **Modular**
 
 ArcsJs particles can be easily added and removed to any project, allowing third party (internal or external) code to be added to your project while maintaining privacy.
-
-

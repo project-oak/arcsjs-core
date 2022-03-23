@@ -6,6 +6,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import {logFactory} from '../utils/log.js';
+import {deepCopy} from '../utils/object.js';
 
 const log = logFactory(logFactory.flags.decorator, 'Decorator', 'plum');
 
@@ -48,7 +49,7 @@ export const Decorator = {
   maybeDecorateItem(item, particle) {
     let models = (typeof item.models === 'string') ? this.getOpaqueData(item.models) : item.models;
     // do a decorator
-    models = maybeDecorate(models, item.privateData, item.decorator, particle);
+    models = maybeDecorate(models, item.decorator, particle);
     // do a filter
     models = maybeFilter(models, item.filter, particle.impl);
     // do a collator
@@ -59,14 +60,20 @@ export const Decorator = {
   },
 };
 
-const maybeDecorate = (models, privateData, decorator, particle) => {
+const maybeDecorate = (models, decorator, particle) => {
   decorator = particle.impl[decorator] ?? decorator;
   const {inputs, state} = particle.internal;
   if (decorator) {
+    // we don't want the decorator to have access to mutable globals
+    const immutableState  = Object.freeze(deepCopy(state));
     // models become decorous
     models = models.map(model => {
-      model.privateData = privateData;
-      const decorated = decorator(model, inputs, state);
+      // use previously mutated data or initialize
+      // TODO(cromwellian): I'd like to do Object.freeze() here
+      model.privateData = model.privateData || {};
+      const decorated = decorator(model, inputs, immutableState);
+      // set new privateData from returned
+      model.privateData = decorated.privateData;
       return {...decorated, ...model};
     });
     // sort (possible that all values undefined)

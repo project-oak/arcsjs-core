@@ -9,7 +9,10 @@ import {Arc} from './core/Arc.js';
 import {Host} from './core/Host.js';
 import {Store} from './core/Store.js';
 import {EventEmitter} from './core/EventEmitter.js';
+import {Paths} from './utils/paths.js';
+import {AggregateStore} from './core/AggregateStore.js';
 import {logFactory} from './utils/log.js';
+import {makeId} from './utils/id.js';
 
 const log = logFactory(logFactory.flags.runtime, 'runtime', 'forestgreen');
 
@@ -23,7 +26,8 @@ const {keys} = Object;
 
 export class Runtime extends EventEmitter {
   log;
-  uid;
+  uid; // user id
+  nid; // network id
   arcs: Dictionary<Arc>;
   peers: Set<string>;
   shares: Set<string>;
@@ -39,15 +43,19 @@ export class Runtime extends EventEmitter {
   constructor(uid) {
     uid = uid || 'user';
     super();
-    this.uid = uid;
     this.arcs = {};
     this.surfaces = {};
     this.stores = {};
     this.peers = new Set();
     this.shares = new Set();
-    this.prettyUid = uid.substring(0, uid.indexOf('@') + 1);
     this.log = logFactory(logFactory.flags.runtime, `runtime:[${this.prettyUid}]`, 'forestgreen');
+    this.setUid(uid);
     Runtime.securityLockdown?.(Runtime.particleOptions);
+  }
+  setUid(uid) {
+    this.uid = uid;
+    this.nid = `${uid}:${makeId(1, 2)}`;
+    this.prettyUid = uid.substring(0, uid.indexOf('@') + 1);
   }
   async bootstrapArc(name, meta, surface, service) {
     // make an arc on `surface`

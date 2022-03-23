@@ -63,6 +63,7 @@ export class AggregateStore extends Store {
   // TODO(mariakleiner): figure out save/load
   save() {
     //return this.stores.map(({meta}) => meta);
+    return '';
   }
   hasStore(store) {
     return this.stores.some(({meta}) => meta.name === store.meta.name);

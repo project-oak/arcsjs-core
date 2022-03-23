@@ -25,6 +25,9 @@ class RawStore extends EventEmitter {
   set data(data) {
     this.change(doc => doc._data = data);
   }
+  get isObject() {
+    return this.data && typeof this.data === 'object';
+  }
   get pojo() {
     return this.data;
   }
@@ -146,7 +149,13 @@ export class Store extends RawStore {
     this.persistor?.remove(this);
   }
   save() {
+    return this.json;
   }
   load(value) {
+    try {
+      this.data = JSON.parse(value);
+    } catch(x) {
+      //
+    }
   }
 }
