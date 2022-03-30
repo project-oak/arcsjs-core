@@ -25,8 +25,6 @@
     "compile": "./tools/compile.sh",
     "docs": "./tools/docs.sh",
     "fdeploy": "./tools/fdeploy.sh",
-    "gpull": "./tools/gpull.sh",
-    "gpush": "./tools/gpush.sh",
     "watch": "./tools/watch.sh"
   }
 }
