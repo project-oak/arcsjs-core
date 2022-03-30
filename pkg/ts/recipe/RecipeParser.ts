@@ -79,8 +79,10 @@ export class Parser {
       name,
       type: spec.$type,
       tags: spec.$tags,
+      capabilities: spec.$capabilities,
       value: spec.$value
     };
+    console.log('parseStoreSpec:', meta);
     this.stores.push(meta);
   }
   parseParticleSpec(container, id, spec) {
