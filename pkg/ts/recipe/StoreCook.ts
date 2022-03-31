@@ -69,7 +69,7 @@ export class StoreCook {
     }
     arc.addStore(meta.name, store);
   }
-  static async derealizeStore(runtime: Runtime, arc, spec) {
+  static async derealizeStore(runtime, arc, spec) {
     runtime.removeStore(spec.$name);
     arc.removeStore(spec.$name);
   }
