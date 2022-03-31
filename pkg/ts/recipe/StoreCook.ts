@@ -52,7 +52,7 @@ export class StoreCook {
     if (!store) {
       //log.error('realizeStore: mapStore returned null');
     } else {
-      log(`realizeStore: mapped "${spec.name}" to "${store.meta.name}"`);
+      log(`realizeStore: mapped "${spec.$name}" to "${store.meta.name}"`);
     }
     if (!store) {
       store = runtime.createStore(meta);
@@ -69,9 +69,9 @@ export class StoreCook {
     }
     arc.addStore(meta.name, store);
   }
-  static async derealizeStore(runtime, arc, spec) {
-    runtime.removeStore(spec.name);
-    arc.removeStore(spec.name);
+  static async derealizeStore(runtime: Runtime, arc, spec) {
+    runtime.removeStore(spec.$name);
+    arc.removeStore(spec.$name);
   }
   static constructMeta(runtime, arc, spec) {
     const meta = {
