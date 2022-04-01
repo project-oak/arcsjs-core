@@ -7,17 +7,19 @@
  */
 
 import {logFactory} from '../utils/log.js';
+import {SlotSpec, RecipeSpec, Recipe, Container, ParticleSpec, ParticleId, Store, Slot} from './Specs.js';
+import {Dictionary} from '../utils/object.js';
 
 const log = logFactory(logFactory.flags.recipe, 'flan', 'violet');
 
 const {entries, create} = Object;
 
 export class Parser {
-  stores;
-  particles;
-  slots;
-  meta;
-  constructor(recipe) {
+  stores: any[];
+  particles: {id: ParticleId, container: Container, spec: ParticleSpec}[];
+  slots: Slot[];
+  meta: any;
+  constructor(recipe: Recipe) {
     this.stores = [];
     this.particles = [];
     this.slots = [];
@@ -26,24 +28,21 @@ export class Parser {
       this.parse(recipe);
     }
   }
-  parse(recipe) {
+  parse(recipe: Recipe): Parser {
     // `normalize` converts shorthand to longhand before parsing
-    // TODO(sjmiles): would be great if `normalize` normalized all the things
     const normalized = this.normalize(recipe);
     this.parseSlotSpec(normalized, 'root', '');
     //log(this);
     return this;
   }
-  normalize(recipe) {
+  normalize(recipe: Recipe): Recipe {
     if (typeof recipe !== 'object') {
       throw Error('recipe must be an Object');
     }
+    // TODO(sjmiles): would be great if `normalize` normalized all the things
     return recipe;
   }
-  // spec is a SlotSpec
-  parseSlotSpec(spec, slotName, parentName) {
-    // record this slot
-    this.slots.push({...spec, $name: slotName, $parent: parentName});
+  parseSlotSpec(spec: Recipe, slotName: string, parentName: string): void {
     // process entries
     for (const key in spec) {
       const info = spec[key];
@@ -65,12 +64,12 @@ export class Parser {
       }
     }
   }
-  parseStoresNode(stores) {
+  parseStoresNode(stores: Dictionary<Store>) {
     for (const key in stores) {
       this.parseStoreSpec(key, stores[key]);
     }
   }
-  parseStoreSpec(name, spec) {
+  parseStoreSpec(name: string, spec: RecipeSpec) {
     if (this.stores.find(s => s.name === name)) {
       log('duplicate store name');
       return;
@@ -83,7 +82,7 @@ export class Parser {
     };
     this.stores.push(meta);
   }
-  parseParticleSpec(container, id, spec) {
+  parseParticleSpec(container: Container, id: ParticleId, spec: ParticleSpec) {
     if (!spec.$kind) {
       log.warn(`parseParticleSpec: malformed spec has no "kind":`, spec);
       throw Error();
@@ -98,9 +97,7 @@ export class Parser {
       this.parseSlotsNode(spec.$slots, id);
     }
   }
-  parseSlotsNode(slots, parent) {
-    return Promise.all(entries(slots).map(([key, spec]) => {
-      this.parseSlotSpec(spec, key, parent);
-    }));
+  parseSlotsNode(slots: Dictionary<SlotSpec>, parent: string): void {
+    entries(slots).forEach(([key, spec]) => this.parseSlotSpec(spec, key, parent));
   }
 }

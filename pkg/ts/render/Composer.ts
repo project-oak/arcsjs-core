@@ -8,6 +8,7 @@
 
 import {EventEmitter} from '../core/EventEmitter.js';
 import {logFactory} from '../utils/log.js';
+import {Slot} from '../recipe/Specs.js';
 
 const log = logFactory(logFactory.flags.composer, 'composer', 'red');
 
@@ -20,8 +21,6 @@ export interface RenderPacket {
     $clear
   }
 }
-
-type Slot = unknown;
 
 export class Composer extends EventEmitter {
   protected slots;

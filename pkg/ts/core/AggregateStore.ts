@@ -7,14 +7,15 @@
  */
 
 import {Store, StoreMeta} from './Store.js';
+import {Tag} from './../recipe/Specs.js';
 import {debounce} from '../utils/task.js';
-import {matches} from '../recipe/StoreCook.js';
+import {matches} from '../utils/matching.js';
 // TODO(sjmiles): layer violation: promote this module out of core/
 import {Runtime} from '../Runtime.js';
 
 export class AggregateStore extends Store {
-  criteria;
-  stores;
+  criteria: Partial<StoreMeta>;
+  stores: Store[];
   protected debounceKey;
   constructor(meta: StoreMeta) {
     super(meta);

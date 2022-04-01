@@ -7,15 +7,18 @@
  */
 import {Arc} from './core/Arc.js';
 import {Host} from './core/Host.js';
-import {Store} from './core/Store.js';
+import {Store, StoreMeta} from './core/Store.js';
 import {EventEmitter} from './core/EventEmitter.js';
 import {logFactory} from './utils/log.js';
+import {Logger} from './utils/types.js';
 import {makeId} from './utils/id.js';
+import {Dictionary} from './utils/object.js';
 
 const log = logFactory(logFactory.flags.runtime, 'runtime', 'forestgreen');
 
-type Dictionary<T> = {[name: string]: T};
+type UID = string;
 type ParticleFactory = (kind: string) => Promise<unknown>;
+type ArcMeta = {};
 
 const particleFactoryCache = {};
 const storeFactories = {};
@@ -23,9 +26,9 @@ const storeFactories = {};
 const {keys} = Object;
 
 export class Runtime extends EventEmitter {
-  log;
-  uid; // user id
-  nid; // network id
+  log: Logger;
+  uid: UID; // user id
+  nid: UID; // network id
   arcs: Dictionary<Arc>;
   peers: Set<string>;
   shares: Set<string>;
@@ -50,12 +53,12 @@ export class Runtime extends EventEmitter {
     this.setUid(uid);
     Runtime.securityLockdown?.(Runtime.particleOptions);
   }
-  setUid(uid) {
+  setUid(uid: UID) {
     this.uid = uid;
     this.nid = `${uid}:${makeId(1, 2)}`;
     this.prettyUid = uid.substring(0, uid.indexOf('@') + 1);
   }
-  async bootstrapArc(name, meta, surface, service) {
+  async bootstrapArc(name: string, meta: ArcMeta, surface, service) {
     // make an arc on `surface`
     const arc = new Arc(name, meta, surface);
     // install service handler
@@ -185,7 +188,7 @@ export class Runtime extends EventEmitter {
   protected static registerParticleFactory(kind, factoryPromise: Promise<unknown>) {
     return particleFactoryCache[kind] = factoryPromise;
   }
-  requireStore(meta): Store {
+  requireStore(meta: StoreMeta): Store {
     let store = this.stores[meta.name];
     if (!store) {
       store = this.createStore(meta);
@@ -193,7 +196,7 @@ export class Runtime extends EventEmitter {
     }
     return store;
   }
-  createStore(meta) {
+  createStore(meta: StoreMeta) {
     const key = keys(storeFactories).find(tag => meta.tags?.includes?.(tag));
     const storeClass = storeFactories[key] || Store;
     return new storeClass(meta);

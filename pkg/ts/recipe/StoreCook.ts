@@ -7,28 +7,19 @@
  */
 
 import {logFactory} from '../utils/log.js';
+import {matches} from '../utils/matching.js';
 import {Runtime} from '../Runtime.js';
+import {StoreSpec, Plan} from './Specs.js';
+import {Arc} from '../core/Arc.js';
+import {StoreMeta} from '../core/Store.js';
 
 const log = logFactory(logFactory.flags.recipe, 'StoreCook', '#187e13');
 
-export type StoreSpec = {
-  $type: string;
-  $value?;
-  //$tags?: [string];
-};
-
 const {values} = Object;
 
-export const matches = (storeMeta, targetMeta) => {
-  for (const property in targetMeta) {
-    if (storeMeta[property] !== targetMeta[property]) {
-      return false;
-    }
-  }
-  return true;
-};
+type StoreMapFunc<T> = (runtime: Runtime, arc: Arc,store: {}) => T;
 
-const findStores = (runtime: Runtime, criteria) => {
+const findStores = (runtime: Runtime, criteria: Partial<StoreMeta>) => {
   return values(runtime.stores).filter(store => matches(store.meta, criteria));
 };
 
@@ -37,16 +28,16 @@ const mapStore = (runtime: Runtime, {name, type}) => {
 };
 
 export class StoreCook {
-  static async execute(runtime, arc, plan) {
+  static async execute(runtime: Runtime, arc: Arc, plan: Plan) {
     return StoreCook.forEachStore(runtime, arc, plan, StoreCook.realizeStore);
   }
-  static async evacipate(runtime, arc, plan) {
+  static async evacipate(runtime: Runtime, arc: Arc, plan: Plan) {
     return StoreCook.forEachStore(runtime, arc, plan, StoreCook.derealizeStore);
   }
-  static async forEachStore(runtime, arc, plan, func) {
+  static async forEachStore<T>(runtime: Runtime, arc: Arc, plan: Plan, func: StoreMapFunc<T>): Promise<T[]> {
     return Promise.all(plan.stores.map(store => func(runtime, arc, store)));
   }
-  static async realizeStore(runtime, arc, spec) {
+  static async realizeStore(runtime: Runtime, arc: Arc, spec: StoreSpec) {
     const meta = StoreCook.constructMeta(runtime, arc, spec);
     let store = mapStore(runtime, meta);
     if (!store) {
@@ -72,11 +63,11 @@ export class StoreCook {
     }
     arc.addStore(meta.name, store);
   }
-  static async derealizeStore(runtime, arc, spec) {
+  static async derealizeStore(runtime: Runtime, arc: Arc, spec: StoreSpec) {
     runtime.removeStore(spec.name);
     arc.removeStore(spec.name);
   }
-  static constructMeta(runtime, arc, spec) {
+  static constructMeta(runtime: Runtime, arc: Arc, spec: StoreSpec): StoreMeta {
     const meta = {
       ...spec,
       arcid: arc.id,

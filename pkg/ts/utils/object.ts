@@ -6,12 +6,14 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
+export type Dictionary<T> = Record<string, T>;
+
 /*
  * update the fields of `obj` with the fields of `data`,
  * perturbing `obj` as little as possible (since it might be a magic proxy thing
  * like an Automerge document)
  */
-export const shallowUpdate = (obj, data) => {
+export const shallowUpdate = (obj: any, data: any) => {
   let result = data;
   if (!data) {
     //
@@ -51,7 +53,7 @@ export const shallowUpdate = (obj, data) => {
   return result;
 };
 
-export const shallowMerge = (obj, data) => {
+export const shallowMerge = (obj: any, data: any) => {
   if (data == null) {
     return null;
   }
@@ -63,13 +65,12 @@ export const shallowMerge = (obj, data) => {
   return data;
 };
 
-export const deepCopy = datum => {
+export function deepCopy<T>(datum: T): T {
   if (!datum) {
     return datum;
   } else if (Array.isArray(datum)) {
-    const clone = [];
-    datum.forEach(element => clone.push(deepCopy(element)));
-    return clone;
+    // This is trivially type safe but tsc cannot prove it so we have to 'promise'.
+    return datum.map(element => deepCopy(element)) as unknown as T;
   } else if (typeof datum === 'object') {
     const clone = Object.create(null);
     Object.entries(datum).forEach(([key, value]) => {
@@ -81,7 +82,7 @@ export const deepCopy = datum => {
   }
 };
 
-export const deepEqual = (a, b) => {
+export const deepEqual = (a: any, b: any) => {
   const type = typeof a;
   // must be same type to be equal
   if (type !== typeof b) {
@@ -98,7 +99,7 @@ export const deepEqual = (a, b) => {
   return (a === b);
 };
 
-export const deepUndefinedToNull = obj => {
+export const deepUndefinedToNull = (obj: any) => {
   if (obj === undefined) {
     return null;
   }

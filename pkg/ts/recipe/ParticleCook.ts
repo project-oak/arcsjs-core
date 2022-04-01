@@ -7,35 +7,13 @@
  */
 
 import {logFactory} from '../utils/log.js';
+import {Runtime} from '../Runtime.js';
+import {ParticleNode} from './Specs.js';
 
 const log = logFactory(logFactory.flags.recipe, 'ParticleCook', '#096f33');
 
-type pojo = Record<string, unknown>;
-
-export type ParticleSpec = {
-  $kind: string,
-  $bindings?: pojo,
-  $inputs?: pojo,
-  $container: string,
-  $slots?: {
-    // name: SlotSpec
-  }
-  $meta?: {
-    surface: ''
-    // ingress: ''
-  }
-  $claims?: pojo,
-  $checks?: pojo
-};
-
-export type ParticleNode = {
-  id: string,
-  container: string,
-  spec: ParticleSpec
-};
-
 export class ParticleCook {
-  static async execute(runtime, arc, plan) {
+  static async execute(runtime: Runtime, arc, plan) {
     // serial
     for (const particle of plan.particles) {
       await this.realizeParticle(runtime, arc, particle);
@@ -43,7 +21,7 @@ export class ParticleCook {
     // parallel
     //return Promise.all(plan.particles.map(particle => this.realizeParticle(runtime, arc, particle)));
   }
-  static async realizeParticle(runtime, arc, node: ParticleNode) {
+  static async realizeParticle(runtime: Runtime, arc, node: ParticleNode) {
     // convert spec to metadata
     const meta = this.specToMeta(node.spec);
     meta.container ||= node.container;
@@ -55,10 +33,10 @@ export class ParticleCook {
     const {$kind: kind, $container: container, $inputs: inputs, $bindings: bindings} = spec;
     return {kind, inputs, bindings, container};
   }
-  static async evacipate(runtime, arc, plan) {
+  static async evacipate(runtime: Runtime, arc, plan) {
     return Promise.all(plan.particles.map(particle => this.derealizeParticle(runtime, arc, particle)));
   }
-  static async derealizeParticle(runtime, arc, node: ParticleNode) {
+  static async derealizeParticle(runtime: Runtime, arc, node: ParticleNode) {
     arc.removeHost(node.id);
   }
 }
