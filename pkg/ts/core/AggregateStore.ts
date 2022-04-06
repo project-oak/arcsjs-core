@@ -7,7 +7,6 @@
  */
 
 import {Store, StoreMeta} from './Store.js';
-import {Tag} from './../recipe/Specs.js';
 import {debounce} from '../utils/task.js';
 import {matches} from '../utils/matching.js';
 // TODO(sjmiles): layer violation: promote this module out of core/

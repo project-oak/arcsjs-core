@@ -9,7 +9,7 @@
 import {EventEmitter} from './EventEmitter.js';
 import {shallowMerge, Dictionary} from '../utils/object.js';
 import {key} from '../utils/rand.js';
-import {Tag} from '../recipe/Specs.js';
+import {Tag} from './Meta.js';
 
 const {values, keys, entries} = Object;
 const {stringify} = JSON;
