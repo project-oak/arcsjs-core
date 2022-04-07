@@ -11,7 +11,7 @@ import {matches} from '../utils/matching.js';
 import {Runtime} from '../Runtime.js';
 import {StoreSpec, Plan} from './Specs.js';
 import {Arc} from '../core/Arc.js';
-import {StoreMeta} from '../core/Store.js';
+import {StoreMeta} from '../core/Meta.js';
 
 const log = logFactory(logFactory.flags.recipe, 'StoreCook', '#187e13');
 

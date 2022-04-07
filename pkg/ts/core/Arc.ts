@@ -9,6 +9,8 @@
 import {EventEmitter} from './EventEmitter.js';
 import {Host} from './Host.js';
 import {logFactory} from '../utils/log.js';
+import {ArcMeta} from './Meta.js';
+import {Store} from './Store.js';
 
 //type Dictionary<T> = {[name: string]: T};
 
@@ -20,13 +22,13 @@ const nob = () => create(null);
 export class Arc extends EventEmitter {
   log;
   id;
-  meta;
-  stores;
+  meta: ArcMeta;
+  stores: Store[];
   hosts;
   surface;
   composer;
   hostService;
-  constructor(id, meta, surface) {
+  constructor(id, meta: ArcMeta, surface) {
     super();
     this.id = id;
     this.meta = meta;
@@ -62,6 +64,7 @@ export class Arc extends EventEmitter {
   }
   addStore(storeId, store) {
     if (store && !this.stores[storeId]) {
+      console.log(this, 'addStore', storeId, store);
       this.stores[storeId] = store;
       store.listen('change', () => this.storeChanged(storeId, store));
     }

@@ -17,3 +17,13 @@ export type StoreMeta = {
   value?: any,
   shareid?: string,
 };
+
+export type ParticleMeta = {
+  kind: string,
+  container: string
+  inputs?;
+  bindings?;
+  // arbitrary field definitions
+};
+
+export type ArcMeta = {};

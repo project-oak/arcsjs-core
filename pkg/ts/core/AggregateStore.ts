@@ -6,7 +6,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {Store, StoreMeta} from './Store.js';
+import {StoreMeta} from './Meta.js';
+import {Store} from './Store.js';
 import {debounce} from '../utils/task.js';
 import {matches} from '../utils/matching.js';
 // TODO(sjmiles): layer violation: promote this module out of core/

@@ -9,7 +9,7 @@
 import {EventEmitter} from './EventEmitter.js';
 import {shallowMerge, Dictionary} from '../utils/object.js';
 import {key} from '../utils/rand.js';
-import {Tag} from './Meta.js';
+import {Tag, StoreMeta} from './Meta.js';
 
 const {values, keys, entries} = Object;
 const {stringify} = JSON;
@@ -103,16 +103,6 @@ class RawStore extends EventEmitter {
   onChange(store) {
   }
 }
-
-export type StoreMeta = {
-  arcid: string,
-  name: string,
-  type: string,
-  owner: string,
-  tags?: string[],
-  value?: any,
-  shareid?: string,
-};
 
 export class Store extends RawStore {
   meta: Partial<StoreMeta>;

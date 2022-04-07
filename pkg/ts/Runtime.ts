@@ -7,7 +7,8 @@
  */
 import {Arc} from './core/Arc.js';
 import {Host} from './core/Host.js';
-import {Store, StoreMeta} from './core/Store.js';
+import {Store} from './core/Store.js';
+import {ArcMeta, ParticleMeta, StoreMeta} from './core/Meta.js';
 import {EventEmitter} from './core/EventEmitter.js';
 import {logFactory} from './utils/log.js';
 import {Logger} from './utils/types.js';
@@ -18,7 +19,6 @@ const log = logFactory(logFactory.flags.runtime, 'runtime', 'forestgreen');
 
 type UID = string;
 type ParticleFactory = (kind: string) => Promise<unknown>;
-type ArcMeta = {};
 
 const particleFactoryCache = {};
 const storeFactories = {};
@@ -71,7 +71,7 @@ export class Runtime extends EventEmitter {
   serviceFactory(service) {
     return async (host, request) => await service.handle(this, host, request);
   }
-  async bootstrapParticle(arc, id, meta) {
+  async bootstrapParticle(arc, id, meta: ParticleMeta) {
     // make a host
     const host = new Host(id);
     // make a particle
@@ -99,7 +99,7 @@ export class Runtime extends EventEmitter {
     throw `arc has no id, or id ["${id}"] is already in use `;
   }
   // create a particle inside of host
-  async marshalParticle(host, particleMeta) {
+  async marshalParticle(host, particleMeta: ParticleMeta) {
     const particle = await this.createParticle(host, particleMeta.kind);
     host.installParticle(particle, particleMeta);
   }
