@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -66,6 +66,9 @@ export class StoreCook {
       runtime.addStore(meta.name, store);
       await store.restore(meta?.value);
       log(`realizeStore: created "${meta.name}"`);
+    } else {
+      log(`realizeStore: mapped to "${meta.name}", setting data to:`, meta?.value);
+      store.data = meta?.value;
     }
     arc.addStore(meta.name, store);
   }
