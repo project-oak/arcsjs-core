@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -11,7 +11,6 @@ import {logFactory} from '../utils/log.js';
 import {Runtime} from '../Runtime.js';
 import {requireParticleBaseCode, requireParticleImplCode, pathForKind} from './code.js';
 import '../../third_party/ses/ses.umd.min.js';
-import {Generator} from '../../third_party/inlinesourcemap/inline-source-map.js';
 
 const requiredLog = logFactory(true, 'SES', 'goldenrod');
 const log = logFactory(logFactory.flags.ses, 'SES', 'goldenrod');
@@ -93,21 +92,15 @@ const repackageImplFactory = (factory, kind) => {
     const body = code.replace('async ', '').replace('function ', '');
     return `${async ? 'async' : ''} function ${body};`;
   });
-  // const rewriteFuncs = funcs.map(([n, f]) => {
-  //   const sync = n.includes('render');
-  //   const code = f.toString();
-  //   const body = sync ? code : code.replace(/async/, '');
-  //   return `${sync ? '' : 'async'} function ${body};`;
-  // });
-  const funcMembers = funcs.map(([n]) => n);
+  const funcNames = funcs.map(([n]) => n);
   //
   const consts = props.filter(item => !isFunc(item));
   const rewriteConsts = consts.map(([n, p]) => {
     return `const ${n} = \`${p}\`;`;
   });
-  const constMembers = consts.map(([n]) => n);
+  const constNames = consts.map(([n]) => n);
   //
-  const proto = `{${[...constMembers, ...funcMembers]}}`;
+  const proto = `{${[...constNames, ...funcNames]}}`;
   //
   const rewrite = `
 ({log, ...utils}) => {
@@ -119,21 +112,11 @@ ${[...rewriteConsts, ...rewriteFuncs].join('\n\n')}
 
 return harden(${proto});
 
+//# sourceURL=Library/${pathForKind(kind).split('/').pop()}
 };
   `;
-  // Since it is too problematic to adjust for comments and whitespace
-  // stripped by the JS parser by traversing an object and calling toString()
-  // Here we just add the generated rewritten particle as-is to the sourcemap
-  // It will appear in DevTools and allow debugging, but won't match what's on
-  // disk.
-  var gen = new Generator({ charset: 'utf-8' })
-      .addSourceContent(pathForKind(kind), rewrite)
-      .addGeneratedMappings(pathForKind(kind), rewrite, { line: 0, column: 0 });
-
-  const inlineSourceMap = gen.inlineMappingUrl();
-  const rewriteWithSourceMap = rewrite + inlineSourceMap + "\n";
-  log('rewritten:\n\n', rewriteWithSourceMap);
-  return particleCompartment.evaluate(rewriteWithSourceMap);
+  log('rewritten:\n\n', rewrite);
+  return particleCompartment.evaluate(rewrite);
 };
 
 let privateCtor;
