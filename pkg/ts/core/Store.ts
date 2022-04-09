@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -114,6 +114,7 @@ export type StoreMeta = {
 export class Store extends RawStore {
   meta;
   persistor;
+  willPersist = false;
   constructor(meta: StoreMeta) {
     super();
     this.meta = meta || {};
@@ -134,7 +135,14 @@ export class Store extends RawStore {
     this.persist();
   }
   async persist() {
-    this.persistor?.persist(this);
+    // persists at most every 500ms
+    if (!this.willPersist && this.persistor) {
+      this.willPersist = true;
+      setTimeout(() => {
+        this.willPersist = false;
+        this.persistor.persist(this);
+      }, 500);
+    }
   }
   async restore(value) {
     const restored = await this.persistor?.restore(this);
