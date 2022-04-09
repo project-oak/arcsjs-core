@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -12,7 +12,7 @@
 **/
 
 const {create, assign, keys, values, entries, defineProperty, setPrototypeOf} = Object;
-const {log, harden} = globalThis as unknown as {log, harden};
+const {log, harden, timeout} = globalThis as unknown as {log, harden, timeout};
 const nob = () => create(null);
 
 // yay lambda, he gets a semi-colon ... named classes not so much
@@ -266,7 +266,8 @@ export class Particle {
   // validate after the next microtask
   invalidate() {
     if (!this.internal.validator) {
-      this.internal.validator = this.async(this.validate);
+      //this.internal.validator = this.async(this.validate);
+      this.internal.validator = timeout(this.validate.bind(this), 1);
     }
   }
   // call fn after a microtask boundary
