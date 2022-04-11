@@ -6,17 +6,9 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-type LoggerFunction = (...args: any[]) => void;
+import {logKinds, errKinds, LoggerFunction, AllLoggerFunctions, DebugLoggers, ErrorLoggers, Logger} from './types.js';
 
-const logKinds = ['log', 'group', 'groupCollapsed', 'groupEnd', 'dir'] as const;
-const errKinds = ['warn', 'error'] as const;
-
-type DebugLoggers = Record<typeof logKinds[number], LoggerFunction>;
-type ErrorLoggers = Record<typeof errKinds[number], LoggerFunction>;
-type LoggerFunctions = DebugLoggers & ErrorLoggers;
-export type Logger = LoggerFunction & LoggerFunctions;
-
-const _logFactory = (enable: boolean, preamble: string, color: string | '', log: keyof LoggerFunctions = 'log'): LoggerFunction => {
+const _logFactory = (enable: boolean, preamble: string, color: string | '', log: keyof AllLoggerFunctions = 'log'): LoggerFunction => {
   if (!enable) {
     return () => {};
   }
@@ -28,7 +20,7 @@ const _logFactory = (enable: boolean, preamble: string, color: string | '', log:
 };
 
 export const logFactory = (enable: boolean, preamble: string, color: string = ''): Logger => {
-  const loggers: LoggerFunctions = {
+  const loggers: AllLoggerFunctions = {
     ...(Object.fromEntries(logKinds.map(log => [log, _logFactory(enable, `${preamble}`, color, log)])) as DebugLoggers),
     ...(Object.fromEntries(errKinds.map(log => [log, _logFactory(true, `${preamble}`, color, log)])) as ErrorLoggers)
   };

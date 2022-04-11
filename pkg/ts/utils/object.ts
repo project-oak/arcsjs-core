@@ -6,8 +6,6 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-export type Dictionary<T> = Record<string, T>;
-
 /*
  * update the fields of `obj` with the fields of `data`,
  * perturbing `obj` as little as possible (since it might be a magic proxy thing

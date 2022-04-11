@@ -9,10 +9,8 @@
 import {EventEmitter} from './EventEmitter.js';
 import {Host} from './Host.js';
 import {logFactory} from '../utils/log.js';
-import {ArcMeta} from './Meta.js';
+import {ArcMeta} from './types.js';
 import {Store} from './Store.js';
-
-//type Dictionary<T> = {[name: string]: T};
 
 const customLogFactory = (id: string) => logFactory(logFactory.flags.arc, `Arc (${id})`, 'slateblue');
 
@@ -64,7 +62,6 @@ export class Arc extends EventEmitter {
   }
   addStore(storeId, store) {
     if (store && !this.stores[storeId]) {
-      console.log(this, 'addStore', storeId, store);
       this.stores[storeId] = store;
       store.listen('change', () => this.storeChanged(storeId, store));
     }

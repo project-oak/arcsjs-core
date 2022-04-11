@@ -7,8 +7,8 @@
  */
 
 import {logFactory} from '../utils/log.js';
-import {SlotSpec, RecipeSpec, Recipe, Container, ParticleSpec, ParticleId, Store, Slot} from './Specs.js';
-import {Dictionary} from '../utils/object.js';
+import {SlotSpec, RecipeSpec, Recipe, Container, ParticleSpec, ParticleId, Store, Slot} from './types.js';
+import {Dictionary} from '../utils/types.js';
 
 const log = logFactory(logFactory.flags.recipe, 'flan', 'violet');
 

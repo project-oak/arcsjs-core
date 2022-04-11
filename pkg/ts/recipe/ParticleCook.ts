@@ -8,7 +8,7 @@
 
 import {logFactory} from '../utils/log.js';
 import {Runtime} from '../Runtime.js';
-import {ParticleNode} from './Specs.js';
+import {ParticleNode} from './types.js';
 
 const log = logFactory(logFactory.flags.recipe, 'ParticleCook', '#096f33');
 

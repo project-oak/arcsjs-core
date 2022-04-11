@@ -6,7 +6,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {StoreMeta} from './Meta.js';
+import {StoreMeta} from './types.js';
 import {Store} from './Store.js';
 import {debounce} from '../utils/task.js';
 import {matches} from '../utils/matching.js';

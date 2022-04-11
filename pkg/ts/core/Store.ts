@@ -7,9 +7,10 @@
  */
 
 import {EventEmitter} from './EventEmitter.js';
-import {shallowMerge, Dictionary} from '../utils/object.js';
+import {shallowMerge} from '../utils/object.js';
 import {key} from '../utils/rand.js';
-import {Tag, StoreMeta} from './Meta.js';
+import {Tag, StoreMeta} from './types.js';
+import {Dictionary} from '../utils/types.js';
 
 const {values, keys, entries} = Object;
 const {stringify} = JSON;

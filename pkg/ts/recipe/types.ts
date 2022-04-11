@@ -6,7 +6,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {Dictionary} from '../utils/object.js';
+import {Dictionary} from '../utils/types.js';
 
 type pojo = Record<string, unknown>;
 

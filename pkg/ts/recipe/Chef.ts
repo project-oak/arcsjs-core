@@ -12,7 +12,7 @@ import {Runtime} from '../Runtime.js';
 import {Parser} from './RecipeParser.js';
 import {StoreCook} from './StoreCook.js';
 import {ParticleCook} from './ParticleCook.js';
-import {RecipeSpec} from './Specs.js';
+import {RecipeSpec} from './types.js';
 
 const log = logFactory(logFactory.flags.recipe, 'Chef', '#087f23');
 

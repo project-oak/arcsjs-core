@@ -8,7 +8,7 @@
 
 import {EventEmitter} from '../core/EventEmitter.js';
 import {logFactory} from '../utils/log.js';
-import {Slot} from '../recipe/Specs.js';
+import {Slot} from '../recipe/types.js';
 
 const log = logFactory(logFactory.flags.composer, 'composer', 'red');
 
