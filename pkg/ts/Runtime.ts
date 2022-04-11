@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -9,8 +9,6 @@ import {Arc} from './core/Arc.js';
 import {Host} from './core/Host.js';
 import {Store} from './core/Store.js';
 import {EventEmitter} from './core/EventEmitter.js';
-import {Paths} from './utils/paths.js';
-import {AggregateStore} from './core/AggregateStore.js';
 import {logFactory} from './utils/log.js';
 import {makeId} from './utils/id.js';
 
@@ -82,12 +80,14 @@ export class Runtime extends EventEmitter {
     // we'll call you when it's ready
     return promise;
   }
+  // no-op surface mapping
   addSurface(id, surface) {
     this.surfaces[id] = surface;
   }
   getSurface(id) {
     return this.surfaces[id];
   }
+  // map arcs by arc.id
   addArc(arc) {
     const {id} = arc;
     if (id && !this.arcs[id]) {
@@ -95,33 +95,49 @@ export class Runtime extends EventEmitter {
     }
     throw `arc has no id, or id ["${id}"] is already in use `;
   }
+  // create a particle inside of host
   async marshalParticle(host, particleMeta) {
     const particle = await this.createParticle(host, particleMeta.kind);
     host.installParticle(particle, particleMeta);
   }
+  // map a store by a Runtime-specific storeId
+  // Stores have no intrinsic id
   addStore(storeId, store) {
+    // if the store needs to discuss things with Runtime
+    // TODO(sjmiles): this is likely unsafe for re-entry
     if (store.marshal) {
-      store.marshal(store);
+      store.marshal(this);
     }
+    // override the Store's own persistor to use the runtime persistor
+    // TODO(sjmiles): why?
     if (store.persistor) {
       store.persistor.persist = store => this.persistor?.persist(storeId, store);
     }
-    store.listen('change', this.storeChanged.bind(this, storeId), `${storeId}-changed`);
+    // bind this.storeChanged to store.change, name the binding
+    store.listen('change', this.storeChanged.bind(this, storeId), `${this.nid}:${storeId}-changed`);
+    // map the store
     this.stores[storeId] = store;
+    // evaluate for sharing
     this.maybeShareStore(storeId);
-    this.fire('store-added', store);
+    // notify listeners that a thing happened
+    // TODO(sjmiles): makes no sense without id
+    //this.fire('store-added', store);
+  }
+  do(storeId, task) {
+    task(this.stores[storeId]);
   }
   removeStore(storeId) {
-    const store = this.stores[storeId];
-    store?.unlisten('change', `${storeId}-changed`);
+    this.do(storeId, store => {
+      store?.unlisten('change', `${this.nid}:${storeId}-changed`);
+    });
     delete this.stores[storeId];
   }
-  //
   maybeShareStore(storeId) {
-    const store = this.stores[storeId];
-    if (store.is('shared')) {
-      this.shareStore(storeId);
-    }
+    this.do(storeId, store => {
+      if (store?.is('shared')) {
+        this.shareStore(storeId);
+      }
+    });
   }
   addPeer(peerId) {
     this.peers.add(peerId);
@@ -132,11 +148,12 @@ export class Runtime extends EventEmitter {
     [...this.peers].forEach(peerId => this.maybeShareStoreWithPeer(storeId, peerId));
   }
   protected maybeShareStoreWithPeer(storeId, peerId) {
-    const store = this.stores[storeId];
-    const nid = this.uid.replace(/\./g, '_');
-    if (!store.is('private') || (peerId.startsWith(nid))) {
-      this.shareStoreWithPeer(storeId, peerId);
-    }
+    this.do(storeId, store => {
+      const nid = this.uid.replace(/\./g, '_');
+      if (!store.is('private') || (peerId.startsWith(nid))) {
+        this.shareStoreWithPeer(storeId, peerId);
+      }
+    });
   }
   protected shareStoreWithPeer(storeId, peerId) {
     this.network?.shareStore(storeId, peerId);
@@ -147,6 +164,7 @@ export class Runtime extends EventEmitter {
     this.onStoreChange(storeId, store);
     this.fire('store-changed', store);
   }
+  // TODO(sjmiles): evacipate this method
   protected onStoreChange(storeId, store) {
     // override for bespoke response
   }
