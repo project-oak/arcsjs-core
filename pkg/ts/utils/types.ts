@@ -6,7 +6,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-export type Dictionary<T> = Record<string, T>;
+export type Dictionary<T> = Partial<Record<string, T>>;
 
 export type LoggerFunction = (...args: any[]) => void;
 
