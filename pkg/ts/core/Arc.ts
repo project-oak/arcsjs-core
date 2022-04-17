@@ -85,6 +85,7 @@ export class Arc extends EventEmitter {
         this.updateHost(host);
       }
     });
+    this.fire('store-changed', storeId);
   }
   updateHost(host) {
     host.inputs = this.computeInputs(host);

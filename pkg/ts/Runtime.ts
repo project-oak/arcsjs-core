@@ -113,8 +113,10 @@ export class Runtime extends EventEmitter {
     if (store.persistor) {
       store.persistor.persist = store => this.persistor?.persist(storeId, store);
     }
-    // bind this.storeChanged to store.change, name the binding
-    store.listen('change', this.storeChanged.bind(this, storeId), `${this.nid}:${storeId}-changed`);
+    // bind this.storeChanged to store.change (and name the binding)
+    const name = `${this.nid}:${storeId}-changed`;
+    const onChange = this.storeChanged.bind(this, storeId);
+    store.listen('change', onChange, name);
     // map the store
     this.stores[storeId] = store;
     // evaluate for sharing
@@ -123,7 +125,17 @@ export class Runtime extends EventEmitter {
     // TODO(sjmiles): makes no sense without id
     //this.fire('store-added', store);
   }
-  do(storeId, task) {
+  protected storeChanged(storeId, store) {
+    this.log('storeChanged', storeId);
+    this.network?.invalidatePeers(storeId);
+    this.onStoreChange(storeId, store);
+    this.fire('store-changed', store);
+  }
+  // TODO(sjmiles): evacipate this method
+  protected onStoreChange(storeId, store) {
+    // override for bespoke response
+  }
+  protected do(storeId, task) {
     task(this.stores[storeId]);
   }
   removeStore(storeId) {
@@ -157,16 +169,6 @@ export class Runtime extends EventEmitter {
   }
   protected shareStoreWithPeer(storeId, peerId) {
     this.network?.shareStore(storeId, peerId);
-  }
-  protected storeChanged(storeId, store) {
-    this.log('storeChanged', storeId);
-    this.network?.invalidatePeers(storeId);
-    this.onStoreChange(storeId, store);
-    this.fire('store-changed', store);
-  }
-  // TODO(sjmiles): evacipate this method
-  protected onStoreChange(storeId, store) {
-    // override for bespoke response
   }
   protected async createParticle(host, kind): Promise<unknown> {
     try {
