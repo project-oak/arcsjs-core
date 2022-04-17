@@ -110,25 +110,13 @@ export class Host extends EventEmitter {
     const {id, container, template} = this;
     this.arc?.render({id, container, content: {template, model}});
   }
-  protected trap(func) {
-//    try {
-      return func();
-//    } catch(x) {
-//      throw x;
-//    }
-  }
-  // protected storeChanged(storeId, store) {
-  //   const bindings = this.meta?.bindings;
-  //   const isBound = bindings && entries(bindings).some(([n, v]) => (v || n) === storeId);
-  //   if (isBound) {
-  //     this.log(`has interest in "${storeId}"`);
-  //     // TODO(sjmiles): we only have to update inputs for storeId, we lose efficiency here
-  //     this.updateHost(storeId);
-  //   }
-  // }
-  // updateHost(storeId) {
-  //   this.inputs = this.computeInputs(host);
-  // }
+//   protected trap(func) {
+// //    try {
+//       return func();
+// //    } catch(x) {
+// //      throw x;
+// //    }
+//   }
   set inputs(inputs) {
     if (this.particle && inputs) {
       const lastInputs = this.particle.internal.inputs;
