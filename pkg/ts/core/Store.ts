@@ -20,6 +20,9 @@ class RawStore extends EventEmitter {
     super();
     this._data = {};
   }
+  toString() {
+    return this.pretty;
+  }
   get data() {
     return this._data;
   }
@@ -111,6 +114,9 @@ export class Store extends RawStore {
   constructor(meta: StoreMeta) {
     super();
     this.meta = meta || {};
+  }
+  toString() {
+    return `${JSON.stringify(this.meta, null, '  ')}, ${this.pretty}`;
   }
   isCollection(): boolean {
     return this.meta.type?.[0] === '[';

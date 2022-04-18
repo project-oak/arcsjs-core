@@ -14,6 +14,8 @@
     "esbuild": "^0.14.12",
     "eslint": "^7.12.1",
     "eslint-plugin-import": "^2.22.1",
+    "local-web-server": "^4.2.1",
+    "puppeteer": "^13.3.1",
     "ts-node": "^10.2.0",
     "typedoc": "^0.22.11",
     "typescript": "^4.2.4"
@@ -25,6 +27,12 @@
     "compile": "./tools/compile.sh",
     "docs": "./tools/docs.sh",
     "fdeploy": "./tools/fdeploy.sh",
+    "get_port": "./tools/get_port.sh",
+    "puppet": "./tools/puppet.sh",
+    "serve": "./tools/serve.sh",
     "watch": "./tools/watch.sh"
+  },
+  "config": {
+    "port": "9875"
   }
 }

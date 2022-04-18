@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -8,6 +8,7 @@
 import {logFactory} from '../utils/log.js';
 import {deepEqual} from '../utils/object.js';
 import {arand} from '../utils/rand.js';
+import {EventEmitter} from './EventEmitter.js';
 import {Decorator} from './Decorator.js';
 import {Particle, Eventlet} from './Particle.js';
 import {ParticleMeta} from './types.js';
@@ -34,7 +35,7 @@ Update Cycle Documented Briefly
      about using immutable data
 6. the particle.inputs are assigned (but is really a *merge*)
 */
-export class Host {
+export class Host extends EventEmitter {
   arc;
   composer;
   id;
@@ -43,6 +44,7 @@ export class Host {
   meta: ParticleMeta;
   particle: Particle;
   constructor(id) {
+    super();
     this.log = customLogFactory(id);
     this.id = id;
   }
@@ -61,7 +63,7 @@ export class Host {
       this.detachParticle();
     }
     if (particle) {
-      this.attachParticle(particle);
+      this.particle = particle;
       this.meta = meta || this.meta;
     }
   }
@@ -71,9 +73,6 @@ export class Host {
   detach() {
     this.detachParticle();
     this.arc = null;
-  }
-  protected attachParticle(particle: Particle) {
-    this.particle = particle;
   }
   protected detachParticle() {
     const {particle} = this;
@@ -104,26 +103,30 @@ export class Host {
     const {id, container, template} = this;
     this.arc?.render({id, container, content: {template, model}});
   }
-  protected trap(func) {
-//    try {
-      return func();
-//    } catch(x) {
-//      throw x;
-//    }
-  }
+//   protected trap(func) {
+// //    try {
+//       return func();
+// //    } catch(x) {
+// //      throw x;
+// //    }
+//   }
   set inputs(inputs) {
     if (this.particle && inputs) {
       const lastInputs = this.particle.internal.inputs;
-      const dirty = !lastInputs || this.dirtyCheck(inputs, lastInputs, this.lastOutput);
-      if (dirty) {
+      if (this.dirtyCheck(inputs, lastInputs, this.lastOutput)) {
         this.particle.inputs = {...this.meta?.inputs, ...inputs};
+        this.fire('inputs-changed');
       } else {
-        this.log('inputs are not interesting, skipping update');
+        this.log('inputs are uninteresting, skipping update');
       }
     }
   }
   dirtyCheck(inputs, lastInputs, lastOutput) {
-    return entries(inputs).some(([n, v]) => (lastOutput?.[n] && !deepEqual(lastOutput[n], v)) || !deepEqual(lastInputs?.[n], v));
+    const dirtyBits = ([n, v]) =>
+      (lastOutput?.[n] && !deepEqual(lastOutput[n], v))
+      || !deepEqual(lastInputs?.[n], v);
+    return !lastInputs
+      || entries(inputs).some(dirtyBits);
   }
   get config() {
     return this.particle?.config;
