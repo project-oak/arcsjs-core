@@ -10,14 +10,7 @@ import {deepEqual} from '../utils/object.js';
 import {arand} from '../utils/rand.js';
 import {Decorator} from './Decorator.js';
 import {Particle, Eventlet} from './Particle.js';
-
-export type ParticleMeta = {
-  kind: string,
-  container: string
-  inputs?;
-  bindings?;
-  // arbitrary field definitions
-};
+import {ParticleMeta} from './types.js';
 
 const {entries} = Object;
 

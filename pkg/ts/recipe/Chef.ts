@@ -12,20 +12,9 @@ import {Runtime} from '../Runtime.js';
 import {Parser} from './RecipeParser.js';
 import {StoreCook} from './StoreCook.js';
 import {ParticleCook} from './ParticleCook.js';
+import {RecipeSpec} from './types.js';
 
 const log = logFactory(logFactory.flags.recipe, 'Chef', '#087f23');
-
-export type SlotSpec = {
-  $meta?: {
-    // arbitrary
-  }
-  $stores?: {
-    // name: StoreSpec
-  }
-  // name: ParticleSpec
-};
-
-export type RecipeSpec = SlotSpec;
 
 export class Chef {
   static async execute(recipe: RecipeSpec, runtime: Runtime, arc: Arc) {
@@ -62,10 +51,10 @@ export class Chef {
     log('===| recipe evacipated: ', recipe.$meta);
     //log.groupEnd();
   }
-  static executeAll(recipes, runtime, arc) {
+  static executeAll(recipes: RecipeSpec[], runtime: Runtime, arc: Arc) {
     return Promise.all(recipes?.map(recipe => this.execute(recipe, runtime, arc)));
   }
-  static evacipateAll(recipes, runtime, arc) {
+  static evacipateAll(recipes: RecipeSpec[], runtime: Runtime, arc: Arc) {
     return Promise.all(recipes?.map(recipe => this.evacipate(recipe, runtime, arc)));
   }
 }

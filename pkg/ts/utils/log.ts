@@ -6,29 +6,29 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-const _logFactory = (enable, preamble, color, log = 'log') => {
+import {logKinds, errKinds, LoggerFunction, AllLoggerFunctions, DebugLoggers, ErrorLoggers, Logger} from './types.js';
+
+const {fromEntries} = Object;
+
+const _logFactory = (enable: boolean, preamble: string, color: string | '', kind: keyof AllLoggerFunctions = 'log'): LoggerFunction => {
   if (!enable) {
     return () => {};
   }
-  if (log === 'dir') {
+  if (kind === 'dir') {
     return console.dir.bind(console);
   }
   const style = `background: ${color || 'gray'}; color: white; padding: 1px 6px 2px 7px; border-radius: 6px 0 0 6px;`;
-  return console[log].bind(console, `%c${preamble}`, style);
+  return console[kind].bind(console, `%c${preamble}`, style);
 };
 
-const logKinds =  ['log', 'group', 'groupCollapsed', 'groupEnd', 'dir'];
-const errKinds =  ['warn', 'error'];
-
-export const logFactory = (enable, preamble: string, color: string = '') => {
-  const loggers = {};
-  logKinds.forEach(log => loggers[log] = _logFactory(enable, `${preamble}`, color, log));
-  errKinds.forEach(log => loggers[log] = _logFactory(true, `${preamble}`, color, log));
-  // `log` is default
-  const log = loggers['log'];
-  // other loggers invoked by name
+export const logFactory = (enable: boolean, preamble: string, color: string = ''): Logger => {
+  const debugLoggers = fromEntries(logKinds.map(kind => [kind, _logFactory(enable, preamble, color, kind)])) as DebugLoggers;
+  const errorLoggers = fromEntries(errKinds.map(kind => [kind, _logFactory(true, preamble, color, kind)])) as ErrorLoggers;
+  const loggers: AllLoggerFunctions = {...debugLoggers, ...errorLoggers};
+  // Inject `log` as default, keeping all loggers available to be invoked by name.
+  const log = loggers.log;
   Object.assign(log, loggers);
-  return log;
+  return log as Logger;
 };
 
 logFactory.flags = globalThis['logFlags'] || {};
