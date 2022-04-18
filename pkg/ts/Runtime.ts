@@ -8,10 +8,10 @@
 import {Arc} from './core/Arc.js';
 import {Host} from './core/Host.js';
 import {Store} from './core/Store.js';
-import {ArcMeta, ParticleMeta, StoreMeta} from './core/types.js';
 import {EventEmitter} from './core/EventEmitter.js';
 import {logFactory} from './utils/log.js';
 import {makeId} from './utils/id.js';
+import {ArcMeta, ParticleMeta, StoreMeta} from './core/types.js';
 import {Dictionary, Logger} from './utils/types.js';
 
 const log = logFactory(logFactory.flags.runtime, 'runtime', 'forestgreen');

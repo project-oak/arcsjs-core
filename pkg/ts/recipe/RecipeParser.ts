@@ -1,15 +1,14 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
 
 import {logFactory} from '../utils/log.js';
-import {SlotSpec, RecipeSpec, Recipe, Container, ParticleSpec, ParticleId, Store, Slot} from './types.js';
-import {Dictionary} from '../utils/types.js';
-
+import {Dictionary, SlotSpec, RecipeSpec, Recipe, Container, ParticleSpec, ParticleId, Store, Slot} from './types.js';
+import
 const log = logFactory(logFactory.flags.recipe, 'flan', 'violet');
 
 const {entries, create} = Object;

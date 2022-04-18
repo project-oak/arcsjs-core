@@ -7,11 +7,16 @@
  */
 
 import {Dictionary} from '../utils/types.js';
+export {Dictionary};
+
+export {StoreMeta} from '../core/types.js';
 
 type pojo = Record<string, unknown>;
 
 type Type = string;
 export type Tag = string;
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type StoreSpec = {
   name: string;
@@ -62,4 +67,3 @@ export type ParticleNode = {
   container: string,
   spec: ParticleSpec
 };
-

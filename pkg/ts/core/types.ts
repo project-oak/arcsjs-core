@@ -6,6 +6,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
+export {Dictionary} from '../utils/types.js';
+
 export type Tag = string;
 
 export type StoreMeta = {
