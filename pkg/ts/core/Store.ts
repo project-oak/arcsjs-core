@@ -9,12 +9,13 @@
 import {EventEmitter} from './EventEmitter.js';
 import {shallowMerge} from '../utils/object.js';
 import {key} from '../utils/rand.js';
+import {Dictionary, Tag, StoreMeta} from './types.js';
 
 const {values, keys, entries} = Object;
 const {stringify} = JSON;
 
 class RawStore extends EventEmitter {
-  protected _data;
+  protected _data: any;
   constructor() {
     super();
     this._data = {};
@@ -34,7 +35,7 @@ class RawStore extends EventEmitter {
   get pojo() {
     return this.data;
   }
-  get json() {
+  get json(): string {
     return stringify(this.data);
   }
   get pretty() {
@@ -54,7 +55,7 @@ class RawStore extends EventEmitter {
   get entries() {
     return entries(this.data);
   }
-  protected change(mutator) {
+  protected change(mutator: (doc: RawStore) => void) {
     mutator(this);
     this.doChange();
   }
@@ -62,18 +63,18 @@ class RawStore extends EventEmitter {
     this.fire('change', this);
     this.onChange(this);
   }
-  set(key, value) {
+  set(key: string, value: any) {
     if (value !== undefined) {
       this.change(doc => doc.data[key] = value);
     } else {
       this.delete(key);
     }
   }
-  push(...values) {
+  push(...values: any[]) {
     const keyString = () => `key_${key(12)}`;
     this.change(doc => values.forEach(value => doc.data[keyString()] = value));
   }
-  removeValue(value) {
+  removeValue(value: any): void {
     this.entries.find(([key, entry]) => {
       if (entry === value) {
         this.delete(key);
@@ -81,22 +82,22 @@ class RawStore extends EventEmitter {
       }
     });
   }
-  has(key) {
+  has(key: string): boolean {
     return this.data[key] !== undefined;
   }
-  get(key) {
+  get(key: string): any {
     return this.data[key];
   }
-  getByIndex(index) {
+  getByIndex(index: number): any {
     return this.data[this.keys[index]];
   }
-  delete(key) {
+  delete(key: string): void {
     this.change(doc => doc.data?.[key] && delete doc.data[key]);
   }
-  deleteByIndex(index) {
+  deleteByIndex(index: number): void {
     this.delete(this.keys[index]);
   }
-  assign(dictionary) {
+  assign(dictionary: Dictionary<any>) {
     this.change(doc => shallowMerge(doc.data, dictionary));
   }
   clear() {
@@ -106,16 +107,8 @@ class RawStore extends EventEmitter {
   }
 }
 
-export type StoreMeta = {
-  arcid: string,
-  name: string,
-  type: string,
-  owner: string,
-  tags?: string[]
-};
-
 export class Store extends RawStore {
-  meta;
+  meta: Partial<StoreMeta>;
   persistor;
   willPersist = false;
   constructor(meta: StoreMeta) {
@@ -125,13 +118,13 @@ export class Store extends RawStore {
   toString() {
     return `${JSON.stringify(this.meta, null, '  ')}, ${this.pretty}`;
   }
-  isCollection() {
+  isCollection(): boolean {
     return this.meta.type?.[0] === '[';
   }
-  get tags() {
+  get tags(): Tag[] {
     return this.meta.tags || (this.meta.tags = []);
   }
-  is(...tags) {
+  is(...tags: Tag[]): boolean {
     // false if any member of `tags` in not also in `this.tags`
     return !tags.find(tag => !this.tags.includes(tag));
   }
@@ -150,7 +143,7 @@ export class Store extends RawStore {
       }, 500);
     }
   }
-  async restore(value) {
+  async restore(value: any) {
     const restored = await this.persistor?.restore(this);
     if (!restored) {
       this.data = value !== undefined ? value : this.getDefaultValue();
@@ -162,10 +155,10 @@ export class Store extends RawStore {
   async remove() {
     this.persistor?.remove(this);
   }
-  save() {
+  save(): string {
     return this.json;
   }
-  load(value) {
+  load(value: string) {
     try {
       this.data = JSON.parse(value);
     } catch(x) {

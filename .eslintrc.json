@@ -18,12 +18,14 @@
   },
   "rules": {
     "semi": [2, "always"],
+    "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "no-empty-function": "off",
     "@typescript-eslint/no-empty-function": ["off"],
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["off"],
     "@typescript-eslint/no-empty-pattern": ["off"],
+    "@typescript-eslint/no-explicit-any": "off",
     "no-empty-pattern": "off"
   },
   "overrides": [

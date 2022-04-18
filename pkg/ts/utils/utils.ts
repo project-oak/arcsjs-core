@@ -9,6 +9,7 @@
 export * from './date.js';
 export * from './id.js';
 export * from './log.js';
+export * from './matching.js';
 export * from './names.js';
 export * from './object.js';
 //export * from './params.js';

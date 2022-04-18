@@ -9,8 +9,8 @@
 import {EventEmitter} from './EventEmitter.js';
 import {Host} from './Host.js';
 import {logFactory} from '../utils/log.js';
-
-//type Dictionary<T> = {[name: string]: T};
+import {ArcMeta} from './types.js';
+import {Store} from './Store.js';
 
 const customLogFactory = (id: string) => logFactory(logFactory.flags.arc, `Arc (${id})`, 'slateblue');
 
@@ -20,13 +20,13 @@ const nob = () => create(null);
 export class Arc extends EventEmitter {
   log;
   id;
-  meta;
-  stores;
+  meta: ArcMeta;
+  stores: Store[];
   hosts;
   surface;
   composer;
   hostService;
-  constructor(id, meta, surface) {
+  constructor(id, meta: ArcMeta, surface) {
     super();
     this.id = id;
     this.meta = meta;
