@@ -37,7 +37,7 @@ const makeKey = () => `i${Math.floor((1 + Math.random() * 9) * 1e14)}`;
 const timeout =  async (func, delayMs) => new Promise(resolve => setTimeout(() => resolve(func()), delayMs));
 
 export const createSesParticleFactory = async (kind, options?) => {
-  // ensure our Particle runner is in the isolation chamber
+  // ensure our Particle runner exists in the isolation chamber
   const Particle = await requireParticle();
   // evaluate custom code in isolation chamber
   const implFactory = await requireImplFactory(kind, options);
@@ -79,44 +79,57 @@ const requireImplFactory = async (kind, options) => {
 };
 
 const repackageImplFactory = (factory, kind) => {
-  // dictionary to array 2-tuples
+  const {constNames, rewriteConsts, funcNames, rewriteFuncs} = collectDecls(factory);
+  const proto = `{${[...constNames, ...funcNames]}}`;
+  const moduleRewrite = `
+({log, ...utils}) => {
+// protect utils
+harden(utils);
+// these are just handy
+const {assign, keys, entries, values, create} = Object;
+// declarations
+${[...rewriteConsts, ...rewriteFuncs].join('\n\n')}
+// hardened Object (map) of declarations,
+// suitable to be a prototype
+return harden(${proto});
+// name the file for debuggers
+//# sourceURL=${pathForKind(kind).split('/').pop()}-(Sandboxed)
+};
+  `;
+  log('rewritten:\n\n', moduleRewrite);
+  return particleCompartment.evaluate(moduleRewrite);
+};
+
+const collectDecls = factory => {
+  // dictionary to 2-tuples
   const props = Object.entries(factory);
   // filter by typeof
   const isFunc = ([n, p]) => typeof p === 'function';
   // get props that are functions
   const funcs = props.filter(isFunc);
-  // rewrite object declarations as module delcarations
+  // rewrite object declarations as module declarations
   const rewriteFuncs = funcs.map(([n, f]) => {
     const code = f.toString();
     const async = code.includes('async');
     const body = code.replace('async ', '').replace('function ', '');
     return `${async ? 'async' : ''} function ${body};`;
   });
+  // array up the function names
   const funcNames = funcs.map(([n]) => n);
-  //
+  // if it's not a Function, it's a const
   const consts = props.filter(item => !isFunc(item));
+  // build const decls
   const rewriteConsts = consts.map(([n, p]) => {
     return `const ${n} = \`${p}\`;`;
   });
+  // array up the const names
   const constNames = consts.map(([n]) => n);
-  //
-  const proto = `{${[...constNames, ...funcNames]}}`;
-  //
-  const rewrite = `
-({log, ...utils}) => {
-
-harden(utils);
-const {assign, keys, entries, values, create} = Object;
-
-${[...rewriteConsts, ...rewriteFuncs].join('\n\n')}
-
-return harden(${proto});
-
-//# sourceURL=Library/${pathForKind(kind).split('/').pop()}
-};
-  `;
-  log('rewritten:\n\n', rewrite);
-  return particleCompartment.evaluate(rewrite);
+  return {
+    constNames,
+    rewriteConsts,
+    funcNames,
+    rewriteFuncs
+  };
 };
 
 let privateCtor;

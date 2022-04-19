@@ -226,6 +226,7 @@ export class Particle {
     this.pipe = pipe;
     this.impl = create(proto);
     defineProperty(this, 'internal', privateProperty(nob()));
+    this.internal.$busy = 0;
     //if (beStateful) {
       this.internal.beStateful = true;
       this.internal.state = nob();
@@ -391,18 +392,18 @@ export class Particle {
       };
       const task = asyncMethod.bind(this.impl, inputs, state, {...stdlib, ...injections});
       this.outputData(await this.try(task));
-      if (this.internal.$validateAfterBusy) {
+      if (!this.internal.$busy && this.internal.$validateAfterBusy) {
         this.invalidate();
       }
     }
   }
   async try(asyncFunc) {
     try {
-      this.internal.$busy = true;
+      this.internal.$busy++;
       try {
         return await asyncFunc();
       } finally {
-        this.internal.$busy = false;
+        this.internal.$busy--;
       }
     } catch(x) {
       this.error(x);
