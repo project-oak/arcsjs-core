@@ -111,7 +111,7 @@ export class Arc extends EventEmitter {
       //this.log(`computeInputs: using "${storeName}" (bound to "${name}")`);
       inputs[name] = store.pojo;
     } else {
-      this.log.error(`computeInputs: "${storeName}" (bound to "${name}") not found`);
+      this.log.error(`computeInput: "${storeName}" (bound to "${name}") not found`);
     }
     if (!(inputs[name]?.length > 0) && staticInputs?.[name]) {
       inputs[name] = staticInputs[name];

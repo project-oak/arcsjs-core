@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -13,7 +13,7 @@ export const PathMapper = class {
     this.setRoot(root);
   }
   add(mappings) {
-    Object.assign(this.map, mappings);
+    Object.assign(this.map, mappings || {});
   }
   resolve(path) {
     const bits = path.split('/');
@@ -33,4 +33,7 @@ export const PathMapper = class {
 };
 
 const root = import.meta.url.split('/').slice(0, -3).join('/');
+
 export const Paths = globalThis['Paths'] = new PathMapper(root);
+
+Paths.add(globalThis.config?.paths);

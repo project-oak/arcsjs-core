@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -21,7 +21,7 @@ const _logFactory = (enable: boolean, preamble: string, color: string | '', kind
   return console[kind].bind(console, `%c${preamble}`, style);
 };
 
-export const logFactory = (enable: boolean, preamble: string, color: string = ''): Logger => {
+export const logFactory = (enable: boolean, preamble: string, color = ''): Logger => {
   const debugLoggers = fromEntries(logKinds.map(kind => [kind, _logFactory(enable, preamble, color, kind)])) as DebugLoggers;
   const errorLoggers = fromEntries(errKinds.map(kind => [kind, _logFactory(true, preamble, color, kind)])) as ErrorLoggers;
   const loggers: AllLoggerFunctions = {...debugLoggers, ...errorLoggers};
@@ -31,4 +31,4 @@ export const logFactory = (enable: boolean, preamble: string, color: string = ''
   return log as Logger;
 };
 
-logFactory.flags = globalThis['logFlags'] || {};
+logFactory.flags = globalThis.config.logFlags || {};
