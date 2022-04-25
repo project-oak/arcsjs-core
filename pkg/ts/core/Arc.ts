@@ -95,7 +95,7 @@ export class Arc extends EventEmitter {
   protected computeInputs(host) {
     const inputs = nob();
     const bindings = host.meta?.bindings;
-    const staticInputs = host.meta?.inputs;
+    const staticInputs = host.meta?.staticInputs;
     if (bindings) {
       keys(bindings).forEach(name => this.computeInput(name, bindings, staticInputs, inputs));
       this.log(`computeInputs(${host.id}) =`, inputs);
