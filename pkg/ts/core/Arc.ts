@@ -78,7 +78,9 @@ export class Arc extends EventEmitter {
     this.log(`storeChanged: "${storeId}"`);
     values(this.hosts).forEach((host: Host) => {
       const bindings = host.meta?.bindings;
-      const isBound = bindings && entries(bindings).some(([n, v]) => (v || n) === storeId);
+      const outputs = host.meta?.outputs;
+      const isBound = (bindings && entries(bindings).some(([n, v]) => (v || n) === storeId))
+                   || (outputs && entries(outputs).some(([n, v]) => (v || n) === storeId));
       if (isBound) {
         this.log(`host "${host.id}" has interest in "${storeId}"`);
         // TODO(sjmiles): we only have to update inputs for storeId, we lose efficiency here
@@ -95,16 +97,36 @@ export class Arc extends EventEmitter {
   protected computeInputs(host) {
     const inputs = nob();
     const bindings = host.meta?.bindings;
+    const recipeInputs = host.meta?.inputs;
     const staticInputs = host.meta?.staticInputs;
     if (bindings) {
-      keys(bindings).forEach(name => this.computeInput(name, bindings, staticInputs, inputs));
+      keys(bindings).forEach(name => this.computeInputBackwardCompatibile(name, bindings, staticInputs, inputs));
+    }
+    if (recipeInputs) {
+      recipeInputs.forEach(input => this.computeInput(entries(input)[0], staticInputs, inputs));
+    }
+    if (bindings || recipeInputs) {
       this.log(`computeInputs(${host.id}) =`, inputs);
     }
     return inputs;
   }
-  protected computeInput(name, bindings, staticInputs, inputs) {
+  protected computeInputBackwardCompatibile(name, bindings, staticInputs, inputs) {
     // TODO(sjmiles): implement _conditional_ bindings that are dynamic at runtime to allow directing data flow (c.f. FooImageRef)
     const storeName = bindings[name] || name;
+    // find referenced store
+    const store = this.stores[storeName];
+    if (store) {
+      //this.log(`computeInputs: using "${storeName}" (bound to "${name}")`);
+      inputs[name] = store.pojo;
+    } else {
+      this.log.error(`computeInput: "${storeName}" (bound to "${name}") not found`);
+    }
+    if (!(inputs[name]?.length > 0) && staticInputs?.[name]) {
+      inputs[name] = staticInputs[name];
+    }
+  }
+  protected computeInput([name, storeName] , staticInputs, inputs) {
+    // TODO(sjmiles): implement _conditional_ bindings that are dynamic at runtime to allow directing data flow (c.f. FooImageRef)
     // find referenced store
     const store = this.stores[storeName];
     if (store) {
@@ -120,21 +142,21 @@ export class Arc extends EventEmitter {
   // complement to `computeInputs`
   assignOutputs({id, meta}, outputs) {
     const names = keys(outputs);
-    if (meta?.bindings && names.length) {
+    if ((meta?.bindings || meta?.outputs) && names.length) {
       //this.log.group(`assignOutputs(${host.id}, {${keys}})`);
       //this.log(`[start][${id}] assignOutputs({${names}})`);
-      names.forEach(name => this.assignOutput(name, this.stores, outputs[name], meta.bindings));
+      names.forEach(name => this.assignOutput(name, this.stores, outputs[name], meta.bindings, meta.outputs));
       //this.log.groupEnd();
       this.log(`[end][${id}] assignOutputs:`, outputs);
     }
   }
-  protected assignOutput(name, stores, output, bindings) {
+  protected assignOutput(name, stores, output, bindings, outputs) {
     if (output !== undefined) {
-      const binding = bindings[name] || name;
+      const binding = bindings?.[name] || outputs?.[name] || name;
      // this.log(`assignOutputs: property "${name}" is bound to store "${binding}"`);
       const store = stores[binding];
       if (!store) {
-        if (bindings[name]) {
+        if (bindings?.[name] || outputs?.[name]) {
           this.log.warn(`assignOutputs: no "${binding}" store for output "${name}"`);
         }
       } else {
