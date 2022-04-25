@@ -30,7 +30,7 @@ export class ParticleCook {
   }
   static specToMeta(spec) {
     // TODO(sjmiles): impedance mismatch here is likely to cause problems
-    const {$kind: kind, $container: container, $inputs: inputs, $bindings: bindings} = spec;
+    const {$kind: kind, $container: container, $inputs: inputs, $staticInputs: staticInputs, $bindings: bindings} = spec;
     return {kind, inputs, bindings, container};
   }
   static async evacipate(runtime: Runtime, arc, plan) {
