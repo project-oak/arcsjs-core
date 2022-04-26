@@ -79,9 +79,8 @@ export class Arc extends EventEmitter {
     values(this.hosts).forEach((host: Host) => {
       const bindings = host.meta?.bindings;
       const outputs = host.meta?.outputs;
-      const isBound = (bindings && entries(bindings).some(([n, v]) => (v || n) === storeId))
-                   || (outputs && entries(outputs).some(([n, v]) => (v || n) === storeId));
-      if (isBound) {
+      const isBound = (bindings) => bindings && entries(bindings).some(([n, v]) => (v || n) === storeId);
+      if (isBound(bindings) || isBound(outputs)) {
         this.log(`host "${host.id}" has interest in "${storeId}"`);
         // TODO(sjmiles): we only have to update inputs for storeId, we lose efficiency here
         this.updateHost(host);
@@ -97,15 +96,15 @@ export class Arc extends EventEmitter {
   protected computeInputs(host) {
     const inputs = nob();
     const bindings = host.meta?.bindings;
-    const recipeInputs = host.meta?.inputs;
+    const inputBindings = host.meta?.inputs;
     const staticInputs = host.meta?.staticInputs;
     if (bindings) {
       keys(bindings).forEach(name => this.computeInputBackwardCompatibile(name, bindings, staticInputs, inputs));
     }
-    if (recipeInputs) {
-      recipeInputs.forEach(input => this.computeInput(entries(input)[0], staticInputs, inputs));
+    if (inputBindings) {
+      inputBindings.forEach(input => this.computeInput(entries(input)[0], staticInputs, inputs));
     }
-    if (bindings || recipeInputs) {
+    if (bindings || inputBindings) {
       this.log(`computeInputs(${host.id}) =`, inputs);
     }
     return inputs;
