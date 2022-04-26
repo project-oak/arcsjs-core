@@ -114,7 +114,7 @@ export class Host extends EventEmitter {
     if (this.particle && inputs) {
       const lastInputs = this.particle.internal.inputs;
       if (this.dirtyCheck(inputs, lastInputs, this.lastOutput)) {
-        this.particle.inputs = {...this.meta?.inputs, ...inputs};
+        this.particle.inputs = {...this.meta?.staticInputs, ...inputs};
         this.fire('inputs-changed');
       } else {
         this.log('inputs are uninteresting, skipping update');

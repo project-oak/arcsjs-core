@@ -23,7 +23,7 @@ export type StoreMeta = {
 export type ParticleMeta = {
   kind: string,
   container: string
-  inputs?;
+  staticInputs?;
   bindings?;
   // arbitrary field definitions
 };
