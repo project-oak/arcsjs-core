@@ -30,17 +30,13 @@ export class ParticleCook {
   }
   static specToMeta(spec) {
     // TODO(sjmiles): impedance mismatch here is likely to cause problems
-    const {$kind: kind, $container: container, $staticInputs: staticInputs, $bindings: bindings, $inputs: inputs, $outputs: outputs} = spec;
-    this.formatBindings(inputs);
-    this.formatBindings(outputs);
+    const {$kind: kind, $container: container, $staticInputs: staticInputs, $bindings: bindings} = spec;
+    const inputs = this.formatBindings(spec.$inputs);
+    const outputs = this.formatBindings(spec.$outputs);
     return {kind, staticInputs, bindings, inputs, outputs, container};
   }
   static formatBindings(bindings) {
-    bindings?.forEach((binding, index) => {
-      if (typeof binding === 'string') {
-        bindings.splice(index, 1, {[binding]: binding});
-      }
-    });
+    return bindings?.map(binding => typeof binding === 'string' ? {[binding]: ''} : binding);
   }
   static async evacipate(runtime: Runtime, arc, plan) {
     return Promise.all(plan.particles.map(particle => this.derealizeParticle(runtime, arc, particle)));

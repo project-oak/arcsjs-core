@@ -125,7 +125,8 @@ export class Arc extends EventEmitter {
       inputs[name] = staticInputs[name];
     }
   }
-  protected computeInput([name, storeName] , staticInputs, inputs) {
+  protected computeInput([name, binding], staticInputs, inputs) {
+    const storeName = binding || name;
     // TODO(sjmiles): implement _conditional_ bindings that are dynamic at runtime to allow directing data flow (c.f. FooImageRef)
     // find referenced store
     const store = this.stores[storeName];
