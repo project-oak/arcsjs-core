@@ -78,9 +78,10 @@ export class Arc extends EventEmitter {
     this.log(`storeChanged: "${storeId}"`);
     values(this.hosts).forEach((host: Host) => {
       const bindings = host.meta?.bindings;
-      const outputs = host.meta?.outputs;
-      const isBound = (bindings) => bindings && entries(bindings).some(([n, v]) => (v || n) === storeId);
-      if (isBound(bindings) || isBound(outputs)) {
+      const inputs = host.meta?.inputs;
+      const isBoundBackwardCompatible = (bindings) => bindings && entries(bindings).some(([n, v]) => (v || n) === storeId);
+      const isBound = (inputs) => inputs && inputs.some(input => values(input)[0] == storeId || keys(input)[0] == storeId);
+      if (isBoundBackwardCompatible(bindings) || isBound(inputs)) {
         this.log(`host "${host.id}" has interest in "${storeId}"`);
         // TODO(sjmiles): we only have to update inputs for storeId, we lose efficiency here
         this.updateHost(host);
@@ -151,7 +152,7 @@ export class Arc extends EventEmitter {
   }
   protected assignOutput(name, stores, output, bindings, outputs) {
     if (output !== undefined) {
-      const binding = bindings?.[name] || outputs?.[name] || name;
+      const binding = bindings?.[name] || this.findOutputByName(outputs, name) || name;
      // this.log(`assignOutputs: property "${name}" is bound to store "${binding}"`);
       const store = stores[binding];
       if (!store) {
@@ -164,6 +165,12 @@ export class Arc extends EventEmitter {
         this.log(`assignOutputs: "${name}" is dirty, updating Store "${binding}"`, output);
         store.data = output;
       }
+    }
+  }
+  findOutputByName(outputs, name) {
+    const output = outputs?.find(output => keys(output)[0] === name);
+    if (output) {
+      return values(output)[0];
     }
   }
   async render(packet) {
