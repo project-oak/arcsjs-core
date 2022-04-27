@@ -51,6 +51,8 @@ export type Plan = {stores: StoreSpec[]};
 export type ParticleSpec = {
   $kind: string,
   $bindings?: pojo,
+  $inputs?: pojo,
+  $outputs?: pojo,
   $staticInputs?: pojo,
   $container: string,
   $slots?: Dictionary<SlotSpec>,
