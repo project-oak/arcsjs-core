@@ -37,7 +37,6 @@ Update Cycle Documented Briefly
 */
 export class Host extends EventEmitter {
   arc;
-  composer;
   id;
   lastOutput;
   log;
@@ -47,12 +46,6 @@ export class Host extends EventEmitter {
     super();
     this.log = customLogFactory(id);
     this.id = id;
-  }
-  async bindToSurface(surface, rootSlot='root') {
-    // create composer
-    this.composer = await surface.createComposer(rootSlot);
-    // set up pipeline for events from surface to arc
-    this.composer.onevent = this.onevent.bind(this);
   }
   onevent(eventlet) {
     this.arc?.onevent(eventlet);
@@ -103,13 +96,6 @@ export class Host extends EventEmitter {
     const {id, container, template} = this;
     this.arc?.render({id, container, content: {template, model}});
   }
-//   protected trap(func) {
-// //    try {
-//       return func();
-// //    } catch(x) {
-// //      throw x;
-// //    }
-//   }
   set inputs(inputs) {
     if (this.particle && inputs) {
       const lastInputs = this.particle.internal.inputs;

@@ -178,7 +178,7 @@ export class Arc extends EventEmitter {
     if (this.composer) {
       this.composer.render(packet);
     } else {
-      this.log('render called, but composer is null', packet);
+      //this.log.low('render called, but composer is null', packet);
     }
   }
   onevent(pid, eventlet) {
