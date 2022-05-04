@@ -232,6 +232,9 @@ export class Particle {
       this.internal.state = nob();
     //}
   }
+  error(e) {
+    this.log(e);
+  }
   get log() {
     return this.pipe?.log || log;
   }
@@ -275,8 +278,8 @@ export class Particle {
   // activate particle lifecycle
   validate() {
     //this.log('validate');
+    // try..finally to ensure we nullify `validator`
     if (this.internal.validator) {
-      // try..finally to ensure we nullify `validator`
       try {
         this.internal.$validateAfterBusy = this.internal.$busy;
         if (!this.internal.$busy) {
@@ -315,15 +318,19 @@ export class Particle {
     return typeof this.impl?.[methodName] === 'function';
   }
   async maybeUpdate() {
-    if (await this.checkInit()) {
-      if (!this.canUpdate()) {
-        // we might want to render even if we don't update,
-        // if we `outputData` the system will add render models
-        this.outputData(null);
+    try {
+      if (await this.checkInit()) {
+        if (!this.canUpdate()) {
+          // we might want to render even if we don't update,
+          // if we `outputData` the system will add render models
+          this.outputData(null);
+        }
+        if (await this.shouldUpdate(this.inputs, this.state)) {
+          this.update();
+        }
       }
-      if (await this.shouldUpdate(this.inputs, this.state)) {
-        this.update();
-      }
+    } catch(x) {
+      this.error(x);
     }
   }
   async checkInit() {
@@ -391,11 +398,15 @@ export class Particle {
     }
   }
   async try(asyncFunc) {
-    this.internal.$busy++;
     try {
-      return await asyncFunc();
-    } finally {
-      this.internal.$busy--;
+      this.internal.$busy++;
+      try {
+        return await asyncFunc();
+      } finally {
+        this.internal.$busy--;
+      }
+    } catch(x) {
+      this.error(x);
     }
   }
 }
