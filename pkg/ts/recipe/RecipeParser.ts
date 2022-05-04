@@ -7,7 +7,7 @@
  */
 
 import {logFactory} from '../utils/log.js';
-import {Dictionary, SlotSpec, RecipeSpec, Recipe, Container, ParticleSpec, ParticleId, Store, Slot} from './types.js';
+import {Dictionary, SlotSpec, Recipe, Container, StoreSpec, ParticleSpec, ParticleId, Slot} from './types.js';
 
 const log = logFactory(logFactory.flags.recipe, 'flan', 'violet');
 
@@ -31,7 +31,6 @@ export class Parser {
     // `normalize` converts shorthand to longhand before parsing
     const normalized = this.normalize(recipe);
     this.parseSlotSpec(normalized, 'root', '');
-    //log(this);
     return this;
   }
   normalize(recipe: Recipe): Recipe {
@@ -44,31 +43,30 @@ export class Parser {
   parseSlotSpec(spec: Recipe, slotName: string, parentName: string): void {
     // process entries
     for (const key in spec) {
-      const info = spec[key];
       switch (key) {
         case '$meta':
           // value is a dictionary
-          this.meta = {...this.meta, ...info};
+          this.meta = {...this.meta, ...spec.$meta};
           break;
         case '$stores':
           // value is a StoreSpec
-          this.parseStoresNode(info);
+          this.parseStoresNode(spec.$stores);
           break;
         default: {
           // value is a ParticleSpec
           const container = parentName ? `${parentName}#${slotName}` : slotName;
-          this.parseParticleSpec(container, key, info);
+          this.parseParticleSpec(container, key, spec[key]);
           break;
         }
       }
     }
   }
-  parseStoresNode(stores: Dictionary<Store>) {
+  parseStoresNode(stores: Dictionary<StoreSpec>) {
     for (const key in stores) {
       this.parseStoreSpec(key, stores[key]);
     }
   }
-  parseStoreSpec(name: string, spec: RecipeSpec) {
+  parseStoreSpec(name: string, spec: StoreSpec) {
     if (this.stores.find(s => s.name === name)) {
       log('duplicate store name');
       return;
@@ -90,7 +88,6 @@ export class Parser {
       log('duplicate particle name');
       return;
     }
-    //log('pushing ', id);
     this.particles.push({id, container, spec});
     if (spec.$slots) {
       this.parseSlotsNode(spec.$slots, id);
