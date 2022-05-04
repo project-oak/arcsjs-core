@@ -7,55 +7,61 @@
  */
 
 import {Dictionary} from '../utils/types.js';
-export {StoreMeta} from '../core/types.js';
-
 export {Dictionary};
 
-export type Tag = string;
+export {StoreMeta} from '../core/types.js';
 
-type Pojo = Record<string, unknown>;
+type pojo = Record<string, unknown>;
+
 type Type = string;
+export type Tag = string;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type StoreSpec = {
-  $name: string;
-  $type: string;
-  $value?: Pojo;
-  $tags?: [string];
+  name: string;
+  type: string;
+  value?: any;
+  tags?: [string];
 };
 
-type ParticleDictionary = Dictionary<ParticleSpec>;
-
 export type SlotSpec = {
-  $meta?: Pojo,
+  $meta?: any, // arbitrary
   $stores?: Dictionary<StoreSpec>,
   $type: Type,
   $tags: Tag[],
-  $value?: Pojo,
-} & ParticleDictionary;
+  $value?: any,
+}; // TODO: & Dictionary<ParticleSpec>;
 
-export type Recipe = SlotSpec;
+export type RecipeSpec = SlotSpec;
+export type Recipe = {
+  $meta?: any, // arbitrary
+  $stores?: Dictionary<StoreSpec>,
+  $type: Type,
+  $tags: Tag[],
+  $value?: any,
+}; // TODO: & Dictionary<ParticleSpec>;
 
 export type Container = string;
 export type ParticleId = string;
-export type Store = Pojo;
+export type Store = any;
 export type Slot = {$name: string, $parent?: string} & Recipe;
+export type Plan = {stores: StoreSpec[]};
 
 export type ParticleSpec = {
-  $meta?: {
-    // surface: ''
-    // ingress: ''
-  },
   $kind: string,
-  $inputs?: Pojo,
-  $outputs?: Pojo,
-  $staticInputs?: Pojo,
+  $bindings?: pojo,
+  $inputs?: pojo,
+  $outputs?: pojo,
+  $staticInputs?: pojo,
   $container: string,
   $slots?: Dictionary<SlotSpec>,
-  $claims?: Pojo,
-  $checks?: Pojo,
-  $bindings?: Pojo
+  $meta?: {
+    surface: ''
+    // ingress: ''
+  }
+  $claims?: pojo,
+  $checks?: pojo
 };
 
 export type ParticleNode = {

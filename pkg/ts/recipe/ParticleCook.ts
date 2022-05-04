@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- *
+ * 
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -13,13 +13,13 @@ import {ParticleNode} from './types.js';
 const log = logFactory(logFactory.flags.recipe, 'ParticleCook', '#096f33');
 
 export class ParticleCook {
-  static async execute(runtime: Runtime, arc, particles) {
+  static async execute(runtime: Runtime, arc, plan) {
     // serial
-    for (const particle of particles) {
+    for (const particle of plan.particles) {
       await this.realizeParticle(runtime, arc, particle);
     }
     // parallel
-    //return Promise.all(particles.map(particle => this.realizeParticle(runtime, arc, particle)));
+    //return Promise.all(plan.particles.map(particle => this.realizeParticle(runtime, arc, particle)));
   }
   static async realizeParticle(runtime: Runtime, arc, node: ParticleNode) {
     // convert spec to metadata
@@ -38,8 +38,8 @@ export class ParticleCook {
   static formatBindings(bindings) {
     return bindings?.map(binding => typeof binding === 'string' ? {[binding]: ''} : binding);
   }
-  static async evacipate(runtime: Runtime, arc, particles) {
-    return Promise.all(particles.map(particle => this.derealizeParticle(runtime, arc, particle)));
+  static async evacipate(runtime: Runtime, arc, plan) {
+    return Promise.all(plan.particles.map(particle => this.derealizeParticle(runtime, arc, particle)));
   }
   static async derealizeParticle(runtime: Runtime, arc, node: ParticleNode) {
     arc.removeHost(node.id);
