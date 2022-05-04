@@ -67,7 +67,7 @@ export function deepCopy<T>(datum: T): T {
   if (!datum) {
     return datum;
   } else if (Array.isArray(datum)) {
-    // This is trivially type safe but tsc needs help
+    // This is trivially type safe but tsc cannot prove it so we have to 'promise'.
     return datum.map(element => deepCopy(element)) as unknown as T;
   } else if (typeof datum === 'object') {
     const clone = Object.create(null);
@@ -78,7 +78,7 @@ export function deepCopy<T>(datum: T): T {
   } else {
     return datum;
   }
-}
+};
 
 export const deepEqual = (a: any, b: any) => {
   const type = typeof a;
