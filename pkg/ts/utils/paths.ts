@@ -33,7 +33,5 @@ export const PathMapper = class {
 };
 
 const root = import.meta.url.split('/').slice(0, -3).join('/');
-
 export const Paths = globalThis['Paths'] = new PathMapper(root);
-
 Paths.add(globalThis.config?.paths);

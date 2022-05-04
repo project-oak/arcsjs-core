@@ -95,7 +95,14 @@ export class Runtime extends EventEmitter {
     if (id && !this.arcs[id]) {
       return this.arcs[id] = arc;
     }
-    throw `arc has no id, or id ["${id}"] is already in use `;
+    throw `arc has no id, or id "${id}" is already in use`;
+  }
+  removeArc(arc) {
+    const {id} = arc;
+    if (id && this.arcs[id]) {
+      return this.arcs[id] = null;
+    }
+    throw `arc has no id, or id "${id}" is not in use`;
   }
   // create a particle inside of host
   async marshalParticle(host, particleMeta: ParticleMeta) {
