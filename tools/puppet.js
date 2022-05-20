@@ -1,25 +1,52 @@
 import puppeteer from 'puppeteer';
 import {port} from './get_port.js';
 
-(async () => {
-  console.log(':: launching puppeteer, using server port:', port);
-  const browser = await puppeteer.launch();
+const timeout = async (test, ms) => {
+  let result, done;
+  try {
+    // setTimeout(() => {
+    //   if (!done) {
+    //     throw ('test launcher timeout');
+    //   }
+    // }, ms);
+    result = await test();
+  } catch(x) {
+    result = false;
+    console.error('Page load error');
+    console.error(x);
+  }
+  done = true;
+  return result;
+};
+
+const testUrl = async (browser, url) => {
   const page = await browser.newPage();
-  await page.goto(`http://localhost:${port}/pkg/tests/puppet.html`, {
-    waitUntil: 'networkidle2'
-  });
-  const passed = await page.evaluate(() => {
+  console.log(':: opening localhost test page', url);
+  await page.goto(url, {waitUntil: 'networkidle2'});
+  console.log(':: evaluating data');
+  const result = await page.evaluate(() => {
     const {runTests, specs} = globalThis.strings;
     return runTests(specs);
   });
-  // console.log(':: waiting for 3s...');
-  // await page.waitForTimeout(3000);
-  // console.log(':: screenshot');
-  // await page.screenshot({path: './screen.png'});
+  //page.close();
+  return result;
+};
+
+const test = async browser => {
+  const url = `http://localhost:${port}/pkg/tests/puppet.html`;
+  return timeout(() => testUrl(browser, url), 10e3);
+};
+
+const start = async () => {
+  console.log(':: launching puppeteer');
+  const browser = await puppeteer.launch();
   //
-  await browser.close();
-  console.log(':: done');
-  //
+  const passed = await test(browser);
   console.log('results:', passed);
   globalThis.process.exitCode = passed ? 0 : 1;
-})();
+  //
+  console.log(':: done');
+  await browser.close();
+};
+
+start();
