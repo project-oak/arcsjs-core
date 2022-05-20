@@ -9,6 +9,7 @@ PID="$!";
 
 echo "[puppet]:: run puppeteer"
 node ./tools/puppet.js
+TEST_CODE="$?";
 
 #echo "[puppet]:: wait for 5s"
 #sleep 5
@@ -16,5 +17,5 @@ node ./tools/puppet.js
 echo "[puppet]:: kill webserver"
 kill $PID || echo "server was not running"
 
-# need to forward the puppeteer exit code
-exit 1;
+# forward the puppeteer exit code
+exit $TEST_CODE;
