@@ -15,3 +15,6 @@ node ./tools/puppet.js
 
 echo "[puppet]:: kill webserver"
 kill $PID || echo "server was not running"
+
+# need to forward the puppeteer exit code
+exit 1;
