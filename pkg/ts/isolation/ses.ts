@@ -93,7 +93,7 @@ ${[...rewriteConsts, ...rewriteFuncs].join('\n\n')}
 // suitable to be a prototype
 return harden(${proto});
 // name the file for debuggers
-//# sourceURL=${pathForKind(kind).split('/').pop()}-(Sandboxed)
+//# sourceURL=sandbox/${pathForKind(kind).split('/').pop()}
 };
   `;
   log('rewritten:\n\n', moduleRewrite);

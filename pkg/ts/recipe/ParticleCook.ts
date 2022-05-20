@@ -36,7 +36,7 @@ export class ParticleCook {
     return {kind, staticInputs, bindings, inputs, outputs, container};
   }
   static formatBindings(bindings) {
-    return bindings?.map(binding => typeof binding === 'string' ? {[binding]: ''} : binding);
+    return bindings?.map(binding => typeof binding === 'string' ? {[binding]: binding} : binding);
   }
   static async evacipate(runtime: Runtime, arc, particles) {
     return Promise.all(particles.map(particle => this.derealizeParticle(runtime, arc, particle)));
