@@ -129,7 +129,7 @@ export class Store extends RawStore {
     return !tags.find(tag => !this.tags.includes(tag));
   }
   async doChange() {
-    super.doChange();
+    //super.doChange();
     // do not await
     this.persist();
   }
