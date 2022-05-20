@@ -13,9 +13,6 @@ echo "[puppet.sh]:: run puppeteer"
 node ./tools/puppet.js
 TEST_CODE="$?";
 
-#echo "[puppet.sh]:: wait for 5s"
-#sleep 5
-
 echo "[puppet.sh]:: kill webserver"
 kill $PID || echo "server was not running"
 

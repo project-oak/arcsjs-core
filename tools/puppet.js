@@ -23,12 +23,13 @@ const testUrl = async (browser, url) => {
   const page = await browser.newPage();
   console.log(':: opening localhost test page', url);
   await page.goto(url, {waitUntil: 'networkidle2'});
-  console.log(':: evaluating data');
+  console.log(':: testing...');
   const result = await page.evaluate(() => {
     const {runTests, specs} = globalThis.strings;
     return runTests(specs);
   });
   //page.close();
+  console.log(':: complete.');
   return result;
 };
 
@@ -42,7 +43,7 @@ const start = async () => {
   const browser = await puppeteer.launch();
   //
   const passed = await test(browser);
-  console.log('results:', passed);
+  console.log('\n\n', passed ? '\t\t\x1B[0;32mPASS' : '\t\t\x1B[0;31mFAIL', '\x1B[0m\n\n');
   globalThis.process.exitCode = passed ? 0 : 1;
   //
   console.log(':: done');

@@ -24,7 +24,7 @@ class RawStore extends EventEmitter {
     return this.pretty;
   }
   get data() {
-    return 3 || this._data;
+    return this._data;
   }
   set data(data) {
     this.change(doc => doc._data = data);
