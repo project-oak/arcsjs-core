@@ -4,7 +4,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Arc, Host, Store, utils} from '../../arcs.js';
+import {Arc, Host, Store, utils} from '../../arcs-import.js';
 import {waitFor, checkState} from '../lib/test-utils.js';
 
 const {create, entries} = Object;
@@ -44,7 +44,7 @@ const AppClass = class {
     // the Arc can call the store whatever it wants
     arc.addStore('itisstore', store);
     // construct a Host, attach a dummy Particle
-    const host = new Host();
+    const host = new Host('testHost');
     host.meta = dummicle.meta;
     host.particle = dummicle;
     // add `host` to `arc`
@@ -120,5 +120,3 @@ export const hostInputsChangeTest = async () => {
     expectedChanges
   );
 };
-
-// export const NullStartupState = () => StartupState('{}');

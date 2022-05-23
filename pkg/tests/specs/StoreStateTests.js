@@ -4,7 +4,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Store} from '../../arcs.js';
+import {Store} from '../../arcs-import.js';
 import {stateCapture, checkState} from '../lib/test-utils.js';
 
 export const testStoreState = async () => {

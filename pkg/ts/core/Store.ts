@@ -7,27 +7,28 @@
  */
 
 import {EventEmitter} from './EventEmitter.js';
-import {shallowMerge} from '../utils/object.js';
-import {key} from '../utils/rand.js';
-import {Dictionary, Tag, StoreMeta} from './types.js';
+import {Tag, StoreMeta} from './types.js';
 
-const {values, keys, entries} = Object;
-const {stringify} = JSON;
+const {create, values, keys, entries} = Object;
+const {stringify, parse} = JSON;
 
-class RawStore extends EventEmitter {
-  protected _data: any;
+export class DataStore extends EventEmitter {
+  private privateData;
   constructor() {
     super();
-    this._data = {};
+    this.privateData = create(null);
+  }
+  protected setPrivateData(data) {
+    this.privateData = data;
+  }
+  set data(data) {
+    this.setPrivateData(data);
+  }
+  get data() {
+    return this.privateData;
   }
   toString() {
     return this.pretty;
-  }
-  get data() {
-    return this._data;
-  }
-  set data(data) {
-    this.change(doc => doc._data = data);
   }
   get isObject() {
     return this.data && typeof this.data === 'object';
@@ -38,131 +39,123 @@ class RawStore extends EventEmitter {
   get json(): string {
     return stringify(this.data);
   }
+  set json(json) {
+    let value = null;
+    try {
+      value = parse(json);
+    } catch(x) {
+      //
+    }
+    this.data = value;
+  }
   get pretty() {
     const sorted = {};
-    this.keys.sort().forEach(key => sorted[key] = this.get(key));
+    const pojo = this.pojo;
+    keys(pojo).sort().forEach(key => sorted[key] = pojo[key]);
     return stringify(sorted, null, '  ');
   }
-  get keys() {
-    return keys(this.data);
-  }
-  get length() {
-    return keys(this.data).length;
-  }
-  get values() {
-    return values(this.data);
-  }
-  get entries() {
-    return entries(this.data);
-  }
-  protected change(mutator: (doc: RawStore) => void) {
+}
+
+class ObservableStore extends DataStore {
+  protected change(mutator) {
     mutator(this);
     this.doChange();
   }
-  doChange() {
+  protected doChange() {
     this.fire('change', this);
     this.onChange(this);
   }
+  onChange(store) {
+    // override
+  }
+  set data(data) {
+    this.change(self => self.setPrivateData(data));
+  }
+  // TODO(sjmiles): one of the compile/build/bundle tools
+  // evacipates the inherited getter, so we clone it
+  get data() {
+    return this['privateData'];
+  }
   set(key: string, value: any) {
+    if (!this.data) {
+      this.setPrivateData(create(null));
+    }
     if (value !== undefined) {
-      this.change(doc => doc.data[key] = value);
+      this.change(self => self.data[key] = value);
     } else {
       this.delete(key);
     }
   }
-  push(...values: any[]) {
-    const keyString = () => `key_${key(12)}`;
-    this.change(doc => values.forEach(value => doc.data[keyString()] = value));
-  }
-  removeValue(value: any): void {
-    this.entries.find(([key, entry]) => {
-      if (entry === value) {
-        this.delete(key);
-        return true;
-      }
-    });
-  }
-  has(key: string): boolean {
-    return this.data[key] !== undefined;
-  }
-  get(key: string): any {
-    return this.data[key];
-  }
-  getByIndex(index: number): any {
-    return this.data[this.keys[index]];
-  }
   delete(key: string): void {
-    this.change(doc => doc.data?.[key] && delete doc.data[key]);
+    this.change(doc => delete doc.data[key]);
   }
-  deleteByIndex(index: number): void {
-    this.delete(this.keys[index]);
-  }
-  assign(dictionary: Dictionary<any>) {
-    this.change(doc => shallowMerge(doc.data, dictionary));
-  }
-  clear() {
-    this.change(doc => doc.data = {});
-  }
-  onChange(store) {
-  }
+  // assign(dictionary: Dictionary<any>) {
+  //   this.change(doc => shallowMerge(doc.data, dictionary));
+  // }
 }
 
-export class Store extends RawStore {
+class PersistableStore extends ObservableStore {
   meta: Partial<StoreMeta>;
   persistor;
-  willPersist = false;
+  protected willPersist;
   constructor(meta: StoreMeta) {
     super();
-    this.meta = meta || {};
+    this.meta = {...meta};
   }
   toString() {
     return `${JSON.stringify(this.meta, null, '  ')}, ${this.pretty}`;
   }
+  get tags(): Tag[] {
+    return this.meta.tags ?? (this.meta.tags = []);
+  }
+  is(...tags: Tag[]): boolean {
+    // true if every member of `tags` is also in `this.tags`
+    return tags.every(tag => this.tags.includes(tag));
+  }
   isCollection(): boolean {
     return this.meta.type?.[0] === '[';
   }
-  get tags(): Tag[] {
-    return this.meta.tags || (this.meta.tags = []);
-  }
-  is(...tags: Tag[]): boolean {
-    // false if any member of `tags` in not also in `this.tags`
-    return !tags.find(tag => !this.tags.includes(tag));
-  }
-  async doChange() {
-    super.doChange();
-    // do not await
-    this.persist();
-  }
-  async persist() {
-    // persists at most every 500ms
-    if (!this.willPersist && this.persistor) {
-      this.willPersist = true;
-      setTimeout(() => {
-        this.willPersist = false;
-        this.persistor.persist(this);
-      }, 500);
-    }
-  }
+  // async doChange() {
+  //   // do not await
+  //   this.persist();
+  //   return super.doChange();
+  // }
+  // async persist() {
+  //   // persists at most every 500ms
+  //   if (!this.willPersist && this.persistor) {
+  //     this.willPersist = true;
+  //     setTimeout(() => {
+  //       this.willPersist = false;
+  //       this.persistor.persist(this);
+  //     }, 500);
+  //   }
+  // }
   async restore(value: any) {
-    const restored = await this.persistor?.restore(this);
-    if (!restored) {
-      this.data = value !== undefined ? value : this.getDefaultValue();
-    }
+    // const restored = await this.persistor?.restore(this);
+    // if (!restored && (value !== undefined)) {
+    //   this.data = value;
+    // }
   }
-  getDefaultValue() {
-    return this.isCollection() ? {} : '';
-  }
-  async remove() {
-    this.persistor?.remove(this);
-  }
+  // delete() {
+  //   this.persistor?.remove(this);
+  // }
   save(): string {
     return this.json;
   }
-  load(value: string) {
+  load(serial: string, defaultValue) {
+    let value = defaultValue;
     try {
-      this.data = JSON.parse(value);
+      if (serial) {
+        value = parse(serial);
+      }
     } catch(x) {
       //
     }
+    if (value !== undefined) {
+      this.data = value;
+    }
+    //this.setPrivateData(value);
   }
 }
+
+export class Store extends PersistableStore {}

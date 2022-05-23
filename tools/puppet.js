@@ -43,7 +43,7 @@ const start = async () => {
   const browser = await puppeteer.launch();
   //
   const passed = await test(browser);
-  console.log('\n\n', passed ? '\t\t\x1B[0;32mPASS' : '\t\t\x1B[0;31mFAIL', '\x1B[0m\n\n');
+  console.log('\n', passed ? '\t\x1B[0;32mPASS' : '\t\x1B[0;31mFAIL', '\x1B[0m\n');
   globalThis.process.exitCode = passed ? 0 : 1;
   //
   console.log(':: done');

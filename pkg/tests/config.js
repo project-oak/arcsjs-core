@@ -13,7 +13,7 @@ globalThis.config = {
     app: true,
     arc: true,
     particles: true,
-    surfaces: true,
-    services: true
+    services: true,
+    storage: true
   }
 };
