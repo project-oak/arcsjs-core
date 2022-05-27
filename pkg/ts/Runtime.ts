@@ -138,7 +138,7 @@ export class Runtime extends EventEmitter {
     this.log('storeChanged', storeId);
     this.network?.invalidatePeers(storeId);
     this.onStoreChange(storeId, store);
-    this.fire('store-changed', store);
+    this.fire('store-changed', {storeId, store});
   }
   // TODO(sjmiles): evacipate this method
   protected onStoreChange(storeId, store) {
