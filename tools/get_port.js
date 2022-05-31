@@ -1,2 +1,5 @@
-import process from 'process';
-export const port = process.env.npm_package_config_port;
+const port = process.env.npm_package_config_port;
+// for importers
+export {port};
+// for stdout
+console.log(port);

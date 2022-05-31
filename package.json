@@ -29,10 +29,11 @@
     "fdeploy": "./tools/fdeploy.sh",
     "get_port": "./tools/get_port.sh",
     "puppet": "./tools/puppet.sh",
+    "test": "./tools/puppet.sh",
     "serve": "./tools/serve.sh",
     "watch": "./tools/watch.sh"
   },
   "config": {
-    "port": "9875"
+    "port": "9942"
   }
 }

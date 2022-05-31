@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -19,9 +19,9 @@ export class AggregateStore extends Store {
   protected debounceKey;
   constructor(meta: StoreMeta) {
     super(meta);
-    this._data = [];
     this.stores = [];
     this.criteria = {name: this.nameFromTags(), type: meta.type};
+    this.setPrivateData([]);
   }
   nameFromTags() {
     // The aggregate store meta will contain `name:storeName` tag.

@@ -10,7 +10,7 @@ on:
     branches: [ test ]
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
 
@@ -30,4 +30,3 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
-    
