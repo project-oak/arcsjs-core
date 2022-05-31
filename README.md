@@ -1,6 +1,6 @@
 # ArcsJs-Core
 
-[![Node.js CI](https://github.com/project-oak/arcsjs-core/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/project-oak/arcsjs-core/actions/workflows/node.js.yml)
+[![tests](https://github.com/project-oak/arcsjs-core/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/project-oak/arcsjs-core/actions/workflows/node.js.yml)
 
 ArcsJs is a rapid application development platform that is privacy-preserving, multi-device, AI-first, and modular. Our goal is to preserve user security and privacy by bringing developer code to the user's data.
 
