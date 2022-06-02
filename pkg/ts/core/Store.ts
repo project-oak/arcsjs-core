@@ -9,14 +9,13 @@
 import {EventEmitter} from './EventEmitter.js';
 import {Tag, StoreMeta} from './types.js';
 
-const {create, values, keys, entries} = Object;
+const {create, keys} = Object;
 const {stringify, parse} = JSON;
 
 export class DataStore extends EventEmitter {
   private privateData;
   constructor() {
     super();
-    this.privateData = create(null);
   }
   protected setPrivateData(data) {
     this.privateData = data;
@@ -115,30 +114,30 @@ class PersistableStore extends ObservableStore {
   isCollection(): boolean {
     return this.meta.type?.[0] === '[';
   }
-  // async doChange() {
-  //   // do not await
-  //   this.persist();
-  //   return super.doChange();
-  // }
-  // async persist() {
-  //   // persists at most every 500ms
-  //   if (!this.willPersist && this.persistor) {
-  //     this.willPersist = true;
-  //     setTimeout(() => {
-  //       this.willPersist = false;
-  //       this.persistor.persist(this);
-  //     }, 500);
-  //   }
-  // }
-  async restore(value: any) {
-    // const restored = await this.persistor?.restore(this);
-    // if (!restored && (value !== undefined)) {
-    //   this.data = value;
-    // }
+  async doChange() {
+    // do not await
+    this.persist();
+    return super.doChange();
   }
-  // delete() {
-  //   this.persistor?.remove(this);
-  // }
+  async persist() {
+    // persists at most every 500ms
+    if (!this.willPersist && this.persistor) {
+      this.willPersist = true;
+      setTimeout(() => {
+        this.willPersist = false;
+        this.persistor.persist(this);
+      }, 500);
+    }
+  }
+  async restore(value: any) {
+    const restored = await this.persistor?.restore(this);
+    if (!restored && (value !== undefined)) {
+      this.data = value;
+    }
+  }
+  delete() {
+    this.persistor?.remove(this);
+  }
   save(): string {
     return this.json;
   }
