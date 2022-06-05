@@ -22,6 +22,7 @@ export class ParticleCook {
     //return Promise.all(particles.map(particle => this.realizeParticle(runtime, arc, particle)));
   }
   static async realizeParticle(runtime: Runtime, arc, node: ParticleNode) {
+    log('realizedParticle:', node.id);
     // convert spec to metadata
     const meta = this.specToMeta(node.spec);
     meta.container ||= node.container;

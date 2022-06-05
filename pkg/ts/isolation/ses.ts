@@ -10,7 +10,7 @@ import {Paths} from '../utils/paths.js';
 import {logFactory} from '../utils/log.js';
 import {Runtime} from '../Runtime.js';
 import {requireParticleBaseCode, requireParticleImplCode, pathForKind} from './code.js';
-import '../../third_party/ses/ses.umd.min.js';
+import '../../third_party/ses/ses.umd.min.js.js.js.js';
 
 const requiredLog = logFactory(true, 'SES', 'goldenrod');
 const log = logFactory(logFactory.flags.ses, 'SES', 'goldenrod');
