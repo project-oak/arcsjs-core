@@ -4,8 +4,8 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Arc, Store} from '../../arcs-import.js';
-import {waitFor, checkState, getTestState, getTestInjections} from '../lib/test-utils.js';
+import {Arc} from '../../arcsjs-core.js';
+import {checkState} from '../lib/test-utils.js';
 
 const AppClass = class {
   async spinup() {
