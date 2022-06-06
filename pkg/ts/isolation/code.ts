@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -39,7 +39,7 @@ export const fetchParticleCode = async (kind?) => {
 };
 
 export const maybeFetchParticleCode = async (kind) => {
-  const path = pathForKind(Paths.resolve(kind));
+  const path = pathForKind(kind);
   try {
     const response = await fetch(path);
     //if (response.ok) {

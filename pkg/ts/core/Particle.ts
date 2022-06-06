@@ -290,10 +290,11 @@ export class Particle {
           // let the impl decide what to do
           this.maybeUpdate();
         }
-      } finally {
-        // nullify validator _after_ methods so state changes don't reschedule validation
-        this.internal.validator = null;
+      } catch(e) {
+        log.error(e);
       }
+      // nullify validator _after_ methods so state changes don't reschedule validation
+      this.internal.validator = null;
     }
   }
   validateInputs() {

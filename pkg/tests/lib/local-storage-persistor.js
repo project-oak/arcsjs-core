@@ -3,7 +3,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {logFactory} from '../../arcs-import.js';
+import {logFactory} from '../../arcsjs-core.js';
 
 const logIn = logFactory(logFactory.flags.storage, 'storage(in)', 'limegreen');
 const logOut = logFactory(logFactory.flags.storage, 'storage(out)', 'darkgreen');

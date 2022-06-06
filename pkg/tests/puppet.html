@@ -12,9 +12,10 @@
 <pre id="logbook"></pre>
 
 <script type="module" src="./config.js"></script>
+
 <script type="module">
   import * as specs from './specs/specs.js';
   import {runTests} from './lib/test-utils.js';
+  // puppet strings =P
   globalThis.strings = {specs, runTests};
-  // runTests(specs);
 </script>

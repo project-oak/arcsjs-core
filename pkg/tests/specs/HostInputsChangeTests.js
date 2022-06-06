@@ -4,7 +4,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Arc, Host, Store, utils} from '../../arcs-import.js';
+import {Arc, Host, Store, utils} from '../../arcsjs-core.js';
 import {waitFor, checkState} from '../lib/test-utils.js';
 
 const {create, entries} = Object;

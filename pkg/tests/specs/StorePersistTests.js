@@ -4,8 +4,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Store} from '../../arcs-import.js';
-import {waitFor, checkState, getTestState, getTestInjections} from '../lib/test-utils.js';
+import {Store} from '../../arcsjs-core.js';
 import {LocalStoragePersistor} from '../lib/local-storage-persistor.js';
 
 const eq = (a, b) => ({pass: a === b, value: a, expected: b});
