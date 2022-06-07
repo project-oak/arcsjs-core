@@ -26,7 +26,6 @@
     "clean": "./tools/clean.sh",
     "compile": "./tools/compile.sh",
     "docs": "./tools/docs.sh",
-    "fdeploy": "./tools/fdeploy.sh",
     "get_port": "./tools/get_port.sh",
     "puppet": "./tools/puppet.sh",
     "test": "./tools/puppet.sh",

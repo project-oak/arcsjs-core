@@ -127,14 +127,15 @@ export class Arc extends EventEmitter {
   }
   protected computeInput([name, binding], staticInputs, inputs) {
     const storeName = binding || name;
-    // TODO(sjmiles): implement _conditional_ bindings that are dynamic at runtime to allow directing data flow (c.f. FooImageRef)
+    // TODO(sjmiles): implement _conditional_ bindings that are dynamic at runtime
+    // to allow directing data flow (c.f. FooImageRef)?
     // find referenced store
     const store = this.stores[storeName];
     if (store) {
       //this.log(`computeInputs: using "${storeName}" (bound to "${name}")`);
       inputs[name] = store.pojo;
     } else {
-      this.log.error(`computeInput: "${storeName}" (bound to "${name}") not found`);
+      this.log.warn(`computeInput: "${storeName}" (bound to "${name}") not found`);
     }
     if (!(inputs[name]?.length > 0) && staticInputs?.[name]) {
       inputs[name] = staticInputs[name];
