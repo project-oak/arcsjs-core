@@ -5,6 +5,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
+
 import {Arc} from './core/Arc.js';
 import {Host} from './core/Host.js';
 import {Store} from './core/Store.js';
@@ -29,9 +30,9 @@ export class Runtime extends EventEmitter {
   uid: UID; // user id
   nid: UID; // network id
   arcs: Dictionary<Arc>;
+  stores: Dictionary<Store>;
   peers: Set<string>;
   shares: Set<string>;
-  stores: Dictionary<Store>;
   endpoint;
   network;
   surfaces;
@@ -48,8 +49,8 @@ export class Runtime extends EventEmitter {
     this.stores = {};
     this.peers = new Set();
     this.shares = new Set();
-    this.log = logFactory(logFactory.flags.runtime, `runtime:[${this.prettyUid}]`, 'forestgreen');
     this.setUid(uid);
+    this.log = logFactory(logFactory.flags.runtime, `runtime:[${this.prettyUid}]`, 'forestgreen');
     Runtime.securityLockdown?.(Runtime.particleOptions);
   }
   setUid(uid: UID) {
@@ -68,7 +69,7 @@ export class Runtime extends EventEmitter {
     return arc;
   }
   serviceFactory(service) {
-    return async (host, request) => await service.handle(this, host, request);
+    return async (host, request) => service.handle(this, host, request);
   }
   async bootstrapParticle(arc, id, meta: ParticleMeta) {
     // make a host
@@ -78,7 +79,8 @@ export class Runtime extends EventEmitter {
     // add `host` to `arc`
     const promise = arc.addHost(host);
     // report
-    log(host);
+    log('bootstrapped particle', id);
+    //log(host);
     // we'll call you when it's ready
     return promise;
   }
@@ -100,7 +102,7 @@ export class Runtime extends EventEmitter {
   removeArc(arc) {
     const {id} = arc;
     if (id && this.arcs[id]) {
-      return this.arcs[id] = null;
+      delete this.arcs[id];
     }
     throw `arc has no id, or id "${id}" is not in use`;
   }
@@ -196,7 +198,7 @@ export class Runtime extends EventEmitter {
   protected static registerParticleFactory(kind, factoryPromise: Promise<unknown>) {
     return particleFactoryCache[kind] = factoryPromise;
   }
-  requireStore(meta: StoreMeta): Store {
+  requireStore(meta: StoreMeta): Store|undefined {
     let store = this.stores[meta.name];
     if (!store) {
       store = this.createStore(meta);
@@ -206,7 +208,7 @@ export class Runtime extends EventEmitter {
   }
   createStore(meta: StoreMeta) {
     const key = keys(storeFactories).find(tag => meta.tags?.includes?.(tag));
-    const storeClass = storeFactories[key] || Store;
+    const storeClass = storeFactories[String(key)] || Store;
     return new storeClass(meta);
   }
   static registerStoreClass(tag, storeClass) {

@@ -9,12 +9,13 @@
 import {EventEmitter} from './EventEmitter.js';
 import {Host} from './Host.js';
 import {logFactory} from '../utils/log.js';
-import {ArcMeta} from './types.js';
+import {Dictionary, ArcMeta} from './types.js';
 import {Store} from './Store.js';
 
 const customLogFactory = (id: string) => logFactory(logFactory.flags.arc, `Arc (${id})`, 'slateblue');
 
-const {keys, entries, values, create} = Object;
+const {keys, entries, create} = Object;
+const values = (o):any[] => Object.values(o);
 const nob = () => create(null);
 
 export class Arc extends EventEmitter {
@@ -22,7 +23,7 @@ export class Arc extends EventEmitter {
   id;
   meta: ArcMeta;
   stores: Store[];
-  hosts;
+  hosts: Dictionary<Host>;
   surface;
   composer;
   hostService;
@@ -41,7 +42,7 @@ export class Arc extends EventEmitter {
     // bookkeep
     this.hosts[host.id] = host;
     host.arc = this;
-    // support per host surfacing?
+    // TODO(sjmiles): support per host surfacing?
     //await host.bindToSurface(surface ?? this.surface);
     // begin work
     this.updateHost(host);
@@ -63,25 +64,25 @@ export class Arc extends EventEmitter {
   addStore(storeId, store) {
     if (store && !this.stores[storeId]) {
       this.stores[storeId] = store;
-      store.listen('change', () => this.storeChanged(storeId, store));
+      store.listen('change', () => this.storeChanged(storeId, store), this.id);
     }
   }
   removeStore(storeId) {
-    if (this.stores[storeId]) {
-      // TODO(sjmiles): must `unlisten` to match `listen` above
-      //this.stores[storeId].onChange = null;
+    const store = this.stores[storeId];
+    if (store) {
+      store.unlisten('change', this.id);
     }
     delete this.stores[storeId];
   }
   // TODO(sjmiles): 2nd param is used in overrides, make explicit
   protected storeChanged(storeId, store) {
     this.log(`storeChanged: "${storeId}"`);
-    values(this.hosts).forEach((host: Host) => {
+    const isBoundBackwardCompatible = bindings => bindings && entries(bindings).some(([n, v]) => (v || n) === storeId);
+    const isBound = inputs => inputs && inputs.some(input => values(input)[0] == storeId || keys(input)[0] == storeId);
+    values(this.hosts).forEach(host => {
       const bindings = host.meta?.bindings;
       const inputs = host.meta?.inputs;
-      const isBoundBackwardCompatible = (bindings) => bindings && entries(bindings).some(([n, v]) => (v || n) === storeId);
-      const isBound = (inputs) => inputs && inputs.some(input => values(input)[0] == storeId || keys(input)[0] == storeId);
-      if (isBoundBackwardCompatible(bindings) || isBound(inputs)) {
+      if (bindings === '*' || isBoundBackwardCompatible(bindings) || isBound(inputs)) {
         this.log(`host "${host.id}" has interest in "${storeId}"`);
         // TODO(sjmiles): we only have to update inputs for storeId, we lose efficiency here
         this.updateHost(host);
@@ -99,14 +100,21 @@ export class Arc extends EventEmitter {
     const bindings = host.meta?.bindings;
     const inputBindings = host.meta?.inputs;
     const staticInputs = host.meta?.staticInputs;
-    if (bindings) {
-      keys(bindings).forEach(name => this.computeInputBackwardCompatibile(name, bindings, staticInputs, inputs));
-    }
-    if (inputBindings) {
-      inputBindings.forEach(input => this.computeInput(entries(input)[0], staticInputs, inputs));
-    }
-    if (bindings || inputBindings) {
-      this.log(`computeInputs(${host.id}) =`, inputs);
+    if (host.meta.bindings === '*') {
+      // TODO(sjmiles): we could make the contract that the bindAll inputs are
+      // names (or names + meta) only. The Particle could look up values via
+      // service.
+      entries(this.stores).forEach(([name, store]) => inputs[name] = store.pojo);
+    } else {
+      if (bindings) {
+        keys(bindings).forEach(name => this.computeInputBackwardCompatibile(name, bindings, staticInputs, inputs));
+      }
+      if (inputBindings) {
+        inputBindings.forEach(input => this.computeInput(entries(input)[0], staticInputs, inputs));
+      }
+      if (bindings || inputBindings) {
+        this.log(`computeInputs(${host.id}) =`, inputs);
+      }
     }
     return inputs;
   }
