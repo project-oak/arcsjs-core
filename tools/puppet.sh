@@ -6,7 +6,7 @@ echo "[puppet.sh]:: build"
 echo "[puppet.sh]:: spinning up webserver"
 
 PORT=$(npm run --silent get_port)
-node ./node_modules/local-web-server/bin/cli.js -p $PORT "$@" &
+node ./node_modules/local-web-server/bin/cli.mjs -p $PORT "$@" &
 PID="$!";
 
 echo "[puppet.sh]:: run puppeteer"
