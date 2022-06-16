@@ -101,10 +101,10 @@ export class Runtime extends EventEmitter {
   }
   removeArc(arc) {
     const {id} = arc;
-    if (id && this.arcs[id]) {
-      delete this.arcs[id];
+    if (!id || !this.arcs[id]) {
+      throw !id ? `arc has no id` : `id "${id}" is not in use`;
     }
-    throw `arc has no id, or id "${id}" is not in use`;
+    delete this.arcs[id];
   }
   // create a particle inside of host
   async marshalParticle(host, particleMeta: ParticleMeta) {
