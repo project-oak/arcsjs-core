@@ -152,8 +152,8 @@ class PersistableStore extends ObservableStore {
     }
     if (value !== undefined) {
       this.data = value;
+      //this.setPrivateData(value);
     }
-    //this.setPrivateData(value);
   }
 }
 

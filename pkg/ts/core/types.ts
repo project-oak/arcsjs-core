@@ -17,7 +17,7 @@ export type StoreMeta = {
   owner: string,
   tags?: Tag[],
   value?: any,
-  shareid?: string,
+  shareid?: string
 };
 
 export type ParticleMeta = {
