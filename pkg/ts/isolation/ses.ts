@@ -21,7 +21,12 @@ let particleCompartment;
 
 export const initSes = (options?) => {
   if (!particleCompartment) {
-    const debugOptions = {consoleTaming: 'unsafe', errorTaming: 'unsafe', errorTrapping: 'report', stackFiltering: 'verbose'};
+    const debugOptions = {
+      consoleTaming: 'unsafe',
+      errorTaming: 'unsafe',
+      errorTrapping: 'report',
+      stackFiltering: 'verbose'
+    };
     const prodOptions = {};
     requiredLog.log('LOCKDOWN');
     requiredLog.groupCollapsed('...removing intrinics...');
