@@ -90,6 +90,11 @@ export class Arc extends EventEmitter {
     });
     this.fire('store-changed', storeId);
   }
+  updateParticleMeta(hostId, meta) {
+    const host = this.hosts[hostId];
+    host.meta = meta;
+    this.updateHost(host);
+  }
   updateHost(host) {
     host.inputs = this.computeInputs(host);
   }
