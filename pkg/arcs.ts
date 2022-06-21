@@ -12,7 +12,6 @@ export * from './js/core/Store.js';
 export * from './js/core/Arc.js';
 export * from './js/core/Host.js';
 export * from './js/core/Decorator.js';
-export * from './js/core/Particle.js';
 export * from './js/recipe/Chef.js';
 export * from './js/recipe/ParticleCook.js';
 export * from './js/recipe/RecipeParser.js';
