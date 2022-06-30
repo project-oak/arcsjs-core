@@ -65,58 +65,103 @@ const AppClass = class {
   }
 };
 
+const HostInputsTest = class {
+  constructor() {
+    this.store = new Store();
+    this.expectations = [];
+  }
+  async init() {
+    // create a test application
+    const app = new AppClass();
+    // test application will observe onStoreChange events sent to Host (?)
+    this.changes = await app.init(this.store);
+  }
+  capture(key, value) {
+    this.store.set(key, value);
+    this.expectations.push({
+      'value': {
+        ...(this.expectations.length > 0 && this.expectations[this.expectations.length - 1].value),
+        [key]: this.formatValue(value)
+      }
+    });
+  }
+  formatValue(value) {
+    return (value === Object(value)) 
+      ? Array.isArray(value) ? [...value] : {...value}
+      : value;
+  }
+  ignore(key, value) {
+    this.store.set(key, value);
+    // this.value = value;
+  }
+  async validate() {
+    await waitFor(100);
+    const actualChanges = this.changes.finalize();
+    // console.log(`******  ${JSON.stringify(actualChanges)}`);
+    // console.log(`******??  ${JSON.stringify(this.expectations)}`);
+    return await checkState(actualChanges, this.expectations);
+  }
+};
+
 export const hostInputsChangeTest = async () => {
-  // make a store
-  const store = new Store();
-  // create a test application
-  const app = new AppClass();
-  // test application will observe onStoreChange events sent to Host (?)
-  const changes = await app.init(store);
+  const test = new HostInputsTest();
+  await test.init();
   // set a key: value pair twice, second change should be filtered
-  store.set('b', 42);
-  store.set('b', 42);
+  test.capture('b', 42);
+  test.ignore('b', 42);
+
   // set an Object value twice, second change should be filtered
-  store.set('obj', {things: 7});
-  store.set('obj', {things: 7});
+  test.capture('obj', {things: 7});
+  test.ignore('obj', {things: 7});
+
   // sub-property change
-  store.set('obj', {things: 6});
+  test.capture('obj', {things: 6});
+
   // set an Array value twice, second change should be filtered
-  store.set('arr', [0, 1, 2]);
-  store.set('arr', [0, 1, 2]);
+  test.capture('arr', [0, 1, 2]);
+  test.ignore('arr', [0, 1, 2]);
+
   // test that change-detection is deep (reference independent)
   const arr = [0, 1, 2];
-  store.set('arr', arr);
+  test.ignore('arr', arr);
+
   arr.push(3);
-  store.set('arr', arr);
+  test.capture('arr', arr);
+
   // capture operations
-  await waitFor(100);
-  const actualChanges = changes.finalize();
-  // define expectations
-  const expectedChanges = [
-    {value: {
-      b: 42
-    }},
-    {value: {
-      b: 42,
-      obj: {things: 7}
-    }},
-    {value: {
-      b: 42,
-      obj: {things: 6}
-    }},
-    {value: {
-      b: 42,
-      obj: {things: 6},
-      arr: [0, 1, 2]
-    }},
-    {value: {
-      b: 42,
-      obj: {things: 6},
-      arr: [0, 1, 2, 3]
-    }}
-  ];
-  return await checkState(
-    actualChanges,
-    expectedChanges
-  );
+  return await test.validate();
+};
+
+export const hostInputChangeTest_object_fieldChanged1 = async () => {
+  const test = new HostInputsTest();
+  await test.init();
+
+  const object = {hello: 'world'};
+  test.capture('object', object);
+  test.ignore('object', object);
+  test.ignore('object', {hello: 'world'});
+
+  object.b = [1, 2, 3];
+  test.ignore('object', object);
+
+  object.b.push(4);
+  test.ignore('object', object);
+
+  return await test.validate();
+}; 
+
+
+export const hostInputChangeTest_object_cloned = async () => {
+  const test = new HostInputsTest();
+  await test.init();
+
+  const object = {hello: 'world'};
+  test.capture('object', object);
+
+  object.foo = 'bar';
+  test.ignore('object', object);
+
+  test.capture('object', {...object, foo: 'qux'});
+
+  return await test.validate();
 };
