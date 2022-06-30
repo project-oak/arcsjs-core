@@ -71,28 +71,22 @@ export const hostInputsChangeTest = async () => {
   const app = new AppClass();
   // test application will observe onStoreChange events sent to Host (?)
   await app.init(store);
-
   // set a key: value pair twice, second change should be filtered
   store.set('b', 42);
   store.set('b', 42);
-
   // set an Object value twice, second change should be filtered
   store.set('obj', {things: 7});
   store.set('obj', {things: 7});
-
-  // // sub-property change
+  // sub-property change
   store.set('obj', {things: 6});
-
   // set an Array value twice, second change should be filtered
   store.set('arr', [0, 1, 2]);
   store.set('arr', [0, 1, 2]);
-
   // test that change-detection is deep (reference independent)
   const arr = [0, 1, 2];
   store.set('arr', arr);
   arr.push(3);
   store.set('arr', arr);
-
   await waitFor(100);
   const actualChanges = app.changes.finalize();
   const expectedChanges = [
