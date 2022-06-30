@@ -49,119 +49,99 @@ const AppClass = class {
     host.particle = dummicle;
     // add `host` to `arc`
     await arc.addHost(host);
+    this.expectations = [];
     // track when the host signals a change
-    const changes = [];
+    this.changes = [];
     host.listen(
       'inputs-changed',
       () => {
         //sysLog('Host:inputs-changed:', JSON.stringify(host.particle.inputs, null, '  '));
-        changes.push(utils.deepCopy(host.particle.inputs));
+        this.changes.push(utils.deepCopy(host.particle.inputs));
       },
       'ahoy'
     );
-    changes.disposeListener = () => host.unlisten('inputs-changed', 'ahoy');
-    changes.finalize = () => (changes.disposeListener(), [...changes]);
-    return changes;
+    this.changes.disposeListener = () => host.unlisten('inputs-changed', 'ahoy');
+    this.changes.finalize = () => (this.changes.disposeListener(), [...this.changes]);
+    // return changes;
   }
-};
 
-const HostInputsTest = class {
-  constructor() {
-    this.store = new Store();
-    this.expectations = [];
+  expect(value) {
+    this.expectations.push({value});
   }
-  async init() {
-    // create a test application
-    const app = new AppClass();
-    // test application will observe onStoreChange events sent to Host (?)
-    this.changes = await app.init(this.store);
-  }
-  capture(key, value) {
-    this.store.set(key, value);
-    this.expectations.push({
-      'value': {
-        ...(this.expectations.length > 0 && this.expectations[this.expectations.length - 1].value),
-        [key]: this.formatValue(value)
-      }
-    });
-  }
-  formatValue(value) {
-    return (value === Object(value)) 
-      ? Array.isArray(value) ? [...value] : {...value}
-      : value;
-  }
-  ignore(key, value) {
-    this.store.set(key, value);
-    // this.value = value;
-  }
+
   async validate() {
     await waitFor(100);
     const actualChanges = this.changes.finalize();
-    // console.log(`******  ${JSON.stringify(actualChanges)}`);
-    // console.log(`******??  ${JSON.stringify(this.expectations)}`);
     return await checkState(actualChanges, this.expectations);
   }
 };
 
 export const hostInputsChangeTest = async () => {
-  const test = new HostInputsTest();
-  await test.init();
+  // make a store
+  const store = new Store();
+  // create a test application
+  const app = new AppClass();
+  // test application will observe onStoreChange events sent to Host (?)
+  await app.init(store);
+
   // set a key: value pair twice, second change should be filtered
-  test.capture('b', 42);
-  test.ignore('b', 42);
+  store.set('b', 42);
+  store.set('b', 42);
+  app.expect({'b': 42});
 
   // set an Object value twice, second change should be filtered
-  test.capture('obj', {things: 7});
-  test.ignore('obj', {things: 7});
+  store.set('obj', {things: 7});
+  store.set('obj', {things: 7});
+  app.expect({'b': 42, 'obj': {things: 7}});
 
-  // sub-property change
-  test.capture('obj', {things: 6});
+  // // sub-property change
+  store.set('obj', {things: 6});
+  app.expect({'b': 42, 'obj': {things: 6}});
 
   // set an Array value twice, second change should be filtered
-  test.capture('arr', [0, 1, 2]);
-  test.ignore('arr', [0, 1, 2]);
+  store.set('arr', [0, 1, 2]);
+  store.set('arr', [0, 1, 2]);
+  app.expect({'b': 42, 'obj': {things: 6}, arr: [0, 1, 2]});
 
   // test that change-detection is deep (reference independent)
   const arr = [0, 1, 2];
-  test.ignore('arr', arr);
-
+  store.set('arr', arr);
   arr.push(3);
-  test.capture('arr', arr);
+  store.set('arr', arr);
+  app.expect({'b': 42, 'obj': {things: 6}, arr: [0, 1, 2, 3]});
 
   // capture operations
-  return await test.validate();
+  return await app.validate();
 };
 
-export const hostInputChangeTest_object_fieldChanged1 = async () => {
-  const test = new HostInputsTest();
-  await test.init();
+export const hostInputChangeTest_fieldChange_ignore = async () => {
+  const store = new Store();
+  const app = new AppClass();
+  await app.init(store);
 
   const object = {hello: 'world'};
-  test.capture('object', object);
-  test.ignore('object', object);
-  test.ignore('object', {hello: 'world'});
+  store.set('object', object);
+  app.expect({'object': {hello: 'world'}});
 
-  object.b = [1, 2, 3];
-  test.ignore('object', object);
-
-  object.b.push(4);
-  test.ignore('object', object);
-
-  return await test.validate();
-}; 
-
-
-export const hostInputChangeTest_object_cloned = async () => {
-  const test = new HostInputsTest();
-  await test.init();
-
-  const object = {hello: 'world'};
-  test.capture('object', object);
-
+  // A field in an unchanged object is set, no update.
   object.foo = 'bar';
-  test.ignore('object', object);
+  store.set('object', object);
 
-  test.capture('object', {...object, foo: 'qux'});
+  return await app.validate();
+};
 
-  return await test.validate();
+export const hostInputChangeTest_clonedObjectFieldChange_capture = async () => {
+  const store = new Store();
+  const app = new AppClass();
+  await app.init(store);
+
+  const object = {hello: 'world'};
+  store.set('object', object);
+  app.expect({'object': {hello: 'world'}});
+
+  // Object is cloned and a field.
+  store.set('object', {...object, foo: 'bar'});
+  app.expect({'object': {hello: 'world', foo: 'bar'}});
+
+  return await app.validate();
 };
