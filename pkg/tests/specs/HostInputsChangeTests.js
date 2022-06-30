@@ -62,11 +62,10 @@ const AppClass = class {
     );
     this.changes.disposeListener = () => host.unlisten('inputs-changed', 'ahoy');
     this.changes.finalize = () => (this.changes.disposeListener(), [...this.changes]);
-    // return changes;
   }
 
-  expect(value) {
-    this.expectations.push({value});
+  expect(values) {
+    this.expectations.push(...values.map(value => ({value})));
   }
 
   async validate() {
@@ -87,28 +86,31 @@ export const hostInputsChangeTest = async () => {
   // set a key: value pair twice, second change should be filtered
   store.set('b', 42);
   store.set('b', 42);
-  app.expect({'b': 42});
 
   // set an Object value twice, second change should be filtered
   store.set('obj', {things: 7});
   store.set('obj', {things: 7});
-  app.expect({'b': 42, 'obj': {things: 7}});
 
   // // sub-property change
   store.set('obj', {things: 6});
-  app.expect({'b': 42, 'obj': {things: 6}});
 
   // set an Array value twice, second change should be filtered
   store.set('arr', [0, 1, 2]);
   store.set('arr', [0, 1, 2]);
-  app.expect({'b': 42, 'obj': {things: 6}, arr: [0, 1, 2]});
 
   // test that change-detection is deep (reference independent)
   const arr = [0, 1, 2];
   store.set('arr', arr);
   arr.push(3);
   store.set('arr', arr);
-  app.expect({'b': 42, 'obj': {things: 6}, arr: [0, 1, 2, 3]});
+
+  app.expect([
+    {'b': 42},
+    {'b': 42, 'obj': {things: 7}},
+    {'b': 42, 'obj': {things: 6}},
+    {'b': 42, 'obj': {things: 6}, arr: [0, 1, 2]},
+    {'b': 42, 'obj': {things: 6}, arr: [0, 1, 2, 3]}
+  ]);
 
   // capture operations
   return await app.validate();
@@ -121,12 +123,12 @@ export const hostInputChangeTest_fieldChange_ignore = async () => {
 
   const object = {hello: 'world'};
   store.set('object', object);
-  app.expect({'object': {hello: 'world'}});
 
   // A field in an unchanged object is set, no update.
   object.foo = 'bar';
   store.set('object', object);
 
+  app.expect([{'object': {hello: 'world'}}]);
   return await app.validate();
 };
 
@@ -137,11 +139,13 @@ export const hostInputChangeTest_clonedObjectFieldChange_capture = async () => {
 
   const object = {hello: 'world'};
   store.set('object', object);
-  app.expect({'object': {hello: 'world'}});
 
   // Object is cloned and a field.
   store.set('object', {...object, foo: 'bar'});
-  app.expect({'object': {hello: 'world', foo: 'bar'}});
 
+  app.expect([
+    {'object': {hello: 'world'}},
+    {'object': {hello: 'world', foo: 'bar'}}
+  ]);
   return await app.validate();
 };
