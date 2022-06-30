@@ -49,7 +49,6 @@ const AppClass = class {
     host.particle = dummicle;
     // add `host` to `arc`
     await arc.addHost(host);
-    this.expectations = [];
     // track when the host signals a change
     this.changes = [];
     host.listen(
