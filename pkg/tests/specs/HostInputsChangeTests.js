@@ -12,9 +12,9 @@ const {create, entries} = Object;
 // create a dummy Particle
 const dummicle = {
   meta: {
-    bindings: {
+    inputs: [{
       value: 'itisstore'
-    }
+    }]
   },
   internal: {
     inputs: {}
