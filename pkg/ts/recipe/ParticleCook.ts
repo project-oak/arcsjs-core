@@ -31,10 +31,10 @@ export class ParticleCook {
   }
   static specToMeta(spec) {
     // TODO(sjmiles): impedance mismatch here is likely to cause problems
-    const {$kind: kind, $container: container, $staticInputs: staticInputs, $bindings: bindings} = spec;
+    const {$kind: kind, $container: container, $staticInputs: staticInputs} = spec;
     const inputs = this.formatBindings(spec.$inputs);
     const outputs = this.formatBindings(spec.$outputs);
-    return {kind, staticInputs, bindings, inputs, outputs, container};
+    return {kind, staticInputs, inputs, outputs, container};
   }
   static formatBindings(bindings) {
     return bindings?.map(binding => typeof binding === 'string' ? {[binding]: binding} : binding);

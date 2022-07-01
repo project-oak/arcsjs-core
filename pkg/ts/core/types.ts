@@ -24,7 +24,6 @@ export type ParticleMeta = {
   kind: string,
   container: string
   staticInputs?;
-  bindings?;
   inputs?: Array<String|Object>;
   outputs?: Array<String|Object>;
   // arbitrary field definitions

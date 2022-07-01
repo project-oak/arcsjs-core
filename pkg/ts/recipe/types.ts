@@ -55,7 +55,6 @@ export type ParticleSpec = {
   $slots?: Dictionary<SlotSpec>,
   $claims?: Pojo,
   $checks?: Pojo,
-  $bindings?: Pojo
 };
 
 export type ParticleNode = {
