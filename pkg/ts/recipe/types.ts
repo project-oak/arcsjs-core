@@ -13,8 +13,8 @@ export {Dictionary};
 
 export type Tag = string;
 
-type Pojo = Record<string, unknown>;
-type Type = string;
+export type Pojo = Record<string, unknown>;
+export type Type = string;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -25,7 +25,7 @@ export type StoreSpec = {
   $tags?: [string];
 };
 
-type ParticleDictionary = Dictionary<ParticleSpec>;
+export type ParticleDictionary = Dictionary<ParticleSpec>;
 
 export type SlotSpec = {
   $meta?: Pojo,

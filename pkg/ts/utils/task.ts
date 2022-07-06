@@ -6,7 +6,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-type Task = (...args: any[]) => void;
+export type Task = (...args: any[]) => void;
 type DebounceKey = number;
 
 /**

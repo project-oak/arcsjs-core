@@ -24,7 +24,7 @@ const mapStore = (runtime: Runtime, {name, type}) => {
   return findStores(runtime, {name, type})?.[0];
 };
 
-type StoreMapFunc = (runtime: Runtime, arc: Arc, store) => void;
+export type StoreMapFunc = (runtime: Runtime, arc: Arc, store) => void;
 
 export class StoreCook {
   static async execute(runtime: Runtime, arc: Arc, stores: StoreMeta[]) {
