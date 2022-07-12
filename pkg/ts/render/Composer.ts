@@ -78,6 +78,7 @@ export class Composer extends EventEmitter {
     //}
     //
     if (slot && model) {
+      this.maybeReattachSlot(slot, container);
       slot.set(model);
       this.processPendingPackets();
     }
@@ -89,6 +90,8 @@ export class Composer extends EventEmitter {
   }
   generateSlot(id, template, parent): Slot {
     return null;
+  }
+  maybeReattachSlot(slot, container) {
   }
   onevent(pid, eventlet) {
     log(`[${pid}] sent [${eventlet.handler}] event`);

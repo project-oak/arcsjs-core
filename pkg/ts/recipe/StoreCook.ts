@@ -58,7 +58,9 @@ export class StoreCook {
       log(`realizeStore: created "${meta.name}"`);
     } else {
       log(`realizeStore: mapped to "${meta.name}", setting data to:`, meta?.value);
-      store.data = meta?.value;
+      if (meta?.value !== undefined) {
+        store.data = meta?.value;
+      }
     }
     arc.addStore(meta.name, store);
   }
