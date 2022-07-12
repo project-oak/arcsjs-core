@@ -18,7 +18,7 @@ import {Dictionary, Logger} from './utils/types.js';
 const log = logFactory(logFactory.flags.runtime, 'runtime', 'forestgreen');
 
 type UID = string;
-type ParticleFactory = (kind: string) => Promise<unknown>;
+export type ParticleFactory = (kind: string) => Promise<unknown>;
 
 const particleFactoryCache = {};
 const storeFactories = {};
