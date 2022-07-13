@@ -77,12 +77,10 @@ export class Arc extends EventEmitter {
   // TODO(sjmiles): 2nd param is used in overrides, make explicit
   protected storeChanged(storeId, store) {
     this.log(`storeChanged: "${storeId}"`);
-    const isBoundBackwardCompatible = bindings => bindings && entries(bindings).some(([n, v]) => (v || n) === storeId);
     const isBound = inputs => inputs && inputs.some(input => values(input)[0] == storeId || keys(input)[0] == storeId);
     values(this.hosts).forEach(host => {
-      const bindings = host.meta?.bindings;
       const inputs = host.meta?.inputs;
-      if (bindings === '*' || isBoundBackwardCompatible(bindings) || isBound(inputs)) {
+      if (inputs === '*' || isBound(inputs)) {
         this.log(`host "${host.id}" has interest in "${storeId}"`);
         // TODO(sjmiles): we only have to update inputs for storeId, we lose efficiency here
         this.updateHost(host);
@@ -102,41 +100,22 @@ export class Arc extends EventEmitter {
   // complement to `assignOutputs`
   protected computeInputs(host) {
     const inputs = nob();
-    const bindings = host.meta?.bindings;
     const inputBindings = host.meta?.inputs;
     const staticInputs = host.meta?.staticInputs;
-    if (host.meta.bindings === '*') {
+    if (inputBindings ===  '*') {
       // TODO(sjmiles): we could make the contract that the bindAll inputs are
       // names (or names + meta) only. The Particle could look up values via
       // service.
       entries(this.stores).forEach(([name, store]) => inputs[name] = store.pojo);
     } else {
-      if (bindings) {
-        keys(bindings).forEach(name => this.computeInputBackwardCompatibile(name, bindings, staticInputs, inputs));
-      }
       if (inputBindings) {
         inputBindings.forEach(input => this.computeInput(entries(input)[0], staticInputs, inputs));
       }
-      if (bindings || inputBindings) {
+      if (inputBindings) {
         this.log(`computeInputs(${host.id}) =`, inputs);
       }
     }
     return inputs;
-  }
-  protected computeInputBackwardCompatibile(name, bindings, staticInputs, inputs) {
-    // TODO(sjmiles): implement _conditional_ bindings that are dynamic at runtime to allow directing data flow (c.f. FooImageRef)
-    const storeName = bindings[name] || name;
-    // find referenced store
-    const store = this.stores[storeName];
-    if (store) {
-      //this.log(`computeInputs: using "${storeName}" (bound to "${name}")`);
-      inputs[name] = store.pojo;
-    } else {
-      this.log.error(`computeInput: "${storeName}" (bound to "${name}") not found`);
-    }
-    if (!(inputs[name]?.length > 0) && staticInputs?.[name]) {
-      inputs[name] = staticInputs[name];
-    }
   }
   protected computeInput([name, binding], staticInputs, inputs) {
     const storeName = binding || name;
@@ -157,21 +136,21 @@ export class Arc extends EventEmitter {
   // complement to `computeInputs`
   assignOutputs({id, meta}, outputs) {
     const names = keys(outputs);
-    if ((meta?.bindings || meta?.outputs) && names.length) {
+    if (meta?.outputs && names.length) {
       //this.log.group(`assignOutputs(${host.id}, {${keys}})`);
       //this.log(`[start][${id}] assignOutputs({${names}})`);
-      names.forEach(name => this.assignOutput(name, this.stores, outputs[name], meta.bindings, meta.outputs));
+      names.forEach(name => this.assignOutput(name, this.stores, outputs[name], meta.outputs));
       //this.log.groupEnd();
       this.log(`[end][${id}] assignOutputs:`, outputs);
     }
   }
-  protected assignOutput(name, stores, output, bindings, outputs) {
+  protected assignOutput(name, stores, output, outputs) {
     if (output !== undefined) {
-      const binding = bindings?.[name] || this.findOutputByName(outputs, name) || name;
+      const binding = this.findOutputByName(outputs, name) || name;
      // this.log(`assignOutputs: property "${name}" is bound to store "${binding}"`);
       const store = stores[binding];
       if (!store) {
-        if (bindings?.[name] || outputs?.[name]) {
+        if (outputs?.[name]) {
           this.log.warn(`assignOutputs: no "${binding}" store for output "${name}"`);
         }
       } else {
