@@ -35,3 +35,33 @@ export const testStoreState = async () => {
   // test
   return checkState(stateCapture({store}), expectedState);
 };
+
+export const testStoreState1 = async () => {
+  // create a store
+  const store = new Store();
+  // set a key: value pair
+  store.set('list', [1, 2, 3]);
+  store.set('list', [1, 2, 3]);
+  // set an object value
+  store.set('objs', [{things: 7}, {otherThings: 8}]);
+  store.set('objs', [{things: 7}, {otherThings: 8}]);
+  // set an object value
+  store.set('objs', [{things: 7}, {otherThings: 88}]);
+  store.set('objs', [{things: 7}, {otherThings: [8, 88]}]);
+  // what we expect
+  const expectedState = JSON.stringify({
+    store: {
+      meta: {
+      },
+      value: {
+        list: [1, 2, 3],
+        objs: [
+          {things: 7},
+          {otherThings: [8, 88]}
+        ]
+      }
+    }
+  });
+  // test
+  return checkState(stateCapture({store}), expectedState);
+};
