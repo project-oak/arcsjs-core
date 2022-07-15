@@ -112,6 +112,7 @@ export class Host extends EventEmitter {
       (lastOutput?.[n] && !deepEqual(lastOutput[n], v))
       || !deepEqual(lastInputs?.[n], v);
     return !lastInputs
+      || entries(inputs).length !== entries(lastInputs).length
       || entries(inputs).some(dirtyBits);
   }
   get config() {
