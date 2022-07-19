@@ -99,23 +99,13 @@ export class Host extends EventEmitter {
   set inputs(inputs) {
     if (this.particle && inputs) {
       const lastInputs = this.particle.internal.inputs;
-      if (this.dirtyCheck(inputs, this.excludeStaticInputs(lastInputs, this.meta?.staticInputs), this.lastOutput)) {
-        this.particle.inputs = {...this.meta?.staticInputs, ...inputs};
+      const newInputs = {...this.meta?.staticInputs, ...inputs};
+      if (this.dirtyCheck(newInputs, lastInputs, this.lastOutput)) {
+        this.particle.inputs = newInputs;
         this.fire('inputs-changed');
       } else {
         this.log('inputs are uninteresting, skipping update');
       }
-    }
-  }
-  excludeStaticInputs(inputs, staticInputs) {
-    if (inputs) {
-      const nonStaticInputs = {};
-      Object.keys(inputs).forEach(key => {
-        if (!staticInputs?.[key]) {
-          nonStaticInputs[key] = inputs[key];
-        }
-      });
-      return nonStaticInputs;
     }
   }
   dirtyCheck(inputs, lastInputs, lastOutput) {
