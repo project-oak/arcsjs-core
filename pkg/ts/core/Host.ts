@@ -42,6 +42,7 @@ export class Host extends EventEmitter {
   log;
   meta: ParticleMeta;
   particle: Particle;
+  lastInputs: Object;
   constructor(id) {
     super();
     this.log = customLogFactory(id);
@@ -98,10 +99,9 @@ export class Host extends EventEmitter {
   }
   set inputs(inputs) {
     if (this.particle && inputs) {
-      const lastInputs = this.particle.internal.inputs;
-      const newInputs = {...this.meta?.staticInputs, ...inputs};
-      if (this.dirtyCheck(newInputs, lastInputs, this.lastOutput)) {
-        this.particle.inputs = newInputs;
+      if (this.dirtyCheck(inputs, this.lastInputs, this.lastOutput)) {
+        this.particle.inputs = {...this.meta?.staticInputs, ...inputs};
+        this.lastInputs = inputs;
         this.fire('inputs-changed');
       } else {
         this.log('inputs are uninteresting, skipping update');
