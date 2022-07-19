@@ -13,7 +13,7 @@ import {Decorator} from './Decorator.js';
 import {Particle, Eventlet} from './Particle.js';
 import {ParticleMeta} from './types.js';
 
-const {entries} = Object;
+const {entries, keys} = Object;
 
 const customLogFactory = (id: string) => logFactory(logFactory.flags.host, `Host (${id})`, arand(['#5a189a','#51168b', '#48137b', '#6b2fa4','#7b46ae', '#3f116c']));
 
@@ -42,7 +42,6 @@ export class Host extends EventEmitter {
   log;
   meta: ParticleMeta;
   particle: Particle;
-  lastInputs: Object;
   constructor(id) {
     super();
     this.log = customLogFactory(id);
@@ -99,9 +98,9 @@ export class Host extends EventEmitter {
   }
   set inputs(inputs) {
     if (this.particle && inputs) {
-      if (this.dirtyCheck(inputs, this.lastInputs, this.lastOutput)) {
+      const lastInputs = this.particle.internal.inputs;
+      if (this.dirtyCheck(inputs, lastInputs, this.lastOutput)) {
         this.particle.inputs = {...this.meta?.staticInputs, ...inputs};
-        this.lastInputs = inputs;
         this.fire('inputs-changed');
       } else {
         this.log('inputs are uninteresting, skipping update');
@@ -113,8 +112,11 @@ export class Host extends EventEmitter {
       (lastOutput?.[n] && !deepEqual(lastOutput[n], v))
       || !deepEqual(lastInputs?.[n], v);
     return !lastInputs
-      || entries(inputs).length !== entries(lastInputs).length
+      || entries(inputs).length !== this.lastInputsLength(lastInputs)
       || entries(inputs).some(dirtyBits);
+  }
+  lastInputsLength(lastInputs) {
+    return keys(lastInputs).filter(key => !this.meta?.staticInputs?.[key] && key !== 'eventlet').length;
   }
   get config() {
     return this.particle?.config;
