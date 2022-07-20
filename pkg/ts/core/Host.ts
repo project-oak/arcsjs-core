@@ -13,7 +13,7 @@ import {Decorator} from './Decorator.js';
 import {Particle, Eventlet} from './Particle.js';
 import {ParticleMeta} from './types.js';
 
-const {entries} = Object;
+const {entries, keys} = Object;
 
 const customLogFactory = (id: string) => logFactory(logFactory.flags.host, `Host (${id})`, arand(['#5a189a','#51168b', '#48137b', '#6b2fa4','#7b46ae', '#3f116c']));
 
@@ -112,8 +112,11 @@ export class Host extends EventEmitter {
       (lastOutput?.[n] && !deepEqual(lastOutput[n], v))
       || !deepEqual(lastInputs?.[n], v);
     return !lastInputs
-      || entries(inputs).length !== entries(lastInputs).length
+      || entries(inputs).length !== this.lastInputsLength(lastInputs)
       || entries(inputs).some(dirtyBits);
+  }
+  lastInputsLength(lastInputs) {
+    return keys(lastInputs).filter(key => !this.meta?.staticInputs?.[key] && key !== 'eventlet').length;
   }
   get config() {
     return this.particle?.config;
