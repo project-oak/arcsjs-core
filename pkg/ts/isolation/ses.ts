@@ -22,10 +22,10 @@ let particleCompartment;
 export const initSes = (options?) => {
   if (!particleCompartment) {
     const debugOptions = {
-      consoleTaming: 'unsafe',
+      consoleTaming: 'safe',
       errorTaming: 'unsafe',
-      errorTrapping: 'report',
-      stackFiltering: 'verbose'
+      errorTrapping: 'unsafe',
+      stackFiltering: 'concise'
     };
     const prodOptions = {};
     requiredLog.log('LOCKDOWN');
