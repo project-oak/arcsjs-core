@@ -273,7 +273,7 @@ export class Particle {
     return Promise.resolve().then(fn.bind(this));
   }
   // activate particle lifecycle
-  validate() {
+  async validate() {
     //this.log('validate');
     if (this.internal.validator) {
       // try..finally to ensure we nullify `validator`
@@ -288,7 +288,7 @@ export class Particle {
           // inputs are immutable (changes to them are ignored)
           this.internal.inputs = this.validateInputs();
           // let the impl decide what to do
-          this.maybeUpdate();
+          await this.maybeUpdate();
         }
       } catch(e) {
         log.error(e);

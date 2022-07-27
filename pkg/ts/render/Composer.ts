@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
@@ -62,7 +62,8 @@ export class Composer extends EventEmitter {
       //log.warn(`found parent, needs slot, container = `, container, parent);
       if (!parent) {
         this.pendingPackets.push(packet);
-        if (packet['pendCount'] % 100 === 0) {
+        if ((packet['pendCount'] % 100) === 0) {
+          packet['pendCount']++;
           log.warn(`container [${container}] unavailable for slot [${id}] (x100)`);
           // stubs out the slot
           //this.slots[id] = 42;
