@@ -55,10 +55,13 @@ export const runTests = async tests => {
 export const waitFor = async ms => new Promise(resolve => setTimeout(resolve, ms));
 
 export const kill = globalThis.kill = () => {
-  globalThis?.App?.dispose();
-  globalThis.App.user = null;
-  globalThis.App.system = null;
-  console.log('::killed app environment');
+  const {App} = globalThis;
+  if (App) {
+    App.dispose?.();
+    App.user = null;
+    App.system = null;
+    console.log('::killed app environment');
+  }
 };
 
 export const checkState = (actualState, expectedState) => {
