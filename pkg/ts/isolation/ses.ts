@@ -89,14 +89,14 @@ const repackageImplFactory = (factory, kind) => {
   const moduleRewrite = `
 ({log, ...utils}) => {
 // protect utils
-harden(utils);
+globalThis.harden(utils);
 // these are just handy
 const {assign, keys, entries, values, create} = Object;
 // declarations
 ${[...rewriteConsts, ...rewriteFuncs].join('\n\n')}
 // hardened Object (map) of declarations,
 // suitable to be a prototype
-return harden(${proto});
+return globalThis.harden(${proto});
 // name the file for debuggers
 //# sourceURL=sandbox/${pathForKind(kind).split('/').pop()}
 };
@@ -110,8 +110,10 @@ const collectDecls = factory => {
   const props = Object.entries(factory);
   // filter by typeof
   const isFunc = ([n, p]) => typeof p === 'function';
+  // filter out forbidden names
+  const isForbidden = ([n, p]) => n == 'harden' || n == 'globalThis';
   // get props that are functions
-  const funcs = props.filter(isFunc);
+  const funcs = props.filter(item => isFunc(item) && !isForbidden(item));
   // rewrite object declarations as module declarations
   const rewriteFuncs = funcs.map(([n, f]) => {
     const code = f.toString();
@@ -122,7 +124,7 @@ const collectDecls = factory => {
   // array up the function names
   const funcNames = funcs.map(([n]) => n);
   // if it's not a Function, it's a const
-  const consts = props.filter(item => !isFunc(item));
+  const consts = props.filter(item => !isFunc(item) && !isForbidden(item));
   // build const decls
   const rewriteConsts = consts.map(([n, p]) => {
     return `const ${n} = \`${p}\`;`;
