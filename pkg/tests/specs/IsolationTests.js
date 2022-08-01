@@ -7,7 +7,7 @@
  import {checkState} from '../lib/test-utils.js';
  import { initSes, createSesParticleFactory } from '../../js/isolation/ses.js';
 
- export const testHardenOverridable = async () => {
+ export const testHardenNotOverridable = async () => {
    initSes();
    const factory = await createSesParticleFactory('Foo', {
     code: `({ 
@@ -25,12 +25,24 @@
      particle.impl.foo();
      x = particle.impl.foo();
    } catch (e) {
-     // should throw 'not extensible' when fixed
+     // should throw 'not extensible'
      return checkState({msg: e.message}, {msg: 'Cannot add property x, object is not extensible'});
    }
 
-   // should change to failure (unreachable line) when fixed
-   return checkState({x}, {x: 2});
+   // Should be unreachable
+   return checkState({x: false}, {x: true});
  };
  
- 
+ export const testOverriddenSpecialsRemoved = async () => {
+    initSes();
+    const factory = await createSesParticleFactory('Foo', {
+     code: `({ 
+             globalThis() {},
+             harden(x) { return x; },
+         })`
+    });
+    
+    const particle = factory({ output() {}, service() { }});
+    return checkState({g: particle.impl.globalThis, h: particle.impl.harden}, {g: undefined, h: undefined});
+  };
+  
