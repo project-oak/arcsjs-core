@@ -23,16 +23,27 @@ export const initSes = (options?) => {
   if (!particleCompartment) {
     const debugOptions = {
       consoleTaming: 'safe',
-      errorTaming: 'unsafe',
-      errorTrapping: 'unsafe',
+      errorTaming: 'safe',
+      errorTrapping: 'safe',
       stackFiltering: 'concise'
     };
     const prodOptions = {};
-    requiredLog.log('LOCKDOWN');
-    requiredLog.groupCollapsed('...removing intrinics...');
-    lockdown(debugOptions || prodOptions);
-    requiredLog.groupEnd();
-    particleCompartment = new Compartment({log, resolve, html, makeKey, timeout, ...options?.injections, harden: globalThis.harden});
+    requiredLog.groupCollapsed('LOCKDOWN');
+    try {
+      lockdown(debugOptions || prodOptions);
+      const utils = {log, resolve, html, makeKey, timeout};
+      particleCompartment = new Compartment({
+        // default injections
+        ...utils,
+        // app injections
+        ...options?.injections,
+        // security injection
+        harden: globalThis.harden
+      });
+      requiredLog.log('Particle Compartment ready');
+    } finally {
+      requiredLog.groupEnd();
+    }
   }
 };
 
@@ -116,7 +127,7 @@ const collectDecls = factory => {
   const funcs = props.filter(item => isFunc(item) && !isForbidden(item));
   // rewrite object declarations as module declarations
   const rewriteFuncs = funcs.map(([n, f]) => {
-    const code = f.toString();
+    const code = (f as Object)?.toString?.() ?? '';
     const async = code.includes('async');
     const body = code.replace('async ', '').replace('function ', '');
     return `${async ? 'async' : ''} function ${body};`;
@@ -152,7 +163,7 @@ const requireParticle = async () => {
 const createLogger = kind => {
   const _log = logFactory(logFactory.flags.particles, kind, 'crimson');
   return (msg, ...args) => {
-    const stack = msg?.stack?.split('\n')?.slice(1, 2) || (new Error()).stack.split('\n').slice(2, 3);
+    const stack = msg?.stack?.split('\n')?.slice(1, 2) || (new Error()).stack?.split('\n').slice(2, 3);
     const where = stack
       .map(entry => entry
         .replace(/\([^()]*?\)/, '')
