@@ -62,8 +62,8 @@ export class Composer extends EventEmitter {
       //log.warn(`found parent, needs slot, container = `, container, parent);
       if (!parent) {
         this.pendingPackets.push(packet);
-        if ((packet['pendCount'] % 1000) === 0) {
-          log.warn(`container [${container}] unavailable for slot [${id}] (x1000)`);
+        if ((++packet['pendCount'] % 1e4) === 0) {
+          log.warn(`container [${container}] unavailable for slot [${id}] (x1e4)`);
           // stubs out the slot
           //this.slots[id] = 42;
         }
