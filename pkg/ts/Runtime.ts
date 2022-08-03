@@ -111,6 +111,12 @@ export class Runtime extends EventEmitter {
     const particle = await this.createParticle(host, particleMeta.kind);
     host.installParticle(particle, particleMeta);
   }
+  // create a host, install a particle, add host to arc
+  async installParticle(arc, particleMeta: ParticleMeta) {
+    const host = new Host(particleMeta.kind);
+    await this.marshalParticle(host, particleMeta);
+    arc.addHost(host);
+  }
   // map a store by a Runtime-specific storeId
   // Stores have no intrinsic id
   addStore(storeId, store) {

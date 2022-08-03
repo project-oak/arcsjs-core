@@ -23,7 +23,7 @@ export class Chef {
       return;
     }
     //log.groupCollapsed('executing recipe...', recipe.$meta);
-    log('|-->...| executing recipe: ', recipe.$meta);
+    log('|-->...| executing recipe: ', recipe.$meta ?? '');
     const plan = new Parser(recipe);
     // `store` preparation
     await StoreCook.execute(runtime, arc, plan.stores);
@@ -32,7 +32,7 @@ export class Chef {
     // seasoning
     // TODO(sjmiles): what do we use this for?
     arc.meta = {...arc.meta, ...plan.meta};
-    log('|...-->| recipe complete: ', recipe.$meta);
+    log('|...-->| recipe complete: ', recipe.$meta ?? '');
     //log.groupEnd();
   }
   static async evacipate(recipe: Recipe, runtime: Runtime, arc: Arc) {

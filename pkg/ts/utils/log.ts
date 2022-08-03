@@ -31,4 +31,4 @@ export const logFactory = (enable: boolean, preamble: string, color = ''): Logge
   return log as Logger;
 };
 
-logFactory.flags = globalThis.config.logFlags || {};
+logFactory.flags = globalThis.config?.logFlags || {};

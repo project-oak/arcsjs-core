@@ -23,7 +23,7 @@ export const initSes = (options?) => {
   if (!particleCompartment) {
     const debugOptions = {
       consoleTaming: 'safe',
-      errorTaming: 'safe',
+      errorTaming: 'unsafe',
       errorTrapping: 'safe',
       stackFiltering: 'concise'
     };
@@ -161,7 +161,7 @@ const requireParticle = async () => {
 };
 
 const createLogger = kind => {
-  const _log = logFactory(logFactory.flags.particles, kind, 'crimson');
+  const _log = logFactory(logFactory.flags.particles, kind, '#002266');
   return (msg, ...args) => {
     const stack = msg?.stack?.split('\n')?.slice(1, 2) || (new Error()).stack?.split('\n').slice(2, 3);
     const where = stack
