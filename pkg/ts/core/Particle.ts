@@ -395,6 +395,8 @@ export class Particle {
     this.internal.$busy++;
     try {
       return await asyncFunc();
+    } catch(e) {
+      log.error(e);
     } finally {
       this.internal.$busy--;
     }
