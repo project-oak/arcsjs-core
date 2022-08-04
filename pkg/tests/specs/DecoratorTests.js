@@ -98,7 +98,7 @@
     return checkState({modelFroze: true, inputsFroze: true}, {modelFroze, inputsFroze});
   };
 
-  export const testPrivateDataCanBeUpdateed = async () => {
+  export const testPrivateDataCanBeUpdated = async () => {
     const particle = await makeParticle(
         `
             , myDecorator({privateData}, inputs, state) { 
@@ -108,5 +108,18 @@
     Decorator.setOpaqueData("fonts", makeTestData());
     Decorator.maybeDecorateModel(particle.impl.render({fonts: 'fonts'}), particle);
     const decoratedModel =  Decorator.maybeDecorateModel(particle.impl.render({fonts: 'fonts'}), particle);
-    return checkState({x: decoratedModel.myfonts.models[0].privateData.x}, {x: 'Hello'});
+    return checkState({x: decoratedModel.myfonts.models[0].privateData.x}, {x: 'HelloHello'});
+  };
+
+  export const testPrivateDataUpdateDoNotMutateOriginalInput = async () => {
+    const particle = await makeParticle(
+        `
+            , myDecorator({privateData}, inputs, state) { 
+                return {privateData: { x: "Hello" + (privateData.x || "") } };
+            }       
+    `);
+    const testData = makeTestData();
+    Decorator.setOpaqueData("fonts", testData);
+    Decorator.maybeDecorateModel(particle.impl.render({fonts: 'fonts'}), particle);
+    return checkState({x: testData[0].privateData}, {x: undefined});
   };

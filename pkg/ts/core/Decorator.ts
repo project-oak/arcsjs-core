@@ -16,7 +16,7 @@ const opaqueData = {};
 
 export const Decorator = {
   setOpaqueData(name, data) {
-    opaqueData[name] = data;
+    opaqueData[name] = deepCopy(data);
     return name;
   },
   getOpaqueData(name) {
@@ -78,8 +78,8 @@ const maybeDecorate = (models, decorator, particle) => {
       const immutableModel = Object.freeze(deepCopy(model));
       const decorated = decorator(immutableModel, immutableInputs, immutableState);
       // set new privateData from returned
-      const privateData = decorated.privateData;
-      return { ...decorated, ...immutableModel, privateData };
+      model.privateData = decorated.privateData;
+      return { ...decorated, ...model,  };
     });
     // sort (possible that all values undefined)
     models.sort(sortByLc('sortKey'));
