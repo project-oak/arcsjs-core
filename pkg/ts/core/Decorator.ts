@@ -64,17 +64,22 @@ const maybeDecorate = (models, decorator, particle) => {
   decorator = particle.impl[decorator] ?? decorator;
   const {inputs, state} = particle.internal;
   if (decorator) {
+    // TODO(cromwellian): Could be expensive to do everything, store responsibility?
+    const immutableInputs = Object.freeze(deepCopy(inputs));
     // we don't want the decorator to have access to mutable globals
-    const immutableState  = Object.freeze(deepCopy(state));
+    const immutableState = Object.freeze(deepCopy(state));
     // models become decorous
     models = models.map(model => {
       // use previously mutated data or initialize
-      // TODO(cromwellian): I'd like to do Object.freeze() here
+      // TODO(cromwellian): I'd like to do Object.freeze() here, also somehow not mutate the models inplace
+      // Possibly have setOpaqueData wrap the data so the privateData lives on the wrapper + internal immutable data
       model.privateData = model.privateData || {};
-      const decorated = decorator(model, inputs, immutableState);
+      // TODO(cromwellian): also could be done once during setOpaqueData() if we can track privateData differently
+      const immutableModel = Object.freeze(deepCopy(model));
+      const decorated = decorator(immutableModel, immutableInputs, immutableState);
       // set new privateData from returned
-      model.privateData = decorated.privateData;
-      return {...decorated, ...model};
+      const privateData = decorated.privateData;
+      return { ...decorated, ...immutableModel, privateData };
     });
     // sort (possible that all values undefined)
     models.sort(sortByLc('sortKey'));
