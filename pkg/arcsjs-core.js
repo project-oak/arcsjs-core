@@ -8,9 +8,11 @@ globalThis.Core = Core;
 
 // outer configuration
 const {config} = globalThis;
+// causes it to exist, if it doesn't already
+globalThis.config = {...config};
 
 // capture absolute path to here into global config
-if (config) {
+if (config && globalThis?.document) {
   // you are here
   const localRelative = import.meta.url.split('/').slice(0, -1).join('/');
   // document root is here

@@ -6,6 +6,7 @@
  license that can be found in the LICENSE file or at
  https://developers.google.com/open-source/licenses/bsd
 -->
+
 <script type="module">
   globalThis.config = {
     logFlags: {particles: true}
@@ -15,7 +16,7 @@
 <script type="module">
   import {Host} from '../js/core/Host.js';
   import {Runtime} from '../js/Runtime.js';
-  import '../js/isolation/ses.js';
+  import '../js/isolation/vanilla.js';
   //
   (async () => {
     const user = new Runtime('user');

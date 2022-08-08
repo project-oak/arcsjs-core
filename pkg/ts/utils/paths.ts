@@ -33,22 +33,27 @@ export const PathMapper = class {
   getAbsoluteHereUrl(meta, depth) {
     // you are here
     const localRelative = meta.url.split('/').slice(0, -(depth ?? 1)).join('/');
-    // document root is here
-    let base = document.URL;
-    // if document URL has a filename, remove it
-    if (base[base.length-1] !== '/') {
-      base = base.split('/').slice(0, -1).join('/');
+    if (!globalThis?.document) {
+      return localRelative;
+    } else {
+      // document root is here
+      let base = document.URL;
+      // if document URL has a filename, remove it
+      if (base[base.length-1] !== '/') {
+        base = base.split('/').slice(0, -1).join('/');
+      }
+      // create absoute path to here (aka 'local')
+      let localAbsolute = new URL(localRelative, base).href;
+      // no trailing slash!
+      if (localAbsolute[localAbsolute.length-1] === '/') {
+        localAbsolute = localAbsolute.slice(0, -1);
+      }
+      return localAbsolute;
     }
-    // create absoute path to here (aka 'local')
-    let localAbsolute = new URL(localRelative, base).href;
-    // no trailing slash!
-    if (localAbsolute[localAbsolute.length-1] === '/') {
-      localAbsolute = localAbsolute.slice(0, -1);
-    }
-    return localAbsolute;
   }
 };
 
 const root = import.meta.url.split('/').slice(0, -3).join('/');
+
 export const Paths = globalThis['Paths'] = new PathMapper(root);
 Paths.add(globalThis.config?.paths);

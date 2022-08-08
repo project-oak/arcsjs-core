@@ -17,11 +17,15 @@ export * from './js/recipe/RecipeParser.js';
 export * from './js/render/Composer.js';
 export * from './js/render/Surface.js';
 export * from './js/isolation/code.js';
-export * from './js/isolation/vanilla.js';
-
 import * as utils from './js/utils/utils.js';
-const {logFactory, Paths} = utils;
-export {logFactory, Paths, utils};
-
-const root = import.meta.url.split('/').slice(0, -1).join('/');
-Paths.setRoot(root);
+declare const logFactory: {
+    (enable: boolean, preamble: string, color?: string): import("./js/utils/types.js").Logger;
+    flags: any;
+}, Paths: {
+    map: Record<string, unknown>;
+    add(mappings: any): void;
+    resolve(path: any): string;
+    setRoot(root: any): void;
+    getAbsoluteHereUrl(meta: any, depth: any): string;
+};
+export { logFactory, Paths, utils };

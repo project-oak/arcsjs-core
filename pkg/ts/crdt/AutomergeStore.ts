@@ -6,7 +6,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {Automerge} from '../../third_party/automerge/automerge.js';
+import {Automerge} from '../../third_party/automerge/automerge.js.js.js.js';
 import {Store} from '../core/Store.js';
 import {deepCopy} from '../utils/object.js';
 import {logFactory} from '../utils/log.js';

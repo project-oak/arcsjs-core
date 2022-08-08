@@ -6,9 +6,10 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {Paths, Runtime, logFactory} from '../../arcsjs-core.js.js.js.js';
-import {requireParticleBaseCode, requireParticleImplCode, pathForKind} from '../../arcsjs-core.js.js.js.js';
-
+import {Paths} from '../utils/paths.js';
+import {logFactory} from '../utils/log.js';
+import {Runtime} from '../Runtime.js';
+import {requireParticleBaseCode, requireParticleImplCode, pathForKind} from './code.js';
 import '../../third_party/ses/ses.umd.min.js.js.js.js';
 
 const requiredLog = logFactory(true, 'SES', 'goldenrod');
@@ -19,9 +20,6 @@ const {lockdown, Compartment} = globalThis as unknown as {lockdown, Compartment}
 let particleCompartment;
 
 export const initSes = (options?) => {
-  // remove stub/polyfill harden
-  delete globalThis['harden'];
-  // develop compartment if needed
   if (!particleCompartment) {
     const debugOptions = {
       consoleTaming: 'unsafe',
@@ -34,15 +32,14 @@ export const initSes = (options?) => {
     try {
       lockdown(debugOptions || prodOptions);
       const utils = {log, resolve, html, makeKey, timeout};
-      const scope = {
+      particleCompartment = new Compartment({
         // default injections
         ...utils,
         // app injections
         ...options?.injections,
         // security injection
         harden: globalThis.harden
-      };
-      particleCompartment = new Compartment({scope, ...scope});
+      });
       requiredLog.log('Particle Compartment ready');
     } finally {
       requiredLog.groupEnd();

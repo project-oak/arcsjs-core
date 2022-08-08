@@ -10,9 +10,9 @@
  * PSA: code in this file is subject to isolation restrictions, including runtime processing.
  * Particle module interfaces with 3p code, and is often loaded into isolation contexts.
 **/
-
 const {create, assign, keys, values, entries, defineProperty, setPrototypeOf} = Object;
-const {log, harden, timeout} = globalThis as unknown as {log, harden, timeout};
+const scope = globalThis['scope'];
+const {log, timeout} = scope;
 const nob = () => create(null);
 
 // yay lambda, he gets a semi-colon ... named classes not so much
@@ -51,7 +51,7 @@ const storePrototype = new class {
     this.data[this.keys[index]] = value;
   }
   add(...values) {
-    values.forEach(value => this.data[globalThis.makeKey()] = value);
+    values.forEach(value => this.data[scope.makeKey()] = value);
   }
   push(...values) {
     this.add(...values);
@@ -403,8 +403,8 @@ export class Particle {
   }
 }
 
-harden(globalThis);
-harden(Particle);
+scope.harden(globalThis);
+scope.harden(Particle);
 
 // log('Any leaked values? Must pass three tests:');
 // try { globalThis['sneaky'] = 42; } catch(x) { log('sneaky test: pass'); }

@@ -14,7 +14,7 @@ import {Store} from './Store.js';
 
 const customLogFactory = (id: string) => logFactory(logFactory.flags.arc, `Arc (${id})`, 'slateblue');
 
-const {keys, entries, create} = Object;
+const {assign, keys, entries, create} = Object;
 const values = (o):any[] => Object.values(o);
 const nob = () => create(null);
 
@@ -101,54 +101,44 @@ export class Arc extends EventEmitter {
   protected computeInputs(host) {
     const inputs = nob();
     const inputBindings = host.meta?.inputs;
-    const staticInputs = host.meta?.staticInputs;
     if (inputBindings ===  '*') {
       // TODO(sjmiles): we could make the contract that the bindAll inputs are
       // names (or names + meta) only. The Particle could look up values via
-      // service.
+      // service (to reduce throughput requirements)
       entries(this.stores).forEach(([name, store]) => inputs[name] = store.pojo);
     } else {
+      const staticInputs = host.meta?.staticInputs;
+      assign(inputs, staticInputs);
       if (inputBindings) {
-        inputBindings.forEach(input => this.computeInput(entries(input)[0], staticInputs, inputs));
-      }
-      if (inputBindings) {
+        inputBindings.forEach(input => this.computeInput(entries(input)[0], inputs));
         this.log(`computeInputs(${host.id}) =`, inputs);
       }
     }
     return inputs;
   }
-  protected computeInput([name, binding], staticInputs, inputs) {
+  protected computeInput([name, binding], inputs) {
     const storeName = binding || name;
-    // TODO(sjmiles): implement _conditional_ bindings that are dynamic at runtime
-    // to allow directing data flow (c.f. FooImageRef)?
-    // find referenced store
     const store = this.stores[storeName];
     if (store) {
-      //this.log(`computeInputs: using "${storeName}" (bound to "${name}")`);
       inputs[name] = store.pojo;
     } else {
       this.log.warn(`computeInput: "${storeName}" (bound to "${name}") not found`);
-    }
-    if (!(inputs[name]?.length > 0) && staticInputs?.[name]) {
-      inputs[name] = staticInputs[name];
     }
   }
   // complement to `computeInputs`
   assignOutputs({id, meta}, outputs) {
     const names = keys(outputs);
     if (meta?.outputs && names.length) {
-      //this.log.group(`assignOutputs(${host.id}, {${keys}})`);
-      //this.log(`[start][${id}] assignOutputs({${names}})`);
-      names.forEach(name => this.assignOutput(name, this.stores, outputs[name], meta.outputs));
-      //this.log.groupEnd();
+      names.forEach(name =>
+        this.assignOutput(name, outputs[name], meta.outputs)
+      );
       this.log(`[end][${id}] assignOutputs:`, outputs);
     }
   }
-  protected assignOutput(name, stores, output, outputs) {
+  protected assignOutput(name, output, outputs) {
     if (output !== undefined) {
       const binding = this.findOutputByName(outputs, name) || name;
-     // this.log(`assignOutputs: property "${name}" is bound to store "${binding}"`);
-      const store = stores[binding];
+      const store = this.stores[binding];
       if (!store) {
         if (outputs?.[name]) {
           this.log.warn(`assignOutputs: no "${binding}" store for output "${name}"`);

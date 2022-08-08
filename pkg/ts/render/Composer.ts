@@ -22,6 +22,11 @@ export interface RenderPacket {
   }
 }
 
+export interface ComposerInterface {
+  render(packet: RenderPacket);
+  onevent(pid, eventlet);
+}
+
 export class Composer extends EventEmitter {
   protected slots;
   protected pendingPackets;
