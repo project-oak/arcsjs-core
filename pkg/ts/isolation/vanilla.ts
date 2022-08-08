@@ -6,73 +6,80 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {Paths, Runtime, logFactory} from '../../arcsjs-core.js.js.js.js';
-import {requireParticleBaseCode, requireParticleImplCode, pathForKind} from '../../arcsjs-core.js.js.js.js';
+import {Paths} from '../utils/paths.js';
+import {Runtime} from '../Runtime.js';
+import {logFactory} from '../utils/log.js';
+import {/*requireParticleBaseCode,*/ requireParticleImplCode, pathForKind} from './code.js';
 
-import '../../third_party/ses/ses.umd.min.js.js.js.js';
+//import {Paths, Runtime, logFactory} from '../../arcsjs-core.js';
+//import {/*requireParticleBaseCode,*/ requireParticleImplCode, pathForKind} from '../../arcsjs-core.js';
 
-const requiredLog = logFactory(true, 'SES', 'goldenrod');
-const log = logFactory(logFactory.flags.ses, 'SES', 'goldenrod');
+//const requiredLog = logFactory(true, 'vanilla', 'goldenrod');
+const log = logFactory(logFactory.flags.ses, 'vanilla', 'goldenrod');
 
-const {lockdown, Compartment} = globalThis as unknown as {lockdown, Compartment};
+const harden = object => object;
+globalThis.harden = harden;
+globalThis.scope = {
+  harden
+};
 
-let particleCompartment;
+//const {lockdown, Compartment} = globalThis as unknown as {lockdown, Compartment};
 
-export const initSes = (options?) => {
-  // remove stub/polyfill harden
-  delete globalThis['harden'];
-  // develop compartment if needed
-  if (!particleCompartment) {
-    const debugOptions = {
-      consoleTaming: 'unsafe',
-      errorTaming: 'unsafe',
-      errorTrapping: 'unsafe',
-      stackFiltering: 'verbose'
-    };
-    const prodOptions = {};
-    requiredLog.groupCollapsed('LOCKDOWN');
+const makeKey = () => `i${Math.floor((1 + Math.random() * 9) * 1e14)}`;
+const timeout =  async (func, delayMs) => new Promise(resolve => setTimeout(() => resolve(func()), delayMs));
+
+//let particleCompartment;
+
+export const initVanilla = (options?) => {
+  // if (!particleCompartment) {
+  //   const debugOptions = {
+  //     consoleTaming: 'unsafe',
+  //     errorTaming: 'unsafe',
+  //     errorTrapping: 'unsafe',
+  //     stackFiltering: 'verbose'
+  //   };
+    // const prodOptions = {};
+    // requiredLog.groupCollapsed('LOCKDOWN');
     try {
-      lockdown(debugOptions || prodOptions);
+      // lockdown(debugOptions || prodOptions);
       const utils = {log, resolve, html, makeKey, timeout};
       const scope = {
         // default injections
         ...utils,
         // app injections
         ...options?.injections,
-        // security injection
-        harden: globalThis.harden
       };
-      particleCompartment = new Compartment({scope, ...scope});
-      requiredLog.log('Particle Compartment ready');
+      Object.assign(globalThis.scope, scope);
+      Object.assign(globalThis, scope);
+      //requiredLog.log('Particle Compartment ready');
     } finally {
-      requiredLog.groupEnd();
+      //requiredLog.groupEnd();
     }
-  }
+  // }
 };
 
 const resolve = Paths.resolve.bind(Paths);
 const html = (strings, ...values) => `${strings[0]}${values.map((v, i) => `${v}${strings[i + 1]}`).join('')}`.trim();
-const makeKey = () => `i${Math.floor((1 + Math.random() * 9) * 1e14)}`;
-const timeout =  async (func, delayMs) => new Promise(resolve => setTimeout(() => resolve(func()), delayMs));
 
-const createSesParticleFactory = async (kind, options?) => {
+const createParticleFactory = async (kind, options?) => {
   // ensure our canonical Particle class exists in the isolation chamber
-  const Particle = await requireParticle();
-  // evaluate custom code in isolation chamber
+  const {Particle} = await import('../core/Particle.js');
+  //const Particle = await requireParticle();
+  // // evaluate custom code in isolation chamber
   const implFactory = await requireImplFactory(kind, options);
   // injections
   const log = createLogger(kind);
   const injections = {log, resolve, html, ...options?.injections};
   // construct 3P prototype
   const proto = implFactory(injections);
-  // construct particleFactory
+  // // construct particleFactory
   const particleFactory = (host) => {
     const pipe = {
       log,
       output: host.output.bind(host),
       service: host.service.bind(host)
     };
-    return new Particle(proto, pipe);
+    return new Particle(proto, pipe, true);
   };
   return particleFactory;
 };
@@ -80,14 +87,14 @@ const createSesParticleFactory = async (kind, options?) => {
 const requireImplFactory = async (kind, options) => {
   // snatch up the custom particle code
   const implCode = await requireParticleImplCode(kind, options);
-  let factory;
-  try {
-    // evaluate in compartment
-    factory = particleCompartment.evaluate(implCode);
-  } catch(x) {
-    log.error('failed to evaluate:', implCode);
-    throw x;
-  }
+  let factory = (0, eval)(implCode);
+  // try {
+  //   // evaluate in compartment
+  //   factory = particleCompartment.evaluate(implCode);
+  // } catch(x) {
+  //   log.error('failed to evaluate:', implCode);
+  //   throw x;
+  // }
   // if it's an object
   if (typeof factory === 'object') {
     // repackage the code to eliminate closures
@@ -116,7 +123,7 @@ return globalThis.harden(${proto});
 };
   `;
   log('rewritten:\n\n', moduleRewrite);
-  return particleCompartment.evaluate(moduleRewrite);
+  return (0, eval)(moduleRewrite);
 };
 
 const collectDecls = factory => {
@@ -153,15 +160,15 @@ const collectDecls = factory => {
   };
 };
 
-let privateCtor;
+// let privateCtor;
 
-const requireParticle = async () => {
-  if (!privateCtor) {
-    const baseCode = await requireParticleBaseCode();
-    privateCtor = particleCompartment.evaluate(baseCode);
-  }
-  return privateCtor;
-};
+// const requireParticle = async () => {
+//   if (!privateCtor) {
+//     const baseCode = await requireParticleBaseCode();
+//     privateCtor = (0, eval)(baseCode);
+//   }
+//   return privateCtor;
+// };
 
 const createLogger = kind => {
   const _log = logFactory(logFactory.flags.particles, kind, '#002266');
@@ -191,5 +198,5 @@ const createLogger = kind => {
 };
 
 // give the runtime a safe way to instantiate Particles
-Runtime.particleIndustry = createSesParticleFactory;
-Runtime.securityLockdown = initSes;
+Runtime.particleIndustry = createParticleFactory;
+Runtime.securityLockdown = initVanilla;

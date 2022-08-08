@@ -11,7 +11,7 @@
 import {Runtime} from '../Runtime.js';
 import {debounce, asyncTask} from '../utils/task.js';
 import {logFactory} from '../utils/log.js';
-import {Automerge} from '../../third_party/automerge/automerge.js';
+import {Automerge} from '../../third_party/automerge/automerge.js.js.js.js';
 import {AutomergeStore} from './AutomergeStore.js';
 
 const peerUpdateDebounceGapMs = 100;

@@ -15,7 +15,7 @@ import {makeId} from './utils/id.js';
 import {ArcMeta, ParticleMeta, StoreMeta} from './core/types.js';
 import {Dictionary, Logger} from './utils/types.js';
 
-const log = logFactory(logFactory.flags.runtime, 'runtime', 'forestgreen');
+const log = logFactory(logFactory.flags.runtime, 'runtime', '#873600');
 
 type UID = string;
 export type ParticleFactory = (kind: string) => Promise<unknown>;
@@ -50,13 +50,13 @@ export class Runtime extends EventEmitter {
     this.peers = new Set();
     this.shares = new Set();
     this.setUid(uid);
-    this.log = logFactory(logFactory.flags.runtime, `runtime:[${this.prettyUid}]`, 'forestgreen');
+    this.log = logFactory(logFactory.flags.runtime, `runtime:[${this.prettyUid}]`, '#873600');
     Runtime.securityLockdown?.(Runtime.particleOptions);
   }
   setUid(uid: UID) {
     this.uid = uid;
     this.nid = `${uid}:${makeId(1, 2)}`;
-    this.prettyUid = uid.substring(0, uid.indexOf('@') + 1);
+    this.prettyUid = uid.substring(0, uid.indexOf('@') + 1) || uid;
   }
   async bootstrapArc(name: string, meta: ArcMeta, surface, service) {
     // make an arc on `surface`
@@ -112,10 +112,21 @@ export class Runtime extends EventEmitter {
     host.installParticle(particle, particleMeta);
   }
   // create a host, install a particle, add host to arc
-  async installParticle(arc, particleMeta: ParticleMeta) {
-    const host = new Host(particleMeta.kind);
+  async installParticle(arc, particleMeta: ParticleMeta, name?) {
+    this.log('installParticle', name, particleMeta, arc.id);
+    // provide a default name
+    name = name || makeId();
+    // deduplicate name
+    if (arc.hosts[name]) {
+      let n = 1;
+      for (; (arc.hosts[`${name}-${n}`]); n++);
+      name = `${name}-${n}`;
+    }
+    // build the structure
+    const host = new Host(name);
     await this.marshalParticle(host, particleMeta);
     arc.addHost(host);
+    return host;
   }
   // map a store by a Runtime-specific storeId
   // Stores have no intrinsic id
@@ -198,7 +209,7 @@ export class Runtime extends EventEmitter {
   protected async marshalParticleFactory(kind: string): Promise<ParticleFactory> {
     return particleFactoryCache[kind] ?? this.lateBindParticle(kind);
   }
-  protected async lateBindParticle(kind: string): Promise<unknown> {
+  protected lateBindParticle(kind: string): Promise<unknown> {
     return Runtime.registerParticleFactory(kind, Runtime?.particleIndustry(kind, Runtime.particleOptions));
   }
   protected static registerParticleFactory(kind, factoryPromise: Promise<unknown>) {

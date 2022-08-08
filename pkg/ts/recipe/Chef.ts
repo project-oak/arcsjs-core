@@ -51,10 +51,13 @@ export class Chef {
     log('|...-->| recipe evacipated: ', recipe.$meta);
     //log.groupEnd();
   }
-  static executeAll(recipes: Recipe[], runtime: Runtime, arc: Arc) {
-    return Promise.all(recipes?.map(recipe => this.execute(recipe, runtime, arc)));
+  static async executeAll(recipes: Recipe[], runtime: Runtime, arc: Arc) {
+    for (const recipe of recipes) {
+      await this.execute(recipe, runtime, arc);
+    }
+    //return Promise.all(recipes?.map(recipe => this.execute(recipe, runtime, arc)));
   }
-  static evacipateAll(recipes: Recipe[], runtime: Runtime, arc: Arc) {
+  static async evacipateAll(recipes: Recipe[], runtime: Runtime, arc: Arc) {
     return Promise.all(recipes?.map(recipe => this.evacipate(recipe, runtime, arc)));
   }
 }
