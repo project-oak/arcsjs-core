@@ -11,19 +11,19 @@ initialize(inputs, state, {service}) {
 },
 
 async update({profile}, state, {output}) {
-  let time = 300;
-  state.opacity = {opacity: 0};
+  // let time = 300;
+  // state.opacity = {opacity: 0};
   if (profile?.uid) {
-    state.style = {display: 'none'};
+    // state.style = {display: 'none'};
     state.login();
-    time = 300;
+    // time = 300;
   } else {
-    state.style = {display: null};
-    await output({});
+    // state.style = {display: null};
+    // await output({});
   }
   // buy some `time` to complete login bookkeeping
   // before fading in the login screen
-  await timeout(() => state.opacity = {opacity: 1}, time);
+  // await timeout(() => state.opacity = {opacity: 1}, time);
 },
 
 async onLoginClick(inputs, state, {service}) {
@@ -62,6 +62,10 @@ template: html`
     overflow: hidden;
     padding: 0.5em;
   }
+  h2 {
+    margin: 0;
+    padding: 8px;
+  }
   mwc-textfield {
     text-align: center;
     --mdc-text-field-fill-color: var(--theme-color-bg-0);
@@ -80,11 +84,11 @@ template: html`
   }
 </style>
 
-<div flex center rows xxen:style="{{style}}">
+<div center rows xxen:style="{{style}}">
 
   <h2>Welcome!</h2>
 
-  <div flex rows xxen:style="{{opacity}}">
+  <div rows>
 
     <mwc-textfield helper="Persona" helperPersistent outline value="{{persona}}" on-change="onPersonaChange"></mwc-textfield>
 

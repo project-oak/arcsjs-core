@@ -1,6 +1,4 @@
 // configure
 import './config.js';
-// import arcsjs-core dependency
-import '../Library/core.js';
-// boot common worker
+// import arcs engine
 import '../Library/App/Worker/ArcsWorker.js';

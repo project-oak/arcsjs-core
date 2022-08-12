@@ -18,7 +18,12 @@ const user = new Runtime('user');
 // composer proxy: sends render messages up, and event messages down
 const composer = {
   render(packet) {
-    postMessage({type: 'render', packet});
+    try {
+      postMessage({type: 'render', packet});
+    } catch(x) {
+      log.error(x);
+      log.error(packet);
+    }
   },
   onevent(pid, eventlet) {
   }
@@ -42,6 +47,8 @@ const configureArc = arc => {
 const getArc = arc => user.arcs[arc];
 const requireArc = async arc => getArc(arc) ?? await handlers.createArc({arc});
 
+const watching = {};
+
 // commands this worker will honor
 const handlers = {
   handleEvent: async ({pid, eventlet}) => {
@@ -52,9 +59,17 @@ const handlers = {
   },
   createArc: async ({arc}) => {
     const realArc = new Arc(arc);
+    realArc.listen('store-changed', handlers.storeChanged.bind(handlers, arc));
     // attach composer and service buses
     configureArc(realArc);
     return user.addArc(realArc);
+  },
+  storeChanged(arc, storeKey) {
+    if (watching[storeKey]) {
+      const realArc = new Arc(arc);
+      const store = realArc?.stores[storeKey];
+      postMessage({type: 'store', arc, storeKey, data: store?.data});
+    }
   },
   createParticle: async ({name, arc, meta}) => {
     const realArc = getArc(arc);
@@ -127,6 +142,6 @@ const flushQueue = async () => {
       flushQueue.busy = false;
     }
   } else {
-    log(queue.length, 'in queue');
+    log(queue.length, 'task(s) in queue');
   }
 };

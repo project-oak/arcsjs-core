@@ -13,7 +13,7 @@ import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
 
 export const App = class {
   constructor(paths, root) {
-    Arcs.init(root || document.body, paths.$engine);
+    Arcs.init(root || document.body, paths.$config);
     Arcs.addPaths(paths);
     Arcs.onservice = msg => console.log(msg);
   }

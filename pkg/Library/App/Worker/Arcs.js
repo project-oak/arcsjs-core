@@ -49,4 +49,5 @@ arcs.addRecipe        = (recipe, arc)             => socket.sendVibration({kind:
 arcs.addAssembly      = (recipes, arc)            => socket.sendVibration({kind: 'addAssembly', recipes, arc});
 arcs.set              = (arc, storeKey, data)     => socket.sendVibration({kind: 'setStoreData', arc, storeKey, data});
 arcs.get              = (arc, storeKey)           => socket.sendVibration({kind: 'getStoreData', arc, storeKey});
+arcs.watch            = (arc, storeKey)           => socket.sendVibration({kind: 'getStoreData', arc, storeKey});
 export {arcs as Arcs};
