@@ -1,0 +1,16 @@
+<!doctype html>
+<!--
+ Copyright (c) 2022 Google LLC All rights reserved.
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file.
+-->
+
+
+<code-mirror style="height: 400px;"></code-mirror>
+
+<script type="module">
+  import 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.js';
+  import 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/mode/javascript/javascript.min.js';
+  import {CodeMirrorElement} from './code-mirror.js';
+  customElements.define(`code-mirror`, CodeMirrorElement);
+</script>

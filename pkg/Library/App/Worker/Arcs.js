@@ -35,11 +35,10 @@ arcs.init = (root, path) => {
   socket = new MessageBus(worker);
   // listen to worker
   socket.receiveVibrations(receiveVibrations);
-};
-
-// channel local events into vibrations
-arcs.onevent = (pid, eventlet) => {
-  socket.sendVibration({kind: 'handleEvent', pid, eventlet});
+  // channel local events into vibrations
+  composer.onevent = (pid, eventlet) => {
+    socket.sendVibration({kind: 'handleEvent', pid, eventlet});
+  };
 };
 
 // public API

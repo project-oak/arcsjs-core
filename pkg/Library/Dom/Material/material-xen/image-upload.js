@@ -3,8 +3,8 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Xen} from '../xen/xen-async.js';
-import {logFactory} from '../../../arcsjs-support.js';
+import {Xen} from '../../Xen/xen-async.js';
+import {logFactory} from '../../../core.js';
 
 const template = Xen.Template.html`
   <style>

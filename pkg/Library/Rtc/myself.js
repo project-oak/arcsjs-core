@@ -1,4 +1,4 @@
-import './peerjs.min.js';
+import '../../third_party/peerjs.min.js';
 import * as tryst from './tryst.js';
 
 const {Peer} = globalThis;
@@ -40,8 +40,9 @@ export const myself = {
   async handshake(onstream) {
     myself.onstream = onstream;
     if (myself.mediaStream && myself.nid) {
-      this.strangers = await tryst.meetStrangers(myself.nid);
-      this.strangers.forAll(pid => pid && myself.maybeCall(pid, onstream));
+      const strangers = await tryst.meetStrangers(myself.nid);
+      strangers.forAll(pid => pid && myself.maybeCall(pid, onstream));
+      this.onstrangers?.(strangers);
     }
   },
   maybeCall: (them, onstream) => {
@@ -92,3 +93,70 @@ export const myself = {
     myself.endCall(mediaConnections[stream]?.metadata?.call);
   }
 };
+
+// const connections = {};
+
+// export const Connector = {
+//   get me() {
+//     return me;
+//   },
+//   get nid() {
+//     return nid;
+//   },
+//   // look for folks who want to connect
+//   async handshake(onxxx) {
+//     myself.onxxx = onxxx;
+//     if (myself.nid) {
+//       const strangers = await tryst.meetStrangers(myself.nid);
+//       strangers.forAll(pid => pid && myself.maybeConnect(pid, onxxx));
+//       this.onstrangers?.(strangers);
+//     }
+//   },
+//   maybeConnect: (them, onstream) => {
+//     if (myself.shouldConnect(them)) {
+//       myself.doConnect(them, onstream);
+//     }
+//   },
+//   shouldConnect: (them) => {
+//     return !connections[them];
+//   },
+//   doConnect(them, onxxx) {
+//     console.log('---> CALLING', them);
+//     const call = me.call(them, myself.mediaStream, {metadata: {id: myself.metadata.name, call: myself.nid}});
+//     if (call) {
+//       calls[them] = call;
+//       call.on('error', error => console.warn(error));
+//       call.on('close', () => {
+//         console.log('call:close');
+//       });
+//     }
+//   },
+//   answerCall: media => {
+//     console.log('ANSWERING <---',  media.metadata);
+//     //
+//     const id = media.metadata.id;
+//     const meta = mediaConnections[id] = {metadata: media.metadata};
+//     //
+//     media.answer(myself.mediaStream);
+//     media.on('stream', stream => {
+//       meta.stream = stream;
+//       console.log('media:onstream', stream);
+//       myself.onstream(stream, media.metadata);
+//     });
+//     media.on('close', () => {
+//       console.log('media:close');
+//     });
+//   },
+//   endCall: them => {
+//     if (them) {
+//       console.log('.........END CALL', them);
+//       const call = calls[them];
+//       calls[them] = null;
+//       //call?.close?.();
+//       setTimeout(calls[them] = null, 500);
+//     }
+//   },
+//   endStreamCall: stream => {
+//     myself.endCall(mediaConnections[stream]?.metadata?.call);
+//   }
+// };
