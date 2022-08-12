@@ -2,10 +2,10 @@
 node_modules
 .firebase
 *.log
-core/js
-core/arcs.js
-core/arcs.js.map
-core/arcs.min.js
-core/arcs.min.js.map
-core/*.tsbuildinfo
-core/docs
+pkg/core/js
+pkg/core/arcs.js
+pkg/core/arcs.js.map
+pkg/core/arcs.min.js
+pkg/core/arcs.min.js.map
+pkg/core/*.tsbuildinfo
+pkg/core/docs

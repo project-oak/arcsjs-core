@@ -85,10 +85,10 @@ template: html`
 <div scrub toolbar>
   <icon on-click="onCameraClick">{{cameraLigature}}</icon>
   <select repeat="option_t" on-change="onSelectChange">{{videoInputs}}</select>
-  <!-- <icon on-click="onMicClick">{{micLigature}}</icon>
+  <icon on-click="onMicClick">{{micLigature}}</icon>
   <select repeat="option_t" on-change="onSelectChange">{{audioInputs}}</select>
   <icon on-click="onAudioClick">{{audioLigature}}</icon>
-  <select repeat="option_t" on-change="onSelectChange">{{audioOutputs}}</select> -->
+  <select repeat="option_t" on-change="onSelectChange">{{audioOutputs}}</select>
   <span flex></span>
 </div>
 

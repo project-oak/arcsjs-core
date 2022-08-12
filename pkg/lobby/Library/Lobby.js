@@ -45,9 +45,12 @@ mergeStrangers(strangers, live) {
 },
 template: html`
 <style>
-  /* :host {
-    flex: none !important;
-  } */
+  :host {
+    margin-top: 16px;
+    padding: 8px;
+    border: 1px solid #eee;
+    flex: 3 !important;
+  }
   [frame=tv] {
     padding-right: 8px;
   }
@@ -55,18 +58,24 @@ template: html`
     margin-top: 0;
   }
 </style>
-<div row>
-  <div frame="tv"></div>
-  <div flex>
-    <h3><span>{{name}}</span>'s Lobby</h3>
-    <hr style="width: 100%;">
+<div flex column>
+  <!-- profile editor on top -->
+  <div flex x2 row frame="profile"></div>
+  <!-- video comms on bottom -->
+  <div flex x3 row>
+    <div frame="tv"></div>
 
-    <h4>Other users in lobby:</h4>
-    <div repeat="name_t">{{strangers}}</div>
-    <hr style="width: 100%;">
+    <div flex center>
+      <h3><span>{{name}}</span>'s Lobby</h3>
+      <hr style="width: 100%;">
 
-    <h4>Invitations sent to:</h4>
-    <div repeat="name_t">{{callees}}</div>
+      <h4>Other users in lobby:</h4>
+      <div repeat="name_t">{{strangers}}</div>
+      <hr style="width: 100%;">
+
+      <h4>Invitations sent to:</h4>
+      <div repeat="name_t">{{callees}}</div>
+    </div>
   </div>
 </div>
 
