@@ -1,6 +1,4 @@
 #!/bin/sh
-echo "[puppet.sh]:: build"
-./tools/build.sh
 #set -m # enable job control
 
 echo "[puppet.sh]:: spinning up webserver"

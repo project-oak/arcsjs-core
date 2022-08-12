@@ -6,11 +6,11 @@
  */
 const {keys} = Object;
 const json = v => JSON.stringify(v);
-// const pretty = v => JSON.stringify(v, null, '  ');
+const pretty = v => JSON.stringify(v, null, '  ');
 
 export const stateCapture = () => {
-  const stores = globalThis.App?.user?.stores;
-  const data = (stores ? keys(stores) : []).reduce((data, key) => {
+  const {user} = globalThis.App;
+  const data = keys(user.stores).reduce((data, key) => {
     const omit = [
       // these are kinda big
       'nodeTypes',
@@ -23,7 +23,7 @@ export const stateCapture = () => {
     ].includes(key);
     if (!omit) {
       //console.warn(key);
-      const {meta, data: value} = stores[key];
+      const {meta, data: value} = user.stores[key];
       data[key] = {meta, value};
     }
     return data;

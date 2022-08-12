@@ -5,15 +5,16 @@
  * license that can be found in the LICENSE file.
  */
 
+// configuration
 globalThis.config = {
-  localArcsjs: true,
-  aeon: 'rapsai-test/0.0.1',
-  meta: 'rapsai-test',
+  //localArcsjs: true,
+  aeon: 'arcsjs-test/0.0.1',
+  meta: 'arcsjs-test',
   logFlags: {
     app: true,
     arc: true,
     particles: true,
-    services: true,
-    storage: true
+    surfaces: true,
+    services: true
   }
 };

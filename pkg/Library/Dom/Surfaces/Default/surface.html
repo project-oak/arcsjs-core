@@ -1,0 +1,44 @@
+<!doctype html>
+<!--
+ Copyright (c) 2022 Google LLC All rights reserved.
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file.
+-->
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<img style="height: 280px;" src='https://wallpaperaccess.com/full/1730273.jpg'>
+
+<br>
+<br>
+<div>What does Arcs say?</div>
+<br>
+<button style="padding: 12px 16px;" onclick="send()">Send Image</button><br>
+<br>
+<hr>
+
+<script type="module">
+  import {subscribe, publish} from './client.js';
+  import {XenComposer} from '../../env/surfaces/xen/xen-composer.js';
+  // make our surface (shadowRoot is on)
+  const composer = new XenComposer(document.body, true);
+  composer.onevent = eventlet => post({kind: 'event', data: eventlet});
+  // receive messages
+  const onmessage = msg => {
+    const pojo = JSON.parse(msg);
+    if (pojo?.kind === 'packet') {
+      composer.render(pojo.data);
+    }
+  };
+  subscribe(onmessage);
+  // send messages
+  const update = value => {
+    publish({kind: 'eventlet', pid: 'helloRemote', eventlet: {handler: 'onImage', data: {value}}});
+  }
+  window.send = () => {
+    update('');
+    setTimeout(() => update('https://wallpaperaccess.com/full/1730273.jpg'), 200);
+  };
+</script>
