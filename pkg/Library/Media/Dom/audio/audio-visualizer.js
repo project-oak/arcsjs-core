@@ -5,7 +5,7 @@
  */
 import '../../../env/third_party/wavefile/wavefile.js';
 import {DEFAULT_NUM_CHANNELS, DEFAULT_SAMPLE_RATE} from './audio-recorder.js';
-import {Xen} from '../../../Dom/xen/xen-async.js';
+import {Xen} from '../../../Dom/Xen/xen-async.js';
 
 const template = Xen.Template.html`
 <style>

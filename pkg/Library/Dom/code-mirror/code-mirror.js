@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-import {Xen} from '../xen/xen-async.js';
+import {Xen} from '../Xen/xen-async.js';
 import './lib/codemirror.min.js';
 import './lib/javascript.min.js';
 import {css as codeMirrorCss} from './themejs/codemirror.css.js';

@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-import {Xen} from '../../../Dom/xen/xen-async.js';
+import {Xen} from '../../../Dom/Xen/xen-async.js';
 import {subscribeToStream} from '../media-stream/media-stream.js';
 
 export const DEFAULT_SAMPLE_RATE = 16000;
