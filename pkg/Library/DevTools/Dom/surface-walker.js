@@ -1,4 +1,4 @@
-import {Xen} from '../../Dom/xen/xen-async.js';
+import {Xen} from '../../Dom/Xen/xen-async.js';
 
 export const SurfaceWalker = class {
   from(root) {
