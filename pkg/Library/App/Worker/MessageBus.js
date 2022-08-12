@@ -1,4 +1,4 @@
-import {logFactory} from '../../support.js';
+import {logFactory} from '../../core.js';
 const log = logFactory(true, 'Bus', 'olive');
 
 // const log = console.log.bind(console); //logFactory(true, 'Bus', 'olive');

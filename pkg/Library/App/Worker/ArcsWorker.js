@@ -1,9 +1,9 @@
 
-import {Paths, Runtime, Arc, Chef, logFactory} from '../../support.js';
+import {Paths, Runtime, Arc, Chef, logFactory} from '../../core.js';
 import {MessageBus} from './MessageBus.js';
 
 // log
-const log = logFactory(true, 'ArcsJs', 'darkgreen');
+const log = logFactory(logFactory.flags.arcsjs, 'ArcsJs', 'darkgreen');
 log('worker is up');
 
 // runtime represents a persona on this machine
@@ -82,8 +82,7 @@ const handlers = {
     }
     if (store) {
       store.data = data;
-      log(`setStoreData: set data into "${arc}:${storeKey}"`);
-
+      log(`setStoreData: set data into "${arc}:${storeKey}"`, data);
     }
   },
   getStoreData: async({arc, storeKey}) => {

@@ -3,7 +3,7 @@ import {LobbyApp} from './LobbyApp.js';
 const app = new LobbyApp({
   $engine: './arcs.js',
   $library: '../Library',
-  $app: './'
+  $app: '.'
 });
 await app.spinup();
 

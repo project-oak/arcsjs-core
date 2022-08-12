@@ -1,8 +1,8 @@
 const tryst = `https://arcsjs-apps.firebaseio.com/tryst_pjs`;
 
 const {keys, entries, values} = Object;
-const {stringify: json} = JSON;
-const pretty = value => json(value, null, '  ');
+//const {stringify: json} = JSON;
+//const pretty = value => json(value, null, '  ');
 
 export const meetStrangers = async (nid) => {
   let beacons = await fetchBeacons();
