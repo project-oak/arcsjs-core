@@ -1,80 +1,140 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Paths, Runtime, Arc, Chef, logFactory} from '../../core.js';
+
+import {Paths, Runtime, Arc, Decorator, Chef, logFactory, utils} from '../../core.js';
 import {MessageBus} from './MessageBus.js';
+import {RecipeService} from '../../Arcs/RecipeService.js';
+import {StoreUpdateService} from '../../Arcs/StoreUpdateService.js';
+
+// n.b. lives in Worker context
+
+// bus
+export const WorkerBus = new MessageBus(globalThis);
 
 // log
-const log = logFactory(logFactory.flags.arcsjs, 'ArcsJs', 'darkgreen');
+const log = logFactory(logFactory.flags.worker, 'worker', 'darkgreen');
 log('worker is up');
 
 // runtime represents a persona on this machine
 const user = new Runtime('user');
 
-// composer proxy: sends render messages up, and event messages down
+// proxy persistance messages
+user.persistor = {
+  async restore(storeId, store) {
+    log('restore', storeId);
+    return serviceRequest({type: 'restore', storeId});
+  },
+  async persist(storeId, store) {
+    log('persist', storeId);
+    serviceRequest({type: 'persist', storeId, data: store.data});
+  }
+};
+
+// composer proxy: sends render messages up
 const composer = {
   render(packet) {
     try {
-      postMessage({type: 'render', packet});
+      WorkerBus.sendVibration({type: 'render', packet});
     } catch(x) {
       log.error(x);
       log.error(packet);
     }
-  },
-  onevent(pid, eventlet) {
   }
 };
 
-// service handler for user's arcs
-const serviceHandler = (arc, host, request) => {
+// map of service-ids to resolve-functions waiting for return values
+const serviceCalls = {};
+
+// Arc service calls come here first
+const serviceHandler = async (arc, host, request) => {
   switch (request?.msg) {
     case 'request-context':
       return ({runtime: user});
   }
+  {
+    const value = await RecipeService(user, host, request);
+    log('RecipeService', request, value);
+    if (value !== undefined) {
+      return value;
+    }
+  }
+  {
+    const value = await StoreUpdateService(user, host, request);
+    log('StoreUpdateService', request, value);
+    if (value !== undefined) {
+      return value;
+    }
+  }
+  return serviceRequest(request);
 };
 
-// sets up composer and service handler
-const configureArc = arc => {
-  arc.service = (host, request) => serviceHandler(arc, host, request);
-  arc.composer = composer;
-  composer.onevent = arc.onevent.bind(arc);
+// ... then here
+const serviceRequest = async request => {
+  // if not handled, make a service-id
+  const sid = utils.makeId(4, 4);
+  // post a request with the service-id
+  WorkerBus.sendVibration({type: 'service', sid, request});
+  // create a promise which may be resolved by invoking `serviceCalls[sid]`
+  return new Promise(resolve => serviceCalls[sid] = resolve);
+};
+
+// ... and then finally resolved here (or dangle forever)
+const resolveRequest = async (sid, data) => {
+  serviceCalls[sid]?.(data);
+  delete serviceCalls[sid];
 };
 
 const getArc = arc => user.arcs[arc];
 const requireArc = async arc => getArc(arc) ?? await handlers.createArc({arc});
 
 const watching = {};
+const storeChanged = (arc, storeKey) => {
+  if (watching[storeKey]) {
+    const realArc = getArc(arc);
+    const store = realArc?.stores[storeKey];
+    try {
+      WorkerBus.sendVibration({type: 'store', arc, storeKey, data: store?.data});
+    } catch(x) {
+      log.error('error posting:', store?.data, x);
+    }
+  }
+};
 
-// commands this worker will honor
+// // the vibrations this worker can handle
 const handlers = {
   handleEvent: async ({pid, eventlet}) => {
-    composer.onevent(pid, eventlet);
+    const arc = Object.values(user.arcs)[0];
+    arc.onevent(pid, eventlet);
   },
   addPaths: ({paths}) => {
     Paths.add(paths);
   },
   createArc: async ({arc}) => {
     const realArc = new Arc(arc);
-    realArc.listen('store-changed', handlers.storeChanged.bind(handlers, arc));
-    // attach composer and service buses
-    configureArc(realArc);
+    // observe store changes
+    realArc.listen('store-changed', storeChanged.bind(null, arc));
+    // send render packets to composer
+    realArc.composer = composer;
+    // async service interface for Particles
+    realArc.service = async (host, request) => serviceHandler(realArc, host, request);
+    // connect arc to runtime
     return user.addArc(realArc);
   },
-  storeChanged(arc, storeKey) {
-    if (watching[storeKey]) {
-      const realArc = new Arc(arc);
-      const store = realArc?.stores[storeKey];
-      postMessage({type: 'store', arc, storeKey, data: store?.data});
-    }
-  },
-  createParticle: async ({name, arc, meta}) => {
+  createParticle: async ({name, arc, meta, code}) => {
     const realArc = getArc(arc);
     if (realArc) {
-      return user.installParticle(realArc, meta, name);
+      Runtime.particleOptions = {code};
+      try {
+        return await user.installParticle(realArc, meta, name);
+      } finally {
+        Runtime.particleOptions.code = null;
+      }
     }
   },
   setInputs: async ({arc, particle, inputs}) => {
@@ -90,9 +150,10 @@ const handlers = {
     return Chef.execute(recipe, user, await requireArc(arc));
   },
   addAssembly: async ({arc, recipes}) => {
-    return Chef.executeAll(recipes, user, await requireArc(arc));
+    const realArc = await requireArc(arc);
+    return Chef.executeAll(recipes, user, realArc);
   },
-  setStoreData: async({arc, storeKey, data}) => {
+  setStoreData: async ({arc, storeKey, data}) => {
     const realArc = getArc(arc);
     if (!realArc) {
       log(`setStoreData: "${arc}" is not an Arc.`);
@@ -106,42 +167,67 @@ const handlers = {
       log(`setStoreData: set data into "${arc}:${storeKey}"`, data);
     }
   },
-  getStoreData: async({arc, storeKey}) => {
+  getStoreData: ({arc, storeKey}) => {
     const realArc = getArc(arc);
-    const store = realArc.stores[storeKey];
+    const store = realArc?.stores[storeKey];
     if (store) {
-      postMessage({type: 'store', arc, storeKey, data: store.data});
+      WorkerBus.sendVibration({type: 'store', arc, storeKey, data: store.data});
     }
+  },
+  watch: ({arc, storeKey, remove}) => {
+    watching[storeKey] = (remove !== true);
+  },
+  setOpaqueData: async ({key, data}) => {
+    Decorator.setOpaqueData(key, data);
+  },
+  serviceResult: ({sid, data}) => {
+    resolveRequest(sid, data);
   }
 };
 
-// bus
-export const WorkerBus = new MessageBus(globalThis);
+const handleVibration = async msg => {
+  const h = handlers[msg?.kind];
+  if (h) {
+    log.group(msg?.kind, '...handler...');
+    try {
+      await h(msg);
+    } catch(x) {
+      log.error(x);
+    }
+    log.groupEnd();
+  }
+};
 
 const queue = [];
 
 // respond to bus vibrations
 WorkerBus.receiveVibrations(msg => {
-  queue.push(msg);
-  flushQueue();
+  if (msg?.kind === 'serviceResult') {
+    log('handle result task', msg?.kind);
+    // bypass queue
+    handleVibration(msg);
+  } else {
+    log('add task', msg?.kind, '-', queue.length, 'task(s) in queue');
+    queue.push(msg);
+    flushQueue();
+  }
 });
 
 // bus vibrations are handled in serial
 const flushQueue = async () => {
   if (!flushQueue.busy) {
     flushQueue.busy = true;
+    log.group('flush');
     try {
       while (queue.length) {
         const msg = queue.shift();
-        const h = handlers[msg?.kind];
-        if (h) {
-          await h(msg);
-        }
+        await handleVibration(msg);
       }
     } finally {
+      log.groupEnd();
       flushQueue.busy = false;
     }
   } else {
-    log(queue.length, 'task(s) in queue');
+    //log(queue.length, 'task(s) in queue');
   }
 };

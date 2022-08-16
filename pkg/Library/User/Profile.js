@@ -64,39 +64,45 @@ template: html`
   }
   h2 {
     margin: 0;
-    padding: 8px;
+    padding: 0;
   }
   mwc-textfield {
-    text-align: center;
+    /* text-align: center; */
     --mdc-text-field-fill-color: var(--theme-color-bg-0);
-    --mdc-typography-subtitle1-font-size: 1.5em;
-    padding: 12px;
+    --mdc-typography-subtitle1-font-size: 1.1em;
+    /* padding: 12px; */
   }
   [profile] {
-    /* min-height: 300px; */
-    /* padding: 2em 0; */
     border: 1px solid var(--theme-fg-3);
     transition: opacity 100ms;
   }
+  [form] {
+    padding: 12px;
+  }
   tenant-icon {
-    width: 128px;
-    height: 128px;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 8px;
   }
 </style>
 
-<div center rows xxen:style="{{style}}">
+<div Xcenter rows Xxen:style="{{style}}">
 
-  <h2>Welcome!</h2>
+  <div column>
 
-  <div rows>
+    <div centered row>
 
-    <mwc-textfield helper="Persona" helperPersistent outline value="{{persona}}" on-change="onPersonaChange"></mwc-textfield>
+      <div flex centered column profile>
+        <tenant-icon avatar="{{photoURL}}"></tenant-icon>
+        <b>{{displayName}}</b>
+        <i>{{email}}</i>
+      </div>
 
-    <div profile rows center>
-      <tenant-icon avatar="{{photoURL}}"></tenant-icon>
-      <br><br>
-      <b>{{displayName}}</b>
-      <i>{{email}}</i>
+      <div flex center column form>
+        <!-- <h2>Welcome!</h2> -->
+        <mwc-textfield helper="Persona" helperPersistent outline value="{{persona}}" on-change="onPersonaChange"></mwc-textfield>
+      </div>
+
     </div>
 
     <div toolbar>

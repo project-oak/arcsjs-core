@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
@@ -11,7 +12,7 @@
  * Particle module interfaces with 3p code, and is often loaded into isolation contexts.
 **/
 const {create, assign, keys, values, entries, defineProperty, setPrototypeOf} = Object;
-const scope = globalThis['scope'];
+const scope = globalThis['scope'] ?? {};
 const {log, timeout} = scope;
 const nob = () => create(null);
 

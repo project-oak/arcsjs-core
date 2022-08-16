@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
@@ -12,7 +13,7 @@ import {Runtime} from '../Runtime.js';
 import {Arc} from '../core/Arc.js';
 import {StoreMeta, StoreSpec} from './types.js';
 
-const log = logFactory(logFactory.flags.recipe, 'StoreCook', '#187e13');
+const log = logFactory(logFactory.flags.recipe, 'StoreCook', '#99bb15');
 
 const {values} = Object;
 
@@ -38,29 +39,31 @@ export class StoreCook {
   }
   static async realizeStore(runtime: Runtime, arc: Arc, rawMeta: StoreMeta) {
     const meta = this.constructMeta(runtime, arc, rawMeta);
+    let value = meta?.value;
     let store = mapStore(runtime, meta);
-    if (!store) {
-      //log.error('realizeStore: mapStore returned null');
-    } else {
+    if (store) {
       log(`realizeStore: mapped "${rawMeta.name}" to "${store.meta.name}"`);
-    }
-    if (!store) {
+    } else {
       store = runtime.createStore(meta);
+      log(`realizeStore: created "${meta.name}"`);
       // TODO(sjmiles): Stores no longer know their own id, so there is a wrinkle here as we
       // re-route persistence through runtime (so we can bind in the id)
       // Also: the 'id' is known as 'meta.name' here, this is also a problem
-      store && (store.persistor = {
-        restore: store => runtime.persistor?.restore(meta.name, store),
-        persist: () => {}
-      });
+      // store && (store.persistor = {
+      //   restore: store => runtime.persistor?.restore(meta.name, store),
+      //   persist: () => {}
+      // });
+      // runtime.addStore(meta.name, store);
+      //await store?.restore(meta?.value)
       runtime.addStore(meta.name, store);
-      await store?.restore(meta?.value);
-      log(`realizeStore: created "${meta.name}"`);
-    } else {
-      log(`realizeStore: mapped to "${meta.name}", setting data to:`, meta?.value);
-      if (meta?.value !== undefined) {
-        store.data = meta?.value;
+      if (store.shouldPersist()) {
+        const cached = await store.restore();
+        value = cached === undefined ? value : cached;
       }
+    }
+    if (value !== undefined) {
+      log(`setting data to:`, value);
+      store.data = value;
     }
     arc.addStore(meta.name, store);
   }

@@ -1,0 +1,50 @@
+/**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+
+const publicPipelinesUrl = `https://arcsjs.firebaseio.com/pipelines`;
+
+export const PipelinesToolbar = {
+  $kind: '$library/FlowGraph/NodeGraph/PipelineToolbar',
+  $inputs: [
+    {pipeline: 'selectedPipeline'},
+    'pipelines'
+  ],
+  $staticInputs: {
+    publicPipelinesUrl: `${publicPipelinesUrl}/`
+  },
+  $outputs: [
+    {pipeline: 'selectedPipeline'},
+    'pipelines'
+  ],
+  $slots: {
+    chooser: {
+      $stores: {
+        pipelines: {
+          $type: '[JSON]',
+          $tags: ['persisted'],
+          $value: []
+        },
+        selectedPipeline: {
+          $type: 'JSON',
+          $tags: ['persisted'],
+          $value: null
+        }
+      },
+      PipelineChooser: {
+        $kind: '$library/FlowGraph/NodeGraph/PipelineChooser',
+        $inputs: [
+          {pipeline: 'selectedPipeline'},
+          'pipelines'
+        ],
+        $outputs: [{pipeline: 'selectedPipeline'}],
+        $staticInputs: {
+          publicPipelinesUrl: null // `${publicPipelinesUrl}.json` //'https://arcsjs.firebaseio.com/pipelines.json'
+        }
+      }
+    }
+  }
+};

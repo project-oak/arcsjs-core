@@ -4,13 +4,14 @@ globalThis.config = {
   theme: 'dark',
   logFlags: {
     app: true,
-    //arcsjs: true,
     //arc: true,
+    //bus: true,
     //composer: true,
     particles: true,
     //recipe: true,
     //runtime: true,
     services: true,
-    surfaces: true
+    surfaces: true,
+    //worker: true
   }
 };

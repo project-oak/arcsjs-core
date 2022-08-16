@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
@@ -136,11 +137,14 @@ export class Runtime extends EventEmitter {
     if (store.marshal) {
       store.marshal(this);
     }
+    // bind to persist/restore functions
+    store.persist = async () => this.persistStore(storeId, store);
+    store.restore = async () => this.restoreStore(storeId, store);
     // override the Store's own persistor to use the runtime persistor
     // TODO(sjmiles): why?
-    if (store.persistor) {
-      store.persistor.persist = store => this.persistor?.persist(storeId, store);
-    }
+    // if (store.persistor) {
+    //   store.persistor.persist = store => this.persistor?.persist(storeId, store);
+    // }
     // bind this.storeChanged to store.change (and name the binding)
     const name = `${this.nid}:${storeId}-changed`;
     const onChange = this.storeChanged.bind(this, storeId);
@@ -152,6 +156,18 @@ export class Runtime extends EventEmitter {
     // notify listeners that a thing happened
     // TODO(sjmiles): makes no sense without id
     //this.fire('store-added', store);
+  }
+  protected async persistStore(storeId, store) {
+    if (store.shouldPersist()) {
+      this.log(`persistStore "${storeId}"`);
+      return this.persistor.persist?.(storeId, store);
+    }
+  }
+  protected async restoreStore(storeId, store) {
+    if (store.shouldPersist()) {
+      this.log(`restoreStore "${storeId}"`);
+      return this.persistor.restore?.(storeId, store);
+    }
   }
   protected storeChanged(storeId, store) {
     this.log('storeChanged', storeId);

@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
@@ -10,7 +11,7 @@ import {logFactory} from '../utils/log.js';
 import {Runtime} from '../Runtime.js';
 import {ParticleNode} from './types.js';
 
-const log = logFactory(logFactory.flags.recipe, 'ParticleCook', '#096f33');
+const log = logFactory(logFactory.flags.recipe, 'ParticleCook', '#5fa530');
 
 export class ParticleCook {
   static async execute(runtime: Runtime, arc, particles) {

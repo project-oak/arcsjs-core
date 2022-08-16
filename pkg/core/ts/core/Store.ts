@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
@@ -88,15 +89,12 @@ class ObservableStore extends DataStore {
   delete(key: string): void {
     this.change(doc => delete doc.data[key]);
   }
-  // assign(dictionary: Dictionary<any>) {
-  //   this.change(doc => shallowMerge(doc.data, dictionary));
-  // }
 }
 
 class PersistableStore extends ObservableStore {
   meta: Partial<StoreMeta>;
-  persistor;
-  protected willPersist;
+  // persistor;
+  // protected willPersist;
   constructor(meta: StoreMeta) {
     super();
     this.meta = {...meta};
@@ -114,30 +112,33 @@ class PersistableStore extends ObservableStore {
   isCollection(): boolean {
     return this.meta.type?.[0] === '[';
   }
+  shouldPersist(): boolean {
+    return this.is('persisted') && !this.is('volatile');
+  }
   async doChange() {
     // do not await
     this.persist();
     return super.doChange();
   }
   async persist() {
-    // persists at most every 500ms
-    if (!this.willPersist && this.persistor) {
-      this.willPersist = true;
-      setTimeout(() => {
-        this.willPersist = false;
-        this.persistor.persist(this);
-      }, 500);
-    }
+    // // persists at most every 500ms
+    // if (!this.willPersist && this.persistor) {
+    //   this.willPersist = true;
+    //   setTimeout(() => {
+    //     this.willPersist = false;
+    //     this.persistor.persist(this);
+    //   }, 500);
+    // }
   }
-  async restore(value: any) {
-    const restored = await this.persistor?.restore(this);
-    if (!restored && (value !== undefined)) {
-      this.data = value;
-    }
+  async restore(/*value: any*/) {
+  //   const restored = await this.persistor?.restore(this);
+  //   if (!restored && (value !== undefined)) {
+  //     this.data = value;
   }
-  delete() {
-    this.persistor?.remove(this);
-  }
+  // }
+  // delete() {
+  //   this.persistor?.remove(this);
+  // }
   save(): string {
     return this.json;
   }
@@ -152,7 +153,6 @@ class PersistableStore extends ObservableStore {
     }
     if (value !== undefined) {
       this.data = value;
-      //this.setPrivateData(value);
     }
   }
 }
