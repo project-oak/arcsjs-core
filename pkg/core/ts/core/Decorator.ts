@@ -1,10 +1,12 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
- * 
+ *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
+
 import {logFactory} from '../utils/log.js';
 import {deepCopy} from '../utils/object.js';
 
@@ -16,7 +18,7 @@ const opaqueData = {};
 
 export const Decorator = {
   setOpaqueData(name, data) {
-    opaqueData[name] = deepCopy(data);
+    opaqueData[name] = data; //deepCopy(data);
     return name;
   },
   getOpaqueData(name) {
@@ -48,15 +50,17 @@ export const Decorator = {
   },
   maybeDecorateItem(item, particle) {
     let models = (typeof item.models === 'string') ? this.getOpaqueData(item.models) : item.models;
-    // do a decorator
-    models = maybeDecorate(models, item.decorator, particle);
-    // do a filter
-    models = maybeFilter(models, item.filter, particle.impl);
-    // do a collator
-    models = maybeCollateBy(models, item);
-    // mutate items
-    item.models = models;
-    //console.log(JSON.stringify(models, null, '  '));
+    if (models) {
+      // do a decorator
+      models = maybeDecorate(models, item.decorator, particle);
+      // do a filter
+      models = maybeFilter(models, item.filter, particle.impl);
+      // do a collator
+      models = maybeCollateBy(models, item);
+      // mutate items
+      item.models = models;
+      //console.log(JSON.stringify(models, null, '  '));
+    }
   },
 };
 

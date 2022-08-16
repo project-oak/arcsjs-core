@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
@@ -17,4 +18,3 @@ export type DebugLoggers = Record<typeof logKinds[number], LoggerFunction>;
 export type ErrorLoggers = Record<typeof errKinds[number], LoggerFunction>;
 export type AllLoggerFunctions = DebugLoggers & ErrorLoggers;
 export type Logger = LoggerFunction & AllLoggerFunctions;
-

@@ -4,7 +4,8 @@ export const LobbyRecipe = {
   },
   $stores: {
     persona: {
-      $type: 'Persona'
+      $type: 'Persona',
+      $tags: ['persisted']
     },
     strangers: {
       $type: '[Stranger]'
@@ -12,10 +13,6 @@ export const LobbyRecipe = {
     callees: {
       $type: '[Callee]'
     }
-  },
-  // use devtools
-  devtools: {
-    $kind: '$library/DevTools/DevTools'
   },
   lobby: {
     $kind: '$app/Library/Lobby',

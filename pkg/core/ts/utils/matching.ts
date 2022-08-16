@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
@@ -14,4 +15,3 @@ export function matches<T>(candidateMeta: T, targetMeta: Partial<T>): boolean {
   }
   return true;
 };
-

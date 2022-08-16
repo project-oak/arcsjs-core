@@ -1,5 +1,5 @@
 import {logFactory} from '../../core.js';
-const log = logFactory(true, 'Bus', 'olive');
+const log = logFactory(logFactory.flags.bus, 'Bus', 'olive');
 
 // const log = console.log.bind(console); //logFactory(true, 'Bus', 'olive');
 // log.error = console.warn.bind(console);
@@ -13,14 +13,14 @@ export const MessageBus = class {
     this.eventListener.removeEventListener('message', this.listener);
   }
   sendVibration(msg) {
-    //log(`sending:`, msg);
+    log(`sending:`, msg);
     this.connection.postMessage(msg);
   }
   receiveVibrations(handler) {
     this.listener = async msg => {
       // TODO(sjmiles): prevent re-entry into `handler`
       const data = (msg.type === 'message') ? msg.data : msg;
-      //log(`receiving:`, data);
+      log(`receiving:`, data);
       handler?.(data);
     };
     this.connection.addEventListener('message', this.listener);

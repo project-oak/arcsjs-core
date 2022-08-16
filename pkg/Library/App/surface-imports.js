@@ -6,5 +6,5 @@ import '../DevTools/Dom/data-explorer/data-explorer.js';
 import '../DevTools/Dom/surface-walker.js';
 import '../DevTools/Dom/resource-view.js';
 import '../Media/Dom/image-resource.js';
-import '../Media/Dom/media-stream/media-stream.js';
 import '../Media/Dom/media-stream/video-view.js';
+export * from '../Media/Dom/media-stream/media-stream.js';

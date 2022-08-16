@@ -49,7 +49,7 @@ template: html`
   }
   [scrub][toolbar] {
     font-size: 24px;
-    padding-left: 0;
+    /* padding-left: 0; */
   }
   [mic] {
     border-radius: 8px;

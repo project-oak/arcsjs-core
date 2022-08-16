@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
@@ -7,16 +8,17 @@
  */
 ({
 initialize(inputs, state) {
+  state.generations = 2;
   state.strangers = {};
 },
 shouldUpdate({strangers}) {
   return Boolean(strangers);
 },
 update({strangers}, state) {
-  state.strangers = this.mergeStrangers(strangers, state.strangers);
+  state.strangers = strangers; //this.mergeStrangers(strangers, state);
 },
-onVideoCall({callees, eventlet: {key}}) {
-  return {callees: {...callees, [key]: {name: key}}};
+onVideoCall({callees, eventlet: {key: nid, value: name}}) {
+  return {callees: {...callees, [name]: {nid, name}}};
 },
 render({persona, callees}, {strangers}) {
   return {
@@ -28,21 +30,20 @@ render({persona, callees}, {strangers}) {
 // the meeting post gets cleared off from time to time,
 // so we want to let a posting live for several generations
 // after it stops reporting before removing it locally
-mergeStrangers(strangers, live) {
-  const generations = 20;
-  strangers.forEach(name => {
-    if (!live[name]) {
-      live[name] = {name: name};
-    }
-    live[name].age = generations;
-  });
-  values(live).forEach(stranger => {
-    if (stranger && --stranger.age === 0) {
-      delete live[stranger.name];
-    }
-  });
-  return live;
-},
+// mergeStrangers(fresh, {strangers, generations}) {
+//   fresh.forEach(name => {
+//     if (!strangers[name]) {
+//       strangers[name] = {name: name};
+//     }
+//     strangers[name].age = generations;
+//   });
+//   values(strangers).forEach(stranger => {
+//     if (stranger && --stranger.age === 0) {
+//       delete strangers[stranger.name];
+//     }
+//   });
+//   return strangers;
+// },
 template: html`
 <style>
   :host {
@@ -50,9 +51,6 @@ template: html`
   }
   [frame=tv] {
     padding-right: 8px;
-  }
-  [frame=profile] {
-    /* padding: 8px; */
   }
   [lobby] {
     padding: 8px;
@@ -71,16 +69,17 @@ template: html`
   <div row frame="profile"></div>
   <!-- video comms on bottom -->
   <div flex row lobby>
+    <!-- left section -->
     <div frame="tv"></div>
-
+    <!-- middle section -->
     <div flex center>
       <h3><span>{{name}}</span>'s Lobby</h3>
       <hr style="width: 100%;">
-
+      <!-- -->
       <h4>Other users in lobby:</h4>
       <div repeat="name_t">{{strangers}}</div>
       <hr style="width: 100%;">
-
+      <!-- -->
       <h4>Invitations sent to:</h4>
       <div repeat="name_t">{{callees}}</div>
     </div>
@@ -88,6 +87,6 @@ template: html`
 </div>
 
 <template name_t>
-  <div peer key="{{name}}" on-dblclick="onVideoCall">{{name}}</div>
+  <div peer key="{{nid}}" value="{{name}}" on-dblclick="onVideoCall">{{name}}</div>
 </template>
 `});
