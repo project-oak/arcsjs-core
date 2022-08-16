@@ -21,6 +21,32 @@ const watchers = {};
 const getters = {};
 const arcs = {};
 
+arcs.init = ({root, paths, onservice}) => {
+  // worker path is document relative
+  const worker = new Worker(paths.$arcs, {type: 'module', name: 'arcsjs'});
+  // bus to worker
+  socket = new MessageBus(worker);
+  // listen to worker
+  socket.receiveVibrations(receiveVibrations);
+  // make a composer suitable for rendering on our document
+  composer = new Composer(root, true);
+  // channel local events into vibrations
+  composer.onevent = (pid, eventlet) => {
+    socket.sendVibration({kind: 'handleEvent', pid, eventlet});
+  };
+  // connect app-supplied conduits
+  arcs.onservice = onservice;
+  // async readiness (because worker has an awaited dynamic import)
+  arcs.ready = new Promise(resolve =>
+    setTimeout(() => {
+      // memoize important paths
+      arcs.addPaths(paths);
+      // be ready
+      resolve();
+    }, 300)
+  );
+};
+
 // n.b. vibrational paths are worker-relative
 
 const receiveVibrations = msg => {
@@ -59,25 +85,6 @@ arcs.get = async (arc, storeKey) => {
     };
     socket.sendVibration({kind: 'getStoreData', arc, storeKey});
   });
-};
-
-arcs.init = ({root, paths, onservice}) => {
-  // make a composer suitable for rendering on our document
-  composer = new Composer(root, true);
-  // worker path is document relative
-  const worker = new Worker(paths.$arcs, {type: 'module', name: 'arcsjs'});
-  // bus to worker
-  socket = new MessageBus(worker);
-  // listen to worker
-  socket.receiveVibrations(receiveVibrations);
-  // channel local events into vibrations
-  composer.onevent = (pid, eventlet) => {
-    socket.sendVibration({kind: 'handleEvent', pid, eventlet});
-  };
-  // memoize important paths
-  arcs.addPaths(paths);
-  // connect app-supplied conduits
-  arcs.onservice = onservice;
 };
 
 // public API

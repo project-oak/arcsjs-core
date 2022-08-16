@@ -27,12 +27,12 @@ export const App = class {
       root: root || document.body,
       onservice: this.service.bind(this)
     });
-    Arcs.addPaths(paths);
   }
   get arcs() {
     return Arcs;
   }
   async spinup() {
+    await Arcs.ready;
     await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     Arcs.addAssembly([...this.userAssembly, DevToolsRecipe], 'user');
   }
@@ -43,11 +43,15 @@ export const App = class {
       case 'restore':
         return this.restore(request);
       default: {
-        const value = await this.onservice?.('user', 'host', request);
-        log('service:', request?.msg, '=', value);
-        return value || null;
+        return this.appService({request});
       }
     }
+  }
+  async appService({request}) {
+    //this.services.
+    const value = await this.onservice?.('user', 'host', request);
+    log('service:', request?.msg, '=', value);
+    return value || null;
   }
   async persist({storeId, data}) {
     await this.persistor?.persist(storeId, data);
@@ -56,7 +60,7 @@ export const App = class {
   async restore({storeId}) {
     return this.persistor?.restore(storeId);
   }
-  enableMedia() {
-    import('../../Media/Dom/media-stream/media-stream.js');
+  async enableMedia() {
+    return import('../../Media/Dom/media-stream/media-stream.js');
   }
 };
