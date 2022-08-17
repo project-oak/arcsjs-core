@@ -12,7 +12,7 @@ export * from './log.js';
 export * from './matching.js';
 export * from './names.js';
 export * from './object.js';
-//export * from './params.js';
+export * from './params.js';
 export * from './paths.js';
 export * from './rand.js';
 export * from './task.js';
