@@ -7,7 +7,6 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-
 // N.B. executing inside worker boundary
 
 // configure
