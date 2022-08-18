@@ -21,7 +21,7 @@
     return {
       om,
       showTools,
-      //particles: this.renderAllHosts(users),
+      particles: this.renderAllHosts(users),
       stores: this.renderAllStores(users),
       version: Math.random(),
       storeBools,
