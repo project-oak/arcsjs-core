@@ -30,11 +30,11 @@ export class ParticleCook {
     return runtime.bootstrapParticle(arc, node.id, meta);
   }
   static specToMeta(spec) {
-    // TODO(sjmiles): impedance mismatch here is likely to cause problems
-    const {$kind: kind, $container: container, $staticInputs: staticInputs, $bindings: bindings} = spec;
-    if (bindings) {
-      console.warn(`Particle '${kind}' spec contains deprecated $bindings property (${JSON.stringify(bindings)})`);
+    if (spec.$bindings) {
+      console.warn(`Particle '${spec.$kind}' spec contains deprecated $bindings property (${JSON.stringify(spec.$bindings)})`);
     }
+    // TODO(sjmiles): impedance mismatch here is likely to cause problems
+    const {$kind: kind, $container: container, $staticInputs: staticInputs} = spec;
     const inputs = this.formatBindings(spec.$inputs);
     const outputs = this.formatBindings(spec.$outputs);
     return {kind, staticInputs, inputs, outputs, container};
