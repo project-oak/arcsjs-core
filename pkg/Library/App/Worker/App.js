@@ -62,16 +62,12 @@ export const App = class {
   // (optional) support login convention
   getLoginBindings() {
     return [
+      this.onStart?.bind(this),
       this.onLogin?.bind(this),
       this.onLogout?.bind(this),
-      this.onStart?.bind(this)
     ];
   }
   bindLoginObserver(loginObserver) {
-    return loginObserver(
-      this.onLogin?.bind(this),
-      this.onLogout?.bind(this),
-      this.onStart?.bind(this)
-    );
+    return loginObserver(...this.getLoginBindings());
   }
 };

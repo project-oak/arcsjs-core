@@ -108,6 +108,7 @@ arcs.get = async (arc, storeKey) => {
 
 // public API
 arcs.addPaths         = (paths)                   => socket.sendVibration({kind: 'addPaths', paths});
+arcs.createArc        = (arc)                     => socket.sendVibration({kind: 'createArc', arc});
 arcs.createParticle   = (name, arc, meta, code)   => socket.sendVibration({kind: 'createParticle', name, arc, meta, code});
 arcs.destroyParticle  = (name, arc)               => socket.sendVibration({kind: 'destroyParticle', name, arc});
 arcs.setInputs        = (arc, particle, inputs)   => socket.sendVibration({kind: 'setInputs', arc, particle, inputs});
