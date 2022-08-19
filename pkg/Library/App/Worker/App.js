@@ -20,7 +20,6 @@ export const App = class {
     return Arcs;
   }
   constructor(paths, root) {
-    this.userAssembly = [];
     this.paths = paths;
     this.root = root;
   }
@@ -35,7 +34,9 @@ export const App = class {
       injections: this.injections
     });
     await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
-    Arcs.addAssembly([...this.userAssembly, DevToolsRecipe], 'user');
+    // TODO(sjmiles): pick a syntax
+    const assembly = [DevToolsRecipe, ...(this.userAssembly ?? this.recipes ?? [])];
+    Arcs.addAssembly(assembly, 'user');
   }
   async service({request}) {
     switch (request?.type) {
@@ -44,7 +45,25 @@ export const App = class {
       case 'restore':
         return this.restore(request);
       default: {
-        return this.appService({request});
+        if (this.appService({request}) === undefined) {
+          this.services({request});
+        }
+        break;
+      }
+    }
+  }
+  async services({request}) {
+    const service = this.services?.[request?.type];
+    if (service) {
+      log('service', request, service);
+      try {
+        if (service[request.msg]) {
+          return (service[request.msg])(request.data);
+        } else {
+          log.warn(`no handler for "${request.msg}"`);
+        }
+      } catch (e) {
+        log.warn(e.toString());
       }
     }
   }

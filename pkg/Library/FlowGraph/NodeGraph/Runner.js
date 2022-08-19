@@ -40,7 +40,7 @@ findRecipe(recipeName, recipes) {
 
 async stopRecipe(recipe, state, service) {
   delete state.recipes[recipe.$meta.name];
-  return service({msg: 'FinagleRecipe', data: {recipe, value: false}});
+  return service({kind: 'RecipeService', msg: 'FinagleRecipe', data: {recipe, value: false}});
 },
 
 async removeStores({$stores}, state, service) {
@@ -80,7 +80,7 @@ omitConnectionStores(recipe, state) {
 
 async startRecipe(recipe, state, service) {
   state.recipes[recipe.$meta.name] = recipe;
-  return service({msg: 'FinagleRecipe', data: {
+  return service({kind: 'RecipeService', msg: 'FinagleRecipe', data: {
     recipe: this.omitConnectionStores(recipe, state),
     value: true
   }});

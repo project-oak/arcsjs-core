@@ -7,17 +7,13 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {App, makeName/*, RecipeService, StoreUpdateService*/} from './conf/allowlist.js';
-//import {App, LocalStoragePersistor, themeRules, RecipeService, StoreUpdateService, DevToolsService} from './conf/support.js';
+import {App, makeName} from './conf/allowlist.js';
 import {StudioRecipe} from './Library/StudioRecipe.js';
 
-// App class
 export const StudioApp = class extends App {
   constructor(paths, root, options) {
     super(paths, root);
-    //this.persistor = LocalStoragePersistor;
-    //this.services = [RecipeService, StoreUpdateService];
-    this.userAssembly = [StudioRecipe];
+    this.recipes = [StudioRecipe];
   }
   onservice(user, host, request) {
     switch (request.msg) {

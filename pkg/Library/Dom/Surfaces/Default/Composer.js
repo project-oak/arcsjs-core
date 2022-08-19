@@ -44,8 +44,8 @@ export class Composer {
       //log.warn(`found parent, needs slot, container = `, container, parent);
       if (!parent) {
         this.pendingPackets.push(packet);
-        if (packet['pendCount'] % 100 === 0) {
-          log.warn(`container [${container}] unavailable for slot [${id}] (x100)`);
+        if ((++packet['pendCount'] % 1e4) === 0) {
+          log.warn(`container [${container}] unavailable for slot [${id}] (x1e4)`);
         }
         return;
       }

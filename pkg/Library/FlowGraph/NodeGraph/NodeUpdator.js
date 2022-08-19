@@ -120,7 +120,7 @@ fullStoreId({key}, storeId) {
 },
 
 updateStoreValue(storeId, value, service) {
-  return service({msg: 'UpdateStoreValue', data: {storeId, value}});
+  return service({kind: 'StoreService', msg: 'UpdateStoreValue', data: {storeId, value}});
 },
 
 updateNodeInPipeline(node, pipeline) {

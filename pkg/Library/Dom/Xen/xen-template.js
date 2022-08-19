@@ -297,7 +297,7 @@ const _setSubTemplate = function(node, value, controller) {
   } else {
     template = maybeStringToTemplate(template);
   }
-  _renderSubtemplates(node, controller, template, models || $models);
+  _renderSubtemplates(node, controller, template, models/* || $models*/);
 };
 
 const _renderSubtemplates = function(container, controller, template, models) {

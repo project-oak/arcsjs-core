@@ -9,9 +9,12 @@
 
  export const GoogleLogin = {
   async enable(Firebase, onchange) {
-    const {app} = await Firebase;
-    // watch for auth activity
-    app.auth().onAuthStateChanged(user => user ? this.onSignedIn(onchange, Firebase, user) : this.onSignedOut(onchange, Firebase));
+    // react to auth activity
+    Firebase.app.auth().onAuthStateChanged(
+      user => user
+        ? this.onSignedIn(onchange, Firebase, user)
+        : this.onSignedOut(onchange, Firebase)
+    );
   },
   async disable(Firebase) {
     this.signOut(Firebase);
@@ -20,7 +23,7 @@
     onchange(user, Firebase);
   },
   /**
-   * onchange should proably do one of these:
+   * supplied onchange should proably do one of these:
    *   GoogleLogin::signInPopup(Firebase);
    *   GoogleLogin::signInWithRedirect(Firebase);
    */
@@ -28,23 +31,19 @@
     onchange(null, Firebase);
   },
   async signOut(Firebase) {
-    const {app} = await Firebase;
-    app.auth().signOut();
+    return Firebase.app.auth().signOut();
   },
   async signInAnonymously(Firebase) {
-    const {app} = await Firebase;
-    return await app.auth().signInAnonymously(app.auth());
+    return Firebase.app.auth().signInAnonymously(Firebase.app.auth());
   },
   async signInWithRedirect(Firebase) {
-    const {firebase, app} = await Firebase;
-    return await app.auth().signInWithRedirect(GoogleLogin.getProvider(firebase));
+    return await Firebase.app.auth().signInWithRedirect(GoogleLogin.getProvider(Firebase));
   },
   async signInPopup(Firebase) {
-    const {firebase, app} = await Firebase;
-    return await app.auth().signInWithPopup(GoogleLogin.getProvider(firebase));
+    return await Firebase.app.auth().signInWithPopup(GoogleLogin.getProvider(Firebase));
   },
-  getProvider(firebase) {
-    const provider = new firebase.auth.GoogleAuthProvider();
+  getProvider(Firebase) {
+    const provider = new Firebase.auth.GoogleAuthProvider();
     //provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
     // provider.setCustomParameters({
     //   //'login_hint': 'user@example.com',
