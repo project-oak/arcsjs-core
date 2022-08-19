@@ -31,7 +31,8 @@ export const App = class {
     await Arcs.init({
       paths: this.paths,
       root: this.root || document.body,
-      onservice: this.service.bind(this)
+      onservice: this.service.bind(this),
+      injections: this.injections
     });
     await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     Arcs.addAssembly([...this.userAssembly, DevToolsRecipe], 'user');

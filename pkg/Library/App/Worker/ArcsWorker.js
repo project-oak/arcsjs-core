@@ -105,14 +105,31 @@ const storeChanged = (arc, storeKey) => {
   }
 };
 
-// // the vibrations this worker can handle
+// the vibrations this worker can handle
 const handlers = {
   handleEvent: async ({pid, eventlet}) => {
-    const arc = Object.values(user.arcs)[0];
-    arc.onevent(pid, eventlet);
+    // TODO(sjmiles): the composer doesn't know from Arcs, so the PID is all we have
+    // perhaps we can imbue the PID with the ArcID also
+    const arc = Object.values(user.arcs).find(({hosts}) => hosts[pid]);
+    arc?.onevent(pid, eventlet);
   },
   addPaths: ({paths}) => {
     Paths.add(paths);
+  },
+  setInjections: ({injections}) => {
+    const o = Runtime.particleOptions || 0;
+    const i = o.injections || 0;
+    Runtime.particleOptions = {
+      ...o,
+      injections: {
+        ...i,
+        fetch,
+        ...injections
+      }
+    };
+  },
+  secureWorker() {
+    Runtime.securityLockdown?.(Runtime.particleOptions);
   },
   createArc: async ({arc}) => {
     const realArc = new Arc(arc);
@@ -128,7 +145,7 @@ const handlers = {
   createParticle: async ({name, arc, meta, code}) => {
     const realArc = getArc(arc);
     if (realArc) {
-      Runtime.particleOptions = {code};
+      Runtime.particleOptions = {...(Runtime.particleOptions || 0), code};
       try {
         return await user.installParticle(realArc, meta, name);
       } finally {

@@ -38,7 +38,7 @@ arcs.blargTheWorker = async ({paths}) => {
   return worker;
 };
 
-arcs.init = async ({root, paths, onservice}) => {
+arcs.init = async ({root, paths, onservice, injections}) => {
   console.log(paths);
   // worker path is document relative
   const worker = await arcs.blargTheWorker({paths});
@@ -55,15 +55,21 @@ arcs.init = async ({root, paths, onservice}) => {
   };
   // connect app-supplied conduits
   arcs.onservice = onservice;
-  // async readiness (because worker has an awaited dynamic import)
-  return new Promise(resolve =>
-    setTimeout(() => {
-      // memoize important paths
-      arcs.addPaths(paths);
-      // be ready
-      resolve();
-    }, 300)
-  );
+  // memoize paths
+  arcs.addPaths(paths);
+  // initialize particle scope
+  socket.sendVibration({kind: 'setInjections', injections});
+  // initiate security procedures
+  socket.sendVibration({kind: 'secureWorker'});
+  // // async readiness (because worker has an awaited dynamic import)
+  // return new Promise(resolve =>
+  //   setTimeout(() => {
+  //     // memoize important paths
+  //     arcs.addPaths(paths);
+  //     // be ready
+  //     resolve();
+  //   }, 300)
+  // );
 };
 
 // n.b. vibrational paths are worker-relative
@@ -107,6 +113,7 @@ arcs.get = async (arc, storeKey) => {
 };
 
 // public API
+//arcs.setInjections    = (injections)              => socket.sendVibration({kind: 'setInjections', injections});
 arcs.addPaths         = (paths)                   => socket.sendVibration({kind: 'addPaths', paths});
 arcs.createArc        = (arc)                     => socket.sendVibration({kind: 'createArc', arc});
 arcs.createParticle   = (name, arc, meta, code)   => socket.sendVibration({kind: 'createParticle', name, arc, meta, code});

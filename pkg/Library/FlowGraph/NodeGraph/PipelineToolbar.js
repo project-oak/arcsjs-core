@@ -145,27 +145,32 @@
   [toolbar] {
     padding: 0;
   }
-  [chooser] {
-    width: 150px;
+  [chooser], [rename] {
+    font-size: 0.8rem;
+    min-width: 170px;
   }
-  [rename] {
-    width: 150px;
+  [separator] {
+    width: 2px;
+    height: 32px;
+    border-right: 1px solid #bbb;
   }
 </style>
-<div rows>
+
+<!-- <div column> -->
   <div toolbar>
-    <span flex></span>
-    <mwc-icon-button on-click="onNew" icon="add"></mwc-icon-button>
-    <mwc-icon-button on-click="onCloneClicked" icon="content_copy"></mwc-icon-button>
-    <mwc-icon-button on-click="onDelete" icon="delete" display$="{{showDeleteIcon}}"></mwc-icon-button>
     <div chooser rows frame="chooser" display$="{{showChooser}}"></div>
+    <div column separator></div>
+    <mwc-icon-button title="New Pipeline" on-click="onNew" icon="add"></mwc-icon-button>
+    <mwc-icon-button title="Duplicate Pipeline" on-click="onCloneClicked" icon="content_copy"></mwc-icon-button>
+    <mwc-icon-button title="Delete Pipeline" on-click="onDelete" icon="delete" display$="{{showDeleteIcon}}"></mwc-icon-button>
     <input rename type="text" value="{{name}}" display$="{{showRenameInput}}" autofocus on-change="onRename" on-blur="onRenameBlur">
-    <mwc-icon-button on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
-    <select display$="{{showPublish}}" on-change="onPublishPathChanged" repeat="option_t">{{publishKeys}}</select>
-    <mwc-icon-button on-click="onShare" icon="public" display$="{{showPublish}}"></mwc-icon-button>
-    <mwc-icon-button on-click="onDontShare" icon="visibility_off" display$="{{showUnpublish}}"></mwc-icon-button>
+    <mwc-icon-button title="Rename Pipeline" on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
+    <div column separator></div>
+    <select title="Publish Target" display$="{{showPublish}}" on-change="onPublishPathChanged" repeat="option_t">{{publishKeys}}</select>
+    <mwc-icon-button title="Publish Pipeline" on-click="onShare" icon="public" display$="{{showPublish}}"></mwc-icon-button>
+    <mwc-icon-button title="Unpublish Pipeline" on-click="onDontShare" icon="visibility_off" display$="{{showUnpublish}}"></mwc-icon-button>
   </div>
-</div>
+<!-- </div> -->
 
 <template option_t>
   <option value="{{key}}" selected="{{selected}}">{{key}}</option>

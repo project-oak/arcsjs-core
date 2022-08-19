@@ -52,7 +52,7 @@ export class Runtime extends EventEmitter {
     this.shares = new Set();
     this.setUid(uid);
     this.log = logFactory(logFactory.flags.runtime, `runtime:[${this.prettyUid}]`, '#873600');
-    Runtime.securityLockdown?.(Runtime.particleOptions);
+    //Runtime.securityLockdown?.(Runtime.particleOptions);
   }
   setUid(uid: UID) {
     this.uid = uid;
