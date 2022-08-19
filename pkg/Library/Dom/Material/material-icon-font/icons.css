@@ -1,0 +1,50 @@
+/**
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+
+/* @font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/materialicons/v87/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2) format('woff2');
+} */
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Material Icons'),
+       local('MaterialIcons-Regular'),
+       url(MaterialIcons-Regular.woff2) format('woff2'),
+       url(MaterialIcons-Regular.woff) format('woff'),
+       url(MaterialIcons-Regular.ttf) format('truetype')
+       ;
+}
+
+@font-face {
+  /* latin */
+  font-family: 'Roboto Mono';
+  src: url('robotomono-variablefont_wght-webfont.woff2') format('woff2'),
+      url('robotomono-variablefont_wght-webfont.woff') format('woff')
+      ;
+  font-weight: normal;
+  font-style: normal;
+}
+
+icon {
+  font-family: "Material Icons";
+  font-size: 24px;
+  font-style: normal;
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  /* partial FOUC prevention */
+  width: 24px;
+  height: 24px;
+  overflow: hidden;;
+}
