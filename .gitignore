@@ -11,15 +11,3 @@ node_modules
 .firebase
 docs
 *.log
-<<<<<<< HEAD
-=======
-pkg/core/js/
-pkg/core/arcs.js
-pkg/core/arcs.js.map
-pkg/core/arcs.min.js
-pkg/core/arcs.min.js.map
-pkg/core/utils.min.js
-pkg/core/utils.min.js.map
-pkg/core/*.tsbuildinfo
-pkg/core/docs
->>>>>>> 4a9b6ea (more Lobby)
