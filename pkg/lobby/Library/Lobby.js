@@ -46,13 +46,21 @@ mergeStrangers(strangers, live) {
 template: html`
 <style>
   :host {
-    margin-top: 16px;
-    padding: 8px;
-    border: 1px solid #eee;
     flex: 3 !important;
   }
   [frame=tv] {
     padding-right: 8px;
+  }
+  [frame=profile] {
+    /* padding: 8px; */
+  }
+  [lobby] {
+    padding: 8px;
+    border: 1px solid #eee;
+  }
+  [peer] {
+    user-select: none;
+    cursor: pointer;
   }
   h3 {
     margin-top: 0;
@@ -60,9 +68,9 @@ template: html`
 </style>
 <div flex column>
   <!-- profile editor on top -->
-  <div flex x2 row frame="profile"></div>
+  <div row frame="profile"></div>
   <!-- video comms on bottom -->
-  <div flex x3 row>
+  <div flex row lobby>
     <div frame="tv"></div>
 
     <div flex center>
@@ -80,6 +88,6 @@ template: html`
 </div>
 
 <template name_t>
-  <div key="{{name}}" on-dblclick="onVideoCall">{{name}}</div>
+  <div peer key="{{name}}" on-dblclick="onVideoCall">{{name}}</div>
 </template>
 `});

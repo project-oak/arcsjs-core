@@ -1,7 +1,7 @@
 import {LobbyApp} from './LobbyApp.js';
 
 const app = new LobbyApp({
-  $engine: './arcs.js',
+  $config: './arcs.js',
   $library: '../Library',
   $app: '.'
 });

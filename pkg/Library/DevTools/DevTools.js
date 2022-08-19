@@ -17,13 +17,11 @@
   render({}, {runtime, showTools, om, capturedState}) {
     const user = runtime;
     const users = runtime?.users || {user};
-    // const users = {runtime, ...runtime?.users};
-    // const {user} = users;
     const storeBools = user && keys(user.stores).reduce((map, key) => (map[key] = false, map), {});
     return {
       om,
       showTools,
-      particles: this.renderAllHosts(users),
+      //particles: this.renderAllHosts(users),
       stores: this.renderAllStores(users),
       version: Math.random(),
       storeBools,
@@ -157,7 +155,6 @@
 <!-- devtools button -->
 <div tools-button on-click="onToggleDevToolsClick">
   <img src=${resolve('$library/App/assets/rainbow-128-opt.gif')}>
-  <!-- <img src="https://arcsjs-apps.web.app/Library/App/assets/rainbow-128-opt.gif"> -->
 </div>
 
 <!-- devtools flyout -->
