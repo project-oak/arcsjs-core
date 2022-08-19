@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-<title>editor</title>
+<title>Remote</title>
 
 <link rel="icon" href="./conf/icon.png">
 
@@ -21,30 +21,6 @@
     font-family: 'Google Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  body > * {
-    flex: 1;
-  }
-  #user {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  [section] {
-    border: 5px solid orange;
-    margin: 24px 64px;
-    background-color: #d9d9d9;
-  }
-  [columns] {
-    display: flex;
-    align-items: stretch;
-  }
 </style>
-
-<div columns>
-  <div section id="catalog"></div>
-  <div section id="inspector"></div>
-</div>
-
-<div section id="user"></div>
 
 <script type="module" src="./index.js"></script>

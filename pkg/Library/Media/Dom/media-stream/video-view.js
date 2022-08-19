@@ -11,8 +11,8 @@ const template = Xen.Template.html`
 <style>
   :host {
     display: flex;
-    min-width: 160px;
-    min-height: 120px;
+    min-width: 16px;
+    min-height: 12px;
     font-size: 10px;
     color: black;
     background-color: black;

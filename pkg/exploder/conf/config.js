@@ -9,6 +9,7 @@ globalThis.config = {
     particles: true,
     //recipe: true,
     //services: true,
-    surfaces: true
+    surfaces: true,
+    //worker: true
   }
 };

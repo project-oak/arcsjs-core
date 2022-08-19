@@ -6,7 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Xen} from './xen/xen-async.js';
+import {Xen} from './Xen/xen-async.js';
 import {DragDrop} from './drag-drop.js';
 import {IconsCss} from './Material/material-icon-font/icons.css.js';
 

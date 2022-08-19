@@ -14,7 +14,12 @@ export const MessageBus = class {
   }
   sendVibration(msg) {
     log(`sending:`, msg);
-    this.connection.postMessage(msg);
+    try {
+      this.connection.postMessage(msg);
+    } catch(x) {
+      log.error(msg);
+      log.error(x);
+    }
   }
   receiveVibrations(handler) {
     this.listener = async msg => {

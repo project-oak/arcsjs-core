@@ -6,11 +6,10 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-
 import {Paths, Runtime, Arc, Decorator, Chef, logFactory, utils} from '../../core.js';
 import {MessageBus} from './MessageBus.js';
 import {RecipeService} from '../../Arcs/RecipeService.js';
-import {StoreUpdateService} from '../../Arcs/StoreUpdateService.js';
+import {StoreService} from '../../Arcs/StoreService.js';
 
 // n.b. lives in Worker context
 
@@ -57,16 +56,16 @@ const serviceHandler = async (arc, host, request) => {
     case 'request-context':
       return ({runtime: user});
   }
-  {
+  if (request.kind === 'RecipeService') {
     const value = await RecipeService(user, host, request);
     log('RecipeService', request, value);
     if (value !== undefined) {
       return value;
     }
   }
-  {
-    const value = await StoreUpdateService(user, host, request);
-    log('StoreUpdateService', request, value);
+  if (request.kind === 'StoreService') {
+    const value = await StoreService(user, host, request);
+    log('StoreService', request, value);
     if (value !== undefined) {
       return value;
     }
@@ -137,6 +136,9 @@ const handlers = {
       }
     }
   },
+  destroyParticle: async ({name, arc}) => {
+    getArc(arc)?.hosts[name]?.detach();
+  },
   setInputs: async ({arc, particle, inputs}) => {
     const realArc = getArc(arc);
     if (realArc) {
@@ -170,9 +172,7 @@ const handlers = {
   getStoreData: ({arc, storeKey}) => {
     const realArc = getArc(arc);
     const store = realArc?.stores[storeKey];
-    if (store) {
-      WorkerBus.sendVibration({type: 'store', arc, storeKey, data: store.data});
-    }
+    WorkerBus.sendVibration({type: 'store', arc, storeKey, data: store?.data});
   },
   watch: ({arc, storeKey, remove}) => {
     watching[storeKey] = (remove !== true);
@@ -188,13 +188,13 @@ const handlers = {
 const handleVibration = async msg => {
   const h = handlers[msg?.kind];
   if (h) {
-    log.group(msg?.kind, '...handler...');
+    //log.group(msg?.kind, '...handler...');
     try {
       await h(msg);
     } catch(x) {
       log.error(x);
     }
-    log.groupEnd();
+    //log.groupEnd();
   }
 };
 
@@ -203,12 +203,12 @@ const queue = [];
 // respond to bus vibrations
 WorkerBus.receiveVibrations(msg => {
   if (msg?.kind === 'serviceResult') {
-    log('handle result task', msg?.kind);
+    log('handle serviceResult', msg.data);
     // bypass queue
     handleVibration(msg);
   } else {
-    log('add task', msg?.kind, '-', queue.length, 'task(s) in queue');
     queue.push(msg);
+    log('add task', msg?.kind, '-', queue.length, 'task(s) in queue');
     flushQueue();
   }
 });
@@ -217,7 +217,7 @@ WorkerBus.receiveVibrations(msg => {
 const flushQueue = async () => {
   if (!flushQueue.busy) {
     flushQueue.busy = true;
-    log.group('flush');
+    log.group('flush', queue.length);
     try {
       while (queue.length) {
         const msg = queue.shift();

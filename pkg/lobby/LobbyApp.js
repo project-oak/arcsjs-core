@@ -17,8 +17,6 @@ import {makeName, logFactory} from '../core/utils.min.js';
 
 const log = logFactory(true, 'LobbyApp', 'navy');
 
-//const keys = o => o ? Object.keys(o) : [];
-
 const streams = globalThis.streams = {};
 
 export const LobbyApp = class extends App {

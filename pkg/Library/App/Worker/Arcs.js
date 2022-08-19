@@ -21,9 +21,28 @@ const watchers = {};
 const getters = {};
 const arcs = {};
 
-arcs.init = ({root, paths, onservice}) => {
+arcs.blargTheWorker = async ({paths}) => {
+  const code = [
+    `import '${paths.$config}';`,
+    `import '${paths.$library}/App/Worker/ArcsWorker.js';`
+  ];
+  const text = code.join('\n');
+  //console.warn(text);
+  const blob = new Blob([text], {type: 'application/javascript'});
+  const oUrl = URL.createObjectURL(blob);
+  const worker = new Worker(oUrl, {type: 'module', name: 'arcsjs'});
+  setTimeout(() => URL.revokeObjectURL(oUrl), 5000);
+  console.groupCollapsed('blarged a worker');
+  console.log(text);
+  console.groupEnd();
+  return worker;
+};
+
+arcs.init = async ({root, paths, onservice}) => {
+  console.log(paths);
   // worker path is document relative
-  const worker = new Worker(paths.$arcs, {type: 'module', name: 'arcsjs'});
+  const worker = await arcs.blargTheWorker({paths});
+  // const worker = new Worker(paths.$arcs, {type: 'module', name: 'arcsjs'});
   // bus to worker
   socket = new MessageBus(worker);
   // listen to worker
@@ -37,7 +56,7 @@ arcs.init = ({root, paths, onservice}) => {
   // connect app-supplied conduits
   arcs.onservice = onservice;
   // async readiness (because worker has an awaited dynamic import)
-  arcs.ready = new Promise(resolve =>
+  return new Promise(resolve =>
     setTimeout(() => {
       // memoize important paths
       arcs.addPaths(paths);
@@ -90,6 +109,7 @@ arcs.get = async (arc, storeKey) => {
 // public API
 arcs.addPaths         = (paths)                   => socket.sendVibration({kind: 'addPaths', paths});
 arcs.createParticle   = (name, arc, meta, code)   => socket.sendVibration({kind: 'createParticle', name, arc, meta, code});
+arcs.destroyParticle  = (name, arc)               => socket.sendVibration({kind: 'destroyParticle', name, arc});
 arcs.setInputs        = (arc, particle, inputs)   => socket.sendVibration({kind: 'setInputs', arc, particle, inputs});
 arcs.addRecipe        = (recipe, arc)             => socket.sendVibration({kind: 'addRecipe', recipe, arc});
 arcs.addAssembly      = (recipes, arc)            => socket.sendVibration({kind: 'addAssembly', recipes, arc});

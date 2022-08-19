@@ -7,11 +7,6 @@ const calls = {};
 const mediaConnections = {};
 const me = new Peer();
 
-const onopen = id => {
-  nid = id;
-  console.log('My peer ID is: ' + id);
-};
-
 const start = () => {
   // when connection to PeerServer is established, we receive our peerid
   me.on('open', id => onopen(id));
@@ -19,10 +14,17 @@ const start = () => {
   me.on('call', mediaConnection => myself.answerCall(mediaConnection));
 };
 
+const onopen = id => {
+  nid = id;
+  console.log('My peer ID is: ' + id);
+  myself.onstart();
+};
+
 export const myself = {
-  start(name) {
+  async start(name) {
     start();
     myself.name = name;
+    return new Promise(resolve => myself.onstart = resolve);
   },
   get me() {
     return me;
@@ -43,36 +45,34 @@ export const myself = {
   },
   shouldCall: them => {
     if (!myself.mediaStream) {
-      console.warn('no media stream');
+      // console.warn('no media stream');
       return false;
     }
     return !calls[them];
   },
   doCall(them, onstream) {
-    console.log('---> CALLING', them);
     const metadata = {
       id: myself.name,
       call: myself.nid
     };
     const call = me.call(them, myself.mediaStream, {metadata});
-    if (call) {
-      console.log(call);
+    // answered calls invoke me.oncall, which invokes 'answerCall'
+    if (!call) {
+      console.log('failed to place call');
+    } else {
+      //console.log(call);
       calls[them] = call;
       call.on('error', error => console.warn(error));
-      call.on('close', () => {
-        console.log('call:close');
-      });
+      call.on('close', () => console.log('call:close'));
     }
   },
   answerCall: media => {
     const metadata = media.metadata;
     const {id: name, call: nid} = metadata;
-    //
     const meta = mediaConnections[nid] = {metadata};
     //
     console.log('ANSWERING <---', name, nid);
     media.answer(myself.mediaStream);
-    //
     media.on('stream', stream => {
       meta.stream = stream;
       console.log('media:onstream', stream);
@@ -87,7 +87,7 @@ export const myself = {
       console.log('.........END CALL', them);
       const call = calls[them];
       calls[them] = null;
-      //call?.close?.();
+      call?.close?.();
       setTimeout(calls[them] = null, 500);
     }
   },

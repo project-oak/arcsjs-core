@@ -70,8 +70,7 @@ export class Host extends EventEmitter {
     this.arc = null;
   }
   protected detachParticle() {
-    const {particle} = this;
-    if (particle) {
+    if (this.particle) {
       this.render({$clear: true});
       this.particle = null;
       this.meta = null;

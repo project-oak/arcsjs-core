@@ -36,7 +36,7 @@ export const StudioRecipe = {
   },
   main: {
     $container: '#user',
-    $kind: './Library/Studio',
+    $kind: '$app/Library/Studio',
     $inputs: [
       {pipeline: 'selectedPipeline'}
     ],

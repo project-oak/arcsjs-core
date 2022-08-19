@@ -22,7 +22,6 @@ export const App = class {
   constructor(paths, root) {
     this.userAssembly = [];
     this.paths = paths;
-    this.root = root;
   }
   get arcs() {
     return Arcs;
@@ -33,6 +32,20 @@ export const App = class {
       root: this.root || document.body,
       onservice: this.service.bind(this)
     });
+    // TODO(sjmiles): adapter is awkward
+    Arcs.user.persistor = {
+      async restore(storeId, store) {
+        log('restore', storeId);
+        this.restore({storeId});
+        //return serviceRequest({type: 'restore', storeId});
+      },
+      async persist(storeId, store) {
+        log('persist', storeId);
+        this.persist({storeId, data: store.data});
+        //serviceRequest({type: 'persist', storeId, data: store.data});
+      }
+    };
+    await Arcs.ready;
     await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     Arcs.addAssembly([...this.userAssembly, DevToolsRecipe], 'user');
   }
@@ -48,6 +61,7 @@ export const App = class {
     }
   }
   async appService({request}) {
+    //this.services.
     const value = await this.onservice?.('user', 'host', request);
     log('service:', request?.msg, '=', value);
     return value || null;
@@ -59,19 +73,7 @@ export const App = class {
   async restore({storeId}) {
     return this.persistor?.restore(storeId);
   }
-  // (optional) support login convention
-  getLoginBindings() {
-    return [
-      this.onLogin?.bind(this),
-      this.onLogout?.bind(this),
-      this.onStart?.bind(this)
-    ];
-  }
-  bindLoginObserver(loginObserver) {
-    return loginObserver(
-      this.onLogin?.bind(this),
-      this.onLogout?.bind(this),
-      this.onStart?.bind(this)
-    );
+  async enableMedia() {
+    return import('../../Media/Dom/media-stream/media-stream.js');
   }
 };

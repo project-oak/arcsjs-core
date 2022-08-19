@@ -7,16 +7,16 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-export const StoreUpdateService = async (runtime, host, request) => {
+export const StoreService = async (runtime, host, request) => {
   switch (request.msg) {
     case 'GetStoreValue':
-      return getStoreValue(request.data, runtime);
+      return getStoreValue(request.data, runtime) || null;
     case 'UpdateStoreValue':
-      return updateStoreValue(request.data, runtime);
+      return updateStoreValue(request.data, runtime) || null;
     case 'ListenToChanges':
-      return listenToChanges(request.data, runtime);
+      return listenToChanges(request.data, runtime) || null;
     case 'ListenToAllChanges':
-      return ListenToAllChanges(runtime, host);
+      return ListenToAllChanges(runtime, host) || null;
     }
 };
 

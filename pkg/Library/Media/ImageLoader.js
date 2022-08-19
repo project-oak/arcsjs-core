@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 import {Resources} from '../App/resources.js';
-import {utils} from '../../arcsjs-support.js';
+import {utils} from '../core.js';
 
 export const allocateResource = () => {
   return utils.makeId(3, 2, '-');

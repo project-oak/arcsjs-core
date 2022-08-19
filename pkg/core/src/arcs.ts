@@ -15,6 +15,7 @@ export * from '../js/core/Host.js';
 export * from '../js/core/Decorator.js';
 export * from '../js/recipe/Chef.js';
 export * from '../js/recipe/ParticleCook.js';
+export * from '../js/recipe/StoreCook.js';
 export * from '../js/recipe/RecipeParser.js';
 export * from '../js/render/Composer.js';
 export * from '../js/render/Surface.js';

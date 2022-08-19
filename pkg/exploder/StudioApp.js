@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 
-import {App, makeName/*, RecipeService, StoreUpdateService*/} from './allowlist.js';
+import {App, makeName/*, RecipeService, StoreUpdateService*/} from './conf/allowlist.js';
 //import {App, LocalStoragePersistor, themeRules, RecipeService, StoreUpdateService, DevToolsService} from './conf/support.js';
 import {StudioRecipe} from './Library/StudioRecipe.js';
 

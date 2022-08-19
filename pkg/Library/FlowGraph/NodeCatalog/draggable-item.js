@@ -4,11 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-// import {importModules} from '../arcsjs-support.js';
-// const {Xen} = await importModules(async path => import(path), [
-//   '$library/Dom/xen/xen-async.js',
-// ]);
-import {Xen} from '../../Library/Dom/xen/xen-async.js';
+import {Xen} from '../../Dom/Xen/xen-async.js';
 
 const template = Xen.Template.html`
 <style>

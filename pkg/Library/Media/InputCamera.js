@@ -43,24 +43,34 @@ onSnap({eventlet: {value: ref}, image}, state, {invalidate}) {
 template: html`
 <style>
   :host {
+    position: relative;
     display: flex;
     flex: 1 1 0%;
     flex-direction: column;
     background-color: black;
     color: #eee;
     overflow: hidden;
-    width: 240px;
-    height: 300px;
+    /*
+    min-width: 240px;
+    min-height: 300px;
+    */
   }
   video-view, image-resource {
     object-fit: contain;
   }
+  icon {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 12px;
+  }
 </style>
 
 <div flex rows>
-  <div toolbar>
+  <icon>videocam</icon>
+  <!-- <div toolbar>
     <icon>videocam</icon>
-  </div>
+  </div> -->
   <video-view flex show$="{{videoNotImage}}" version="{{version}}" box="{{box}}" on-snap="onSnap" on-stream="onStream"></video-view>
   <image-resource center flex hide$="{{videoNotImage}}" image="{{image}}"></image-resource>
 </div>

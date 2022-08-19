@@ -6,10 +6,10 @@
  */
 import './conf/config.js';
 import {paths} from './conf/allowlist.js';
-import {StudioApp} from './StudioApp.js';
+import {ComputeApp} from './Library/ComputeApp.js';
 
 try {
-  const app = new StudioApp(paths);
+  const app = new ComputeApp(paths);
   await app.spinup();
 } catch(x) {
   console.error(x);

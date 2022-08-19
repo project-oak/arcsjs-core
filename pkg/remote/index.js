@@ -6,10 +6,10 @@
  */
 import './conf/config.js';
 import {paths} from './conf/allowlist.js';
-import {StudioApp} from './StudioApp.js';
+import {RemoteApp} from './Library/RemoteApp.js';
 
 try {
-  const app = new StudioApp(paths);
+  const app = new RemoteApp(paths);
   await app.spinup();
 } catch(x) {
   console.error(x);

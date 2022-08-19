@@ -7,7 +7,7 @@
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-import {Xen} from '../../Library/Dom/xen/xen-async.js';
+import {Xen} from '../../Library/Dom/Xen/xen-async.js';
 import {logFactory} from '../arcs/js/utils/log.js';
 import {configureFirebase} from './firebase.js';
 
