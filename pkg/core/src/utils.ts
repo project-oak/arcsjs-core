@@ -7,5 +7,5 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-//export * from '../js/core/Particle.js';
 export * from '../js/utils/utils.js';
+export * from '../js/utils/names.js';
