@@ -8,7 +8,8 @@
 // const {Xen} = await importModules(async path => import(path), [
 //   '$library/Dom/xen/xen-async.js',
 // ]);
-import {Xen} from '../../Library/Dom/xen/xen-async.js';
+// import {Xen} from '../../Library/Dom/xen/xen-async.js';
+import {Xen} from '../../Dom/Xen/xen-async.js';
 
 const template = Xen.Template.html`
 <style>

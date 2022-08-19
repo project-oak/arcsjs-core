@@ -5,8 +5,8 @@
  */
 
 ({
-initialize(inputs, state) {
-  state.selectedCategory = 'input';
+initialize({nodeTypes}, state) {
+  state.selectedCategory = nodeTypes?.[0].$meta.category;//'input';
 },
 
 update({nodeTypes, search}, state) {

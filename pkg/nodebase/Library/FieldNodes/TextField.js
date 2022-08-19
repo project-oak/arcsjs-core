@@ -16,7 +16,8 @@ template: html`
   :host {
     padding: 0 6px;
     height: 2em;
-    width: 6em;
+    width: 300px; /*6em;*/
+    border: 1px solid fuchsia;
   }
   [label] {
     background: inherit;

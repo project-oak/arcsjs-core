@@ -19,7 +19,7 @@ export const TextField = {
     }
   },
   field: {
-    $kind: '$app/nodebase/Library/FieldNodes/TextField',
+    $kind: '$app/Library/FieldNodes/TextField',
     $inputs: ['label', 'value'],
     $outputs: ['label', 'value']
   }
@@ -39,7 +39,7 @@ export const BooleanField = {
     }
   },
   field: {
-    $kind: '$app/nodebase/Library/FieldNodes/BooleanField',
+    $kind: '$app/Library/FieldNodes/BooleanField',
     $inputs: ['label', 'value'],
     $outputs: ['label', 'value']
   }
@@ -59,7 +59,7 @@ export const TextObject = {
     }
   },
   text: {
-    $kind: '$app/nodebase/Library/FieldNodes/TextObject',
+    $kind: '$app/Library/FieldNodes/TextObject',
     $inputs: ['text', 'textStyle']
   }
 };
@@ -75,7 +75,7 @@ export const LineObject = {
     }
   },
   field: {
-    $kind: '$app/nodebase/Library/FieldNodes/LineObject',
+    $kind: '$app/Library/FieldNodes/LineObject',
     $inputs: ['lineStyle']
   }
 };

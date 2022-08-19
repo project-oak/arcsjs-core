@@ -6,11 +6,14 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {App} from '../Library/App/Worker/App.js';
+
+ import {App} from './allowlist.js';
+// import {App} from '../Library/App/Worker/App.js';
+
 import {RecipeService} from '../Library/Arcs/RecipeService.js';
 import {StoreUpdateService} from '../Library/Arcs/StoreUpdateService.js';
 import {NodebaseRecipe} from './Library/NodebaseRecipe.js';
-import {LocalStoragePersistor} from '../Library/LocalStorage/LocalStoragePersistor.js';
+// import {LocalStoragePersistor} from '../Library/LocalStorage/LocalStoragePersistor.js';
 // import {FissionPersistor} from '../Library/Fission/FissionPersistor.js';
 import {logFactory} from '../core/utils.min.js';
 import '../Library/App/surface-imports.js';
