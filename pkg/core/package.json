@@ -9,30 +9,15 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.13.0",
-    "esbuild": "^0.14.12",
-    "eslint": "^8.10.0",
-    "eslint-plugin-import": "^2.25.4",
-    "local-web-server": "^5.1.1",
-    "puppeteer": "^13.3.1",
-    "ts-node": "^10.6.0",
-    "typedoc": "^0.22.12",
-    "typescript": "^4.5"
-  },
   "scripts": {
     "build": "./tools/build.sh",
     "bundle": "./tools/bundle.sh",
     "clean": "./tools/clean.sh",
     "compile": "./tools/compile.sh",
     "docs": "./tools/docs.sh",
-    "get_port": "./tools/get_port.sh",
     "puppet": "./tools/puppet.sh",
     "test": "./tools/puppet.sh",
     "serve": "./tools/serve.sh",
     "watch": "./tools/watch.sh"
-  },
-  "config": {
-    "port": "9942"
   }
 }

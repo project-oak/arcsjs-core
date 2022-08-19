@@ -1,3 +1,10 @@
+/**
+ * Copyright 2022 Google LLC
+ *
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file or at
+ * https://developers.google.com/open-source/licenses/bsd
+ */
 import '../Library/App/surface-imports.js';
 import {makeName} from '../core/utils.min.js';
 import {App} from '../Library/App/Worker/WorkerApp.js';
@@ -12,16 +19,17 @@ export const LobbyApp = class extends App {
   }
   async spinup() {
     await super.spinup();
-    await this.enableMedia();
     this.persona = makeName();
     this.Arcs.set('user', 'persona', this.persona);
-    this.meet();
+    await this.enableMedia();
     this.createTvParticle(this.persona, 'lobby#tv', this.persona);
+    this.meet();
   }
   async meet() {
     if (!this.closed) {
-      this.Arcs.set('user', 'strangers', await meetStrangers(this.persona));
       setTimeout(() => this.meet(), 500);
+      const strangers = await meetStrangers(this.persona);
+      this.Arcs.set('user', 'strangers', strangers);
     }
   }
   createTvParticle(name, container, stream) {
