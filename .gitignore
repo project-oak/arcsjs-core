@@ -3,6 +3,8 @@ arcs.js
 arcs.js.map
 arcs.min.js
 arcs.min.js.map
+utils.min.js
+utils.min.js.map
 *.tsbuildinfo
 .DS_Store
 node_modules
