@@ -1,7 +1,8 @@
-export * from './NullTests.js';
-export * from './StoreStateTests.js';
-export * from './StorePersistTests.js';
-export * from './HostInputsChangeTests.js';
-export * from './IsolationTests.js';
-export * from './DecoratorTests.js';
+import '../config.js';
+import '../../arcsjs-core.js';
+import '../../arcsjs-support.js';
 
+export * from './NoderTests.js';
+//export * from './NoderAutoTests.js';
+export * from './BaserTests.js';
+//export * from './BaserAutoTests.js';

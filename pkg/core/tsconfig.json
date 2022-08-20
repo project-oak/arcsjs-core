@@ -1,0 +1,19 @@
+{
+  "exclude": [
+    "./src/*.ts",
+    "./js/**/*"
+  ],
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "esnext",
+    "rootDir": "./ts",
+    "outDir": "./js",
+    "declaration": true
+  },
+  "typedocOptions": {
+    "entryPoints": ["./ts"],
+    "out": "./docs",
+    "name": "ArcsJs"
+  }
+}

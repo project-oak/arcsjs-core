@@ -1,0 +1,29 @@
+<!doctype html>
+<!--
+ Copyright (c) 2022 Google LLC
+
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file or at
+ https://developers.google.com/open-source/licenses/bsd
+-->
+
+<script type="module">
+  globalThis.config = {
+    logFlags: {particles: true}
+  };
+</script>
+
+<script type="module">
+  import {Host} from '../js/core/Host.js';
+  import {Runtime} from '../js/Runtime.js';
+  import '../js/isolation/vanilla.js';
+  //
+  (async () => {
+    const user = new Runtime('user');
+    const p = await user.createParticle(new Host(), './HelloWorld')
+    console.log(p);
+    p.inputs = {
+      things: {}
+    };
+  })();
+</script>

@@ -1,0 +1,23 @@
+{
+  "name": "arcsjs-core",
+  "author": "sjmiles@google.com",
+  "type": "module",
+  "license": "BSD",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "scripts": {
+    "build": "./tools/build.sh",
+    "bundle": "./tools/bundle.sh",
+    "clean": "./tools/clean.sh",
+    "compile": "./tools/compile.sh",
+    "docs": "./tools/docs.sh",
+    "puppet": "./tools/puppet.sh",
+    "test": "./tools/puppet.sh",
+    "serve": "./tools/serve.sh",
+    "watch": "./tools/watch.sh"
+  }
+}

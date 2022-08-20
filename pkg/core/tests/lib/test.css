@@ -1,0 +1,34 @@
+body, pre {
+  font-size: 14px;
+  font-family: sans-serif;
+  font-family: monospace;
+  /*
+  zoom: 1;
+  */
+}
+entry {
+  display: block;
+  border-bottom: 1px dotted silver;
+  white-space: pre;
+  padding: 4px 0;
+}
+test-name::before {
+  font-weight: bold;
+  font-style: normal;
+  content: 'test: ';
+}
+test-name {
+  display: block;
+  font-weight: normal;
+  /* font-style: italic; */
+  padding-top: 8px;
+}
+[system] {
+  color: rgb(74, 74, 74);
+}
+[console] {
+  color: rgb(69, 145, 62);
+}
+[error] {
+  color: rgb(147, 19, 19);
+}

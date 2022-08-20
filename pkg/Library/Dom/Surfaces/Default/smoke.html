@@ -1,0 +1,28 @@
+<!doctype html>
+<style>
+  #surface {
+    border: 6px solid violet;
+    width: 640px;
+    height: 480px;
+  }
+</style>
+
+<div id="surface"></div>
+
+<script type="module">
+  import {initSurface} from './RemoteSurface.js';
+  const surface = initSurface(window.surface);
+  setTimeout(() => {
+    surface.onmessage(JSON.stringify({
+      kind: 'packet',
+      //const {id, container, content: {template, model}} = packetData;
+      data: {
+        id: '0',
+        container: 'root',
+        content: {
+          template: '<div>Bi`teme</div>'
+        }
+      }
+    }));
+  }, 0);
+</script>
