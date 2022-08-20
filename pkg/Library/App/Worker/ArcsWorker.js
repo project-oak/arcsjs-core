@@ -53,10 +53,6 @@ const serviceCalls = {};
 // Arc service calls come here first
 const serviceHandler = async (arc, host, request) => {
   switch (request?.msg) {
-    // case 'MakeName':
-    // case 'make-name': {
-    //   return utils.makeName();
-    // }
     case 'request-context':
       return ({runtime: user});
   }
