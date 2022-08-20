@@ -45,16 +45,20 @@ formatTitle({name, index}) {
 async monitorStores(state, nodeTypes, {service, invalidate}) {
   const nodeType = this.findNodeType(state.node.name, nodeTypes);
   if (nodeType) {
-    const {storeId} = await service({
+    const result = await service({
       msg: 'ListenToChanges',
       data: {storeIds: this.getNodeStoreIds(state.node, nodeType)}
     });
-    //log(`${storeId} has changed affecting node ${state.node.key}`);
-    // this method is untethered from return stack because of
-    // Special Circumstances created above, so we provoke
-    // a change manually
-    assign(state, {hasMonitor: false});
-    invalidate();
+    if (result) {
+      //log(`${storeId} has changed affecting node ${state.node.key}`);
+      // this method is untethered from return stack because of
+      // Special Circumstances created above, so we provoke
+      // a change manually
+      assign(state, {hasMonitor: false});
+      invalidate();
+    } else {
+      // something bad happened, so we stop trying
+    }
   }
 },
 
@@ -124,7 +128,7 @@ fullStoreId({key}, storeId) {
 },
 
 getStoreValue(storeId, service) {
-  return service({msg: 'GetStoreValue', data: {storeId}});
+  return service({kind: 'StoreService', msg: 'GetStoreValue', data: {storeId}});
 },
 
 async constructConnections({connections}, pipeline, nodeTypes, service) {

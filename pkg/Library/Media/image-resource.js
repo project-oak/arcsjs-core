@@ -3,7 +3,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Xen} from '../../Dom/Xen/xen-async.js';
+import {Xen} from '../Dom/Xen/xen-async.js';
 
 const template = Xen.Template.html`
 <style>

@@ -11,8 +11,8 @@
 inspectorDelimiter: '$$',
 
 async update({node, pipeline, data}, state, {service, output}) {
-  if (node?.key && this.dataChanged(data, state.data)) {
-    if (state.data?.key === data.key && data.shouldDelete) {
+  if (data && node?.key && this.dataChanged(data, state.data)) {
+    if (state.data?.key === data?.key && data?.shouldDelete) {
       output(this.deleteNode(node, pipeline));
       state.data = null;
     } else {

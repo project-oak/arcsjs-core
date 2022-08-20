@@ -9,36 +9,33 @@ export const DeviceUxRecipe = {
     description: 'Device Ux'
   },
   $stores: {
-    isCameraEnabled: {
-      $type: 'Boolean'
+    mediaDeviceState: {
+      $type: 'MedaDeviceState',
+      $value: {
+        isCameraEnabled: false,
+        isMicEnabled: false,
+        isAudioEnabled: false,
+        // videoDeviceId
+        // audioOutputDeviceId
+      }
     },
-    isMicEnabled: {
-      $type: 'Boolean'
-    },
-    transcript: {
-      $type: 'Transcript',
-      $tags: ['shared']
-    },
-    isAudioEnabled: {
-      $type: 'Boolean'
+    mediaDevices: {
+      $type: '[JSON]'
     },
     textForSpeech: {
       $type: 'String',
       $tags: ['shared']
-    },
-    mediaDevices: {
-      $type: '[JSON]'
     }
   },
   deviceUx: {
     $kind: 'Media/DeviceUx',
-    $inputs: ['mediaDevices', 'isCameraEnabled', 'isMicEnabled', 'isAudioEnabled', 'transcript'],
-    $outputs: ['isCameraEnabled', 'isMicEnabled', 'isAudioEnabled', 'transcript']
+    $inputs: ['mediaDevices', 'mediaDeviceState'],
+    $outputs: ['mediaDeviceState']
   },
   localStream: {
     $kind: 'Media/MediaStream',
     $inputs: [
-      'isCameraEnabled'
+      'mediaDeviceState'
     ],
     $outputs: [
       'mediaDevices'
@@ -46,12 +43,49 @@ export const DeviceUxRecipe = {
   },
   speechFeed: {
     $kind: 'Media/SpeechRecognizer',
-    $inputs: ['isMicEnabled'],
-    $outputs: ['isMicEnabled', 'transcript']
+    $inputs: ['mediaDeviceState'],
+    $outputs: ['mediaDeviceState', 'transcript']
   },
   speechOutput: {
     $kind: 'Media/SpeechSynthesizer',
-    $inputs: ['isAudioEnabled', 'textForSpeech'],
-    $outputs: ['isMicEnabled']
+    $inputs: ['mediaDeviceState', 'textForSpeech'],
+    $outputs: ['mediaDeviceState']
+  }
+};
+
+export const SpeechRecipe = {
+  $meta: {
+    description: 'speech in/out'
+  },
+  $stores: {
+    mediaDeviceState: {
+      $type: 'MedaDeviceState',
+      $value: {}
+    },
+    transcript: {
+      $type: 'Transcript',
+      $tags: ['shared']
+    },
+    textForSpeech: {
+      $type: 'String',
+      $tags: ['shared'],
+      // uncomment to test speech synthesizer:
+      // $value: 'hello world!'
+    }
+  },
+  micBox: {
+    $kind: 'Media/MicBox',
+    $inputs: ['mediaDeviceState', 'transcript'],
+    $container: 'deviceUx#micbox'
+  },
+  speechFeed: {
+    $kind: 'Media/SpeechRecognizer',
+    $inputs: ['mediaDeviceState'],
+    $outputs: ['mediaDeviceState', 'transcript']
+  },
+  speechOutput: {
+    $kind: 'Media/SpeechSynthesizer',
+    $inputs: ['mediaDeviceState', 'textForSpeech'],
+    $outputs: ['mediaDeviceState']
   }
 };

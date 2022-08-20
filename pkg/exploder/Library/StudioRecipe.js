@@ -8,7 +8,7 @@
  */
 
 import {nodeTypes} from './nodeTypes.js';
-import {NodeCatalogParticles, NodeCatalogStores} from '../../Library/FlowGraph/NodeCatalog/NodeCatalogSpecs.js';
+import {NodeCatalogParticles, NodeCatalogStores} from '../../Library/NodeCatalog/NodeCatalogSpecs.js';
 
 export const StudioRecipe = {
   $meta: {
@@ -49,7 +49,7 @@ export const StudioRecipe = {
       // actually a slot in main
       editor: {
         Editor: {
-          $kind: '$library/FlowGraph/NodeGraph/Editor',
+          $kind: '$library/NodeGraph/Editor',
           $inputs: [
             {pipeline: 'selectedPipeline'},
             'selectedNode',
@@ -75,7 +75,7 @@ export const StudioRecipe = {
       inspector: {
         Inspector: {
           $container: '#inspector',
-          $kind: '$library/FlowGraph/NodeGraph/Inspector',
+          $kind: '$library/NodeGraph/Inspector',
           $inputs: [{data: 'inspectorData'}],
           $outputs: [{data: 'inspectorData'}]
         }
@@ -83,7 +83,7 @@ export const StudioRecipe = {
     }
   },
   nodeInspector: {
-    $kind: '$library/FlowGraph/NodeGraph/NodeInspector',
+    $kind: '$library/NodeGraph/NodeInspector',
     $inputs: [
       {node: 'selectedNode'},
       {pipeline: 'selectedPipeline'},
@@ -94,7 +94,7 @@ export const StudioRecipe = {
     ]
   },
   nodeUpdator: {
-    $kind: '$library/FlowGraph/NodeGraph/NodeUpdator',
+    $kind: '$library/NodeGraph/NodeUpdator',
     $inputs: [
       {node: 'selectedNode'},
       {pipeline: 'selectedPipeline'},
@@ -106,7 +106,7 @@ export const StudioRecipe = {
     ]
   },
   nodesConnector: {
-    $kind: '$library/FlowGraph/NodeGraph/NodesConnector',
+    $kind: '$library/NodeGraph/NodesConnector',
     $inputs: [
       {pipeline: 'selectedPipeline'},
       'selectedNode',

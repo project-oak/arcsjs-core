@@ -4,8 +4,8 @@
  * license that can be found in the LICENSE file.
  */
 
-import {Xen} from '../../Dom/Xen/xen-async.js';
-import {subscribeToStream} from '../media-stream/media-stream.js';
+import {Xen} from '../../Dom/xen/xen-async.js';
+import {subscribeToDefaultStream} from '../media-stream/media-stream.js';
 
 export const DEFAULT_SAMPLE_RATE = 16000;
 export const DEFAULT_NUM_CHANNELS = 1;
@@ -40,7 +40,7 @@ export class AudioRecorder extends Xen.Async {
 
   getMediaStream() {
     // listen to media-stream and set it's data into state
-    return subscribeToStream(stream => {
+    return subscribeToDefaultStream(stream => {
       this.mergeState({stream});
 
       // Special handling when an audio stream ends.
@@ -52,7 +52,7 @@ export class AudioRecorder extends Xen.Async {
         this.fire('stream');
 
         if (this.state.recording) {
-          this.stopRecording()
+          this.stopRecording();
         }
       }
     });

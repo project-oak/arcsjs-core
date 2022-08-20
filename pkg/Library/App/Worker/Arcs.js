@@ -80,7 +80,7 @@ const receiveVibrations = msg => {
     composer.render(msg.packet);
   } else if (msg.type === 'service') {
     // channel vibrations to the arcs service
-    arcs.service(msg);
+    handleServiceCall(msg);
   } else if (msg.type === 'store') {
     // channel vibrations to the store getter
     getters[msg.storeKey]?.(msg.data);
@@ -90,15 +90,17 @@ const receiveVibrations = msg => {
 };
 
 // service call from Arcs engine
-arcs.service = async msg => {
+const handleServiceCall = async msg => {
+  // async `onservice` handler was provided by user
   const data = await arcs.onservice?.(msg);
+  // when it's done, send the answer vibration back
   socket.sendVibration({kind: 'serviceResult', sid: msg.sid, data});
 };
 
 // install data watcher
 arcs.watch = (arc, storeKey, handler) => {
   watchers[storeKey] = handler;
-  arcs.addWatch(arc, storeKey);
+  socket.sendVibration({kind: 'watch', arc, storeKey});
 };
 
 // get handler
@@ -122,7 +124,7 @@ arcs.setInputs        = (arc, particle, inputs)   => socket.sendVibration({kind:
 arcs.addRecipe        = (recipe, arc)             => socket.sendVibration({kind: 'addRecipe', recipe, arc});
 arcs.addAssembly      = (recipes, arc)            => socket.sendVibration({kind: 'addAssembly', recipes, arc});
 arcs.set              = (arc, storeKey, data)     => socket.sendVibration({kind: 'setStoreData', arc, storeKey, data});
-arcs.addWatch         = (arc, storeKey)           => socket.sendVibration({kind: 'watch', arc, storeKey});
+//arcs.addWatch         = (arc, storeKey)           => socket.sendVibration({kind: 'watch', arc, storeKey});
 arcs.setOpaqueData    = (key, data)               => socket.sendVibration({kind: 'setOpaqueData', key, data});
 
 export {arcs as Arcs};

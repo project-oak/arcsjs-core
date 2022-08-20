@@ -9,7 +9,7 @@
 import {Arcs} from './Arcs.js';
 import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
-import {logFactory} from '../../../core/utils.min.js';
+import {logFactory, makeName} from '../../../core/utils.min.js';
 
 // n.b. lives in 'top' context
 
@@ -39,6 +39,11 @@ export const App = class {
     Arcs.addAssembly(assembly, 'user');
   }
   async service({request}) {
+    switch (request?.msg) {
+      case 'makeName':
+      case 'MakeName':
+        return makeName();
+    }
     switch (request?.type) {
       case 'persist':
         return this.persist(request);
@@ -51,6 +56,11 @@ export const App = class {
         break;
       }
     }
+  }
+  async appService({request}) {
+    const value = await this.onservice?.('user', 'host', request);
+    log('service:', request?.msg, '=', value);
+    return value || null;
   }
   async services({request}) {
     const service = this.services?.[request?.type];
@@ -66,11 +76,6 @@ export const App = class {
         log.warn(e.toString());
       }
     }
-  }
-  async appService({request}) {
-    const value = await this.onservice?.('user', 'host', request);
-    log('service:', request?.msg, '=', value);
-    return value || null;
   }
   async persist({storeId, data}) {
     await this.persistor?.persist(storeId, data);

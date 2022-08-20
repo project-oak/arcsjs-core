@@ -4,14 +4,14 @@
  * license that can be found in the LICENSE file.
  */
 ({
-render({isMicEnabled}) {
-  return {micEnabled: Boolean(isMicEnabled)};
+render({mediaDeviceState}) {
+  return {micEnabled: Boolean(mediaDeviceState.isMicEnabled)};
 },
 onTranscript({eventlet: {value}}) {
   return {transcript: value};
 },
-onEnd() {
-  return {isMicEnabled: false};
+onEnd({mediaDeviceState}) {
+  return {mediaDeviceState: {...mediaDeviceState, isMicEnabled: false}};
 },
 template: html`
   <style>:host, * { display: none !important; }</style>

@@ -14,29 +14,33 @@ shouldUpdate({nodeTypes}) {
   return !nodeTypes.empty;
 },
 
-update({pipeline, selectedNode, nodeTypes, customInspectors, inspectorData, globalStores}, state) {
-  if (pipeline) { //} && this.nodesChanged(pipeline.nodes, state.nodes)) {
-    //log('update: (re)building pipeline recipes');
-    //state.nodes = [...pipeline.nodes];
-    pipeline.nodes = pipeline.nodes.map(node => this.updateNodeConnectionCandidates(node, pipeline, nodeTypes, globalStores));
-    const recipes = pipeline.nodes
-      .map(node => this.recipeForNode(node, nodeTypes, pipeline, customInspectors, inspectorData || 'inspectorData'))
-      .filter(recipe => recipe)
-      ;
-    return {
-      pipeline,
-      selectedNode: pipeline.nodes.find(n => n.key === selectedNode?.key),
-      recipes
-    };
+update(inputs, state) {
+  const {pipeline} = inputs;
+  if (pipeline && this.nodesDidChange(pipeline.nodes, state.nodes)) {
+    state.nodes = [...pipeline.nodes];
+    return this.updateNodes(inputs, state);
   }
 },
 
-// nodesChanged(nodes, currentNodes) {
-//   if (nodes?.length === currentNodes?.length) {
-//     return !currentNodes.every(node => this.hasSameNode(node, nodes));
-//   }
-//   return true;
-// },
+nodesDidChange(nodes, currentNodes) {
+  if (nodes?.length === currentNodes?.length) {
+    return !currentNodes.every(node => this.hasSameNode(node, nodes));
+  }
+  return true;
+},
+
+updateNodes({pipeline, selectedNode, nodeTypes, customInspectors, inspectorData, globalStores}) {
+  pipeline.nodes = pipeline.nodes.map(node => this.updateNodeConnectionCandidates(node, pipeline, nodeTypes, globalStores));
+  const recipes = pipeline.nodes
+    .map(node => this.recipeForNode(node, nodeTypes, pipeline, customInspectors, inspectorData || 'inspectorData'))
+    .filter(recipe => recipe)
+    ;
+  return {
+    pipeline,
+    recipes,
+    selectedNode: pipeline.nodes.find(n => n.key === selectedNode?.key),
+  };
+},
 
 hasSameNode(node, nodes) {
   const nodeInNodes = nodes.find(n => n.name === node.name);

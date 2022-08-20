@@ -9,31 +9,29 @@
 
 ({
   async update({pipeline, pipelines, publishPaths}, state, {service}) {
-    let updatedPipelines;
-    if (pipeline) {
-      updatedPipelines = this.updateItemInPipelines(pipeline, pipelines);
-    } else {
-      pipeline = await this.makeNewPipeline(null, service);
-      updatedPipelines = [...pipelines, pipeline];
-      state.renaming = false;
-    }
     if (publishPaths?.length > 0 && !state.selectedPublishKey) {
       state.selectedPublishKey = keys(publishPaths)[0];
     }
-    return {
-      pipeline,
-      pipelines: updatedPipelines
-    };
+    if (pipeline) {
+      if (this.updateItemInPipelines(pipeline, pipelines)) {
+        service({msg: 'SetSelectedPipeline', data: {pipeline: pipeline.$meta.name}});
+        return({pipelines});
+      }
+    } else {
+      state.renaming = false;
+      pipeline = await this.makeNewPipeline(null, service);
+      return({pipeline, pipelines: [...pipelines, pipeline]});
+    }
   },
   updateItemInPipelines(pipeline, pipelines) {
     const index = this.findPipelineIndex(pipeline, pipelines);
-    if (index >= 0) {
+    if (index < 0) {
       pipelines[index] = pipeline;
+      return true;
     }
-    return pipelines;
   },
   async makeNewPipeline(name, service) {
-    name = name ?? await service({msg: 'MakeName'});
+    name = (name ?? await service({msg: 'MakeName'})) || 'new pipeline';
     return {$meta: {name}, nodes: []};
   },
   render({pipeline, pipelines, publishPaths}, {renaming, selectedPublishKey}) {

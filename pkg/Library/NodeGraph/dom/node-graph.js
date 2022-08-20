@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-import {Xen} from '../../../Dom/Xen/xen-async.js';
+import {Xen} from '../../Dom/Xen/xen-async.js';
 import {d3} from './d3-import.js';
 
 const template = Xen.Template.html`

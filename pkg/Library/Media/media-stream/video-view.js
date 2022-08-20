@@ -3,16 +3,16 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Xen} from '../../../Dom/Xen/xen-async.js';
-import {subscribeToStream} from './media-stream.js';
-//import {Resources} from '../../Apps.js';
+
+import {Xen} from '../../Dom/Xen/xen-async.js';
+import {subscribeToDefaultStream} from './media-stream.js';
 
 const template = Xen.Template.html`
 <style>
   :host {
     display: flex;
-    min-width: 16px;
-    min-height: 12px;
+    min-width: 160px;
+    min-height: 120px;
     font-size: 10px;
     color: black;
     background-color: black;
@@ -36,7 +36,7 @@ const template = Xen.Template.html`
 
 export class VideoView extends Xen.Async {
   static get observedAttributes() {
-    return ['box', 'flip', 'version', 'stream'];
+    return ['box', 'flip', 'version'];
   }
   get template() {
     return template;
@@ -53,39 +53,36 @@ export class VideoView extends Xen.Async {
   }
   getMediaStream() {
     // listen to media-stream and set it's data into state
-    return subscribeToStream(stream => {
-      // attach to the 'main' av feed unless we are attached to another
-      if (!globalThis.streams?.[this.stream]) {
-        this.mergeState({stream});
+    return subscribeToDefaultStream(stream => {
+      this.mergeState({stream});
+      if (!this.hasVideoTracks(stream)) {
+        this.value = false;
+        this.fire('stream');
       }
-      // if (!this.hasVideoTracks(stream)) {
-      //   this.value = false;
-      //   this.fire('stream');
-      // }
     });
   }
-  update({box, version, stream}, state) {
+  update({box, version}, state) {
     // TODO(sjmiles): should come from an import, or a service
     const {resources} = globalThis;
     if (resources) {
       resources[state.id] = this.canvas;
     }
     this.value = state.id;
-    state.stream = globalThis.streams?.[stream] || state.stream;
     // notify about the stream sitch
     if (state.lastStream !== state.stream) {
       state.lastStream = state.stream;
-      const streamAvailable = Boolean(state.stream) && this.hasVideoTracks(state.stream);
-      this.value = streamAvailable;
+      const videoStreamAvailable =
+          Boolean(state.stream) && this.hasVideoTracks(state.stream);
+      this.value = videoStreamAvailable;
       this.fire('stream');
       // enable rendering for stream update
       // shouldRender is set false in updateSpan
       // to squelch an extra render
-      state.shouldRender = streamAvailable;
+      state.shouldRender = videoStreamAvailable;
     }
-    // if (state.videoPlaying) {
-    //   this.updateSnap({box, version}, state);
-    // }
+    if (state.videoPlaying) {
+      this.updateSnap({box, version}, state);
+    }
   }
   shouldRender({}, {shouldRender}) {
     // allow state-based render squelch
@@ -142,7 +139,7 @@ export class VideoView extends Xen.Async {
     this.fire('snap');
   }
   hasVideoTracks(stream) {
-    return stream?.getVideoTracks().some(track=>track.readyState !== 'ended');
+    return stream.getVideoTracks().some(track=>track.readyState !== 'ended');
   }
 }
 customElements.define('video-view', VideoView);
