@@ -52,23 +52,18 @@ const serviceCalls = {};
 
 // Arc service calls come here first
 const serviceHandler = async (arc, host, request) => {
-  switch (request?.msg) {
-    case 'request-context':
-      return ({runtime: user});
+  if (request?.msg === 'request-context') {
+    return ({runtime: user});
   }
   if (request.kind === 'RecipeService') {
     const value = await RecipeService(user, host, request);
     log('RecipeService', request, value);
-    if (value !== undefined) {
-      return value;
-    }
+    return value;
   }
   if (request.kind === 'StoreService') {
     const value = await StoreService(user, host, request);
     log('StoreService', request, value);
-    if (value !== undefined) {
-      return value;
-    }
+    return value;
   }
   return serviceRequest(request);
 };

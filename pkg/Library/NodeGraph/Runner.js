@@ -47,7 +47,7 @@ async removeStores({$stores}, state, service) {
   return Promise.all(entries($stores || {}).map(async ([storeId, store]) => {
     if (!store.connection) {
       delete state.stores[storeId];
-      await service({msg: 'RemoveStore', data: {storeId}});
+      await service({kind: 'StoreService', msg: 'RemoveStore', data: {storeId}});
     }
   }));
 },

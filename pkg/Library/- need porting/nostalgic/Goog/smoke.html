@@ -1,0 +1,48 @@
+<!--
+ Copyright (c) 2022 Google LLC All rights reserved.
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file.
+-->
+
+<style>
+  body {
+    font-family: sans-serif;
+  }
+  input {
+    padding: 8px 6px;
+    width: 60%;
+  }
+</style>
+
+<h3>Will it kill you?</h3>
+<input id="input" value="Cobra"><br><br>
+<button id="button" onclick="test(input.value)">Well?</button>
+<hr>
+<pre id="response"></pre>
+
+<script type="module">
+  const runMacroEndpointUrl = 'https://api-dot-macromaker.googleplex.com/run-macro';
+  const MACRO_ID = "NvfwycdHBRpq4h13rEj2";
+  window.test = async (entity) => {
+    // construct payload
+    const userInputs= {
+      "6f3a583b-1f7c-4e19-af80-eb9ddf374688": entity // [[entity]]
+    };
+    const formData = new FormData();
+    formData.append("id", MACRO_ID);
+    formData.append("userInputs", JSON.stringify(userInputs));
+    formData.append("temperature", 0.1);
+    const payload = {method: 'POST', body: formData, credentials: 'include'};
+    // make request
+    window.button.disabled = true;
+    window.response.innerText = `thinking...`;
+    try {
+      const response = await fetch(runMacroEndpointUrl, payload);
+      const json = await response.json();
+      window.response.innerText = json?.messages?.[0].text ?? `didn't work, sorry`;
+      console.log(json);
+    } finally {
+      window.button.disabled = false;
+    }
+  };
+</script>

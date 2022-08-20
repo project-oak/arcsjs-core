@@ -50,30 +50,31 @@ export const App = class {
       case 'restore':
         return this.restore(request);
       default: {
-        if (this.appService({request}) === undefined) {
-          this.services({request});
-        }
-        break;
+        return await (this.dispatchServiceRequest({request}) || this.appServices({request}));
       }
     }
   }
   async appService({request}) {
     const value = await this.onservice?.('user', 'host', request);
-    log('service:', request?.msg, '=', value);
-    return value || null;
+    log('service:', request?.kind || '-', request?.msg, '=', value);
+    return value;
   }
-  async services({request}) {
-    const service = this.services?.[request?.type];
-    if (service) {
-      log('service', request, service);
-      try {
-        if (service[request.msg]) {
-          return (service[request.msg])(request.data);
-        } else {
-          log.warn(`no handler for "${request.msg}"`);
+  async dispatchServiceRequest({request}) {
+    if (request?.kind) {
+      const service = this.services?.[request?.kind];
+      if (!service) {
+        log('no service called', request?.kind);
+      } else {
+        try {
+          const {msg, data} = request || {};
+          if (service[msg]) {
+            return (service[msg])(data);
+          } else {
+            log.warn(`no handler for "${msg}"`);
+          }
+        } catch (e) {
+          log.warn(e.toString());
         }
-      } catch (e) {
-        log.warn(e.toString());
       }
     }
   }

@@ -51,7 +51,7 @@ renderProps(data, customInspectors, state) {
 renderProp(prop, parent, customInspectors, state) {
   const key = `${parent ? `${parent}:` : ''}${prop.name}`;
   const $template = this.chooseTemplate(prop, state.editedKey === key, customInspectors);
-  const model = this.constructPropModel(key, prop, $template, state);
+  const model = this.constructPropModel(key, prop, parent, $template, state);
   return {
     prop: {
       $template,
@@ -90,7 +90,7 @@ chooseTemplate({store: {$type, values, range}, value}, isEditing, customInspecto
   return template;
 },
 
-constructPropModel(key, prop, template, state) {
+constructPropModel(key, prop, parent, template, state) {
   const {name, propId, store: {$type, values, range, multiple}, value, displayName} = prop;
   let model = {
     name,
@@ -99,7 +99,7 @@ constructPropModel(key, prop, template, state) {
     type: $type,
     value
   };
-  switch(template) {
+  switch (template) {
     case 'select_t': {
       const selected = model.value;
       model.value = values.map(v => {

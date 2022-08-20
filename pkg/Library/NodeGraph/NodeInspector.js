@@ -46,6 +46,7 @@ async monitorStores(state, nodeTypes, {service, invalidate}) {
   const nodeType = this.findNodeType(state.node.name, nodeTypes);
   if (nodeType) {
     const result = await service({
+      kind: 'StoreService',
       msg: 'ListenToChanges',
       data: {storeIds: this.getNodeStoreIds(state.node, nodeType)}
     });
