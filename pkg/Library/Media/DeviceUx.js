@@ -60,9 +60,6 @@ onAudioClick({mediaDeviceState}) {
   };
 
 },
-// onTextChange({eventlet: {value}}) {
-//   return {transcript: {transcript: value}};
-// },
 onSelectChange({eventlet: {key, value}, mediaDeviceState}) {
   if (key && value) {
     return {
@@ -77,14 +74,12 @@ template: html`
 <style>
   :host {
     flex: 0 !important;
-    padding: 4px;
   }
   [scrub][toolbar] {
-    Xflex: 1;
-    font-size: 24px;
+    font-size: 20px;
   }
   icon {
-    font-size: 20px;
+    font-size: 18px;
     margin-right: 2px !important;
   }
   select {

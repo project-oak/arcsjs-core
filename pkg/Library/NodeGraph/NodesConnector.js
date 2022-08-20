@@ -16,7 +16,7 @@ shouldUpdate({nodeTypes}) {
 
 update(inputs, state) {
   const {pipeline} = inputs;
-  if (pipeline && this.nodesDidChange(pipeline.nodes, state.nodes)) {
+  if (pipeline?.nodes && this.nodesDidChange(pipeline.nodes, state.nodes)) {
     state.nodes = [...pipeline.nodes];
     return this.updateNodes(inputs, state);
   }
@@ -24,7 +24,7 @@ update(inputs, state) {
 
 nodesDidChange(nodes, currentNodes) {
   if (nodes?.length === currentNodes?.length) {
-    return !currentNodes.every(node => this.hasSameNode(node, nodes));
+    return !nodes?.length && !currentNodes?.every(node => this.hasSameNode(node, nodes));
   }
   return true;
 },

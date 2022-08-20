@@ -50,14 +50,17 @@ export class MediaStream extends Xen.Async {
   async enumerateDevices() {
     const mediaDevices = await navigator.mediaDevices.enumerateDevices();
     let hasVideoInput, hasAudioInput;
+    // make mediaDevice objects into POJOs so they are transferable
+    // https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects
     const devices = mediaDevices.map(({deviceId, groupId, kind, label}) => ({
       kind,
       deviceId,
       groupId,
-      label,
-      hasVideoInput: kind === 'videoinput',
-      hasAudioInput: kind === 'audioinput',
+      label
     }));
+    hasVideoInput = devices.some(({kind}) => kind === 'videoinput');
+    hasAudioInput = devices.some(({kind}) => kind === 'audioinput');
+
     log.groupCollapsed('media devices:');
     log(JSON.stringify(devices.map(info => info.label), null, '  '));
     log.groupEnd();

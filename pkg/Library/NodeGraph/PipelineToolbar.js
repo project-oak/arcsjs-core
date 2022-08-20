@@ -6,7 +6,6 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-
 ({
   async update({pipeline, pipelines, publishPaths}, state, {service}) {
     if (publishPaths?.length > 0 && !state.selectedPublishKey) {
@@ -14,13 +13,13 @@
     }
     if (pipeline) {
       if (this.updateItemInPipelines(pipeline, pipelines)) {
-        service({msg: 'SetSelectedPipeline', data: {pipeline: pipeline.$meta.name}});
-        return({pipelines});
+        service({msg: 'SetSelectedPipeline', data: {pipeline: pipeline.$meta?.name}});
+        return {pipelines};
       }
     } else {
       state.renaming = false;
       pipeline = await this.makeNewPipeline(null, service);
-      return({pipeline, pipelines: [...pipelines, pipeline]});
+      return {pipeline, pipelines: [...(pipelines || []), pipeline]};
     }
   },
   updateItemInPipelines(pipeline, pipelines) {
@@ -44,7 +43,7 @@
       showDeleteIcon: String(isOwned),
       publishKeys,
       showPublish: String(isOwned && publishKeys.length > 0),
-      showUnpublish: String(Boolean(pipeline?.$meta.isPublished) && isOwned),
+      showUnpublish: String(Boolean(pipeline?.$meta?.isPublished) && isOwned),
       name: pipeline?.$meta?.name
     };
   },
@@ -52,26 +51,28 @@
     const pipeline = await this.makeNewPipeline(null, service);
     return {
       pipeline,
-      pipelines: [...pipelines, pipeline]
+      pipelines: [...(pipelines || []), pipeline]
     };
   },
   async onCloneClicked({pipeline, pipelines}) {
-    const clonedPipeline = await this.makeNewPipeline(`Copy of ${pipeline.$meta.name}`);
-    clonedPipeline.nodes = [...pipeline.nodes];
+    const clonedPipeline = await this.makeNewPipeline(`Copy of ${pipeline.$meta?.name}`);
+    clonedPipeline.nodes = [...pipeline?.nodes];
     return {
       pipeline: clonedPipeline,
-      pipelines: [...pipelines, clonedPipeline]
+      pipelines: [...(pipelines || []), clonedPipeline]
     };
   },
   async onDelete({pipeline, pipelines, publishPaths}) {
     const index = this.findPipelineIndex(pipeline, pipelines);
-    pipelines.splice(index, 1);
+    if (index >= 0) {
+      pipelines?.splice(index, 1);
+    }
     for(const publishPath of values(publishPaths)) {
       await this.unpublishPipeline(publishPath, pipeline?.$meta?.name);
     }
     return {
       pipelines,
-      pipeline: pipelines.length > 0 ? pipelines[0] : null
+      pipeline: pipelines?.[0]
     };
   },
   onShare({pipeline, pipelines, publishPaths}, {selectedPublishKey}) {
@@ -85,7 +86,7 @@
     }
   },
   onDontShare({pipeline, pipelines, publishPaths}) {
-    for(const publishPath of values(publishPaths)) {
+    for (const publishPath of values(publishPaths)) {
       this.unpublishPipeline(publishPath, pipeline.$meta.name);
     }
     return this.updatePipelineMeta({isPublished: false}, pipeline, pipelines);
@@ -108,7 +109,7 @@
   },
   onRename({eventlet: {value}, pipeline, pipelines}, state) {
     state.renaming = false;
-    if (value !== pipeline.$meta.name) {
+    if (pipeline && value !== pipeline.$meta.name) {
       if (this.isValidPipelineName(value)) {
         return this.updatePipelineMeta({name: value}, pipeline, pipelines);
       }
@@ -127,10 +128,10 @@
     return {pipeline, pipelines};
   },
   findPipelineIndex(pipeline, pipelines) {
-    return this.findPipelineByName(pipeline.$meta.name, pipelines);
+    return this.findPipelineByName(pipeline?.$meta?.name, pipelines);
   },
   findPipelineByName(name, pipelines) {
-    return pipelines.findIndex(({$meta}) => $meta.name === name);
+    return pipelines?.findIndex?.(({$meta}) => $meta?.name === name);
   },
   onPublishPathChanged({eventlet: {value}}, state) {
     state.selectedPublishKey = value;
@@ -152,27 +153,30 @@
     height: 32px;
     border-right: 1px solid #bbb;
   }
+  select {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    border-radius: 6px;
+  }
 </style>
 
-<!-- <div column> -->
-  <div toolbar>
-    <div chooser rows frame="chooser" display$="{{showChooser}}"></div>
-    <div column separator></div>
-    <mwc-icon-button title="New Pipeline" on-click="onNew" icon="add"></mwc-icon-button>
-    <mwc-icon-button title="Duplicate Pipeline" on-click="onCloneClicked" icon="content_copy"></mwc-icon-button>
-    <mwc-icon-button title="Delete Pipeline" on-click="onDelete" icon="delete" display$="{{showDeleteIcon}}"></mwc-icon-button>
-    <input rename type="text" value="{{name}}" display$="{{showRenameInput}}" autofocus on-change="onRename" on-blur="onRenameBlur">
-    <mwc-icon-button title="Rename Pipeline" on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
-    <div column separator></div>
-    <select title="Publish Target" display$="{{showPublish}}" on-change="onPublishPathChanged" repeat="option_t">{{publishKeys}}</select>
-    <mwc-icon-button title="Publish Pipeline" on-click="onShare" icon="public" display$="{{showPublish}}"></mwc-icon-button>
-    <mwc-icon-button title="Unpublish Pipeline" on-click="onDontShare" icon="visibility_off" display$="{{showUnpublish}}"></mwc-icon-button>
-  </div>
-<!-- </div> -->
+<div toolbar>
+  <div chooser rows frame="chooser" display$="{{showChooser}}"></div>
+  <div column separator></div>
+  <mwc-icon-button title="New Pipeline" on-click="onNew" icon="add"></mwc-icon-button>
+  <mwc-icon-button title="Duplicate Pipeline" on-click="onCloneClicked" icon="content_copy"></mwc-icon-button>
+  <mwc-icon-button title="Delete Pipeline" on-click="onDelete" icon="delete" display$="{{showDeleteIcon}}"></mwc-icon-button>
+  <input rename type="text" value="{{name}}" display$="{{showRenameInput}}" autofocus on-change="onRename" on-blur="onRenameBlur">
+  <mwc-icon-button title="Rename Pipeline" on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
+  <div column separator></div>
+  <select title="Publish Target" display$="{{showPublish}}" on-change="onPublishPathChanged" repeat="option_t">{{publishKeys}}</select>
+  <mwc-icon-button title="Publish Pipeline" on-click="onShare" icon="public" display$="{{showPublish}}"></mwc-icon-button>
+  <mwc-icon-button title="Unpublish Pipeline" on-click="onDontShare" icon="visibility_off" display$="{{showUnpublish}}"></mwc-icon-button>
+</div>
 
 <template option_t>
   <option value="{{key}}" selected="{{selected}}">{{key}}</option>
 </template>
-
-  `
+`
 });

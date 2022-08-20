@@ -34,17 +34,17 @@ render({pipeline, pipelines}, {publicPipelines}) {
   const separator = {name: '_________________', selected: false, isDisabled: true};
   return {
     pipelines: [
-      ...this.renderPipelines(pipelines, pipeline?.$meta?.name),
+      ...(this.renderPipelines(pipelines, pipeline?.$meta?.name) || []),
       ...(publicPipelines?.length > 0 ? [separator] : []),
-      ...this.renderPipelines(publicPipelines, pipeline?.$meta?.name)
+      ...(this.renderPipelines(publicPipelines, pipeline?.$meta?.name) || [])
     ]
   };
 },
 renderPipelines(pipelines, selectedName) {
-  return !pipelines ? [] : pipelines?.map(({$meta: {name}}) => ({
-    name,
+  return !pipelines ? [] : pipelines?.map?.(({$meta}) => ({
+    name: $meta?.name,
     isDisabled: false,
-    isSelected: name === selectedName
+    isSelected: $meta?.name === selectedName
   }));
 },
 onSelect({eventlet: {value}, pipelines}, {publicPipelines}) {
@@ -54,7 +54,7 @@ onSelect({eventlet: {value}, pipelines}, {publicPipelines}) {
   };
 },
 findPipelineByName(name, pipelines) {
-  return pipelines?.find(({$meta}) => $meta.name === name);
+  return pipelines?.find?.(({$meta}) => $meta?.name === name);
 },
 onRefresh(inputs, state) {
   state.publicPipelines = null;
@@ -62,7 +62,9 @@ onRefresh(inputs, state) {
 template: html`
 <style>
   select {
-    padding: 4px 6px;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 0.8rem;
+    padding: 3px 6px;
     border-radius: 6px;
     width: 100%;
   }

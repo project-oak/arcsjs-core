@@ -166,7 +166,7 @@ export class Runtime extends EventEmitter {
   protected async restoreStore(storeId, store) {
     if (store.shouldPersist()) {
       this.log(`restoreStore "${storeId}"`);
-      return this.persistor.restore?.(storeId, store);
+      return this.persistor.restore?.(storeId);
     }
   }
   protected storeChanged(storeId, store) {
