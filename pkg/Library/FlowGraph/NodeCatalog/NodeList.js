@@ -7,11 +7,12 @@
 ({
 catalogDelimiter: '$$',
 
-render({selectedNodeTypes}, {showInfoPanel}) {
+render({selectedNodeTypes}, {showInfoPanel, infoPanelTop}) {
   return {
     nodeTypes: this.renderNodeTypes(selectedNodeTypes),
     hideNoMatchedNodesLabel: selectedNodeTypes.length !== 0,
-    showInfoPanel: String(Boolean(showInfoPanel))
+    showInfoPanel: String(Boolean(showInfoPanel)),
+    infoPanelContainerStyle: {top: `${infoPanelTop}px`}
   };
 },
 
@@ -67,12 +68,11 @@ formatNodeKey({name, index}) {
 onHoverNodeType({eventlet: {key, value}, selectedNodeTypes}, state) {
   const [category, name] = key.split(this.catalogDelimiter);
   state.showInfoPanel = true;
+  // 44 is the height of the toolbar.
+  state.infoPanelTop = value + 44;
   const index = this.findNodeTypeIndex({name, category}, selectedNodeTypes.sort(this.sortNodeTypes));
   return {
-    hoverEvent: {
-      nodeType: selectedNodeTypes[index],
-      top: 50 + value
-    }
+    hoveredNodeType: selectedNodeTypes[index],
   };
 },
 
@@ -140,6 +140,16 @@ template: html`
   [container]:hover {
     background-color: #e0e1e2;
   }
+  [info-panel-container] {
+    position: fixed;
+    background: white;
+    z-index: 1000;
+    left: 250px;
+    padding: 12px;
+    box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 2px 6px 2px rgba(60, 64, 67, 0.15);
+    border-radius: 8px;
+    max-width: 320px;
+  }
   nodetype-info-panel {
     display: none;
   }
@@ -148,7 +158,10 @@ template: html`
   <div repeat="nodetype_t">{{nodeTypes}}</div>
   <div no-matched-nodes hide$="{{hideNoMatchedNodesLabel}}">No matched nodes</div>
 </div>
-<div frame="typeInfo" display$="{{showInfoPanel}}"></div>
+<div info-panel-container xen:style="{{infoPanelContainerStyle}}"
+     display$="{{showInfoPanel}}">
+  <div frame="typeInfo"></div>
+</div>
 
 <template nodetype_t>
   <draggable-item key="{{key}}"

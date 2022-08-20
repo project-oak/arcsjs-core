@@ -5,9 +5,8 @@
  */
 
 ({
-render({hoverEvent}) {
-  if (hoverEvent?.nodeType) {
-    const {nodeType, top} = hoverEvent;
+render({nodeType}) {
+  if (nodeType) {
     const {inputs, outputs} = this.retrieveInputsAndOutputs(nodeType);
     const description = nodeType?.$meta?.description || '';
     const showDescription = Boolean(description);
@@ -20,7 +19,6 @@ render({hoverEvent}) {
       inputs,
       showOutputs: String(showOutputs),
       outputs,
-      popupStyle: {top: `${top}px`},
       showNoInfoMessage: String(Boolean(!showDescription && !showInputs && !showOutputs))
     };
   }
@@ -47,7 +45,11 @@ retrieveBindings(bindings, nodeType) {
       const {key, binding} = this.decodeBinding(value);
       const store = nodeType.$stores[binding];
       if (!store.nodisplay) {
-        return {name: key, binding, type: store.$type};
+        let type = store.$type;
+        if (store.multiple) {
+          type += ' (multiple)';
+        }
+        return {name: key, binding, type};
       }
     }).filter(binding => !!binding);
 },
@@ -64,20 +66,12 @@ decodeBinding(value) {
 template: html`
   <style>
     [panel] {
-      position: fixed;
-      z-index: 1000;
-      left: 250px;
-      background: white;
-      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 2px 6px 2px rgba(60, 64, 67, 0.15);
-      border-radius: 8px;
-      padding: 12px;
       color: #3c4043;
       font-size: 12px;
-      min-width: 200px;
-      max-width: 320px;
     }
     [description] {
       margin-bottom: 16px;
+      white-space: break-spaces;
     }
     [io] {
       line-height: 18px;
@@ -86,7 +80,7 @@ template: html`
       font-weight: 500;
       padding-right: 4px;
       vertical-align: top;
-      width: 70px;
+      width: 60px;
     }
     [name] {
       padding-right: 4px;
@@ -99,7 +93,7 @@ template: html`
     }
   </style>
 
-  <div panel xen:style="{{popupStyle}}">
+  <div panel>
     <div description display$="{{showDescription}}">{{description}}</div>
     <div columns inputs outputs$="{{showOutputs}}" display$="{{showInputs}}">
       <div io label>Inputs:</div>

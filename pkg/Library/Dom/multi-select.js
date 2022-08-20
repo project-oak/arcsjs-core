@@ -6,7 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Xen} from '../Dom/Xen/xen-async.js';
+import {Xen} from '../Dom/xen/xen-async.js';
 
 export class MultiSelect extends Xen.Async {
   static get observedAttributes() {
@@ -36,16 +36,13 @@ export class MultiSelect extends Xen.Async {
     return Xen.Template.html`
 <style>
   [options] {
-    font-size: 10px;
+    font-size: 12px;
     width: 100%;
-    border: none;
-    border-bottom: 1px dotted var(--theme-color-fg-0);
-    padding: 8px 0 8px 4px;
+    border: 1px solid var(--theme-color-fg-0);
+    border-radius: 4px;
+    padding: 4px;
     color: inherit;
-    background-color: transparent;
-  }
-  [options]:focus-visible {
-    outline: none;
+    background-color: white;
   }
 </style>
 <select

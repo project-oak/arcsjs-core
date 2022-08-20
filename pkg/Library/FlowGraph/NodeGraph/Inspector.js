@@ -1,10 +1,8 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 ({
 
@@ -37,6 +35,7 @@ render({data, customInspectors}, state) {
   }
   let title = data?.title || '\\o/';
   return {
+    showNothingToInspect: String(data == null),
     title,
     showDelete: String(Boolean(data?.props)),
     props: this.renderProps(data, customInspectors, state)
@@ -283,26 +282,52 @@ template: html`
     height: 100%;
     width: 280px;
     white-space: nowrap;
+    background-color: var(--theme-color-bg-0);
+    color: var(--them-color-fg-4);
+    position: relative;
+    overflow-y: auto;
   }
-  [bar] > *:first-child[name] {
+  [info-container] {
     border-bottom: 1px solid var(--theme-color-bg-3);
+    color: #3c4043;
+    padding: 8px 16px 16px;
+  }
+  [title-container] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0;
+  }
+  [title] {
     font-weight: bold;
     font-size: 14px;
-    line-height: 46px;
-    padding: 4px 12px;
     overflow: hidden;
     white-space: nowrap;
-    text-align: center;
-    text-transform: uppercase;
     text-overflow: ellipsis;
-    width: 100%;
+    text-transform: capitalize;
+  }
+  [title][properties] {
+    color: #3c4043;
+    padding: 16px 0 0 16px;
+    flex-shrink: 0;
+  }
+  [prop-container] {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    padding-bottom: 16px;
+  }
+  [prop-container][vertical] {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  [prop-container][object] {
+    padding-bottom: 2px;
   }
   [controls] {
     font-size: 12px;
-    padding: 12px;
-  }
-  [controls] [bar] {
-    margin-bottom: 4px;
+    padding: 16px;
   }
   [controls] img {
     border: 1px dotted var(--theme-color-bg-2);
@@ -321,34 +346,39 @@ template: html`
     height: 17px;
   }
   input[type="text"] {
-    width: 10em;
+    width: 100%;
+    height: 24px;
+    border: 1px solid var(--theme-color-fg-0);
+    border-radius: 4px;
+  }
+  input[type="checkbox"] {
+    margin-left: 0;
+    margin-right: 8px;
   }
   [buttons] {
     padding: 12px;
   }
   [select] {
-    width: 70%;
+    width: 100%;
   }
   [subprop] {
-    /* border-bottom: 1px dotted var(--theme-color-5); */
     border-top: 1px dotted var(--theme-color-5);
-    /* margin: 4px; */
-    /* padding: 8px 4px 8px 8px; */
-    padding: 4px 0 0 8px;
+    padding: 8px 0 0 16px;
   }
   [subprop] [subprop]:first-child {
     border-top: none;
   }
   [label] {
-    font-size: 11px;
-    width: 84px;
-    /* width: 72px; */
-    /* margin-right: 6px; */
-    /* margin-bottom: 4px; */
+    font-size: 13px;
+    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: left;
     color: var(--theme-color-fg-2);
+    text-transform: capitalize;
+  }
+  [label][control] {
+    margin-bottom: 4px;
   }
   [bar] > *:first-child {
     width: 72px;
@@ -361,13 +391,32 @@ template: html`
   textarea {
     width: 100%;
   }
+  [noSelectionMsg] {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    background-color: var(--theme-color-bg-0);
+    font-size: 13px;
+  }
 </style>
 
-<div bar>
-  <div name>{{title}}</div>
-  <mwc-icon-button on-click="onDelete" icon="delete" display$="{{showDelete}}"></mwc-icon-button>
+<div info-container>
+  <div title-container>
+    <div title>{{title}}</div>
+    <mwc-icon-button on-click="onDelete" icon="delete" display$="{{showDelete}}"></mwc-icon-button>
+  </div>
+  <div frame="info"></div>
 </div>
+<div title properties>Properties</div>
 <div controls repeat="prop_t">{{props}}</div>
+<div noSelectionMsg display$="{{showNothingToInspect}}">Nothing to inspect</div>
 
 <template prop_t>
   <div prop>{{prop}}</div>
@@ -382,7 +431,7 @@ template: html`
 
 <template object_t>
   <div>
-    <div bar>
+    <div prop-container object>
       <span label>{{displayName}}</span>
       <mwc-icon-button on-click="onEditObject" key="{{key}}" icon="edit"></mwc-icon-button>
     </div>
@@ -391,8 +440,8 @@ template: html`
 </template>
 
 <template object_editor_t>
-  <div>
-    <div label>Enter plain JSON:</div>
+  <div prop-container vertical>
+    <div label control>Enter plain JSON:</div>
     <textarea key="{{key}}" on-blur="onEditObjectChange">{{value}}</textarea>
   </div>
 </template>
@@ -432,7 +481,7 @@ template: html`
 </template>
 
 <template imageupload_t>
-  <div bar>
+  <div prop-container>
     <img src="{{value}}">
     <image-upload on-image="onPropChange" key="{{key}}">
       <mwc-button>Upload</mwc-button>
@@ -462,28 +511,28 @@ template: html`
 </template>
 
 <template checkbox_t>
-  <div bar style="padding: 8px 0 0 9px;">
+  <div prop-container>
     <input type="checkbox" checked="{{value}}" key="{{key}}" on-change="onPropChange">
     <span label>{{displayName}}</span>
   </div>
 </template>
 
 <template text_t>
-  <div bar>
-    <span label flex>{{displayName}}</span>
+  <div prop-container vertical>
+    <span label control>{{displayName}}</span>
     <input type="text" key="{{key}}" value="{{value}}" on-change="onPropChange">
   </div>
 </template>
 
 <template select_t>
-  <div bar>
-    <div label flex>{{displayName}}</div>
+  <div prop-container vertical>
+    <div label control>{{displayName}}</div>
     <multi-select select key="{{key}}" disabled$="{{disabled}}" on-change="onPropChange" multiple="{{multiple}}" options="{{value}}"></multi-select>
   </div>
 </template>
 
 <template custom_t>
-  <div flex frame$="{{container}}"></div>
+  <div flex prop-container frame$="{{container}}"></div>
 </template>
 `
 });

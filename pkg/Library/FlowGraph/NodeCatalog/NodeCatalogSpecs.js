@@ -11,25 +11,25 @@ export const NodeCatalogStores = {
   nodeSearch: {
     $type: 'String',
   },
-  hoverEvent: {
+  hoveredNodeType: {
     $type: 'JSON'
   }
 };
 
 export const NodeCatalogParticles = {
   NodeCatalog: {
-    $kind:'$library/FlowGraph/NodeCatalog/NodeCatalog',
+    $kind:'$library/NodeCatalog/NodeCatalog',
     $slots: {
       nodeSearch: {
         SearchBar: {
-          $kind: '$library/FlowGraph/NodeCatalog/SearchBar',
+          $kind: '$library/NodeCatalog/SearchBar',
           $inputs: [{'search': 'nodeSearch'}],
           $outputs: [{'search': 'nodeSearch'}]
         }
       },
       categories: {
         CategoryCatalog: {
-          $kind: '$library/FlowGraph/NodeCatalog/CategoryCatalog',
+          $kind: '$library/NodeCatalog/CategoryCatalog',
           $inputs: [
             'nodeTypes',
             'categories',
@@ -40,20 +40,20 @@ export const NodeCatalogParticles = {
       },
       nodetypes: {
         NodeList: {
-          $kind: '$library/FlowGraph/NodeCatalog/NodeList',
+          $kind: '$library/NodeCatalog/NodeList',
           $inputs: [
             'selectedNodeTypes',
             {pipeline: 'selectedPipeline'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'hoverEvent'
+            'hoveredNodeType'
           ],
           $slots: {
             typeInfo: {
               infoPanel: {
-                $kind: '$library/FlowGraph/NodeCatalog/NodeTypeInfoPanel',
-                $inputs: ['hoverEvent']
+                $kind: '$library/NodeCatalog/NodeTypeInfoPanel',
+                $inputs: [{nodeType: 'hoveredNodeType'}]
               }
             }
           }

@@ -1,10 +1,8 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 ({
 
@@ -12,13 +10,14 @@ inspectorDelimiter: '$$',
 
 async update({node, pipeline, nodeTypes}, state, {service, output, invalidate}) {
   if (node?.key) {
+    const nodeType = this.findNodeType(node?.name, nodeTypes);
     if (node?.key !== state.node?.key) {
       assign(state, {data: null, hasMonitor: false});
     }
     if (this.nodeChanged(node, state.node) || !state.hasMonitor) {
       state.node = node;
       const data = await this.constructData(node, pipeline, nodeTypes, service);
-      await output({data});
+      await output({data, nodeType});
     }
     if (!state.hasMonitor) {
       state.hasMonitor = true;
@@ -28,7 +27,7 @@ async update({node, pipeline, nodeTypes}, state, {service, output, invalidate}) 
     }
   } else {
     state.node = null;
-    return {data: {title: 'No selected node'}};
+    return {data: null, nodeType: null};
   }
 },
 
@@ -40,21 +39,17 @@ nodeChanged({key, connections, props, displayName}, node) {
 },
 
 formatTitle({name, index}) {
-  return `${name} ${index}`;
+  return this.nodeDisplay({name, index});
 },
 
 async monitorStores(state, nodeTypes, {service, invalidate}) {
   const nodeType = this.findNodeType(state.node.name, nodeTypes);
   if (nodeType) {
-    //const value =
-    await service({
-      kind: 'StoreService',
+    const {storeId} = await service({
       msg: 'ListenToChanges',
       data: {storeIds: this.getNodeStoreIds(state.node, nodeType)}
     });
-    //const storeId = value?.storeId;
     //log(`${storeId} has changed affecting node ${state.node.key}`);
-    //
     // this method is untethered from return stack because of
     // Special Circumstances created above, so we provoke
     // a change manually
@@ -115,7 +110,7 @@ async computeProp(node, fullNodeKey, {name, store}, service) {
   } else if (store.$type === '[Image]') {
     value = value?.map(v => ({src: v.url}));
   }
-  return {name, propId: `${fullNodeKey}${name}`, store, value};
+  return {name, propId: this.sanitize(`${fullNodeKey}${name}`), store, value};
 },
 
 async getBindingValue(name, store, node, service) {
@@ -129,7 +124,7 @@ fullStoreId({key}, storeId) {
 },
 
 getStoreValue(storeId, service) {
-  return service({kind: 'StoreService', msg: 'GetStoreValue', data: {storeId}});
+  return service({msg: 'GetStoreValue', data: {storeId}});
 },
 
 async constructConnections({connections}, pipeline, nodeTypes, service) {
@@ -183,6 +178,10 @@ encodeConnectionValue({from, store}) {
 
 encodeFullNodeKey({key}, {$meta}, delimiter) {
   return [$meta?.name, key].filter(Boolean).join(delimiter);
+},
+
+sanitize(key) {
+  return key.replace(/[^A-Za-z0-9]/g, '');
 },
 
 nodeDisplay({name, index}) {
