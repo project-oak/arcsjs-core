@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-import {Xen} from '../Dom/xen/xen-async.js';
+import {Xen} from '../Dom/Xen/xen-async.js';
 import {subscribeToDefaultStream} from '../Media/media-stream/media-stream.js';
 import {getHolistic} from './mp-classifier.js';
 

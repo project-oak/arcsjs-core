@@ -5,7 +5,7 @@
  */
 
 import {Recognizer} from './Recognizer.js';
-import {Xen} from '../../Dom/xen/xen-async.js';
+import {Xen} from '../../Dom/Xen/xen-async.js';
 
 //import {logFactory} from '../../../../env/arcs/js/utils/log.js';
 

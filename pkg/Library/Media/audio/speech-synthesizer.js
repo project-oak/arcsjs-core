@@ -5,7 +5,7 @@
  */
 
 import {Synthesizer} from './Synthesizer.js';
-import {Xen} from '../../Dom/xen/xen-async.js';
+import {Xen} from '../../Dom/Xen/xen-async.js';
 //import {logFactory} from '../../../../env/arcs/js/utils/log.js';
 
 //const log = logFactory(true, 'speech-synthesizer', '#837006');

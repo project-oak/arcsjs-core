@@ -6,7 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Xen} from './Dom/xen/xen-async.js.js.js';
+import {Xen} from './Dom/Xen/xen-async.js.js.js';
 import 'https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js';
 
 const {Chart} = window;
