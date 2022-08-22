@@ -1,0 +1,68 @@
+/**
+ * @license
+ * Copyright 2022 Google LLC
+ *
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file or at
+ * https://developers.google.com/open-source/licenses/bsd
+ */
+import {meetStrangers} from '../Firebase/tryst.js';
+import {myself} from './myself.js';
+
+const getResource = id => globalThis.resources?.[id];
+const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
+const freeResource = id => globalThis.resources[id] = null;
+const newId = () => Math.floor(Math.random()*1e3 + 9e2);
+
+const Lobby = class {
+  constructor() {
+    this.streams = [];
+  }
+  async meetStrangers(persona) {
+    if (!myself.nid) {
+      await this.start(persona);
+    }
+    const {name, nid} = myself;
+    if (nid) {
+      // be present at the meeting place
+      await meetStrangers(name, {name, nid});
+      // these are the streams we captured since last time
+      const {streams} = this;
+      // start fresh
+      this.streams = [];
+      // return the streams
+      return streams;
+    }
+  }
+  async start(persona) {
+    // TODO(sjmiles): um 1:n?
+    myself.onstream = this.onstream.bind(this);
+    return myself.start(persona);
+  }
+  onstream(stream, meta) {
+    if (stream && meta.id) {
+      // create a resource id for this stream
+      this.streamId = `lobbyStream-${meta.id}`;
+      // stash our stream there
+      setResource(this.streamId, stream);
+      // remember this stream when asked
+      const info = {stream: this.streamId, meta: {name: meta.id, ...meta}};
+      this.streams.push(info);
+      // what we found
+      console.log(info);
+    }
+  }
+};
+
+export const LobbyService = {
+  createLobby() {
+    const lobbyId = newId();
+    const lobby = new Lobby();
+    setResource(lobbyId, lobby);
+    return lobbyId;
+  },
+  async meetStrangers({lobby, persona}) {
+    const realLobby = getResource(lobby);
+    return await realLobby?.meetStrangers(persona);
+  }
+};

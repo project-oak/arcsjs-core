@@ -5,10 +5,13 @@
  */
 ({
 
-render({isCameraEnabled, isMicEnabled}) {
+render({mediaDeviceState}) {
+  const {isCameraEnabled, isMicEnabled, videoDeviceId, audioInputDeviceId} = mediaDeviceState || {};
   return {
     playingVideo: Boolean(isCameraEnabled),
-    playingAudio: Boolean(isMicEnabled)
+    playingAudio: Boolean(isMicEnabled),
+    videoDeviceId,
+    audioInputDeviceId
   };
 },
 
@@ -27,7 +30,13 @@ template: html`
     display: none !important;
   }
 </style>
-<media-stream playingvideo="{{playingVideo}}" playingaudio="{{playingAudio}}" on-devices="onMediaDevices"></media-stream>
+<media-stream
+    playingvideo="{{playingVideo}}"
+    playingaudio="{{playingAudio}}"
+    videoDeviceId="{{videoDeviceId}}"
+    audioInputDeviceId="{{audioInputDeviceId}}"
+    on-devices="onMediaDevices">
+</media-stream>
 `
 
 });

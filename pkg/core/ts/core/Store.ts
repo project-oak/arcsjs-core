@@ -93,8 +93,6 @@ class ObservableStore extends DataStore {
 
 class PersistableStore extends ObservableStore {
   meta: Partial<StoreMeta>;
-  // persistor;
-  // protected willPersist;
   constructor(meta: StoreMeta) {
     super();
     this.meta = {...meta};
@@ -120,22 +118,12 @@ class PersistableStore extends ObservableStore {
     this.persist();
     return super.doChange();
   }
+  // TODO(sjmiles): as of now the persist/restore methods
+  // are bound in Runtime:addStore
   async persist() {
-    // // persists at most every 500ms
-    // if (!this.willPersist && this.persistor) {
-    //   this.willPersist = true;
-    //   setTimeout(() => {
-    //     this.willPersist = false;
-    //     this.persistor.persist(this);
-    //   }, 500);
-    // }
   }
   async restore(/*value: any*/) {
-  //   const restored = await this.persistor?.restore(this);
-  //   if (!restored && (value !== undefined)) {
-  //     this.data = value;
   }
-  // }
   // delete() {
   //   this.persistor?.remove(this);
   // }

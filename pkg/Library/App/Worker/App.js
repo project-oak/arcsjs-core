@@ -9,7 +9,7 @@
 import {Arcs} from './Arcs.js';
 import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
-import {logFactory} from '../../../core/utils.min.js';
+import {logFactory, makeName} from '../../../core/utils.min.js';
 
 // n.b. lives in 'top' context
 
@@ -39,38 +39,44 @@ export const App = class {
     Arcs.addAssembly(assembly, 'user');
   }
   async service({request}) {
+    switch (request?.msg) {
+      case 'makeName':
+      case 'MakeName':
+        return makeName();
+    }
     switch (request?.type) {
       case 'persist':
         return this.persist(request);
       case 'restore':
         return this.restore(request);
       default: {
-        if (this.appService({request}) === undefined) {
-          this.services({request});
-        }
-        break;
-      }
-    }
-  }
-  async services({request}) {
-    const service = this.services?.[request?.type];
-    if (service) {
-      log('service', request, service);
-      try {
-        if (service[request.msg]) {
-          return (service[request.msg])(request.data);
-        } else {
-          log.warn(`no handler for "${request.msg}"`);
-        }
-      } catch (e) {
-        log.warn(e.toString());
+        return await (this.dispatchServiceRequest({request}) || this.appServices({request}));
       }
     }
   }
   async appService({request}) {
     const value = await this.onservice?.('user', 'host', request);
-    log('service:', request?.msg, '=', value);
-    return value || null;
+    log('service:', request?.kind || '-', request?.msg, '=', value);
+    return value;
+  }
+  async dispatchServiceRequest({request}) {
+    if (request?.kind) {
+      const service = this.services?.[request?.kind];
+      if (!service) {
+        log('no service called', request?.kind);
+      } else {
+        try {
+          const {msg, data} = request || {};
+          if (service[msg]) {
+            return (service[msg])(data);
+          } else {
+            log.warn(`no handler for "${request?.kind}:${msg}"`);
+          }
+        } catch (e) {
+          log.warn(e.toString());
+        }
+      }
+    }
   }
   async persist({storeId, data}) {
     await this.persistor?.persist(storeId, data);

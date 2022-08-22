@@ -46,11 +46,9 @@ export class ContainerLayout extends DragDrop {
   }
   getActiveElement(root) {
     const activeEl = root.activeElement;
-
     if (!activeEl) {
       return null;
     }
-
     if (activeEl.shadowRoot) {
       return this.getActiveElement(activeEl.shadowRoot);
     } else {
@@ -158,7 +156,15 @@ export class ContainerLayout extends DragDrop {
     this.updateOrders(this.target);
     // This is to select the node right away when pointer is down.
     this.firePosition(this.target);
-  }
+    // TODO(sjmiles): hack to allow dragging only from title bar
+    if (from === ':::') {
+      const t0 = e.composedPath?.()?.[0];
+      //console.log(t0 && t0.attributes.title);
+      if (t0 && !t0.attributes.title) {
+        return false;
+      }
+    }
+}
   doMove(dx, dy) {
     // grid-snap
     const snap = rect => DragDrop.snap(rect, 16);

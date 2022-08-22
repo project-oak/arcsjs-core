@@ -9,6 +9,7 @@ const {config} = globalThis;
 const aeonPath = `/${config.aeon}`;
 
 const log = logFactory(logFactory.flags.storage, 'storage', 'limegreen');
+const len = serial => !serial?.length ? 'n/a' : `${(serial.length/1024).toFixed(2)}Kb`;
 
 export const Persistor = class {
   constructor(uid) {
@@ -20,19 +21,35 @@ export const Persistor = class {
   getKey(id) {
     return `${this.path}/${id}`;
   }
-  async persist(id, serial) {
-    const key = this.getKey(id);
-    if (serial) {
-      this.upload(key, serial);
-      log(`${key}: serialized [${(serial.length/1024).toFixed(2)}Kb]`);
-      localStorage.setItem(key, serial);
+  async persist(id, data) {
+    let serial;
+    if (id && data) {
+      const key = this.getKey(id);
+      try {
+        serial = JSON.stringify(data);
+      } catch(x) {
+        log.warn(x);
+      }
+      if (serial) {
+        this.upload(key, serial);
+        log(`[${key}]\nPERSIST [${len(serial)}]`);
+        localStorage.setItem(key, serial);
+      }
     }
   }
-  async restore(id, store) {
-    const key = this.getKey(id);
-    const serial = this.download(key);
-    log(`${key}: restored [${(serial.length/1024).toFixed(2)}Kb]`);
-    return serial;
+  async restore(id) {
+    let data;
+    if (id) {
+      const key = this.getKey(id);
+      const serial = await this.download(key);
+      log(`[${key}]\nRESTORE [${len(serial)}]`);
+      try {
+        data = JSON.parse(serial);
+      } catch(x) {
+        log.warn(x);
+      }
+    }
+    return data;
   }
 };
 

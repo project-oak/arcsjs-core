@@ -27,7 +27,6 @@ arcs.blargTheWorker = async ({paths}) => {
     `import '${paths.$library}/App/Worker/ArcsWorker.js';`
   ];
   const text = code.join('\n');
-  //console.warn(text);
   const blob = new Blob([text], {type: 'application/javascript'});
   const oUrl = URL.createObjectURL(blob);
   const worker = new Worker(oUrl, {type: 'module', name: 'arcsjs'});
@@ -61,15 +60,6 @@ arcs.init = async ({root, paths, onservice, injections}) => {
   socket.sendVibration({kind: 'setInjections', injections});
   // initiate security procedures
   socket.sendVibration({kind: 'secureWorker'});
-  // // async readiness (because worker has an awaited dynamic import)
-  // return new Promise(resolve =>
-  //   setTimeout(() => {
-  //     // memoize important paths
-  //     arcs.addPaths(paths);
-  //     // be ready
-  //     resolve();
-  //   }, 300)
-  // );
 };
 
 // n.b. vibrational paths are worker-relative
@@ -80,7 +70,7 @@ const receiveVibrations = msg => {
     composer.render(msg.packet);
   } else if (msg.type === 'service') {
     // channel vibrations to the arcs service
-    arcs.service(msg);
+    handleServiceCall(msg);
   } else if (msg.type === 'store') {
     // channel vibrations to the store getter
     getters[msg.storeKey]?.(msg.data);
@@ -90,15 +80,17 @@ const receiveVibrations = msg => {
 };
 
 // service call from Arcs engine
-arcs.service = async msg => {
+const handleServiceCall = async msg => {
+  // async `onservice` handler was provided by user
   const data = await arcs.onservice?.(msg);
+  // when it's done, send the answer vibration back
   socket.sendVibration({kind: 'serviceResult', sid: msg.sid, data});
 };
 
 // install data watcher
 arcs.watch = (arc, storeKey, handler) => {
   watchers[storeKey] = handler;
-  arcs.addWatch(arc, storeKey);
+  socket.sendVibration({kind: 'watch', arc, storeKey});
 };
 
 // get handler
@@ -113,7 +105,6 @@ arcs.get = async (arc, storeKey) => {
 };
 
 // public API
-//arcs.setInjections    = (injections)              => socket.sendVibration({kind: 'setInjections', injections});
 arcs.addPaths         = (paths)                   => socket.sendVibration({kind: 'addPaths', paths});
 arcs.createArc        = (arc)                     => socket.sendVibration({kind: 'createArc', arc});
 arcs.createParticle   = (name, arc, meta, code)   => socket.sendVibration({kind: 'createParticle', name, arc, meta, code});
@@ -122,7 +113,6 @@ arcs.setInputs        = (arc, particle, inputs)   => socket.sendVibration({kind:
 arcs.addRecipe        = (recipe, arc)             => socket.sendVibration({kind: 'addRecipe', recipe, arc});
 arcs.addAssembly      = (recipes, arc)            => socket.sendVibration({kind: 'addAssembly', recipes, arc});
 arcs.set              = (arc, storeKey, data)     => socket.sendVibration({kind: 'setStoreData', arc, storeKey, data});
-arcs.addWatch         = (arc, storeKey)           => socket.sendVibration({kind: 'watch', arc, storeKey});
 arcs.setOpaqueData    = (key, data)               => socket.sendVibration({kind: 'setOpaqueData', key, data});
 
 export {arcs as Arcs};

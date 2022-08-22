@@ -6,10 +6,10 @@
  * license that can be found in the LICENSE file.
  */
 
-update({isAudioEnabled, textForSpeech}, state, {output}) {
-  if (isAudioEnabled && textForSpeech && textForSpeech !== state.text) {
+update({mediaDeviceState, textForSpeech}, state) {
+  if (mediaDeviceState.isAudioEnabled && textForSpeech && textForSpeech !== state.text) {
     state.text = textForSpeech;
-    output({isMicEnabled: false});
+    return {mediaDeviceState : {...mediaDeviceState, isMicEnabled: false}};
   }
 },
 render({}, {text}) {

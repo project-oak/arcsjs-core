@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!--
+ Copyright (c) 2022 Google LLC All rights reserved.
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file.
+-->
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86">
+
+<base href="../../../">
+
+<link rel="stylesheet" href="../Library/Dom/material-icon-font/icons.css">
+<link rel="stylesheet" href="../Library/Dom/material-xen/xen.css">
+
+<style>
+  html, body {
+    height: 100%;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    overflow: hidden;
+    /* light */
+    /*
+    background-color: white;
+    color: #333;
+    */
+    /* dark */
+    background-color: #333;
+    color: #eee;
+    /**/
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+  body, button, input {
+    font-family: 'Google Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  *[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  window.logFlags = {
+    // composer: true,
+    // render: true
+  };
+</script>
+
+<script type="module">
+  // external component support
+  // import './Library/RedOwl/dom/surfaces/device/allowlist.js';
+  // import './builder/surfaces/device/allowlist.js';
+  import '../Library/Devices/Emulators/surface/allowlist.js'
+  // xen-style surface library
+  import {XenSurface} from '../Library/Dom/surfaces/xen/xen-surface.js';
+  // make our surface (shadowRoot is on)
+  window.surface = new XenSurface(document.body, true);
+  document.body.style.opacity = 1;
+  // be heard
+  console.log('RedOwl/dom/surfaces/device says hello');
+  setTimeout(() => window.resizeTo(640, 480), 500);
+</script>

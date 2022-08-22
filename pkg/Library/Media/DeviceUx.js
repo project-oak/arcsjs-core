@@ -1,79 +1,85 @@
+({
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
-({
 shouldRender({mediaDevices}) {
   return Boolean(mediaDevices && mediaDevices.length);
 },
-render({mediaDevices, isCameraEnabled, isMicEnabled, isAudioEnabled, transcript}) {
+render({mediaDevices, mediaDeviceState}) {
+  const {isCameraEnabled, isMicEnabled, isAudioEnabled, videoDeviceId, audioInputDeviceId, audioOutputDeviceId} = mediaDeviceState;
   const cameraEnabled = Boolean(isCameraEnabled);
   const micEnabled = Boolean(isMicEnabled);
   const audioEnabled = Boolean(isAudioEnabled);
-  const devices = values(mediaDevices).map(d => ({name: d.label || 'default', kind: d.kind}));
-  const videoInputs = devices.filter(d => d.kind === 'videoinput');
-  const audioInputs = devices.filter(d => d.kind === 'audioinput');
-  const audioOutputs = devices.filter(d => d.kind === 'audiooutput');
+  const devices = values(mediaDevices).map(d => ({name: d.label || 'default', kind: d.kind, key: d.deviceId}));
+  const videoInputs = this.renderDevices(devices, 'videoinput', videoDeviceId);
+  const audioInputs = this.renderDevices(devices, 'audioinput', audioInputDeviceId);
+  const audioOutputs = this.renderDevices(devices, 'audiooutput', audioOutputDeviceId);
   return {
     videoInputs,
     audioInputs,
     audioOutputs,
     cameraEnabled,
     cameraLigature: cameraEnabled ? `videocam` : `videocam_off`,
-    micEnabled: micEnabled,
+    micEnabled,
     micLigature: isMicEnabled ? `mic` : `mic_off`,
     audioEnabled,
     audioLigature: audioEnabled ? `volume_up` : `volume_off`,
-    text: transcript?.transcript || transcript?.interimTranscript || ''
   };
 },
-onCameraClick({isCameraEnabled}) {
-  return {isCameraEnabled: !isCameraEnabled};
+renderDevices(devices, kind, selectedDeviceId) {
+  return devices
+    .filter(d => d.kind === kind)
+    .map(d => ({...d, selected: Boolean(selectedDeviceId && d.key === selectedDeviceId)}));
 },
-onMicClick({isMicEnabled}) {
-  return {isMicEnabled: !isMicEnabled, transcript: null};
+onCameraClick({mediaDeviceState}) {
+  return {
+    mediaDeviceState: {
+      ...mediaDeviceState,
+      isCameraEnabled: !mediaDeviceState.isCameraEnabled
+    }
+  };
 },
-onAudioClick({isAudioEnabled}) {
-  return {isAudioEnabled: !isAudioEnabled};
+onMicClick({mediaDeviceState}) {
+  return {
+    mediaDeviceState: {
+      ...mediaDeviceState,
+      isMicEnabled: !mediaDeviceState.isMicEnabled
+    },
+    transcript: null
+  };
 },
-onTextChange({eventlet: {value}}) {
-  return {transcript: {transcript: value}};
+onAudioClick({mediaDeviceState}) {
+  return {
+    mediaDeviceState: {
+      ...mediaDeviceState,
+      isAudioEnabled: !mediaDeviceState.isAudioEnabled
+    }
+  };
+
+},
+onSelectChange({eventlet: {key, value}, mediaDeviceState}) {
+  if (key && value) {
+    return {
+      mediaDeviceState: {
+        ...mediaDeviceState,
+        [key]: value
+      }
+    };
+  }
 },
 template: html`
 <style>
   :host {
     flex: 0 !important;
-    /* padding: 4px; */
   }
   [scrub][toolbar] {
-    font-size: 24px;
-    /* padding-left: 0; */
-  }
-  [mic] {
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 12px;
-    margin: 6px;
-    transition: all 200ms ease-out;
-    width: 100%;
-  }
-  [mic][showing] {
-    transform: translateY(0px);
-  }
-  [micbox] {
-    overflow: hidden;
-    height: 0;
-    transition: all 200ms ease-out;
-  }
-  [micbox][showing] {
-    height: 48px;
+    font-size: 20px;
   }
   icon {
-    font-size: 20px;
+    font-size: 18px;
     margin-right: 2px !important;
   }
   select {
@@ -86,11 +92,11 @@ template: html`
 
 <div scrub toolbar>
   <icon on-click="onCameraClick">{{cameraLigature}}</icon>
-  <select repeat="option_t" on-change="onSelectChange">{{videoInputs}}</select>
+  <select repeat="option_t" on-change="onSelectChange" key="videoDeviceId">{{videoInputs}}</select>
   <icon on-click="onMicClick">{{micLigature}}</icon>
-  <select repeat="option_t" on-change="onSelectChange">{{audioInputs}}</select>
+  <select repeat="option_t" on-change="onSelectChange" key="audioInputDeviceId">{{audioInputs}}</select>
   <icon on-click="onAudioClick">{{audioLigature}}</icon>
-  <select repeat="option_t" on-change="onSelectChange">{{audioOutputs}}</select>
+  <select repeat="option_t" on-change="onSelectChange" key="audioOutputDeviceId">{{audioOutputs}}</select>
   <span flex></span>
 </div>
 
@@ -99,10 +105,6 @@ template: html`
 </template>
 
 <div>{{devices}}</div>
-
-<div micbox bar showing$="{{micEnabled}}">
-  <icon>mic</icon>
-  <input mic value="{{text}}" on-change="onTextChange"/>
-</div>
+<div frame="micbox"></div>
 `
 });

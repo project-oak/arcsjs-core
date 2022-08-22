@@ -10,7 +10,7 @@
 const publicPipelinesUrl = `https://arcsjs.firebaseio.com/pipelines`;
 
 export const PipelinesToolbar = {
-  $kind: '$library/FlowGraph/NodeGraph/PipelineToolbar',
+  $kind: '$library/NodeGraph/PipelineToolbar',
   $inputs: [
     {pipeline: 'selectedPipeline'},
     'pipelines'
@@ -37,7 +37,7 @@ export const PipelinesToolbar = {
         }
       },
       PipelineChooser: {
-        $kind: '$library/FlowGraph/NodeGraph/PipelineChooser',
+        $kind: '$library/NodeGraph/PipelineChooser',
         $inputs: [
           {pipeline: 'selectedPipeline'},
           'pipelines'
