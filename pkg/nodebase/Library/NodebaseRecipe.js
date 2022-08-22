@@ -43,7 +43,7 @@ export const NodebaseRecipe = {
     ...NodeCatalogStores
   },
   main: {
-    $kind: './Library/Nodebase',
+    $kind: '$app/Library/Nodebase',
     $inputs: [
       {pipeline: 'selectedPipeline'}
     ],
@@ -59,7 +59,7 @@ export const NodebaseRecipe = {
       },
       preview: {
         navigator: {
-          $kind: './Library/Navigator',
+          $kind: '$app/Library/Navigator',
           $inputs: '*',
           $outputs: ['records']
         },
