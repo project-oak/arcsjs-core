@@ -161,8 +161,8 @@ async constructConnectedStore(connection, selected, pipeline, nodeTypes, service
   const value = await Promise.all(selected?.map(
     async ({from, store}) => {
       const node = pipeline.nodes.find(node => node.key == from);
-      if (node) {
-        const nodeType = this.findNodeType(node.name, nodeTypes);
+      const nodeType = this.findNodeType(node?.name, nodeTypes);
+      if (nodeType) {
         return await this.getBindingValue(store, nodeType.$stores[store], node, service);
       }
     }
