@@ -6,16 +6,13 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import './config.js';
+import './conf/config.js';
+import {paths} from './conf/allowlist.js';
 import {NodebaseApp} from './NodebaseApp.js';
 
 // spin up application instance
 try {
-  const app = globalThis.app = new NodebaseApp({
-    $arcs: './arcs.js',
-    $library: '../Library',
-    $app: '.'
-  });
+  const app = globalThis.app = new NodebaseApp(paths);
   await app.spinup();
 } catch(x) {
   console.error(x);
