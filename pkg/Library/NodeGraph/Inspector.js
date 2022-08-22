@@ -72,6 +72,7 @@ chooseTemplate({store: {$type, values, range}, value}, isEditing, customInspecto
     string: 'text_t',
     boolean: 'checkbox_t',
     Select: 'select_t',
+    MultilineText: 'textarea_t'
   }[$type] ?? 'unimpl_t';
 
   if (customInspectors?.[$type]) {
@@ -155,6 +156,7 @@ constructPropModel(key, prop, parent, template, state) {
       model.container = `custom${propId}`;
       break;
     }
+    case 'textarea_t':
     case 'text_t': {
       model.value = model.value ?? '';
       break;
@@ -390,6 +392,10 @@ template: html`
   }
   textarea {
     width: 100%;
+    min-width: 248px;
+    min-height: 96px;
+    font-size: 0.75rem;
+    font-family: "Google Sans", monospace;
   }
   [noSelectionMsg] {
     position: absolute;
@@ -521,6 +527,13 @@ template: html`
   <div prop-container vertical>
     <span label control>{{displayName}}</span>
     <input type="text" key="{{key}}" value="{{value}}" on-change="onPropChange">
+  </div>
+</template>
+
+<template textarea_t>
+  <div prop-container vertical>
+    <span label control>{{displayName}}</span>
+    <textarea key="{{key}}" value="{{value}}" on-input="onPropChange"></textarea>
   </div>
 </template>
 

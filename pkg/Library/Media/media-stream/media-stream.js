@@ -11,12 +11,23 @@ const subscribers = {};
 
 export const defaultStreamName = 'default';
 
+const getResource = (id) => globalThis.resources?.[id];
+const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
+
 export const subscribeToStream = (streamName, fn) => {
   if (!subscribers[streamName]) {
     subscribers[streamName] = [];
   }
   subscribers[streamName].push(fn);
   return sharedStreams[streamName];
+};
+
+export const unsubscribeFromStream = (streamName, fn) => {
+  const subs = subscribers[streamName];
+  const i = subs?.indexOf?.(fn);
+  if (i >= 0) {
+    subs.splice(i, 1);
+  }
 };
 
 export const subscribeToDefaultStream = (fn) => {
@@ -60,7 +71,6 @@ export class MediaStream extends Xen.Async {
     }));
     hasVideoInput = devices.some(({kind}) => kind === 'videoinput');
     hasAudioInput = devices.some(({kind}) => kind === 'audioinput');
-
     log.groupCollapsed('media devices:');
     log(JSON.stringify(devices.map(info => info.label), null, '  '));
     log.groupEnd();
@@ -101,6 +111,9 @@ export class MediaStream extends Xen.Async {
       }
     }
     notifySubscribers(streamName);
+    if (streamName === defaultStreamName) {
+      setResource(defaultStreamName, sharedStreams[streamName]);
+    }
   }
   async produceStream(enableVideo, enableAudio, videodeviceid, audioinputdeviceid) {
     // these are the droids we are looking for

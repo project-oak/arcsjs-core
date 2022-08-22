@@ -6,7 +6,7 @@
 ({
 
 render({mediaDeviceState}) {
-  const {isCameraEnabled, isMicEnabled, videoDeviceId, audioInputDeviceId} = mediaDeviceState;
+  const {isCameraEnabled, isMicEnabled, videoDeviceId, audioInputDeviceId} = mediaDeviceState || {};
   return {
     playingVideo: Boolean(isCameraEnabled),
     playingAudio: Boolean(isMicEnabled),

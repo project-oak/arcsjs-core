@@ -6,7 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {App, makeName, subscribeToStream} from '../conf/allowlist.js';
+import {App, makeName, subscribeToDefaultStream} from '../conf/allowlist.js';
 import {RemoteRecipe} from './RemoteRecipe.js';
 import {meetStrangers} from '../../Library/Firebase/tryst.js';
 import {myself} from '../../Library/Rtc/myself.js';
@@ -40,7 +40,7 @@ export const RemoteApp = class extends App {
   }
   async initRtc() {
     myself.onstream = this.onstream.bind(this);
-    subscribeToStream(stream => myself.mediaStream = stream);
+    subscribeToDefaultStream(stream => myself.mediaStream = stream);
     await myself.start(this.persona);
     //this.arcs.watch('user', 'callees', callees => this.calleesChanged(callees));
     //this.createTvParticle(this.persona, 'lobby#tv', this.persona);

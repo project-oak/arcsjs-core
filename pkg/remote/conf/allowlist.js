@@ -12,4 +12,4 @@ export const paths = {
 export * from '../../core/utils.min.js';
 export * from '../../Library/App/Worker/App.js';
 export * from '../../Library/App/surface-imports.js';
-export * from '../../Library/Media//media-stream/media-stream.js';
+export * from '../../Library/Media/media-stream/media-stream.js';

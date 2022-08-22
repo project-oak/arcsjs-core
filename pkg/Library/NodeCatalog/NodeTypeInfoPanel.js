@@ -44,7 +44,7 @@ retrieveBindings(bindings, nodeType) {
     .map(value => {
       const {key, binding} = this.decodeBinding(value);
       const store = nodeType.$stores[binding];
-      if (!store.nodisplay) {
+      if (store && !store.nodisplay) {
         let type = store.$type;
         if (store.multiple) {
           type += ' (multiple)';

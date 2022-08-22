@@ -165,7 +165,7 @@ recipeForNode(node, nodeTypes, pipeline, customInspectors, inspectorData) {
 
 addInspectorSpecs(recipe, node, nodeType, customInspectors, inspectorData) {
   let hasInspector = false;
-  keys(nodeType.$stores || {}).forEach(storeName => {
+  keys(nodeType?.$stores || {}).forEach(storeName => {
     const store = nodeType.$stores[storeName];
     const inspector = customInspectors?.[store.$type];
     if (inspector) {
@@ -191,7 +191,7 @@ constructInspectParticle(key, spec, storeName, inspectorData) {
 
 buildParticleSpecs(nodeType, node) {
   const specs = {};
-  const names = this.getParticleNames(nodeType);
+  const names = this.getParticleNames(nodeType) || [];
   for (const particleName of names) {
     specs[`${node.key}${particleName}`] = this.buildParticleSpec(nodeType, node, particleName);
   }
@@ -231,7 +231,7 @@ resolveGroup(bindings, node, {$stores}) {
   return bindings?.map(coded => {
     const {key, binding} = this.decodeBinding(coded);
     const resolutions = this.resolveBinding(binding || key, node, $stores);
-    return resolutions.map((resolution, index) => ({[`${key}${index > 0 ? String(index) : ''}`]: resolution}));
+    return resolutions?.map((resolution, index) => ({[`${key}${index > 0 ? String(index) : ''}`]: resolution}));
   }).flat();
 },
 

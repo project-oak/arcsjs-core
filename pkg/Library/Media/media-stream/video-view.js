@@ -5,7 +5,7 @@
  */
 
 import {Xen} from '../../Dom/Xen/xen-async.js';
-import {subscribeToDefaultStream} from './media-stream.js';
+import {subscribeToStream} from './media-stream.js';
 
 const template = Xen.Template.html`
 <style>
@@ -34,6 +34,8 @@ const template = Xen.Template.html`
 
 `;
 
+const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
+
 export class VideoView extends Xen.Async {
   static get observedAttributes() {
     return ['box', 'flip', 'version'];
@@ -48,12 +50,12 @@ export class VideoView extends Xen.Async {
   getInitialState() {
     return {
       id: Math.floor(Math.random()*1e3 + 9e2),
-      stream: this.getMediaStream()
+      stream: this.getMediaStream('default')
     };
   }
-  getMediaStream() {
+  getMediaStream(streamId) {
     // listen to media-stream and set it's data into state
-    return subscribeToDefaultStream(stream => {
+    return subscribeToStream(streamId, stream => {
       this.mergeState({stream});
       if (!this.hasVideoTracks(stream)) {
         this.value = false;
@@ -62,21 +64,16 @@ export class VideoView extends Xen.Async {
     });
   }
   update({box, version}, state) {
-    // TODO(sjmiles): should come from an import, or a service
-    const {resources} = globalThis;
-    if (resources) {
-      resources[state.id] = this.canvas;
-    }
+    setResource(state.id, this.canvas);
     this.value = state.id;
-    // notify about the stream sitch
     if (state.lastStream !== state.stream) {
       state.lastStream = state.stream;
-      const videoStreamAvailable =
-          Boolean(state.stream) && this.hasVideoTracks(state.stream);
+      const videoStreamAvailable = state.stream && this.hasVideoTracks(state.stream);
       this.value = videoStreamAvailable;
+      // notify about the stream sitch
       this.fire('stream');
       // enable rendering for stream update
-      // shouldRender is set false in updateSpan
+      // shouldRender is set false in update
       // to squelch an extra render
       state.shouldRender = videoStreamAvailable;
     }

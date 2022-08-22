@@ -15,11 +15,14 @@ export const DragDrop = class extends Xen.Async {
   }
   onDown(e) {
     const {screenX: x, screenY: y} = e;
-    this.dragging = true;
-    this.dragStart = {x, y};
-    window.onmousemove = this.onMove.bind(this);
-    window.onmouseup = this.onUp.bind(this);
-    this.doDown(e);
+    if (this.doDown(e) !== false) {
+      this.dragging = true;
+      this.dragStart = {x, y};
+      window.onmousemove = this.onMove.bind(this);
+      window.onmouseup = this.onUp.bind(this);
+    } else {
+      this.dragging = false;
+    }
   }
   onMove(e) {
     // TODO(sjmiles): optional?

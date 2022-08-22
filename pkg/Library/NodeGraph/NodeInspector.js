@@ -48,7 +48,7 @@ async monitorStores(state, nodeTypes, {service, invalidate}) {
     const result = await service({
       kind: 'StoreService',
       msg: 'ListenToChanges',
-      data: {storeIds: this.getNodeStoreIds(state.node, nodeType)}
+      data: {storeIds: this.getMonitoredNodeStoreIds(state.node, nodeType)}
     });
     if (result) {
       //log(`${storeId} has changed affecting node ${state.node.key}`);
@@ -63,8 +63,11 @@ async monitorStores(state, nodeTypes, {service, invalidate}) {
   }
 },
 
-getNodeStoreIds(node, {$stores}) {
-  return $stores && keys($stores).map(id => this.fullStoreId(node, id));
+getMonitoredNodeStoreIds(node, {$stores}) {
+  return $stores && keys($stores)
+    .filter(id => !$stores[id].nomonitor)
+    .map(id => this.fullStoreId(node, id))
+    ;
 },
 
 async constructData(node, pipeline, nodeTypes, service) {

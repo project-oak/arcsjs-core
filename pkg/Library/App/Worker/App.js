@@ -70,7 +70,7 @@ export const App = class {
           if (service[msg]) {
             return (service[msg])(data);
           } else {
-            log.warn(`no handler for "${msg}"`);
+            log.warn(`no handler for "${request?.kind}:${msg}"`);
           }
         } catch (e) {
           log.warn(e.toString());

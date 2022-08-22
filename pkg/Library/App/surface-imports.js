@@ -9,4 +9,5 @@ import '../DevTools/Dom/surface-walker.js';
 import '../DevTools/Dom/resource-view.js';
 import '../Media/image-resource.js';
 import '../Media/media-stream/video-view.js';
+import '../Media/media-stream/stream-view.js';
 export * from '../Media/media-stream/media-stream.js';
