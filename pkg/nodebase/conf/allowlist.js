@@ -1,5 +1,4 @@
 export * from '../../core/utils.min.js';
-export * from '../../Library/App/Worker/App.js';
 export * from '../../Library/App/surface-imports.js';
 export * from '../../Library/Dom/container-layout.js';
 export * from '../../Library/NodeGraph/dom/node-graph.js';
