@@ -49,11 +49,13 @@ export const App = class {
         return this.persist(request);
       case 'restore':
         return this.restore(request);
-      default: {
-        return await (this.dispatchServiceRequest({request}) || this.appServices({request}));
-      }
     }
-  }
+    const result =
+      this.dispatchServiceRequest()
+      || this.appService({request})
+      ;
+    return await result;
+}
   async appService({request}) {
     const value = await this.onservice?.('user', 'host', request);
     log('service:', request?.kind || '-', request?.msg, '=', value);
