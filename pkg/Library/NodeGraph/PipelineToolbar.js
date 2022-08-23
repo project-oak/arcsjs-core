@@ -13,7 +13,7 @@
     if (pipeline) {
       return {pipeline};
     } else {
-      service({mkind: 'HistoryService', sg: 'setSelectedPipeline', data: {pipeline: null}});
+      service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: null}});
     }
   },
   async update({pipeline, pipelines, publishPaths}, state, {service}) {
