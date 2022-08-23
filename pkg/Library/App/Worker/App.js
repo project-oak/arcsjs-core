@@ -50,12 +50,9 @@ export const App = class {
       case 'restore':
         return this.restore(request);
     }
-    const result =
-      this.dispatchServiceRequest({request})
-      || this.appService({request})
-      ;
-    return await result;
-}
+    return await this.dispatchServiceRequest({request}) ||
+        await this.appService({request});
+  }
   async appService({request}) {
     const value = await this.onservice?.('user', 'host', request);
     log('service:', request?.kind || '-', request?.msg, '=', value);
