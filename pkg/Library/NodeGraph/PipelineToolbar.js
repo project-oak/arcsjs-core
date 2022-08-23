@@ -20,22 +20,28 @@
     if (publishPaths?.length > 0 && !state.selectedPublishKey) {
       state.selectedPublishKey = keys(publishPaths)[0];
     }
-    let updatedPipelines;
     if (pipeline) {
-      updatedPipelines = this.updateItemInPipelines(pipeline, pipelines);
-      if (state.pipelineName !== pipeline.$meta?.name) {
-        await service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: pipeline.$meta?.name}});
-        state.pipelineName = pipeline.$meta?.name;
+      if (this.pipelineChanged(pipeline, state.pipeline)) {
+        if (state.pipeline?.$meta?.name !== pipeline.$meta?.name) {
+          await service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: pipeline.$meta?.name}});
+        }
+        state.pipeline = pipeline;
+        return {
+          pipeline,
+          pipelines: this.updateItemInPipelines(pipeline, pipelines)
+        };
       }
     } else {
       pipeline = await this.makeNewPipeline(null, service);
-      updatedPipelines = [...(pipelines || []), pipeline];
       state.renaming = false;
+      return {
+        pipeline,
+        pipelines: [...(pipelines || []), pipeline]
+      };
     }
-    return {
-      pipeline,
-      pipelines: updatedPipelines
-    };
+  },
+  pipelineChanged(pipeline, currentPipeline) {
+    return JSON.stringify(pipeline) !== JSON.stringify(currentPipeline);
   },
   updateItemInPipelines(pipeline, pipelines) {
     const index = this.findPipelineIndex(pipeline, pipelines);

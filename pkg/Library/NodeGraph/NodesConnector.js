@@ -24,7 +24,7 @@ update(inputs, state) {
 
 nodesDidChange(nodes, currentNodes) {
   if (nodes?.length === currentNodes?.length) {
-    return !nodes?.length && !currentNodes?.every(node => this.hasSameNode(node, nodes));
+    return !nodes?.length || !currentNodes?.every(node => this.hasSameNode(node, nodes));
   }
   return true;
 },
