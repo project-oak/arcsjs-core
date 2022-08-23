@@ -7,34 +7,49 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
+  async initialize({pipelines}, state, {service}) {
+    const pipelineName = await service({kind: 'HistoryService', msg: 'retrieveSelectedPipeline'});
+    const pipeline = this.findPipelineByName(pipelineName, pipelines);
+    if (pipeline) {
+      return {pipeline};
+    } else {
+      service({mkind: 'HistoryService', sg: 'setSelectedPipeline', data: {pipeline: null}});
+    }
+  },
   async update({pipeline, pipelines, publishPaths}, state, {service}) {
     if (publishPaths?.length > 0 && !state.selectedPublishKey) {
       state.selectedPublishKey = keys(publishPaths)[0];
     }
+    let updatedPipelines;
     if (pipeline) {
-      if (this.updateItemInPipelines(pipeline, pipelines)) {
-        service({msg: 'SetSelectedPipeline', data: {pipeline: pipeline.$meta?.name}});
-        return {pipelines};
+      updatedPipelines = this.updateItemInPipelines(pipeline, pipelines);
+      if (state.pipelineName !== pipeline.$meta?.name) {
+        await service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: pipeline.$meta?.name}});
+        state.pipelineName = pipeline.$meta?.name;
       }
     } else {
-      state.renaming = false;
       pipeline = await this.makeNewPipeline(null, service);
-      return {pipeline, pipelines: [...(pipelines || []), pipeline]};
+      updatedPipelines = [...(pipelines || []), pipeline];
+      state.renaming = false;
     }
+    return {
+      pipeline,
+      pipelines: updatedPipelines
+    };
   },
   updateItemInPipelines(pipeline, pipelines) {
     const index = this.findPipelineIndex(pipeline, pipelines);
     if (index < 0) {
       pipelines[index] = pipeline;
-      return true;
     }
+    return pipelines;
   },
   async makeNewPipeline(name, service) {
     name = (name ?? await service({msg: 'MakeName'})) || 'new pipeline';
     return {$meta: {name}, nodes: []};
   },
   render({pipeline, pipelines, publishPaths}, {renaming, selectedPublishKey}) {
-    const isOwned = this.findPipelineByName(pipeline?.$meta?.name, pipelines) >= 0;
+    const isOwned = this.findPipelineIndex(pipeline, pipelines) >= 0;
     const publishKeys = keys(publishPaths || {}).map(key => ({key, selected: key === selectedPublishKey}));
     return {
       showRenameIcon: String(!renaming && isOwned),
@@ -56,7 +71,7 @@
   },
   async onCloneClicked({pipeline, pipelines}) {
     const clonedPipeline = await this.makeNewPipeline(`Copy of ${pipeline.$meta?.name}`);
-    clonedPipeline.nodes = [...pipeline?.nodes];
+    clonedPipeline.nodes = [...pipeline?.nodes || []];
     return {
       pipeline: clonedPipeline,
       pipelines: [...(pipelines || []), clonedPipeline]
@@ -72,7 +87,7 @@
     }
     return {
       pipelines,
-      pipeline: pipelines?.[0]
+      pipeline: pipelines.length > 0 ? pipelines[0] : null
     };
   },
   onShare({pipeline, pipelines, publishPaths}, {selectedPublishKey}) {
@@ -128,10 +143,10 @@
     return {pipeline, pipelines};
   },
   findPipelineIndex(pipeline, pipelines) {
-    return this.findPipelineByName(pipeline?.$meta?.name, pipelines);
+    return pipelines?.findIndex(({$meta}) => $meta.name === pipeline?.$meta?.name);
   },
   findPipelineByName(name, pipelines) {
-    return pipelines?.findIndex?.(({$meta}) => $meta?.name === name);
+    return pipelines?.find(({$meta}) => $meta.name === name);
   },
   onPublishPathChanged({eventlet: {value}}, state) {
     state.selectedPublishKey = value;
