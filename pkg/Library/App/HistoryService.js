@@ -9,21 +9,14 @@
 
 import {Params} from './Params.js';
 
-export const HistoryService = async (runtime, host, request) => {
-  switch (request.msg) {
-    case 'RetrieveSelectedPipeline':
-      return retrieveSelectedPipeline();
-    case 'SetSelectedPipeline':
-      return setSelectedPipeline(request.data);
+export class HistoryService {
+  static retrieveSelectedPipeline() {
+    const pipeline = Params.getParam('pipeline');
+    Params.replaceUrlParam('pipeline', null);
+    return pipeline;
   }
-};
 
-const retrieveSelectedPipeline =  () => {
-  const pipeline = Params.getParam('pipeline');
-  Params.replaceUrlParam('pipeline', null);
-  return pipeline;
-};
-
-const setSelectedPipeline = ({pipeline}) => {
-  Params.setUrlParam('pipeline', pipeline);
-};
+  static setSelectedPipeline({pipeline}) {
+    Params.setUrlParam('pipeline', pipeline);
+  }
+}
