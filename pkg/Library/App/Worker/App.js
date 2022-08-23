@@ -51,7 +51,7 @@ export const App = class {
         return this.restore(request);
     }
     const result =
-      this.dispatchServiceRequest({request})
+      await this.dispatchServiceRequest({request})
       || this.appService({request})
       ;
     return await result;
