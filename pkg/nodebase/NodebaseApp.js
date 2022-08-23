@@ -21,7 +21,7 @@ const log = logFactory(true, 'LobbyApp', 'navy');
 export const NodebaseApp = class extends App {
   constructor(paths) {
     super(paths);
-    // this.persistor = FissionPersistor;
+    //this.persistor = FissionPersistor;
     this.userAssembly = [NodebaseRecipe];
   }
 };

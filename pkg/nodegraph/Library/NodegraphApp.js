@@ -9,7 +9,7 @@
 import {App} from '../../Library/App/App.js';
 import {LocalStoragePersistor} from '../../Library/App/storage.js';
 import {RecipeService} from '../../Library/App/RecipeService.js';
-import {StoreUpdateService} from '../../Library/NodeGraph/StoreUpdateService.js';
+import {StoreService} from '../../Library/NodeGraph/StoreService.js';
 import {DevToolsService} from '../../Library/DevTools/DevToolsService.js';
 import {themeRules} from '../../Library/App/theme.js';
 import {NodegraphRecipe} from './NodegraphRecipe.js';
@@ -28,7 +28,7 @@ export const NodegraphApp = class extends App {
   constructor() {
     super({themeRules});
     this.persistor = LocalStoragePersistor;
-    this.services = [RecipeService, StoreUpdateService, DevToolsService, AdaptedServices];
+    this.services = [RecipeService, StoreService, DevToolsService, AdaptedServices];
     this.userAssembly = [NodegraphRecipe];
   }
 };
