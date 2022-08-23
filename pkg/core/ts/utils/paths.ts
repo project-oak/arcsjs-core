@@ -41,7 +41,7 @@ export const PathMapper = class {
       let base = document.URL;
       // if document URL has a filename, remove it
       if (base[base.length-1] !== '/') {
-        base = base.split('/').slice(0, -1).join('/');
+        base = `${base.split('/').slice(0, -1).join('/')}/`;
       }
       // create absoute path to here (aka 'local')
       let localAbsolute = new URL(localRelative, base).href;
