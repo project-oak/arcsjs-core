@@ -39,7 +39,7 @@
   },
   updateItemInPipelines(pipeline, pipelines) {
     const index = this.findPipelineIndex(pipeline, pipelines);
-    if (index < 0) {
+    if (index >= 0) {
       pipelines[index] = pipeline;
     }
     return pipelines;

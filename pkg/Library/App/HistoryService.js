@@ -9,14 +9,13 @@
 
 import {Params} from './Params.js';
 
-export class HistoryService {
-  static retrieveSelectedPipeline() {
+export const HistoryService = {
+  retrieveSelectedPipeline() {
     const pipeline = Params.getParam('pipeline');
     Params.replaceUrlParam('pipeline', null);
     return pipeline;
-  }
-
-  static setSelectedPipeline({pipeline}) {
+  },
+  setSelectedPipeline({pipeline}) {
     Params.setUrlParam('pipeline', pipeline);
   }
-}
+};
