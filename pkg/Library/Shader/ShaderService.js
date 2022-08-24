@@ -117,8 +117,8 @@ const ShaderJunk = class {
   createChannel(width, height) {
     const textureCanvas = new OffscreenCanvas(width, height);
     const texture = new THREE.CanvasTexture(textureCanvas);
-    texture.minFilter = THREE.NearestFilter;
-    texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     return {texture, textureCanvas};
