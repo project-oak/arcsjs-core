@@ -163,7 +163,9 @@ async constructConnectedStore(connection, selected, pipeline, nodeTypes, service
       const node = pipeline.nodes.find(node => node.key == from);
       if (node) {
         const nodeType = this.findNodeType(node.name, nodeTypes);
-        return nodeType && await this.getBindingValue(store, nodeType.$stores[store], node, service);
+        if (nodeType) {
+          return await this.getBindingValue(store, nodeType.$stores[store], node, service);
+        }
       }
     }
   ) || []);
