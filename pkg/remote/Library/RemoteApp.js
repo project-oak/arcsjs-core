@@ -42,8 +42,6 @@ export const RemoteApp = class extends App {
     myself.onstream = this.onstream.bind(this);
     subscribeToDefaultStream(stream => myself.mediaStream = stream);
     await myself.start(this.persona);
-    //this.arcs.watch('user', 'callees', callees => this.calleesChanged(callees));
-    //this.createTvParticle(this.persona, 'lobby#tv', this.persona);
   }
   async initLobby() {
     // network id

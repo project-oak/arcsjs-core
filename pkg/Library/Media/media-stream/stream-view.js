@@ -47,15 +47,17 @@ export class StreamView extends Xen.Async {
     }
   }
   doCanvasCadence(frequency, id) {
-    const iv = this.invalidate.bind(this);
-    const msPerFrame = 1000 * (1 / frequency) || 16;
     const {videoWidth: w, videoHeight: h} = this.video;
+    const {width: cw, height: ch} = this.canvas;
     if (w && h) {
-      Object.assign(this.canvas, {width: w, height: h});
+      if (cw !== w || ch !== w) {
+        Object.assign(this.canvas, {width: w, height: h});
+      }
       this.canvas.getContext('2d').drawImage(this.video, 0, 0, w, h);
       this.fire('canvas', id);
     }
-    setTimeout(iv, msPerFrame);
+    const msPerFrame = 1000 * (1 / frequency) || 16;
+    setTimeout(this.invalidate.bind(this), msPerFrame);
   }
   render({flip, frequency}, {}) {
     return {
@@ -100,7 +102,8 @@ export class StreamView extends Xen.Async {
     transform: scaleX(-1);
   }
   [hide=true],[show=false] {
-    transform: translateX(-200%);
+    visibility: hidden;
+    /* transform: translateX(-200%); */
   }
 </style>
 

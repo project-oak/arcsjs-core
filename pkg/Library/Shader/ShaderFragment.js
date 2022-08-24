@@ -14,7 +14,8 @@
     if (shader !== state.shader) {
       state.shader = shader;
       if (shader) {
-        state.shaderId = await service({kind: 'ShaderService', msg: 'makeShader', data: {shader, shaderId: state.shaderId}});
+        state.shaderId = await service({kind: 'ShaderService', msg: 'makeShader',
+          data: {shader, shaderId: state.shaderId}});
       } else {
         state.shaderId = null;
       }
