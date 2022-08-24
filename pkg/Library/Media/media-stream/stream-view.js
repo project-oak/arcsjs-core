@@ -34,8 +34,6 @@ export class StreamView extends Xen.Async {
       subscribeToStream(stream, state.subscriber);
       state.stream = stream;
       console.log(stream);
-    } else if (stream && frequency) {
-      this.doCanvasCadence(Number(frequency), stream);
     }
     if (stream) {
       const realStream = getResource(stream);
@@ -44,20 +42,29 @@ export class StreamView extends Xen.Async {
         this.video.srcObject = realStream;
       }
     }
+    if (stream && frequency) {
+      this.doCanvasCadence(Number(frequency), stream);
+    }
   }
   doCanvasCadence(frequency, id) {
     const iv = this.invalidate.bind(this);
     const msPerFrame = 1000 * (1 / frequency) || 16;
-    this.canvas.getContext('2d').drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+    const {videoWidth: w, videoHeight: h} = this.video;
+    if (w && h) {
+      Object.assign(this.canvas, {width: w, height: h});
+      this.canvas.getContext('2d').drawImage(this.video, 0, 0, w, h);
+      this.fire('canvas', id);
+    }
     setTimeout(iv, msPerFrame);
-    this.fire('canvas', id);
     //return {
     //  image: {canvas: id, version: Math.random()}
     //};
   }
-  render({flip, stream}, {}) {
-    //const realStream = getResource(stream);
-    return {flip}; //, realStream};
+  render({flip, frequency}, {}) {
+    return {
+      flip,
+      canvasNotVideo: Boolean(frequency).toString()
+    };
   }
   onVideoReady() {
     this.mergeState({videoReady: true});
@@ -83,22 +90,26 @@ export class StreamView extends Xen.Async {
   * {
     box-sizing: border-box;
   }
+  /* canvas overlays video */
   video {
-    width: 320px;
-    height: 240px;
+    position: absolute;
   }
-  canvas {
+  canvas, video {
+    object-fit: contain;
     width: 320px;
     height: 240px;
   }
   [flip] {
     transform: scaleX(-1);
   }
+  [hide=true],[show=false] {
+    display: none !important;
+  }
 </style>
 
 <video autoplay playsinline muted flip$="{{flip}}"></video>
-<canvas Xhidden></canvas>
-    `;
+<canvas show$="{{canvasNotVideo}}"></canvas>
+   `;
   }
 }
 customElements.define('stream-view', StreamView);

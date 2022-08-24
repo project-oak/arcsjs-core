@@ -18,10 +18,12 @@ const Lobby = class {
   constructor() {
     this.streams = [];
   }
-  async meetStrangers(persona) {
+  async meetStrangers(persona, returnStream) {
+    console.log(persona, returnStream);
     if (!myself.nid) {
       await this.start(persona);
     }
+    myself.mediaStream = getResource(returnStream);
     const {name, nid} = myself;
     if (nid) {
       // be present at the meeting place
@@ -61,8 +63,8 @@ export const LobbyService = {
     setResource(lobbyId, lobby);
     return lobbyId;
   },
-  async meetStrangers({lobby, persona}) {
+  async meetStrangers({lobby, persona, returnStream}) {
     const realLobby = getResource(lobby);
-    return await realLobby?.meetStrangers(persona);
+    return realLobby?.meetStrangers(persona, returnStream);
   }
 };

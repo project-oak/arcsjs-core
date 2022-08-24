@@ -11,20 +11,20 @@ import {logKinds, errKinds, LoggerFunction, AllLoggerFunctions, DebugLoggers, Er
 
 const {fromEntries} = Object;
 
-const _logFactory = (enable: boolean, preamble: string, color: string | '', kind: keyof AllLoggerFunctions = 'log'): LoggerFunction => {
+const _logFactory = (enable: boolean, preamble: string, bg: string, color: string, kind: keyof AllLoggerFunctions = 'log'): LoggerFunction => {
   if (!enable) {
     return () => {};
   }
   if (kind === 'dir') {
     return console.dir.bind(console);
   }
-  const style = `background: ${color || 'gray'}; color: white; padding: 1px 6px 2px 7px; border-radius: 6px 0 0 6px;`;
+  const style = `background: ${bg || 'gray'}; color: ${color || 'white'}; padding: 1px 6px 2px 7px; border-radius: 6px 0 0 6px;`;
   return console[kind].bind(console, `%c${preamble}`, style);
 };
 
-export const logFactory = (enable: boolean, preamble: string, color = ''): Logger => {
-  const debugLoggers = fromEntries(logKinds.map(kind => [kind, _logFactory(enable, preamble, color, kind)])) as DebugLoggers;
-  const errorLoggers = fromEntries(errKinds.map(kind => [kind, _logFactory(true, preamble, color, kind)])) as ErrorLoggers;
+export const logFactory = (enable: boolean, preamble: string, bg = '', color = ''): Logger => {
+  const debugLoggers = fromEntries(logKinds.map(kind => [kind, _logFactory(enable, preamble, bg, color, kind)])) as DebugLoggers;
+  const errorLoggers = fromEntries(errKinds.map(kind => [kind, _logFactory(true, preamble, bg, color, kind)])) as ErrorLoggers;
   const loggers: AllLoggerFunctions = {...debugLoggers, ...errorLoggers};
   // Inject `log` as default, keeping all loggers available to be invoked by name.
   const log = loggers.log;

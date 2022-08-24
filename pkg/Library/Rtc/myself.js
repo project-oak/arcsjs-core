@@ -1,13 +1,15 @@
 import '../../third_party/peerjs.min.js';
 const {Peer} = globalThis;
 
+let me;
 let nid;
 
 const calls = {};
 const mediaConnections = {};
-const me = new Peer();
 
 const start = () => {
+  me = new Peer();
+  me.on('error', err => console.error(err));
   // when connection to PeerServer is established, we receive our peerid
   me.on('open', id => onopen(id));
   // when a call comes in, answer it
@@ -22,8 +24,10 @@ const onopen = id => {
 
 export const myself = {
   async start(name) {
-    start();
     myself.name = name;
+    // start my Peer ('me')
+    start();
+    // return a Promise that resolves when onstart is called
     return new Promise(resolve => myself.onstart = resolve);
   },
   get me() {

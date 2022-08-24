@@ -32,6 +32,7 @@ template: html`
     right: 8px;
     width: 120px;
     height: 90px;
+    overflow: hidden;
   }
 </style>
 <div frame="devices"></div>
