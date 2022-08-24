@@ -42,7 +42,7 @@ export const NodegraphRecipe = {
     ...NodeCatalogStores
   },
   main: {
-    $kind: '$app/nodegraph/Library/Noder',
+    $kind: '$app/Library/Noder',
     $inputs: [
       {pipeline: 'selectedPipeline'}
     ],
@@ -135,8 +135,5 @@ export const NodegraphRecipe = {
         'selectedPipeline'
       ]
     }
-  },
-  DevTools: {
-    $kind: 'DevTools/DevTools'
   }
 };
