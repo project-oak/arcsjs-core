@@ -50,18 +50,21 @@ export const App = class {
       case 'restore':
         return this.restore(request);
     }
-    const result =
+    // this code is tricky for performance sake
+    const resultPromise =
+      // may be null
       this.dispatchServiceRequest({request})
+      // must be a promise
       || this.appService({request})
       ;
-    return await result;
+    return await resultPromise;
 }
   async appService({request}) {
     const value = await this.onservice?.('user', 'host', request);
     log('service:', request?.kind || '-', request?.msg, '=', value);
     return value;
   }
-  async dispatchServiceRequest({request}) {
+  dispatchServiceRequest({request}) {
     if (request?.kind) {
       const service = this.services?.[request?.kind];
       if (!service) {
