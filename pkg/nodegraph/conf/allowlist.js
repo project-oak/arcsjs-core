@@ -3,36 +3,23 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Paths} from '../../arcsjs-support.js';
 
-// discover library path
-const library = Paths.resolve(`$library`);
-const dom = Paths.resolve(`$library/Dom`);
+export * from '../../core/utils.min.js';
+export * from '../../Library/App/surface-imports.js';
+export * from '../../Library/Dom/container-layout.js';
+export * from '../../Library/Dom/multi-select.js';
+export * from '../../Library/NodeGraph/dom/node-graph.js';
+export * from '../../Library/NodeCatalog/draggable-item.js';
 
-// import CSS loader
-const {loadCss} = await import(`${dom}/dom.js`);
+// n.b. operates in outer context
 
-// scoping hack
-export const {Resources} = await import(`${library}/App/resources.js`);
+// extract an absolute url to the folder 1 above here (aka 'nodegraph/')
+import {Paths} from '../../core/utils.min.js';
+const url = Paths.getAbsoluteHereUrl(import.meta, 2);
 
-// common surface implementation
-export const {XenSurface: Surface} = await import(`${dom}/surfaces/xen/xen-surface.js`);
-
-// material icon font
-await loadCss(`${dom}/material-icon-font/icons.css`);
-// Material Web Components
-await import(`${dom}/mwc/mwc.min.js`);
-await import(`${dom}/material-xen/material-xen.js`);
-
-// mostly used in DevTools
-await import(`${dom}/arcs-elements/arcs-elements.js`);
-await import(`${dom}/surfaces/xen/surface-walker.js`);
-await import(`${library}/DevTools/resource-view.js`);
-await import(`${library}/Dom/data-explorer/data-explorer.js`);
-
-// bespoke
-await import(`${library}/NodeGraph/dom/node-graph.js`);
-// ui libs
-await import(`${library}/Dom/container-layout.js`);
-// media support
-await import(`${library}/Media/image-resource.js`);
+// calculate important paths
+export const paths = {
+  $app: url,
+  $config: `${url}/conf/config.js`,
+  $library: `${url}/../Library`
+};

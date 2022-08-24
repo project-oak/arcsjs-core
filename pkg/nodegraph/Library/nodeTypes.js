@@ -10,19 +10,19 @@
 import * as candyNodes from './CandyNodes.js';
 import * as builderNodes from './BuilderNodes.js';
 import * as testNodes from './TestNodes.js';
-import * as locationNodes from '../../Library/nostalgic/Goog/LocationNodes.js';
-import * as homescreen from '../../Library/nostalgic/Homescreen/HomescreenRecipes.js';
-import * as speech from '../../Library/nostalgic/Actions/SpeechRecipes.js';
-import * as translator from '../../Library/nostalgic/Actions/TranslationDisplayRecipe.js';
+// import * as locationNodes from '../../Library/nostalgic/Goog/LocationNodes.js';
+// import * as homescreen from '../../Library/nostalgic/Homescreen/HomescreenRecipes.js';
+// import * as speech from '../../Library/nostalgic/Actions/SpeechRecipes.js';
+// import * as translator from '../../Library/nostalgic/Actions/TranslationDisplayRecipe.js';
 
 export const nodeTypes = [
   ...Object.values(candyNodes),
   ...Object.values(builderNodes),
   ...Object.values(testNodes),
-  ...Object.values(locationNodes),
-  ...Object.values(homescreen),
-  ...Object.values(speech),
-  ...Object.values(translator)
+  // ...Object.values(locationNodes),
+  // ...Object.values(homescreen),
+  // ...Object.values(speech),
+  // ...Object.values(translator)
 ];
 
 const icons = ['coffee', 'shower', 'chair', 'flatware', 'light', 'casino', 'escalator', 'umbrella', 'theater_comedy', 'diamond'];

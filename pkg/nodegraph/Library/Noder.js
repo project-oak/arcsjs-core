@@ -68,7 +68,7 @@ template: html`
   [nav] {
     border-bottom: 1px solid var(--theme-color-bg-3);
   }
-  ${themeRules}
+  /* $ { themeRules } */
 </style>
 
 <page-group flex rows>
