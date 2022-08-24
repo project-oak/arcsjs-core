@@ -58,7 +58,7 @@ async renewRecipes(recipes, state, service) {
     if (runningRecipe) {
       const updatedParticles = this.findParticlesWithChangedConnections(recipe, runningRecipe);
       updatedParticles.forEach(particleId => {
-        service({msg: 'UpdateConnections', data: {particleId, spec: recipe[particleId]}});
+        service({kind: 'RecipeService', msg: 'UpdateConnections', data: {particleId, spec: recipe[particleId]}});
         state.recipes[recipe.$meta.name] = recipe;
       });
     } else {
