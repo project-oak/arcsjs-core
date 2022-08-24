@@ -56,9 +56,6 @@ export class StreamView extends Xen.Async {
       this.fire('canvas', id);
     }
     setTimeout(iv, msPerFrame);
-    //return {
-    //  image: {canvas: id, version: Math.random()}
-    //};
   }
   render({flip, frequency}, {}) {
     return {
@@ -103,11 +100,11 @@ export class StreamView extends Xen.Async {
     transform: scaleX(-1);
   }
   [hide=true],[show=false] {
-    display: none !important;
+    transform: translateX(-200%);
   }
 </style>
 
-<video autoplay playsinline muted flip$="{{flip}}"></video>
+<video hide$="{{canvasNotVideo}}" autoplay playsinline muted flip$="{{flip}}"></video>
 <canvas show$="{{canvasNotVideo}}"></canvas>
    `;
   }

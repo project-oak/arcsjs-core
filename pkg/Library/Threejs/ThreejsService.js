@@ -7,8 +7,8 @@
 import {logFactory} from '../core.js';
 import {Resources} from '../App/resources.js';
 import {loadImage} from '../Media/ImageLoader.js';
-import * as toys from '../Shader/shader-toy.js';
 import {THREE} from '../../third_party/threejs/threejs-import.js';
+import * as tools from '../Shader/shader-tools.js';
 
 const log = logFactory(logFactory.flags.services, 'ThreejsService', 'teal');
 
@@ -116,7 +116,7 @@ const ShaderJunk = class {
   async init(inCanvas, outCanvas, toy) {
     this.ready = false;
     this.toyId = toy?.Shader?.info?.id;
-    const fragmentShader = await toys.loadShaderToy(toy);
+    const fragmentShader = await tools.loadShaderToy(toy);
     try {
       if (fragmentShader) {
         this.initRenderer(inCanvas, outCanvas, fragmentShader);
@@ -131,7 +131,7 @@ const ShaderJunk = class {
     }
   }
   initRenderer(inCanvas, outCanvas, fragmentShader) {
-    const uniforms = toys.uniformsFactory();
+    const uniforms = tools.uniformsFactory();
     this.uniforms = uniforms;
     //
     const texture = new THREE.CanvasTexture(inCanvas);
