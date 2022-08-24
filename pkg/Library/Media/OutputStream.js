@@ -9,25 +9,25 @@
 ({
 
 async initialize(inputs, state, {service}) {
-  // state.stream = await service({kind: 'ThreejsService', msg: 'allocateResource'});
+  state.stream = await service({kind: 'ThreejsService', msg: 'allocateResource'});
 },
 
 async update({image}, state, {service}) {
-  // const {stream} = state;
-  // const canvas = image?.canvas;
-  // if (canvas != state.canvas) {
-  //   state.canvas = canvas;
-  //   if (canvas) {
-  //     await service({msg: 'captureStream', data: {canvas, stream}});
-  //     return {stream};
-  //   }
-  // }
+  const {stream} = state;
+  const canvas = image?.canvas;
+  if (canvas != state.canvas) {
+    state.canvas = canvas;
+    if (canvas) {
+      await service({msg: 'captureStream', data: {canvas, stream}});
+      return {stream};
+    }
+  }
 },
 
 render(inputs, {stream}) {
-  // return {
-  //   stream
-  // };
+  return {
+    stream
+  };
 },
 
 template: html`
@@ -44,6 +44,6 @@ template: html`
   }
 </style>
 <div>{{stream}}</div>
-<!-- <stream-view stream="{{stream}}"></stream-view> -->
+<stream-view stream="{{stream}}"></stream-view>
 `
 });

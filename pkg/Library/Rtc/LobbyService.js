@@ -16,10 +16,11 @@ const newId = () => Math.floor(Math.random()*1e3 + 9e2);
 
 const Lobby = class {
   constructor() {
+    this.allStreams = [];
     this.streams = [];
   }
   async meetStrangers(persona, returnStream) {
-    console.log(persona, returnStream);
+    //console.log(persona, returnStream);
     if (!myself.nid) {
       await this.start(persona);
     }
@@ -32,8 +33,20 @@ const Lobby = class {
       const {streams} = this;
       // start fresh
       this.streams = [];
+      // collect all the streams
+      this.allStreams = [...this.allStreams, ...streams];
+      // try some callbacks
+      this.allStreams.forEach(s => this.maybeTryBack(s));
       // return the streams
       return streams;
+    }
+  }
+  maybeTryBack(stream) {
+    const them = stream?.meta?.call;
+    console.log('maybeTryBack', them);
+    if (myself.shouldCall(them)) {
+      console.log('CALLING', them);
+      myself.doCall(them);
     }
   }
   async start(persona) {
@@ -52,6 +65,10 @@ const Lobby = class {
       this.streams.push(info);
       // what we found
       console.log(info);
+      // if (myself.shouldCall(meta.call)) {
+      //   console.log('CALLING', meta.call);
+      //   myself.doCall(meta.call);
+      // }
     }
   }
 };

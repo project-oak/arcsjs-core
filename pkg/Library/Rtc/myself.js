@@ -54,7 +54,7 @@ export const myself = {
     }
     return !calls[them];
   },
-  doCall(them, onstream) {
+  doCall(them) {
     const metadata = {
       id: myself.name,
       call: myself.nid

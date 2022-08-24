@@ -1,5 +1,5 @@
 ({
-render({frequency, stream}, {version}) {
+render({frequency, stream}, {}) {
   return {
     frequency,
     stream,
@@ -26,6 +26,13 @@ template: html`
   }
   video-view, image-resource {
     object-fit: contain;
+  }
+  [toolbar] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: transparent;
+    border: 1px solid black;
   }
 </style>
 

@@ -1,3 +1,4 @@
+import '../App/resources.js';
 import '../Dom/modal-view.js';
 import '../Dom/fancy-image.js';
 import '../Dom/code-mirror/code-mirror.js';
