@@ -13,7 +13,7 @@ import {NodebaseRecipe} from './Library/NodebaseRecipe.js';
 import {logFactory} from '../core/utils.min.js';
 import '../Library/App/surface-imports.js';
 
-const log = logFactory(true, 'LobbyApp', 'navy');
+const log = logFactory(true, 'Nodebase', 'navy');
 
 //App.Paths.add({$here: App.Paths.getAbsoluteHereUrl(import.meta)});
 
@@ -23,5 +23,6 @@ export const NodebaseApp = class extends App {
     super(paths);
     //this.persistor = FissionPersistor;
     this.userAssembly = [NodebaseRecipe];
+    log('Welcome to Nodebase!');
   }
 };

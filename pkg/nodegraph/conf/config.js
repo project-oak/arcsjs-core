@@ -1,13 +1,13 @@
 globalThis.config = {
-  localArcsjs: true,
-  aeon: 'support-noder/0.0.1',
-  meta: 'support-noder',
+  aeon: 'nodegraph/0.4.0',
+  meta: 'nodegraph',
   theme: 'dark',
   logFlags: {
     app: true,
     //recipe: true,
     //arc: true,
     particles: true,
+    storage: true,
     //surfaces: true,
     //services: true
   }

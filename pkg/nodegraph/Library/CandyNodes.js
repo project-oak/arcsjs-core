@@ -6,9 +6,6 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Paths} from '../../arcsjs-core.js';
-
-const nodegraph = Paths.resolve('$app/nodegraph');
 
 export const Sugar = {
   $meta: {
@@ -24,7 +21,7 @@ export const Sugar = {
   Sugar: {
     $kind: '$library/Media/OutputImage',
     $staticInputs: {
-      image: {url: `${nodegraph}/assets/glucose.png`}
+      image: {url: `assets/glucose.png`}
     },
     $outputs: ['sugar']
   }
@@ -47,7 +44,7 @@ export const Melting = {
     }
   },
   melting: {
-    $kind: '$app/nodegraph/Library/Noop',
+    $kind: '$app/Library/Noop',
     $inputs: ['candy'],
     $outputs: ['sugar']
   }
@@ -71,7 +68,7 @@ export const Lollipop = {
   sweet: {
     $kind: '$library/Media/OutputImage',
     $staticInputs: {
-      image: {url: `${nodegraph}/assets/lollipop.png`}
+      image: {url: `assets/lollipop.png`}
     },
     $inputs: ['sugar'],
     $outputs: ['candy']
@@ -105,7 +102,7 @@ export const CottonCandy = {
   CottonCandy: {
     $kind: '$library/Media/OutputImage',
     $staticInputs: {
-      image: {url: `${nodegraph}/assets/cottoncandy.png`}
+      image: {url: `assets/cottoncandy.png`}
     },
     $inputs: ['sugar'],
     $outputs: ['candy']

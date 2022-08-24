@@ -6,8 +6,14 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import './conf/support.js';
-import {NodegraphApp} from './Library/NodegraphApp.js';
+import './conf/config.js';
+import {paths} from './conf/allowlist.js';
+import {NodegraphApp} from './NodegraphApp.js';
 
 // spin up application instance
-await (globalThis.App = new NodegraphApp()).spinup();
+try {
+  const app = globalThis.app = new NodegraphApp(paths);
+  await app.spinup();
+} catch(x) {
+  console.error(x);
+}
