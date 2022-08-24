@@ -7,10 +7,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import {App} from '../Library/App/Worker/App.js';
-import {RecipeService} from '../Library/Arcs/RecipeService.js';
-import {StoreUpdateService} from '../Library/Arcs/StoreUpdateService.js';
 import {NodebaseRecipe} from './Library/NodebaseRecipe.js';
-import {LocalStoragePersistor} from '../Library/LocalStorage/LocalStoragePersistor.js';
+// import {LocalStoragePersistor} from '../Library/LocalStorage/LocalStoragePersistor.js';
 // import {FissionPersistor} from '../Library/Fission/FissionPersistor.js';
 import {logFactory} from '../core/utils.min.js';
 import '../Library/App/surface-imports.js';
@@ -24,7 +22,6 @@ export const NodebaseApp = class extends App {
   constructor(paths) {
     super(paths);
     //this.persistor = FissionPersistor;
-    this.services = [RecipeService, StoreUpdateService];
     this.userAssembly = [NodebaseRecipe];
   }
 };
