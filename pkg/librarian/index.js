@@ -7,14 +7,11 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
+import {paths} from './conf/allowlist.js';
 import {LibrarianApp} from './LibrarianApp.js';
 
 try {
-  const app = new LibrarianApp({
-    $arcs: './arcs.js',
-    $library: '../Library',
-    $app: '.'
-  });
+  const app = new LibrarianApp(paths); 
   await app.spinup();
 } catch(x) {
   console.error(x);

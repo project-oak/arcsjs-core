@@ -21,7 +21,7 @@ const LibrarianRecipe = {
     }
   },
   librarian: {
-    $kind: './Library/Librarian.js',
+    $kind: '$app/Library/Librarian.js',
     $inputs: ['library'],
     $outputs: ['library']
   }
@@ -74,7 +74,7 @@ export const LibrarianApp = class extends App {
 };
 
 const makeEditorParticleMeta = props => ({
-  kind: './Library/Editor.js',
+  kind: '$app/Library/Editor.js',
   container: 'librarian#editors',
   staticInputs: {
     name: props?.name ?? makeName(),
