@@ -43,7 +43,7 @@ updateNodes({pipeline, selectedNode, nodeTypes, customInspectors, inspectorData,
 },
 
 hasSameNode(node, nodes) {
-  const nodeInNodes = nodes.find(n => n.name === node.name);
+  const nodeInNodes = nodes.find(({key}) => key === node.key);
   return nodeInNodes && JSON.stringify(nodeInNodes) === JSON.stringify(node);
 },
 
