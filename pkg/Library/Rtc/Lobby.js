@@ -77,7 +77,6 @@
   <span>{{name}}</span>'s Lobby
 </div>
 <hr>
-<div label2>Users in Lobby:</div>
 <div tvs flex scrolling row repeat="video_t">{{tvs}}</div>
 
 <template video_t>
