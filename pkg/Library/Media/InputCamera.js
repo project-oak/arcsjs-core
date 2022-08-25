@@ -24,6 +24,9 @@ template: html`
     color: #eee;
     overflow: hidden;
   }
+  [rows] {
+    position: relative;
+  }
   video-view, image-resource {
     object-fit: contain;
   }
