@@ -92,8 +92,8 @@ export class StreamView extends Xen.Async {
 <style>
   :host {
     display: flex;
-    min-width: 160px;
-    min-height: 120px;
+    /* min-width: 160px;
+    min-height: 120px; */
     font-size: 10px;
     color: black;
     background-color: black;
