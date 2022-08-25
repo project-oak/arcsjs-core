@@ -56,6 +56,14 @@ export class XenComposer extends Composer {
     dom('style', {innerHTML: css}, root);
     return slot;
   }
+  maybeReattachSlot(slot, container) {
+    if (!slot.root.isConnected) {
+      const parent = this.findContainer(container);
+      if (parent) {
+        parent.appendChild(slot.root.host);
+      }
+    }
+  }
   clearSlot(slot) {
     slot.root.host.remove();
   }
