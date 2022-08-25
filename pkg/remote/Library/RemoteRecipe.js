@@ -14,29 +14,39 @@ export const RemoteRecipe = {
   },
   $stores: {
     persona: {$type: 'Persona'},
-    remoteStream: {$type: 'Stream'}
+    remoteStream: {$type: 'Stream'},
+    showFlyout: {$type: 'Boolean'}
   },
   stream: {
     $kind: '$library/Media/MediaStream'
   },
   flyout: {
-    $kind: '$library/Layout/FlyOut'
+    $kind: '$library/Layout/FlyOut',
+    $inputs: [{show: 'showFlyout'}],
+    $outputs: [{show: 'showFlyout'}],
+    $slots: {
+      flyout: {
+        profile: {
+          $kind: '$library/User/Profile'
+        }
+      }
+    }
   },
   remote: {
     $kind: '$app/Library/Remote',
+    $inputs: ['showFlyout'],
+    $outputs: ['showFlyout'],
     $slots: {
       devices: DeviceUxRecipe,
       camera: {
         camera: {
           $kind: '$library/Media/InputCamera',
-          //$kind: '$app/Library/Tv',
           $staticInputs: {stream: 'default'}
         }
       },
       tv: {
         tv: {
           $kind: '$library/Media/InputCamera',
-          //$kind: '$app/Library/Tv',
           $inputs: [{stream: 'remoteStream'}]
         }
       }
