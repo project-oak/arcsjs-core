@@ -25,6 +25,7 @@ template: html`
     flex: 1 !important;
   } */
   [frame=camera] {
+    display: none !important;
     position: absolute;
     border: 1px solid silver;
     padding: 8px;

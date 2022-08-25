@@ -30,19 +30,19 @@ template: html`
   video-view, image-resource {
     object-fit: contain;
   }
-  [toolbar] {
+  /* [toolbar] {
     position: absolute;
     top: 0;
     left: 0;
     background: transparent;
     border: 1px solid black;
-  }
+  } */
 </style>
 
 <div flex rows>
-  <div toolbar>
+  <!-- <div toolbar>
     <icon>videocam</icon>
-  </div>
+  </div> -->
   <stream-view flex show$="{{videoNotImage}}" stream="{{stream}}" frequency="{{frequency}}" on-canvas="onCanvas"></stream-view>
   <image-resource center flex hide$="{{videoNotImage}}" image="{{image}}"></image-resource>
 </div>

@@ -43,7 +43,7 @@ template: html`
     height: 100%;
   }
 </style>
-<div>{{stream}}</div>
+<!-- <div>{{stream}}</div> -->
 <stream-view stream="{{stream}}"></stream-view>
 `
 });

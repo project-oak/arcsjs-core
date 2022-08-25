@@ -32,7 +32,7 @@
     return streams;
   },
   render(inputs, {persona, streams}) {
-    const tvs = values(streams || {}).map(({stream, meta: {name}}) => ({stream, name})) ;
+    const tvs = values(streams || {}).map(({stream, meta: {name}}) => ({stream, name})).reverse();
     return {
       name: persona,
       tvs
@@ -65,13 +65,13 @@
 <div tvs flex scrolling row repeat="video_t">{{tvs}}</div>
 
 <template video_t>
-  <div style="width:240px; margin: 4px;">
+  <div column style="width: 240px; margin: 4px;">
     <div bar>
       <span style="font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{name}}</span>
       <span flex></span>
-      <icon>close</icon>
+      <icon key="{{name}}" on-click="onCloseClick">close</icon>
     </div>
-    <stream-view playsinline muted stream="{{stream}}"></stream-view>
+    <stream-view flex playsinline muted stream="{{stream}}"></stream-view>
   </div>
 </template>
 `
