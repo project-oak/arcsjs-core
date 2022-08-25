@@ -53,6 +53,7 @@ export class Composer {
       this.slots[id] = slot;
     }
     if (slot && model) {
+      this.maybeReattachSlot(slot, container);
       slot.set(model);
       this.processPendingPackets();
     }
