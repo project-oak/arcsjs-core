@@ -7,14 +7,43 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-  async initialize({pipelines}, state, {service}) {
-    const pipelineName = await service({kind: 'HistoryService', msg: 'retrieveSelectedPipeline'});
-    const pipeline = this.findPipelineByName(pipelineName, pipelines);
+  async initialize({pipelines}, state, {service, output}) {
+    pipelines = await this.backwardCompatibilityPipelines(pipelines, {service, output});
+    const pipeline = await this.retrieveSelectedPipeline(pipelines, service);
     if (pipeline) {
       return {pipeline};
     } else {
       service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: null}});
     }
+  },
+  async retrieveSelectedPipeline(pipelines, service) {
+    const pipelineId = await service({kind: 'HistoryService', msg: 'retrieveSelectedPipeline'});
+    let pipeline = this.findPipelineById(pipelineId, pipelines);
+    if (!pipeline) {
+      pipeline = await this.backwardCompatibilitySelectedPipeline(pipelineId, pipelines, service);
+    }
+    return pipeline;
+  },
+  async backwardCompatibilityPipelines(pipelines, {service, output}) {
+    // Prior to 0.4.0 pipelines were created with `name` only.
+    // This method backfills missing unique ids.
+    if (pipelines?.some(({$meta}) => !$meta.id)) {
+      pipelines = await Promise.all(pipelines.map(async p => {
+        p.$meta.id = p.$meta.id || await this.makeUniqueId(pipelines, service);
+        return p;
+      }));
+      await output({pipelines});
+    }
+    return pipelines;
+  },
+  async backwardCompatibilitySelectedPipeline(name, pipelines, service) {
+    // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
+    // This method selects pipeline by name found in the URL param.
+    const pipeline = this.findPipelineByName(name, pipelines);
+    if (pipeline) {
+      await service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: pipeline.$meta?.id}});
+    }
+    return pipeline;
   },
   async update({pipeline, pipelines, publishPaths}, state, {service}) {
     if (publishPaths?.length > 0 && !state.selectedPublishKey) {
@@ -22,8 +51,8 @@
     }
     if (pipeline) {
       if (this.pipelineChanged(pipeline, state.pipeline)) {
-        if (state.pipeline?.$meta?.name !== pipeline.$meta?.name) {
-          await service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: pipeline.$meta?.name}});
+        if (state.pipeline?.$meta?.id !== pipeline.$meta?.id) {
+          await service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: pipeline.$meta?.id}});
         }
         state.pipeline = pipeline;
         return {
@@ -32,12 +61,8 @@
         };
       }
     } else {
-      pipeline = await this.makeNewPipeline(null, service);
       state.renaming = false;
-      return {
-        pipeline,
-        pipelines: [...(pipelines || []), pipeline]
-      };
+      return this.addNewPipeline(pipelines, /* name */null, service);
     }
   },
   pipelineChanged(pipeline, currentPipeline) {
@@ -50,9 +75,24 @@
     }
     return pipelines;
   },
-  async makeNewPipeline(name, service) {
-    name = (name ?? await service({msg: 'MakeName'})) || 'new pipeline';
-    return {$meta: {name}, nodes: []};
+  async addNewPipeline(pipelines, newName, service) {
+    const id = await this.makeUniqueId(pipelines, service);
+    const name = await this.makeNewName(newName, service);
+    const pipeline = {$meta: {name, id}, nodes: []};
+    return {
+      pipeline,
+      pipelines: [...(pipelines || []), pipeline]
+    };
+  },
+  async makeNewName(name, service) {
+    return (name ?? await service({msg: 'MakeName'})) || 'new pipeline';
+  },
+  async makeUniqueId(pipelines, service) {
+    let id = await service({msg: 'MakeId'});
+    while (this.findPipelineById(id, pipelines)) {
+      id = await service({msg: 'MakeId'});
+    }
+    return id;
   },
   render({pipeline, pipelines, publishPaths}, {renaming, selectedPublishKey}) {
     const isOwned = this.findPipelineIndex(pipeline, pipelines) >= 0;
@@ -69,19 +109,14 @@
     };
   },
   async onNew({pipelines}, state, {service}) {
-    const pipeline = await this.makeNewPipeline(null, service);
-    return {
-      pipeline,
-      pipelines: [...(pipelines || []), pipeline]
-    };
+    return this.addNewPipeline(pipelines, null, service);
   },
-  async onCloneClicked({pipeline, pipelines}) {
-    const clonedPipeline = await this.makeNewPipeline(`Copy of ${pipeline.$meta?.name}`);
-    clonedPipeline.nodes = [...pipeline?.nodes || []];
-    return {
-      pipeline: clonedPipeline,
-      pipelines: [...(pipelines || []), clonedPipeline]
-    };
+  async onCloneClicked({pipeline: currentPipeline, pipelines: currentPipelines}, state, {service}) {
+    if (currentPipeline) {
+      const {pipeline, pipelines} = await this.addNewPipeline(currentPipelines, `Copy of ${currentPipeline.$meta?.name}`, service);
+      pipeline.nodes = currentPipeline.nodes.map(node => ({...node}));
+      return {pipeline, pipelines};
+    }
   },
   async onDelete({pipeline, pipelines, publishPaths}) {
     const index = this.findPipelineIndex(pipeline, pipelines);
@@ -97,10 +132,12 @@
     };
   },
   onShare({pipeline, pipelines, publishPaths}, {selectedPublishKey}) {
-    const name = pipeline?.$meta?.name;
+    const id = pipeline?.$meta?.name;
     const value = pipeline?.json.replace(/\$/g, '*');
-    if (name && value && publishPaths[selectedPublishKey]) {
-      this.publishPipeline(publishPaths[selectedPublishKey], name, value);
+    if (id && value && publishPaths[selectedPublishKey]) {
+      // Backward compatibility for pipelines published in versions < 0.4:
+      this.unpublishPipeline(publishPaths[selectedPublishKey], pipeline.$meta.name, value);
+      this.publishPipeline(publishPaths[selectedPublishKey], id, value);
       if (!pipeline?.$meta.isPublished) {
         return this.updatePipelineMeta({isPublished: true}, pipeline, pipelines);
       }
@@ -108,22 +145,24 @@
   },
   onDontShare({pipeline, pipelines, publishPaths}) {
     for (const publishPath of values(publishPaths)) {
+      this.unpublishPipeline(publishPath, pipeline.$meta.id);
+      // Backward compatibility for pipelines published in versions < 0.4:
       this.unpublishPipeline(publishPath, pipeline.$meta.name);
     }
     return this.updatePipelineMeta({isPublished: false}, pipeline, pipelines);
   },
-  publishPipeline(publishPath, name, body) {
-    return fetch(this.makePublicPipelinesUrl(publishPath, name), {
+  publishPipeline(publishPath, id, body) {
+    return fetch(this.makePublicPipelinesUrl(publishPath, id), {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
       body
     });
   },
-  unpublishPipeline(path, name) {
-    return fetch(this.makePublicPipelinesUrl(path, name), {method: 'DELETE'});
+  unpublishPipeline(path, id) {
+    return fetch(this.makePublicPipelinesUrl(path, id), {method: 'DELETE'});
   },
-  makePublicPipelinesUrl(path, name) {
-    return `${path}${name}.json`;
+  makePublicPipelinesUrl(path, id) {
+    return `${path}${id}.json`;
   },
   onRenameClicked({}, state) {
     state.renaming = true;
@@ -149,7 +188,10 @@
     return {pipeline, pipelines};
   },
   findPipelineIndex(pipeline, pipelines) {
-    return pipelines?.findIndex(({$meta}) => $meta.name === pipeline?.$meta?.name);
+    return pipelines?.findIndex(({$meta}) => $meta.id === pipeline?.$meta?.id);
+  },
+  findPipelineById(id, pipelines) {
+    return pipelines?.find(({$meta}) => $meta.id === id);
   },
   findPipelineByName(name, pipelines) {
     return pipelines?.find(({$meta}) => $meta.name === name);

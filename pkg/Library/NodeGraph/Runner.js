@@ -148,8 +148,10 @@ findNodeByParticle(particleName, pipeline, recipes) {
 },
 
 getParticleNamesForNode(node, pipeline, recipes) {
-  const fullNodeKey = this.encodeFullNodeKey(node, pipeline);
-  return this.getParticleNames(recipes[fullNodeKey]);
+  if (pipeline) {
+    const fullNodeKey = this.encodeFullNodeKey(node, pipeline);
+    return this.getParticleNames(recipes[fullNodeKey]);
+  }
 },
 
 encodeFullNodeKey({key}, {$meta}) {
