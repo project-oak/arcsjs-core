@@ -30,8 +30,9 @@ template: html`
     padding: 8px;
     top: 32px;
     right: 8px;
-    width: 120px;
-    height: 90px;
+    width: 240px;
+    height: 180px;
+    overflow: hidden;
   }
 </style>
 <div frame="devices"></div>

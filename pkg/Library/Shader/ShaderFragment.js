@@ -14,7 +14,8 @@
     if (shader !== state.shader) {
       state.shader = shader;
       if (shader) {
-        state.shaderId = await service({kind: 'ShaderService', msg: 'makeShader', data: {shader, shaderId: state.shaderId}});
+        state.shaderId = await service({kind: 'ShaderService', msg: 'makeShader',
+          data: {shader, shaderId: state.shaderId}});
       } else {
         state.shaderId = null;
       }
@@ -27,11 +28,6 @@
       await this.shaderize(state.shaderId, inputs, output, service);
       return {output};
     }
-    // if (inputs.input?.json !== state.input?.json || inputs.shader !== state.shader) {
-    //   state.shader = inputs.shader;
-    //   state.input = inputs.input;
-    //   return this.updateInput(inputs, state, {service});
-    // }
   },
   async shaderize(shaderId, {shader, image, image2, image3, image4}, output, service) {
     return service({

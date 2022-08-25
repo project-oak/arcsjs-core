@@ -12,11 +12,11 @@ export const uniformsFactory = () => ({
   iFrame: {value: 0},
   iChannelTime: {value: [0, 0, 0, 0]},
   iChannelResolution: {value: null},
-  // iMouse: {value: null},
   iChannel0: {value: null},
   iChannel1: {value: null},
   iChannel2: {value: null},
   iChannel3: {value: null},
+  // iMouse: {value: null},
   // iDate: {value: null},
   // iSampleRate: {value: 44100}
 });
@@ -42,6 +42,3 @@ void main() {
   mainImage(gl_FragColor, gl_FragCoord.xy);
 }
 `.trim();
-
-const defaultId = 'MdjBRy';
-//const defaultId = '4lccRB';

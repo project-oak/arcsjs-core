@@ -1,19 +1,14 @@
 ({
-async update({image, stream, frequency}, state, {output, service}) {
-  state.streaming = Boolean(stream);
-},
-render({frequency, image, stream}, {streaming, version}) {
+render({frequency, stream}, {}) {
   return {
     frequency,
     stream,
-    videoNotImage: Boolean(streaming).toString(),
-    image
+    videoNotImage: Boolean(stream).toString()
   };
 },
-onCanvas({eventlet: {value: ref}, image}) {
+onCanvas({eventlet: {value: ref}}) {
   return {
     image: {
-      //...image,
       canvas: ref,
       version: Math.random()
     }
@@ -28,11 +23,16 @@ template: html`
     background-color: black;
     color: #eee;
     overflow: hidden;
-    width: 240px;
-    height: 300px;
   }
   video-view, image-resource {
     object-fit: contain;
+  }
+  [toolbar] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: transparent;
+    border: 1px solid black;
   }
 </style>
 

@@ -28,12 +28,15 @@ export const RemoteRecipe = {
       devices: DeviceUxRecipe,
       camera: {
         camera: {
-          $kind: '$library/Media/InputCamera'
+          $kind: '$library/Media/InputCamera',
+          //$kind: '$app/Library/Tv',
+          $staticInputs: {stream: 'default'}
         }
       },
       tv: {
         tv: {
-          $kind: '$app/Library/Tv',
+          $kind: '$library/Media/InputCamera',
+          //$kind: '$app/Library/Tv',
           $inputs: [{stream: 'remoteStream'}]
         }
       }
