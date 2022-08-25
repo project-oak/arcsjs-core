@@ -25,8 +25,7 @@
     return pipeline;
   },
   async backwardCompatibilityPipelines(pipelines, {service, output}) {
-    // Prior to 0.4.0 pipelines were created with `name` only.
-    // This method backfills missing unique ids.
+    // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
     if (pipelines?.some(({$meta}) => !$meta.id)) {
       pipelines = await Promise.all(pipelines.map(async p => {
         p.$meta.id = p.$meta.id || await this.makeUniqueId(pipelines, service);
