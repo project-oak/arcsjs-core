@@ -10,53 +10,37 @@
 import {Paths} from '../utils/paths.js';
 import {Runtime} from '../Runtime.js';
 import {logFactory} from '../utils/log.js';
-import {/*requireParticleBaseCode,*/ requireParticleImplCode, pathForKind} from './code.js';
+import {deepEqual} from '../utils/object.js';
+import {requireParticleImplCode, pathForKind} from './code.js';
 
-//import {Paths, Runtime, logFactory} from '../../arcsjs-core.js';
-//import {/*requireParticleBaseCode,*/ requireParticleImplCode, pathForKind} from '../../arcsjs-core.js';
-
-//const requiredLog = logFactory(true, 'vanilla', 'goldenrod');
-const log = logFactory(logFactory.flags.ses, 'vanilla', 'goldenrod');
+const log = logFactory(logFactory.flags.isolation, 'vanilla', 'goldenrod');
 
 const harden = object => object;
+
 globalThis.harden = harden;
 globalThis.scope = {
   harden
 };
 
-//const {lockdown, Compartment} = globalThis as unknown as {lockdown, Compartment};
-
 const makeKey = () => `i${Math.floor((1 + Math.random() * 9) * 1e14)}`;
 const timeout =  async (func, delayMs) => new Promise(resolve => setTimeout(() => resolve(func()), delayMs));
 
-//let particleCompartment;
-
 export const initVanilla = (options?) => {
-  // if (!particleCompartment) {
-  //   const debugOptions = {
-  //     consoleTaming: 'unsafe',
-  //     errorTaming: 'unsafe',
-  //     errorTrapping: 'unsafe',
-  //     stackFiltering: 'verbose'
-  //   };
-    // const prodOptions = {};
-    // requiredLog.groupCollapsed('LOCKDOWN');
-    try {
-      // lockdown(debugOptions || prodOptions);
-      const utils = {log, resolve, html, makeKey, timeout};
-      const scope = {
-        // default injections
-        ...utils,
-        // app injections
-        ...options?.injections,
-      };
-      Object.assign(globalThis.scope, scope);
-      Object.assign(globalThis, scope);
-      //requiredLog.log('Particle Compartment ready');
-    } finally {
-      //requiredLog.groupEnd();
-    }
-  // }
+  // requiredLog.groupCollapsed('LOCKDOWN');
+  try {
+    log(deepEqual);
+    const utils = {log, resolve, html, makeKey, deepEqual, timeout};
+    const scope = {
+      // default injections
+      ...utils,
+      // app injections
+      ...options?.injections,
+    };
+    Object.assign(globalThis.scope, scope);
+    Object.assign(globalThis, scope);
+  } finally {
+    /**/
+  }
 };
 
 const resolve = Paths.resolve.bind(Paths);
@@ -89,13 +73,6 @@ const requireImplFactory = async (kind, options) => {
   // snatch up the custom particle code
   const implCode = await requireParticleImplCode(kind, options);
   let factory = (0, eval)(implCode);
-  // try {
-  //   // evaluate in compartment
-  //   factory = particleCompartment.evaluate(implCode);
-  // } catch(x) {
-  //   log.error('failed to evaluate:', implCode);
-  //   throw x;
-  // }
   // if it's an object
   if (typeof factory === 'object') {
     // repackage the code to eliminate closures
@@ -160,16 +137,6 @@ const collectDecls = factory => {
     rewriteFuncs
   };
 };
-
-// let privateCtor;
-
-// const requireParticle = async () => {
-//   if (!privateCtor) {
-//     const baseCode = await requireParticleBaseCode();
-//     privateCtor = (0, eval)(baseCode);
-//   }
-//   return privateCtor;
-// };
 
 const createLogger = kind => {
   const _log = logFactory(logFactory.flags.particles, kind, '#002266');

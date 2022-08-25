@@ -6,6 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
+/* global scope */
 ({
 
 connectorDelimiter: '$$',
@@ -29,6 +30,17 @@ nodesDidChange(nodes, currentNodes) {
   return true;
 },
 
+hasSameNode(node, nodes) {
+  const nodeInNodes = nodes.find(n => n.key === node.key);
+  if (nodeInNodes) {
+    if (scope.deepEqual(nodeInNodes, node)) {
+      return true;
+    }
+  }
+  log('hasSameNode: FALSE:', nodeInNodes, node);
+  return false;
+},
+
 updateNodes({pipeline, selectedNode, nodeTypes, customInspectors, inspectorData, globalStores}) {
   pipeline.nodes = pipeline.nodes.map(node => this.updateNodeConnectionCandidates(node, pipeline, nodeTypes, globalStores));
   const recipes = pipeline.nodes
@@ -40,11 +52,6 @@ updateNodes({pipeline, selectedNode, nodeTypes, customInspectors, inspectorData,
     recipes,
     selectedNode: pipeline.nodes.find(n => n.key === selectedNode?.key),
   };
-},
-
-hasSameNode(node, nodes) {
-  const nodeInNodes = nodes.find(({key}) => key === node.key);
-  return nodeInNodes && JSON.stringify(nodeInNodes) === JSON.stringify(node);
 },
 
 updateNodeConnectionCandidates(node, pipeline, nodeTypes, globalStores) {
