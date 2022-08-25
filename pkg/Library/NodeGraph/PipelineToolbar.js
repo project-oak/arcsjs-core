@@ -7,7 +7,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-  async initialize({pipelines}, state, {service}) {
+  async initialize({pipelines}, state, {service, output}) {
+    pipelines = await this.backwardCompatibilityPipelines(pipelines, {service, output});
     const pipelineName = await service({kind: 'HistoryService', msg: 'retrieveSelectedPipeline'});
     const pipeline = this.findPipelineByName(pipelineName, pipelines);
     if (pipeline) {
@@ -15,6 +16,17 @@
     } else {
       service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: null}});
     }
+  },
+  async backwardCompatibilityPipelines(pipelines, {service, output}) {
+    // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
+    if (pipelines?.some(({$meta}) => !$meta.id)) {
+      pipelines = await Promise.all(pipelines.map(async p => {
+        p.$meta.id = p.$meta.id || await this.makeUniqueId(pipelines, service);
+        return p;
+      }));
+      await output({pipelines});
+    }
+    return pipelines;
   },
   async update({pipeline, pipelines, publishPaths}, state, {service}) {
     if (publishPaths?.length > 0 && !state.selectedPublishKey) {
@@ -32,12 +44,8 @@
         };
       }
     } else {
-      pipeline = await this.makeNewPipeline(null, service);
       state.renaming = false;
-      return {
-        pipeline,
-        pipelines: [...(pipelines || []), pipeline]
-      };
+      return this.addNewPipeline(pipelines, /* name */null, service);
     }
   },
   pipelineChanged(pipeline, currentPipeline) {
@@ -50,9 +58,24 @@
     }
     return pipelines;
   },
-  async makeNewPipeline(name, service) {
-    name = (name ?? await service({msg: 'MakeName'})) || 'new pipeline';
-    return {$meta: {name}, nodes: []};
+  async addNewPipeline(pipelines, newName, service) {
+    const id = await this.makeUniqueId(pipelines, service);
+    const name = await this.makeNewName(newName, service);
+    const pipeline = {$meta: {name, id}, nodes: []};
+    return {
+      pipeline,
+      pipelines: [...(pipelines || []), pipeline]
+    };
+  },
+  async makeNewName(name, service) {
+    return (name ?? await service({msg: 'MakeName'})) || 'new pipeline';
+  },
+  async makeUniqueId(pipelines, service) {
+    let newId = await service({msg: 'MakeId'});
+    while (pipelines?.some(({$meta: {name, id}}) => (id || name) === newId)) {
+      newId = await service({msg: 'MakeId'});
+    }
+    return newId;
   },
   render({pipeline, pipelines, publishPaths}, {renaming, selectedPublishKey}) {
     const isOwned = this.findPipelineIndex(pipeline, pipelines) >= 0;
@@ -69,19 +92,14 @@
     };
   },
   async onNew({pipelines}, state, {service}) {
-    const pipeline = await this.makeNewPipeline(null, service);
-    return {
-      pipeline,
-      pipelines: [...(pipelines || []), pipeline]
-    };
+    return this.addNewPipeline(pipelines, null, service);
   },
-  async onCloneClicked({pipeline, pipelines}) {
-    const clonedPipeline = await this.makeNewPipeline(`Copy of ${pipeline.$meta?.name}`);
-    clonedPipeline.nodes = [...pipeline?.nodes || []];
-    return {
-      pipeline: clonedPipeline,
-      pipelines: [...(pipelines || []), clonedPipeline]
-    };
+  async onCloneClicked({pipeline: currentPipeline, pipelines: currentPipelines}, state, {service}) {
+    if (currentPipeline) {
+      const {pipeline, pipelines} = await this.addNewPipeline(currentPipelines, `Copy of ${currentPipeline.$meta?.name}`, service);
+      pipeline.nodes = currentPipeline.nodes.map(node => ({...node}));
+      return {pipeline, pipelines};
+    }
   },
   async onDelete({pipeline, pipelines, publishPaths}) {
     const index = this.findPipelineIndex(pipeline, pipelines);
