@@ -29,13 +29,13 @@ async fetchPublicPipelines({publicPipelinesUrl, pipelines}) {
   }
 },
 filterPublicPipelines(publicPipelines, pipelines) {
-if (Array.isArray(publicPipelines)) {
-  return publicPipelines.filter(({$meta: {name, id}}) => {
-    // Prior to 0.4.0 pipelines were created with `name` only.
-    // Filtering by `name` (in addition to filtering by `id`) is done for backward compabitility.
-    return !this.findPipelineById(id, pipelines) && !this.findPipelineByName(name, pipelines);
-  });
-}
+  if (Array.isArray(publicPipelines)) {
+    return publicPipelines.filter(({$meta: {name, id}}) => {
+      // Prior to 0.4.0 pipelines were created with `name` only.
+      // Filtering by `name` (in addition to filtering by `id`) is done for backward compabitility.
+      return !this.findPipelineById(id, pipelines) && !this.findPipelineByName(name, pipelines);
+    });
+  }
 },
 render({pipeline, pipelines}, {publicPipelines}) {
   const separator = {name: '_________________', selected: false, isDisabled: true};
