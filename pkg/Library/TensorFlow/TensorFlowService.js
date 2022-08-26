@@ -7,7 +7,7 @@
 import {logFactory} from '../core.js';
 import {Resources} from '../App/Resources.js';
 import {ThreejsService} from '../Threejs/ThreejsService.js';
-import {requireImage, allocateResource} from '../Media/ImageLoader.js';
+import {requireImage} from '../Media/ImageLoader.js';
 
 const log = logFactory(logFactory.flags.TensorFlowService, 'TensorFlowService', 'coral');
 
@@ -338,7 +338,7 @@ export class TensorFlowService  {
           existingDepthMap.toTensor().dispose();
         }
       }
-      const depthMapId = existingDepthMapId || allocateResource();
+      const depthMapId = existingDepthMapId || Resources.newId();
       Resources.set(depthMapId, {
         toTensor: () => outputTensor
         // TODO(jingjin): implement other DepthMap interface methods as needed.

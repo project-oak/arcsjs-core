@@ -16,12 +16,7 @@
       scope.timeout(invalidate, 3*1e3);
     }
     state.streams = await this.updateStreams({returnStream}, state, {service});
-    const lastStream = state?.streams[state.streams?.length-1]?.stream;
-    if (lastStream !== stream) {
-      return {
-        stream: lastStream
-      };
-    }
+    return this.getOutputTranche(state.streams);
   },
   async updateStreams({returnStream}, {streams, lobby, persona}, {service}) {
     const newStreams = await service({kind: 'LobbyService', msg: 'meetStrangers', data: {lobby, persona, returnStream}});
@@ -30,6 +25,15 @@
       ...(newStreams || [])
     ];
     return streams;
+  },
+  getOutputTranche(streams) {
+    const tranche = streams.length > 4 ? streams.slice(0, -4) : streams;
+    return {
+      stream: tranche[0],
+      stream1: tranche[1],
+      stream2: tranche[2],
+      stream3: tranche[3]
+    };
   },
   render(inputs, {persona, streams}) {
     const tvs = values(streams || {}).map(({stream, meta: {name}}) => ({stream, name})).reverse();

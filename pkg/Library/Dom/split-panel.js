@@ -13,39 +13,65 @@ const template = Xen.Template.html`
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: column;
   }
   [resizer] {
+    border-top: 1px solid #ffffff;
+    border-bottom: 1px solid #e6e6e6;
+    /*
     width: 7px;
-    /* height: 100%; */
+    cursor: ew-resize;
+    */
+    height: 7px;
+    cursor: ns-resize;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: ew-resize;
   }
   [resizer]:hover,
   [resizer][dragging] {
     background-color: #e6e6e6;
   }
   [handle] {
-    width: 2px;
-    height: 12px;
+    width: 12px;
+    height: 2px;
+    /* width: 2px;
+    height: 12px; */
     background-color: #ccc;
     border: 1px solid white;
   }
   [startside] {
-    min-width: 16px;
+    min-height: 16px;
+    /* min-width: 16px; */
+  }
+  [startside], [endside] {
+    display: flex;
+    flex-direction: column;
+  }
+  [flex] {
+    flex: 1;
+    flex-basis: 0px;
+    overflow: hidden;
   }
 </style>
 
-<div startside xen:style="{{startStyle}}"></div>
+<div startside xen:style="{{startStyle}}" frame="startside">
+  <slot name="startside"></slot>
+</div>
 <div resizer dragging$="{{dragging}}" on-pointerdown="onDown">
   <div handle></div>
 </div>
-<div endside flex></div>
+<div endside flex frame="endside">
+  <slot name="endside"></slot>
+</div>
 
 `;
 
 export class SplitPanel extends DragDrop {
+  static get observedAttributes() {
+    return ['divider'];
+  }
+
   get template() {
     return template;
   }
@@ -57,18 +83,26 @@ export class SplitPanel extends DragDrop {
       window.removeEventListener('pointerup', this.upListener);
       this.mergeState({dragging: false});
     };
+    const ss = this._dom.$('[startside]');
+    ss.setAttribute('flex', '');
+    setTimeout(() => {
+      //this.mergeState({divider: ss.offsetWidth});
+      this.mergeState({divider: ss.offsetHeight});
+      ss.removeAttribute('flex');
+    }, 10);
   }
 
-  update({}, state) {
-    if (!state.divider) {
-      state.divider = 120;
-    }
-  }
+  // update({divider}, state) {
+  //   if (!state.divider && d) {
+  //     state.divider = divider || 120;
+  //   }
+  // }
 
   render({}, {divider, dragging}) {
     return {
       startStyle: {
-        width: `${divider}px`
+        height: `${divider}px`
+        // width: `${divider}px`
       },
       dragging
     };
@@ -77,17 +111,21 @@ export class SplitPanel extends DragDrop {
   // implement drag-drop handlers to support resizing the image grid.
   doDown(e) {
     e.stopPropagation();
-    document.body.style.cursor = 'ew-resize';
-    // this.state.imageGridWidth = this.state.imageGrid.offsetWidth;
-    document.addEventListener('pointerup', this.upListener);
-    this.mergeState({dragging: true, dividerStart: this.state.divider});
+    document.body.style.cursor = 'ns-resize';
+    //document.body.style.cursor = 'ew-resize';
+    window.addEventListener('pointerup', this.upListener);
+    this.mergeState({
+      dragging: true,
+      dividerStart: this.state.divider
+    });
   }
 
   doMove(dx, dy) {
-    const divider = this.state.dividerStart + dx;
-    this.mergeState({divider});
-    //const newWidth = DragDrop.grid(this.state.imageGridWidth + dx, 8);
-    //this.state.imageGrid.style.width = `${Math.max(newWidth, 8)}px`;
+    //const d = dx;
+    const d = dy;
+    this.mergeState({
+      divider: this.state.dividerStart + d
+    });
   }
 }
 customElements.define('split-panel', SplitPanel);

@@ -6,18 +6,20 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
+
 const tryst = `https://arcsjs-apps.firebaseio.com/tryst`;
 
 export const meetStrangers = async (aeon, nid, meta) => {
+  const root = `${tryst}${aeon ? `/${aeon}` : ''}/beacons`;
   // first get all beacons
-  let beacons = await fetchBeacons(aeon);
-  // one-pass gambit: beacons are erased periodically, so stale beacons do not reappear
-  // TODO(sjmiles): still need a way to clear stale messages
+  let beacons = await fetchBeacons(root);
+  // one-pass gambit: beacons are erased periodically,
+  // so stale beacons do not reappear
   if (Math.random() < 0.1) {
-    await clearBeacons();
+    await clearBeacons(root);
   }
-  // ensure our beacon exists at larege
-  await placeBeacon(nid, meta);
+  // ensure our beacon exists at large
+  await placeBeacon(root, nid, meta);
   // clean input
   if (beacons) {
     // don't need ours
@@ -28,21 +30,27 @@ export const meetStrangers = async (aeon, nid, meta) => {
   return beacons;
 };
 
-const fetchBeacons = async () => {
-  const res = await fetch(`${tryst}/aeon/beacons.json`);
+const fetchBeacons = async root => {
+  return getJson(`${root}.json`);
+};
+
+const clearBeacons = async (root) => {
+  return putJson(`${root}.json`, {});
+};
+
+const placeBeacon = async (root, nid, meta) => {
+  await putJson(`${root}/${nid}.json`, meta);
+};
+
+const getJson = async url => {
+  const res = await fetch(url);
   return res.json();
 };
 
-const clearBeacons = async () => {
-  return put(`${tryst}/beacons.json`, {});
-};
-
-const placeBeacon = async (nid, meta) => {
-  await put(`${tryst}/beacons/${nid}.json`, meta);
-};
-
-const put = async (url, body) => {
-  const method = 'PUT';
-  const headers = {'Content-Type': 'application/json'};
-  return fetch(url, {method, headers, body: JSON.stringify(body)});
+const putJson = async (url, body) => {
+  return fetch(url, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body)
+  });
 };
