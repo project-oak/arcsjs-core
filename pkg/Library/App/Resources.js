@@ -7,19 +7,28 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
+import {makeId} from '../core.js';
+
 const resources = {};
 
 export const Resources = {
-  new() {
-    return Math.floor(Math.random()*1e3 + 9e2);
+  newId() {
+    return makeId(4, 4, '-');
   },
   get(id) {
-    return resources?.[id];
+    return resources[id];
   },
   set(id, resource) {
     resources[id] = resource;
+    return id;
   },
   free(id) {
-    this.set(id, null);
+    Resources.set(id, null);
+  },
+  allocate(resource) {
+    return Resources.set(Resources.newId(), resource);
+  },
+  all() {
+    return resources;
   }
 };

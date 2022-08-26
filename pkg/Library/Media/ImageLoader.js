@@ -6,12 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Resources} from '../App/resources.js';
-import {utils} from '../core.js';
-
-export const allocateResource = () => {
-  return utils.makeId(3, 2, '-');
-};
+import {Resources} from '../App/Resources.js';
 
 export const incrementVersion = version => (Number(version) || 0) + 1;
 
@@ -21,7 +16,7 @@ export const incrementVersion = version => (Number(version) || 0) + 1;
  * @returns the canvas or an HTMLImageElement.
  */
 export async function requireImage(data) {
-  const imagePromise = Resources[data?.canvas] ?? loadImage(data?.url);
+  const imagePromise = Resources.get(data?.canvas) ?? loadImage(data?.url);
   if (imagePromise) {
     const image = await imagePromise;
     return image;
@@ -35,9 +30,7 @@ export const allocateCanvas = async () => {
   const realCanvas = d.body.appendChild(Object.assign(d.createElement('canvas'), {
     style: 'display: none; width: 240px; height: 180px;'
   }));
-  const id = allocateResource();
-  Resources[id] = realCanvas;
-  return id;
+  return Resources.allocate(realCanvas);
 };
 
 /**
