@@ -126,7 +126,11 @@ export class ContainerLayout extends DragDrop {
   updateOrders(target) {
     const particleDivs = this.querySelectorAll('[particle]');
     particleDivs.forEach(div => {
-      div.style.zIndex = (div === target ? 100 : 99);
+      if (!this.state.rects.find(rect => rect.id === div.id)) {
+        div.style.zIndex = 98;
+      } else {
+        div.style.zIndex = (div === target ? 100 : 99);
+      }
     });
   }
   // deselect when clicking empty backgroud
