@@ -68,14 +68,31 @@ updateNodeStoreConnections(node, pipeline, nodeTypes, globalStores) {
   nodeType?.$stores && entries(nodeType.$stores).forEach(([storeName, store]) => {
     if (store.connection) {
       const bindings = this.findStoreBindings(storeName, nodeType);
-      const candidates = this.findConnectionCandidates(storeName, store, bindings, node, pipeline, nodeTypes, globalStores);
+      const candidates = this.findConnectionCandidates(storeName, store, node, pipeline, nodeTypes, globalStores);
       connections[storeName] = {store, bindings, candidates};
     }
   });
+  if (!node.connections) {
+    this.initDefaultCandidates(connections);
+  }
   return connections;
 },
 
-findConnectionCandidates(storeName, {$type}, bindings, node, {nodes}, nodeTypes, globalStores) {
+initDefaultCandidates(connections) {
+  const used = new Set();
+  keys(connections).forEach(storeName => {
+    const {bindings, candidates} = connections[storeName];
+    if (candidates.length === 1 && bindings?.length > 0) {
+      const candidateId = this.constructStoreId(candidates[0]);
+      if (!used.has(candidateId)) {
+        candidates[0].selected = true;
+        used.add(candidateId);
+      }
+    }
+  });
+},
+
+findConnectionCandidates(storeName, {$type}, node, {nodes}, nodeTypes, globalStores) {
   if (this.findGlobalCandidate(storeName, globalStores)) {
     return [{from: 'global', store: storeName, type: $type, selected: true}];
   }
@@ -89,10 +106,6 @@ findConnectionCandidates(storeName, {$type}, bindings, node, {nodes}, nodeTypes,
       candidates.push(candidate);
     }
   });
-  // Set default connection.
-  if (!node.connections && candidates.length === 1 && bindings?.length > 0) {
-    candidates[0].selected = true;
-  }
   return candidates;
 },
 
