@@ -64,7 +64,7 @@ export const App = class {
 }
   async appService({request}) {
     const value = await this.onservice?.('user', 'host', request);
-    log('service:', request?.kind || '-', request?.msg, '=', value);
+    log('service:', `[${request?.kind || 'App'}]`, request?.msg, '=', value);
     return value;
   }
   dispatchServiceRequest({request}) {

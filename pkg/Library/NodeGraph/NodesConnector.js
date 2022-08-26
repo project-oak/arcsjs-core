@@ -101,7 +101,7 @@ findConnectionCandidates(storeName, {$type}, node, {nodes}, nodeTypes, globalSto
     const candidate = this.findCandidateInNode($type, n, nodeTypes);
     if (candidate && candidate.from !== node.key) {
       if (node.connections) {
-        candidate.selected = node.connections[storeName].candidates.find(({from, store}) => from === candidate.from && store === candidate.store)?.selected;
+        candidate.selected = node.connections[storeName]?.candidates.find(({from, store}) => from === candidate.from && store === candidate.store)?.selected;
       }
       candidates.push(candidate);
     }
