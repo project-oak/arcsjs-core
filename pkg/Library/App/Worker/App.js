@@ -9,7 +9,7 @@
 import {Arcs} from './Arcs.js';
 import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
-import {logFactory, makeName} from '../../../core/utils.min.js';
+import {logFactory, makeId, makeName} from '../../../core/utils.min.js';
 
 // n.b. lives in 'top' context
 
@@ -43,6 +43,9 @@ export const App = class {
       case 'makeName':
       case 'MakeName':
         return makeName();
+      case 'makeId':
+      case 'MakeId':
+        return makeId(3, 4);
     }
     switch (request?.type) {
       case 'persist':

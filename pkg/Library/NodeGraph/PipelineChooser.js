@@ -23,12 +23,19 @@ async fetchPublicPipelines({publicPipelinesUrl, pipelines}) {
       const text = await res.text();
       if (text) {
         const publicPipelines = values(JSON.parse(text.replace(/"\*/g, '"$')) ?? Object);
-        if (Array.isArray(publicPipelines)) {
-          return publicPipelines.filter(({$meta: {name}}) => !this.findPipelineByName(name, pipelines));
-        }
+        return this.filterPublicPipelines(publicPipelines, pipelines);
       }
     }
   }
+},
+filterPublicPipelines(publicPipelines, pipelines) {
+if (Array.isArray(publicPipelines)) {
+  return publicPipelines.filter(({$meta: {name, id}}) => {
+    // Prior to 0.4.0 pipelines were created with `name` only.
+    // Filtering by `name` (in addition to filtering by `id`) is done for backward compabitility.
+    return !this.findPipelineById(id, pipelines) && !this.findPipelineByName(name, pipelines);
+  });
+}
 },
 render({pipeline, pipelines}, {publicPipelines}) {
   const separator = {name: '_________________', selected: false, isDisabled: true};
@@ -43,15 +50,18 @@ render({pipeline, pipelines}, {publicPipelines}) {
 renderPipelines(pipelines, selectedName) {
   return !pipelines ? [] : pipelines?.map?.(({$meta}) => ({
     name: $meta?.name,
+    id: $meta?.id,
     isDisabled: false,
     isSelected: $meta?.name === selectedName
   }));
 },
 onSelect({eventlet: {value}, pipelines}, {publicPipelines}) {
-  log(`selected "${value}"`);
-  return {
-    pipeline: this.findPipelineByName(value, pipelines) || this.findPipelineByName(value, publicPipelines)
-  };
+  const pipeline = this.findPipelineById(value, pipelines) || this.findPipelineById(value, publicPipelines);
+  log(`selected "${value}" (${pipeline?.$meta.name})`);
+  return {pipeline};
+},
+findPipelineById(id, pipelines) {
+  return pipelines?.find?.(({$meta}) => $meta?.id === id);
 },
 findPipelineByName(name, pipelines) {
   return pipelines?.find?.(({$meta}) => $meta?.name === name);
@@ -77,7 +87,7 @@ template: html`
 </div>
 
 <template pipeline_t>
-  <option selected="{{isSelected}}" disabled="{{isDisabled}}">{{name}}</option>
+  <option selected="{{isSelected}}" value="{{id}}" disabled="{{isDisabled}}">{{name}}</option>
 </template>
   `
 });
