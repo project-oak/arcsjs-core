@@ -13,7 +13,7 @@
     if (pipeline) {
       return {pipeline};
     } else {
-      service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: null}});
+      this.updateSelectedPipelineHistory(null, service);
     }
   },
   async retrieveSelectedPipeline(pipelines, service) {
@@ -40,7 +40,7 @@
     // This method selects pipeline by name found in the URL param.
     const pipeline = this.findPipelineByName(name, pipelines);
     if (pipeline) {
-      await service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: pipeline.$meta?.id}});
+      await this.updateSelectedPipelineHistory(pipeline, service);
     }
     return pipeline;
   },
@@ -50,8 +50,8 @@
     }
     if (pipeline) {
       if (this.pipelineChanged(pipeline, state.pipeline)) {
-        if (state.pipeline?.$meta?.id !== pipeline.$meta?.id) {
-          await service({kind: 'HistoryService', msg: 'setSelectedPipeline', data: {pipeline: pipeline.$meta?.id}});
+        if (this.pipelineId(state.pipeline) !== this.pipelineId(pipeline)) {
+          await this.updateSelectedPipelineHistory(pipeline, service);
         }
         state.pipeline = pipeline;
         return {
@@ -63,6 +63,19 @@
       state.renaming = false;
       return this.addNewPipeline(pipelines, /* name */null, service);
     }
+  },
+  async updateSelectedPipelineHistory(pipeline, service) {
+    return service({
+      kind: 'HistoryService',
+      msg: 'setSelectedPipeline',
+      data: {
+        pipeline: this.pipelineId(pipeline)
+      }
+    });
+  },
+  pipelineId(pipeline) {
+    // Backward compatibility: prior to 0.4.0 pipelines were created with `name` only, without a unique id.
+    return pipeline?.$meta.id || pipeline?.$meta?.name || null;
   },
   pipelineChanged(pipeline, currentPipeline) {
     return JSON.stringify(pipeline) !== JSON.stringify(currentPipeline);
