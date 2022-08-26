@@ -9,16 +9,16 @@
 import {App, makeName, subscribeToDefaultStream} from '../conf/allowlist.js';
 import {RemoteRecipe} from './RemoteRecipe.js';
 import {meetStrangers} from '../../Library/Firebase/tryst.js';
-import {myself} from '../../Library/Rtc/myself.js';
+import {Myself} from '../../Library/Rtc/Meself.js';
 
 console.log(globalThis.config);
 
 //const streams = globalThis.streams = {};
 
-const getResource = id => globalThis.resources?.[id];
+//const getResource = id => globalThis.resources?.[id];
 const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
-const freeResource = id => globalThis.resources[id] = null;
-const newId = () => Math.floor(Math.random()*1e3 + 9e2);
+//const freeResource = id => globalThis.resources[id] = null;
+//const newId = () => Math.floor(Math.random()*1e3 + 9e2);
 
 // App class
 export const RemoteApp = class extends App {
@@ -33,8 +33,8 @@ export const RemoteApp = class extends App {
     await this.initLobby();
   }
   async initPersona() {
-    // keep "myself.name" set to "persona"
-    //this.arcs.watch('user', 'persona', persona => myself.name = persona);
+    // keep "persona" up to date
+    this.arcs.watch('user', 'persona', persona => this.persona = persona);
     // fetch system value for persona
     this.persona = await this.arcs.get('user', 'persona');
     // initialize persona if needed
@@ -44,23 +44,25 @@ export const RemoteApp = class extends App {
     }
   }
   async initRtc() {
-    myself.onstream = this.onstream.bind(this);
-    subscribeToDefaultStream(stream => myself.mediaStream = stream);
-    await myself.start(this.persona);
+    this.myself = new Myself();
+    this.myself.onstream = this.onstream.bind(this);
+    subscribeToDefaultStream(stream => this.myself.mediaStream = stream);
+    await this.myself.ready;
   }
   async initLobby() {
     // network id
-    const nid = myself.nid; //Math.random();
+    const nid = this.myself.peerId;
     this.meet(this.persona, nid, 3000);
   }
   async meet(name, nid, pingIntervalMs) {
     if (!this.closed) {
       setTimeout(() => this.meet(name, nid, pingIntervalMs), pingIntervalMs || 1e5);
+      this.myself.name = this.persona;
       const strangers = await meetStrangers(name, {name, nid}) || {};
       Object.values(strangers).forEach(({name, nid}) => {
-        if (myself.shouldCall(nid)) {
+        if (this.myself.shouldCall(nid)) {
           console.log('CALLING', name);
-          myself.doCall(nid);
+          this.myself.doCall(nid);
         }
       });
       //console.log(strangers);
@@ -70,13 +72,10 @@ export const RemoteApp = class extends App {
     console.log('onstream', meta);
     const id = meta?.id || makeName();
     setResource(id, stream);
-    //streams[id] = stream;
     this.arcs.set('user', 'remoteStream', id);
-    //this.createTvParticle(id, '#tvs', id);
   }
   createTvParticle(name, container, stream) {
     const meta = {kind: '$library/Media/InputCamera', container, staticInputs: {stream}};
-    //const meta = {kind: '$app/Library/Tv', container, staticInputs: {stream}};
     this.arcs.createParticle(name, 'user', meta);
   }
 };
