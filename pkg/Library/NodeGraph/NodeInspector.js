@@ -14,7 +14,8 @@ async update({node, pipeline, nodeTypes}, state, {service, output, invalidate}) 
     if (node?.key !== state.node?.key) {
       assign(state, {data: null, hasMonitor: false});
     }
-    if (this.nodeChanged(node, state.node) || !state.hasMonitor) {
+    if (this.pipelineChanged(pipeline, state.pipeline) || this.nodeChanged(node, state.node) || !state.hasMonitor) {
+      state.pipeline = pipeline;
       state.node = node;
       const data = await this.constructData(node, pipeline, nodeTypes, service);
       await output({data, nodeType});
@@ -36,6 +37,15 @@ nodeChanged({key, connections, props, displayName}, node) {
       || node?.displayName !== displayName
       || JSON.stringify(node?.connections) != JSON.stringify(connections)
       || JSON.stringify(node?.props) !== JSON.stringify(props);
+},
+
+pipelineChanged(pipeline, oldPipeline) {
+  return this.pipelineId(pipeline) !== this.pipelineId(oldPipeline);
+},
+
+pipelineId(pipeline) {
+  // Backward compatibility for pipelines published in versions < 0.4
+  return pipeline?.$meta?.id || pipeline?.$meta?.name;
 },
 
 formatTitle({name, index}) {
