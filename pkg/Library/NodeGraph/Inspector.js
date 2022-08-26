@@ -14,7 +14,8 @@ async update({data}, state, {output}) {
 },
 
 dataPropsChanged(data, {data: oldData}) {
-  return data?.title !== oldData?.title ||
+  return data?.key !== oldData?.key ||
+    data?.title !== oldData?.title ||
     data?.props?.length !== oldData?.props?.length ||
     data?.props?.some(({name}, index) => name !== oldData?.props?.[index].name);
 },

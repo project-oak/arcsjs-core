@@ -17,10 +17,21 @@ shouldUpdate({nodeTypes}) {
 
 update(inputs, state) {
   const {pipeline} = inputs;
-  if (pipeline?.nodes && this.nodesDidChange(pipeline.nodes, state.nodes)) {
+  if (this.pipelineChanged(pipeline, state.pipeline) ||
+      (pipeline?.nodes && this.nodesDidChange(pipeline.nodes, state.nodes))) {
+    state.pipeline = pipeline;
     state.nodes = [...pipeline.nodes];
     return this.updateNodes(inputs, state);
   }
+},
+
+pipelineChanged(pipeline, oldPipeline) {
+  return this.pipelineId(pipeline) !== this.pipelineId(oldPipeline);
+},
+
+pipelineId(pipeline) {
+  // Backward compatibility for pipelines published in versions < 0.4
+  return pipeline?.$meta?.id || pipeline?.$meta?.name;
 },
 
 nodesDidChange(nodes, currentNodes) {
