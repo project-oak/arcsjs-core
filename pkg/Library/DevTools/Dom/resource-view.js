@@ -6,6 +6,7 @@
 
 import {Xen} from '../../Dom/Xen/xen-async.js';
 import {IconsCss} from '../../Dom/Material/material-icon-font/icons.css.js';
+import {Resources} from '../../App/Resources.js';
 
 const {entries} = Object;
 
@@ -14,8 +15,7 @@ export class ResourceView extends Xen.Async {
     return ['version'];
   }
   update(_, state) {
-    state.resources = globalThis.resources || {};
-    state.canvases = entries(state.resources).filter(([name, res]) => res?.localName === 'canvas');
+    state.canvases = entries(Resources.all()).filter(([name, res]) => res?.localName === 'canvas');
   }
   render({}, {canvases}) {
     return {

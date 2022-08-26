@@ -11,15 +11,6 @@ import {RemoteRecipe} from './RemoteRecipe.js';
 import {meetStrangers} from '../../Library/Firebase/tryst.js';
 import {Myself} from '../../Library/Rtc/Meself.js';
 
-console.log(globalThis.config);
-
-//const streams = globalThis.streams = {};
-
-//const getResource = id => globalThis.resources?.[id];
-const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
-//const freeResource = id => globalThis.resources[id] = null;
-//const newId = () => Math.floor(Math.random()*1e3 + 9e2);
-
 // App class
 export const RemoteApp = class extends App {
   constructor(paths, root, options) {

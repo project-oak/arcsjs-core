@@ -4,6 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 import {Xen} from '../Dom/Xen/xen-async.js';
+import {Resources} from '../App/Resources.js';
 
 const template = Xen.Template.html`
 <style>
@@ -63,7 +64,7 @@ export class ImageResource extends Xen.Async {
   async updateMasks(masks, state) {
     if (masks !== state.masks) {
       state.masks = masks;
-      const realMasks = this.getResource(masks?.masksResource);
+      const realMasks = Resources.get(masks?.masksResource);
       const mask = realMasks[0];
       if (mask) {
         state.canvas = await mask.toCanvasImageSource();
@@ -73,12 +74,8 @@ export class ImageResource extends Xen.Async {
   updateImage(image, state) {
     if (image !== state.image) {
       state.image = image;
-      state.canvas = this.getResource(image?.canvas);
+      state.canvas = Resources.get(image?.canvas);
     }
-  }
-  getResource(name) {
-    // TODO(sjmiles): should come from an import, or a service
-    return globalThis.resources?.[name];
   }
   render({image}, state) {
     const model = {};

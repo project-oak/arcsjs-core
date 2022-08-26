@@ -6,9 +6,7 @@
 
 import {Xen} from '../../Dom/Xen/xen-async.js';
 import {subscribeToStream, unsubscribeFromStream} from './media-stream.js';
-
-const getResource = (id) => globalThis.resources?.[id];
-const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
+import {Resources} from '../../App/Resources.js';
 
 export class StreamView extends Xen.Async {
   static get observedAttributes() {
@@ -29,7 +27,7 @@ export class StreamView extends Xen.Async {
   }
   update({frequency, stream}, state) {
     // make output canvas available as a resource id
-    setResource(state.id, this.canvas);
+    Resources.set(state.id, this.canvas);
     this.value = state.id;
     // 'stream' here is a stream resource id
     if (stream !== state.stream) {
@@ -39,7 +37,7 @@ export class StreamView extends Xen.Async {
       //console.warn(stream);
     }
     if (stream) {
-      const realStream = getResource(stream);
+      const realStream = Resources.get(stream);
       if (state.realStream !== realStream) {
         state.realStream = realStream;
         this.video.srcObject = realStream;

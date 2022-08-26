@@ -5,7 +5,7 @@
  */
 
 import {logFactory} from '../core.js';
-import {Resources} from '../App/resources.js';
+import {Resources} from '../App/Resources.js';
 import {ThreejsService} from '../Threejs/ThreejsService.js';
 import {requireImage, allocateResource} from '../Media/ImageLoader.js';
 
@@ -74,7 +74,7 @@ export class TensorFlowService  {
       this.segmenterCanvas = ThreejsService.allocateCanvas();
     }
     const handle = await this.segmenterCanvas;
-    const canvas = Resources[handle];
+    const canvas = Resources.get(handle);
     const img = new Image();
     // TODO(sjmiles): repair sizing
     img.width = 640; //canvas.width;
@@ -190,7 +190,7 @@ export class TensorFlowService  {
     size,
     existingTensorId
   }) {
-    const tensor = Resources[tensorId];
+    const tensor = Resources.get(tensorId);
     if (tensor) {
       // For target resize size, first try using the given size. If not
       // available, use the crop region size. If not available, use the original
@@ -247,7 +247,7 @@ export class TensorFlowService  {
     toRangeMax,
     existingTensorId
   }) {
-    const tensor = Resources[tensorId];
+    const tensor = Resources.get(tensorId);
     if (tensor) {
       const outputTensor = tf.tidy(() => {
         const {scale, offset} = this.transformValueRange(
@@ -269,7 +269,7 @@ export class TensorFlowService  {
   //
   static async runCustomModel({tensorId, modelUrl, existingTensorId}) {
     const tasks = [
-      Resources[tensorId],
+      Resources.get(tensorId),
       this.requireCustomModel(modelUrl)
     ];
     const [tensor, model] = await Promise.all(tasks);
@@ -307,8 +307,8 @@ export class TensorFlowService  {
   //
   //
   static async binaryOp({tensor0Id, tensor1Id, op, existingTensorId}) {
-    const tensor0 = Resources[tensor0Id];
-    const tensor1 = Resources[tensor1Id];
+    const tensor0 = Resources.get(tensor0Id);
+    const tensor1 = Resources.get(tensor1Id);
     const opFn = tf[op];
     if (tensor0 && tensor1 && opFn) {
       const tensor = opFn(tensor0, tensor1);
@@ -319,7 +319,7 @@ export class TensorFlowService  {
   //
   //
   static async clipByValue({tensorId, min, max, existingTensorId}) {
-    const tensor = Resources[tensorId];
+    const tensor = Resources.get(tensorId);
     if (tensor) {
       const outputTensor = tf.clipByValue(tensor, min,  max);
       return this.storeTensorInResources(existingTensorId, outputTensor);
@@ -329,20 +329,20 @@ export class TensorFlowService  {
   //
   //
   static async tensorToDepthMap({tensorId, existingDepthMapId}) {
-    const tensor = Resources[tensorId];
+    const tensor = Resources.get(tensorId);
     if (tensor && tensor.shape.length === 4) {
       const outputTensor = tf.squeeze(tensor, [0, 3]);
       if (existingDepthMapId) {
-        const existingDepthMap = Resources[existingDepthMapId];
+        const existingDepthMap = Resources.get(existingDepthMapId);
         if (existingDepthMap) {
           existingDepthMap.toTensor().dispose();
         }
       }
       const depthMapId = existingDepthMapId || allocateResource();
-      Resources[depthMapId] = {
+      Resources.set(depthMapId, {
         toTensor: () => outputTensor
         // TODO(jingjin): implement other DepthMap interface methods as needed.
-      };
+      });
       return depthMapId;
     }
   }
@@ -402,7 +402,7 @@ export class TensorFlowService  {
   //
   //
   static async postprocessDepthModel({tensorId, size, config, existingTensorId}) {
-    const tensor = Resources[tensorId];
+    const tensor = Resources.get(tensorId);
 
     if (tensor) {
 
@@ -440,7 +440,7 @@ export class TensorFlowService  {
   static storeTensorInResources(existingTensorId, tensor) {
     // Dispose existing tensor if existed.
     if (existingTensorId) {
-      const existingTensor = Resources[existingTensorId];
+      const existingTensor = Resources.get(existingTensorId);
       if (existingTensor) {
         existingTensor.dispose();
       }
@@ -448,8 +448,8 @@ export class TensorFlowService  {
 
     // Allocate a resource id (if necessary) and store the given tensor with
     // the id.
-    const tensorId = existingTensorId || allocateResource();
-    Resources[tensorId] = tensor;
+    const tensorId = existingTensorId || Resources.newId();
+    Resources.set(tensorId, tensor);
     return tensorId;
   }
   // TODO(jingjin): move rapsai specific functions to another service hosted in

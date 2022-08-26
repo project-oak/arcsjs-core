@@ -5,7 +5,7 @@
  */
 
 import {logFactory} from '../core.js';
-import {Resources} from '../App/resources.js';
+import {Resources} from '../App/Resources.js';
 import {loadImage} from '../Media/ImageLoader.js';
 import {THREE} from '../../third_party/threejs/threejs-import.js';
 import * as tools from '../Shader/shader-tools.js';
@@ -17,27 +17,14 @@ const dom = (tag, props, container) => (container ?? document.body).appendChild(
 const isImproperSize = (width, height) => (width !== 1280 && width !== 640) || (height !== 480 && height !== 720);
 
 export const ThreejsService = class {
-  static async receive({msg, data}) {
-    //log('receive', msg, data);
-    if (this[msg]) {
-      return this[msg](data);
-    } else {
-      log(`no handler for "${msg}"`);
-    }
-  }
-  //
   static async allocateResource(resource) {
-    const id = Math.floor(Math.random()*1e3 + 9e2);
-    Resources[id] = resource;
-    return id;
+    return Resources.allocate(resource);
   }
-  //
   static async allocateCanvas() {
     log('allocateCanvas');
     const canvas = dom('canvas', {style: 'display: none; width: 240px; height: 180px;'});
     return this.allocateResource(canvas);
   }
-  //
   static async canvasFromImage({url}) {
     log('canvasFromImage, url = ', url?.slice(0, 80));
     const image = await loadImage(url);
@@ -48,7 +35,7 @@ export const ThreejsService = class {
   static imageToCanvas(image, canvasId) {
     const {width, height} = image;
     if (width && height) {
-      const canvas = Resources[canvasId];
+      const canvas = Resources.get(canvasId);
       assign(canvas, {width, height});
       //
       const ctx = canvas.getContext('2d');
@@ -58,8 +45,8 @@ export const ThreejsService = class {
   //
   static async shaderize({shaderId, toy, inImageRef, outImageRef}) {
     const [inCanvas, outCanvas] = [
-      Resources[inImageRef?.canvas],
-      Resources[outImageRef?.canvas]
+      Resources.get(inImageRef?.canvas),
+      Resources.get(outImageRef?.canvas)
     ];
     if (inCanvas && outCanvas && shaderId) {
       const {width, height} = inCanvas;
@@ -77,13 +64,13 @@ export const ThreejsService = class {
   }
   static async requireShader(shaderId, canvasKeys, inCanvas, outCanvas, toy) {
     // one shader per shader id
-    let shader = Resources[shaderId];
+    let shader = Resources.get(shaderId);
     // but we must rebuild the shader if the canvasses change
     // TODO(sjmiles): changing the canvas size(s) will break the shader
     if (!shader || shader.canvasKeys !== canvasKeys || toy?.Shader?.info?.id !== shader.toyId) {
       shader?.dispose();
       log('allocating shader', shaderId, canvasKeys);
-      shader = Resources[shaderId] = new ShaderJunk();
+      shader = Resources.set(shaderId, new ShaderJunk());
       shader.canvasKeys = canvasKeys;
       await shader.init(inCanvas, outCanvas, toy);
     }
@@ -91,7 +78,7 @@ export const ThreejsService = class {
   }
   //
   static getImageSize({canvasId}) {
-    const canvas = Resources[canvasId];
+    const canvas = Resources.get(canvasId);
     if (canvas) {
       return {
         width: canvas.width,

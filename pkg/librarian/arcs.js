@@ -30,7 +30,7 @@ import '../Library/App/Worker/ArcsWorker.js';
 //  XenSurface: Surface,
 //  subscribeToStream
 // } = await importModules(async path => import(path), [
-//  '$library/App/resources.js',
+//  '$library/App/Resources.js',
 //  '$library/Dom/dom.js',
 //  '$library/Dom/surfaces/xen/xen-surface.js',
 //  '$library/Dom/material-xen/material-xen.js',

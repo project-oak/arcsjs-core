@@ -5,14 +5,12 @@
  */
 import {Xen} from '../../Dom/Xen/xen-async.js';
 import {logFactory} from '../../core.js';
+import {Resources} from '../../App/Resources.js';
 
 const sharedStreams = {};
 const subscribers = {};
 
 export const defaultStreamName = 'default';
-
-const getResource = (id) => globalThis.resources?.[id];
-const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
 
 export const subscribeToStream = (streamName, fn) => {
   if (!subscribers[streamName]) {
@@ -112,7 +110,7 @@ export class MediaStream extends Xen.Async {
     }
     notifySubscribers(streamName);
     if (streamName === defaultStreamName) {
-      setResource(defaultStreamName, sharedStreams[streamName]);
+      Resources.set(defaultStreamName, sharedStreams[streamName]);
     }
   }
   async produceStream(enableVideo, enableAudio, videodeviceid, audioinputdeviceid) {

@@ -1,4 +1,3 @@
-import '../App/resources.js';
 import '../Dom/modal-view.js';
 import '../Dom/fancy-image.js';
 import '../Dom/split-panel.js';
