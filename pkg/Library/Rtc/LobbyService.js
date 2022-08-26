@@ -11,13 +11,14 @@ import {Myself} from './Meself.js';
 
 const getResource = id => globalThis.resources?.[id];
 const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
-const freeResource = id => globalThis.resources[id] = null;
 const newId = () => Math.floor(Math.random()*1e3 + 9e2);
+const freeResource = id => globalThis.resources[id] = null;
 
 const Lobby = class {
-  constructor() {
+  constructor(aeon) {
     this.allStreams = [];
     this.streams = [];
+    this.aeon = aeon || 'universal';
     this.myself = new Myself();
   }
   async meetStrangers(persona, returnStream) {
@@ -29,7 +30,7 @@ const Lobby = class {
     const {peerId} = this.myself;
     if (peerId) {
       // be present at the meeting place
-      await tryst.meetStrangers(persona, {persona, nid: peerId});
+      await tryst.meetStrangers(this.aeon, persona, {persona, nid: peerId});
       // these are the streams we captured since last time
       const {streams} = this;
       // start fresh
@@ -66,14 +67,13 @@ const Lobby = class {
 };
 
 export const LobbyService = {
-  createLobby() {
-    const lobbyId = newId();
-    const lobby = new Lobby();
-    setResource(lobbyId, lobby);
-    return lobbyId;
+  createLobby(aeon) {
+    const id = newId();
+    setResource(id, new Lobby(aeon));
+    return id;
   },
   async meetStrangers({lobby, persona, returnStream}) {
     const realLobby = getResource(lobby);
-    return realLobby?.meetStrangers(persona, returnStream);
+    return realLobby?.meetStrangers(lobby, persona, returnStream);
   }
 };

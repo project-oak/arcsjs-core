@@ -6,8 +6,8 @@
  */
 /* global scope */
 ({
-  async initialize({}, state, {service}) {
-    state.lobby = await service({kind: 'LobbyService', msg: 'createLobby'});
+  async initialize({aeon}, state, {service}) {
+    state.lobby = await service({kind: 'LobbyService', msg: 'createLobby', aeon});
   },
   async update({stream, profile, persona, returnStream}, state, {service, invalidate}) {
     //log(profile);
