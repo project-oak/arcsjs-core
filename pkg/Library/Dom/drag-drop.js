@@ -10,9 +10,6 @@
 import {Xen} from './Xen/xen-async.js';
 
 export const DragDrop = class extends Xen.Async {
-  static get observedAttributes() {
-    return [];
-  }
   onDown(e) {
     const {screenX: x, screenY: y} = e;
     if (this.doDown(e) !== false) {
