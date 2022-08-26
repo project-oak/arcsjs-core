@@ -50,13 +50,16 @@ render({pipeline, pipelines}, {publicPipelines}) {
 renderPipelines(pipelines, selectedName) {
   return !pipelines ? [] : pipelines?.map?.(({$meta}) => ({
     name: $meta?.name,
-    id: $meta?.id,
+    id: $meta?.id || $meta.name,
     isDisabled: false,
     isSelected: $meta?.name === selectedName
   }));
 },
 onSelect({eventlet: {value}, pipelines}, {publicPipelines}) {
-  const pipeline = this.findPipelineById(value, pipelines) || this.findPipelineById(value, publicPipelines);
+  const pipeline = this.findPipelineById(value, pipelines) 
+    || this.findPipelineById(value, publicPipelines)
+    // Backward compatibility: prior to 0.4.0 pipelines were created with `name` only.
+    || this.findPipelineByName(value, publicPipelines);
   log(`selected "${value}" (${pipeline?.$meta.name})`);
   return {pipeline};
 },
