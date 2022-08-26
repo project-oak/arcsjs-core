@@ -41,19 +41,26 @@ render({pipeline, pipelines}, {publicPipelines}) {
   const separator = {name: '_________________', selected: false, isDisabled: true};
   return {
     pipelines: [
-      ...(this.renderPipelines(pipelines, pipeline?.$meta?.name) || []),
+      ...(this.renderPipelines(pipelines, pipeline) || []),
       ...(publicPipelines?.length > 0 ? [separator] : []),
-      ...(this.renderPipelines(publicPipelines, pipeline?.$meta?.name) || [])
+      ...(this.renderPipelines(publicPipelines, pipeline) || [])
     ]
   };
 },
-renderPipelines(pipelines, selectedName) {
-  return !pipelines ? [] : pipelines?.map?.(({$meta}) => ({
-    name: $meta?.name,
-    id: $meta?.id || $meta.name,
-    isDisabled: false,
-    isSelected: $meta?.name === selectedName
-  }));
+renderPipelines(pipelines, selectedPipeline) {
+  return pipelines ? pipelines?.map?.(pipeline => {
+    const id = this.pipelineId(pipeline);
+    return {
+      name: pipeline.$meta?.name,
+      id,
+      isDisabled: false,
+      isSelected: id === this.pipelineId(selectedPipeline)
+    };
+  }) : [];
+},
+pipelineId(pipeline) {
+  // Backward compatibility: prior to 0.4.0 pipelines were created with `name` only, without a unique id.
+  return pipeline?.$meta.id || pipeline?.$meta?.name || null;
 },
 onSelect({eventlet: {value}, pipelines}, {publicPipelines}) {
   const pipeline = this.findPipelineById(value, pipelines) 
