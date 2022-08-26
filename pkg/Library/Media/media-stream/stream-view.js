@@ -36,7 +36,7 @@ export class StreamView extends Xen.Async {
       unsubscribeFromStream(state.stream, state.subscriber);
       subscribeToStream(stream, state.subscriber);
       state.stream = stream;
-      console.warn(stream);
+      //console.warn(stream);
     }
     if (stream) {
       const realStream = getResource(stream);
@@ -92,11 +92,12 @@ export class StreamView extends Xen.Async {
 <style>
   :host {
     display: flex;
-    min-width: 160px;
-    min-height: 120px;
+    /* min-width: 160px;
+    min-height: 120px; */
     font-size: 10px;
     color: black;
     background-color: black;
+    position: relative;
   }
   * {
     box-sizing: border-box;
@@ -109,15 +110,12 @@ export class StreamView extends Xen.Async {
     object-fit: contain;
     width: 100%;
     height: 100%;
-    /* width: 320px;
-    height: 240px; */
   }
   [flip] {
     transform: scaleX(-1);
   }
   [hide=true],[show=false] {
     visibility: hidden;
-    /* transform: translateX(-200%); */
   }
 </style>
 

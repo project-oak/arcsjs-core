@@ -32,7 +32,7 @@ export const DeviceUxRecipe = {
     $inputs: ['mediaDevices', 'mediaDeviceState'],
     $outputs: ['mediaDeviceState']
   },
-  localStream: {
+  defaultStream: {
     $kind: 'Media/MediaStream',
     $inputs: [
       'mediaDeviceState'

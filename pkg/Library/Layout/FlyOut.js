@@ -6,17 +6,18 @@
 /* global scope */
 ({
   async update({show}, state, {service}) {
-    if (show === true) {
-      state.showTools = true;
-    }
+    // if (show === true) {
+    //   state.showTools = true;
+    // }
   },
-  render({}, {showTools}) {
+  render({show}, {showTools}) {
     return {
-      showTools
+      showTools: show
     };
   },
-  async onToggleFlyOverClick(inputs, state, {service}) {
-    state.showTools = !state.showTools;
+  async onToggleFlyOverClick({show}, state, {service}) {
+    return {show: false};
+    //state.showTools = !state.showTools;
   },
   template: html`
 <style>
@@ -25,7 +26,7 @@
     flex: 0 !important;
   }
   /* beachball */
-  [tools-button] {
+  /* [tools-button] {
     position: fixed;
     bottom: -15px;
     right: -15px;
@@ -43,6 +44,9 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
+  } */
+  [scrim],[flyout] {
+    z-index: 10000;
   }
   [scrim] {
     position: fixed;
@@ -50,20 +54,18 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background: green;
-    opacity: 0.5;
+    background: #888888;
+    opacity: 0.2;
     transform: translateX(120%);
-    z-index: 10000;
   }
   [scrim][show] {
     transform: translateX(0);
   }
   [flyout] {
     position: fixed;
-    z-index: 6000;
     transition: transform 200ms ease-in;
-    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
-    color: lightblue;
+    box-shadow: #515151 0px 20px 30px -10px;
+    color: #555;
     background: #333;
   }
   [right], [left] {
@@ -98,9 +100,9 @@
 </style>
 
 <!-- flyout button -->
-<div tools-button on-click="onToggleFlyOverClick">
+<!-- <div tools-button on-click="onToggleFlyOverClick">
   <img src=${scope.resolve('$library/App/assets/rainbow-128-opt.gif')}>
-</div>
+</div> -->
 
 <!-- flyout -->
 <div scrim show$="{{showTools}}" on-click="onToggleFlyOverClick"></div>

@@ -13,21 +13,27 @@
     const {shader, image} = inputs;
     if (shader !== state.shader) {
       state.shader = shader;
-      if (shader) {
-        state.shaderId = await service({kind: 'ShaderService', msg: 'makeShader',
-          data: {shader, shaderId: state.shaderId}});
-      } else {
-        state.shaderId = null;
-      }
+      state.shaderId = await this.updateShaderId(state.shaderId, shader, service);
     }
     if (state.shaderId && image?.canvas) {
-      const output = state.output = {
-        canvas: state.canvas,
-        version: Math.random()
-      };
-      await this.shaderize(state.shaderId, inputs, output, service);
-      return {output};
+      state.output = await this.updateOutputCanvas(inputs, state, {service});
+      return {output: state.output};
     }
+  },
+  async updateShaderId(shaderId, shader, service) {
+    return shader && await service({
+      kind: 'ShaderService',
+      msg: 'makeShader',
+      data: {shader, shaderId}
+    });
+  },
+  async updateOutputCanvas(inputs, state, {service}) {
+    const output = {
+      canvas: state.canvas,
+      version: Math.random()
+    };
+    await this.shaderize(state.shaderId, inputs, output, service);
+    return output;
   },
   async shaderize(shaderId, {shader, image, image2, image3, image4}, output, service) {
     return service({
@@ -52,10 +58,10 @@
       background-color: black;
       color: #eee;
       overflow: hidden;
-      width: 240px;
+      /* width: 240px;
       height: 300px;
       padding: 8px;
-      border-radius: 8px;
+      border-radius: 8px; */
     }
   </style>
   <image-resource center flex image="{{output}}"></image-resource>

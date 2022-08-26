@@ -10,6 +10,9 @@
 ({
 async update({pipeline}, state, {service}) {
 },
+onAccountClick() {
+  return {showFlyout: true};
+},
 template: html`
 <style>
   /* :host {
@@ -25,6 +28,7 @@ template: html`
     flex: 1 !important;
   } */
   [frame=camera] {
+    display: none !important;
     position: absolute;
     border: 1px solid silver;
     padding: 8px;
@@ -35,10 +39,14 @@ template: html`
     overflow: hidden;
   }
 </style>
-<div frame="devices"></div>
+<div row>
+  <div frame="devices"></div>
+  <span flex></span>
+  <div toolbar><icon on-click="onAccountClick">account_circle</icon></div>
+</div>
 <div flex row video>
   <div flex row frame="tv"></div>
-  <div row frame="camera"></div>
+  <div frame="camera"></div>
 </div>
 `
 });

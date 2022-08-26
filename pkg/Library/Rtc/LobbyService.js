@@ -43,7 +43,7 @@ const Lobby = class {
   }
   maybeTryBack(stream) {
     const them = stream?.meta?.call;
-    console.log('maybeTryBack', them);
+    //console.log('maybeTryBack', them);
     if (myself.shouldCall(them)) {
       console.log('CALLING', them);
       myself.doCall(them);

@@ -32,11 +32,17 @@
     return streams;
   },
   render(inputs, {persona, streams}) {
-    const tvs = values(streams || {}).map(({stream, meta: {name}}) => ({stream, name})) ;
+    const tvs = values(streams || {}).map(({stream, meta: {name}}) => ({stream, name})).reverse();
     return {
       name: persona,
       tvs
     };
+  },
+  onCloseClick({eventlet: {key}}, state) {
+    const index = state.streams.findIndex(s => s?.meta?.name === key);
+    if (index >= 0) {
+      state.streams.splice(index, 1);
+    }
   },
   template: html`
 <style>
@@ -55,23 +61,32 @@
     padding: 4px;
     font-family: "Google Sans", sans-serif;
   }
+  [stream] {
+    width: 80px;
+    margin: 4px;
+  }
+  [name] {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>
+
 <div>
   <span>{{name}}</span>'s Lobby
 </div>
 <hr>
-<div label2>Users in Lobby:</div>
-
 <div tvs flex scrolling row repeat="video_t">{{tvs}}</div>
 
 <template video_t>
-  <div style="width:240px; margin: 4px;">
+  <div stream column>
     <div bar>
-      <span style="font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{name}}</span>
+      <span name>{{name}}</span>
       <span flex></span>
-      <icon>close</icon>
+      <icon key="{{name}}" on-click="onCloseClick">close</icon>
     </div>
-    <stream-view playsinline muted stream="{{stream}}"></stream-view>
+    <stream-view flex playsinline muted stream="{{stream}}"></stream-view>
   </div>
 </template>
 `
