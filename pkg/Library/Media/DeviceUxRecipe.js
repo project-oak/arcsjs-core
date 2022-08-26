@@ -22,10 +22,6 @@ export const DeviceUxRecipe = {
     mediaDevices: {
       $type: '[JSON]'
     },
-    textForSpeech: {
-      $type: 'String',
-      $tags: ['shared']
-    }
   },
   deviceUx: {
     $kind: 'Media/DeviceUx',
@@ -40,16 +36,6 @@ export const DeviceUxRecipe = {
     $outputs: [
       'mediaDevices'
     ]
-  },
-  speechFeed: {
-    $kind: 'Media/SpeechRecognizer',
-    $inputs: ['mediaDeviceState'],
-    $outputs: ['mediaDeviceState', 'transcript']
-  },
-  speechOutput: {
-    $kind: 'Media/SpeechSynthesizer',
-    $inputs: ['mediaDeviceState', 'textForSpeech'],
-    $outputs: ['mediaDeviceState']
   }
 };
 
