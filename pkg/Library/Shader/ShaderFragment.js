@@ -53,10 +53,8 @@
       code: shader || ''
     };
   },
-  onCodeChanged({eventlet: {key, value}}) {
-    if (key === 'code') {
-      return {shader: value};
-    }
+  onCodeChanged({eventlet: {value}}) {
+    return {shader: value};
   },
   template: html`
   <style>
@@ -72,7 +70,7 @@
   </style>
   <mxc-tab-pages flex tabs="Output, Code">
     <image-resource center flex image="{{output}}"></image-resource>
-    <code-mirror flex text="{{code}}" key="code" on-blur="onCodeChanged"></code-mirror>
+    <code-mirror flex text="{{code}}" on-blur="onCodeChanged"></code-mirror>
   </mxc-tab-pages>
   `
   });
