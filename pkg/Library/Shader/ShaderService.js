@@ -6,6 +6,7 @@
 import {logFactory} from '../core.js';
 import {uniformsFactory, fragmentShader} from './shader-tools.js';
 import {THREE} from '../Threejs/threejs-import.js';
+import {Resources} from '../App/Resources.js';
 
 const {assign} = Object;
 
@@ -13,24 +14,17 @@ const log = logFactory(logFactory.flags.services || logFactory.flags.ShaderServi
 
 const isImproperSize = (width, height) => !width || !height;
 
-const getResource = id => globalThis.resources?.[id];
-const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
-const freeResource = id => globalThis.resources[id] = null;
-const newId = () => Math.floor(Math.random()*1e3 + 9e2);
-
 export const ShaderService = {
   makeShader({shader, shaderId}) {
-    freeResource(shaderId);
-    shaderId = newId();
+    Resources.free(shaderId);
     const fragShader = new ShaderJunk();
-    setResource(shaderId, fragShader);
     fragShader.init(shader);
-    return shaderId;
+    return Resources.allocate(fragShader);
   },
   async runFragment({shaderId, inImageRefs, outImageRef}) {
-    const shader = getResource(shaderId);
-    const outCanvas = getResource(outImageRef?.canvas);
-    const inCanvases = inImageRefs.map(ref => ref && getResource(ref.canvas));
+    const shader = Resources.get(shaderId);
+    const outCanvas = Resources.get(outImageRef?.canvas);
+    const inCanvases = inImageRefs.map(ref => ref && Resources.get(ref.canvas));
     if (inCanvases?.[0] && outCanvas && shader) {
       const {width, height} = inCanvases[0];
       if (isImproperSize(width, height)) {

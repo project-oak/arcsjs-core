@@ -7,13 +7,13 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {makeId} from '../core.js';
+import {utils} from '../core.js';
 
 const resources = {};
 
 export const Resources = {
   newId() {
-    return makeId(4, 4, '-');
+    return utils.makeId(4, 4, '-');
   },
   get(id) {
     return resources[id];

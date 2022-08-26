@@ -5,13 +5,13 @@
  */
 
 import {Xen} from '../../Dom/Xen/xen-async.js';
-// import {subscribeToStream, unsubscribeFromStream} from './media-stream.js';
+import {Resources} from '../../App/Resources.js';
 
 const template = Xen.Template.html`
 <style>
-  :host {
-    /* display: none; */
-  }
+  /* :host {
+    display: none;
+  } */
   canvas {
     border: 2px solid magenta;
   }
@@ -22,9 +22,6 @@ const template = Xen.Template.html`
 <canvas></canvas>
 <video autoplay playsinline></video>
 `;
-
-const getResource = (id) => globalThis.resources?.[id];
-const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
 
 export class MediaCanvas extends Xen.Async {
   static get observedAttributes() {
@@ -44,12 +41,12 @@ export class MediaCanvas extends Xen.Async {
   }
   update({frequency, stream}, state) {
     // state.id refers to our output canvas' resource id
-    setResource(state.id, this.canvas);
+    Resources.set(state.id, this.canvas);
     this.value = state.id;
     // 'stream' here is a stream resource id
     if (stream !== state.stream) {
       state.stream = stream;
-      const realStream = getResource(stream);
+      const realStream = Resources.get(stream);
       this.video.srcObject = realStream;
       // reset time
       this.t0 = Date.now();
@@ -111,7 +108,7 @@ export class MediaCanvas extends Xen.Async {
   //  return shouldRender;
   //}
   render({flip, stream}, {}) {
-    const realStream = getResource(stream);
+    const realStream = Resources.get(stream);
     return {flip, realStream};
   }
   onVideoReady() {
