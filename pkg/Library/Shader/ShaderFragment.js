@@ -47,10 +47,16 @@
       }
     });
   },
-  render({}, {output}) {
+  render({shader}, {output}) {
     return {
-      output
+      output,
+      code: shader || ''
     };
+  },
+  onCodeChanged({eventlet: {key, value}}) {
+    if (key === 'code') {
+      return {shader: value};
+    }
   },
   template: html`
   <style>
@@ -64,6 +70,9 @@
       border-radius: 8px; */
     }
   </style>
-  <image-resource center flex image="{{output}}"></image-resource>
+  <mxc-tab-pages flex tabs="Output, Code">
+    <image-resource center flex image="{{output}}"></image-resource>
+    <code-mirror flex text="{{code}}" key="code" on-blur="onCodeChanged"></code-mirror>
+  </mxc-tab-pages>
   `
   });
