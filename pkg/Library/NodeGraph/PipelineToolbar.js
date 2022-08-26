@@ -87,10 +87,10 @@
     return (name ?? await service({msg: 'MakeName'})) || 'new pipeline';
   },
   async makeUniqueId(pipelines, service) {
-    let id = await service({msg: 'MakeId'});
-    while (this.findPipelineById(id, pipelines)) {
+    let id;
+    do {
       id = await service({msg: 'MakeId'});
-    }
+    } while (this.findPipelineById(id, pipelines));
     return id;
   },
   render({pipeline, pipelines, publishPaths}, {renaming, selectedPublishKey}) {
