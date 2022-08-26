@@ -6,8 +6,8 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {meetStrangers} from '../Firebase/tryst.js';
-import {myself} from './myself.js';
+import * as tryst from '../Firebase/tryst.js';
+import {Myself} from './Meself.js';
 
 const getResource = id => globalThis.resources?.[id];
 const setResource = (id, resource) => globalThis.resources && (globalThis.resources[id] = resource);
@@ -18,17 +18,18 @@ const Lobby = class {
   constructor() {
     this.allStreams = [];
     this.streams = [];
+    this.myself = new Myself();
   }
   async meetStrangers(persona, returnStream) {
+    await this.myself.ready;
+    this.myself.name = persona;
+    this.myself.mediaStream = getResource(returnStream);
+    this.myself.onstream = this.onstream.bind(this);
     //console.log(persona, returnStream);
-    if (!myself.nid) {
-      await this.start(persona);
-    }
-    myself.mediaStream = getResource(returnStream);
-    const {name, nid} = myself;
-    if (nid) {
+    const {peerId} = this.myself;
+    if (peerId) {
       // be present at the meeting place
-      await meetStrangers(name, {name, nid});
+      await tryst.meetStrangers(persona, {persona, nid: peerId});
       // these are the streams we captured since last time
       const {streams} = this;
       // start fresh
@@ -36,7 +37,7 @@ const Lobby = class {
       // collect all the streams
       this.allStreams = [...this.allStreams, ...streams];
       // try some callbacks
-      this.allStreams.forEach(s => this.maybeTryBack(s));
+      this.allStreams.forEach(stream => this.maybeTryBack(stream));
       // return the streams
       return streams;
     }
@@ -44,20 +45,15 @@ const Lobby = class {
   maybeTryBack(stream) {
     const them = stream?.meta?.call;
     //console.log('maybeTryBack', them);
-    if (myself.shouldCall(them)) {
+    if (this.myself.shouldCall(them)) {
       console.log('CALLING', them);
-      myself.doCall(them);
+      this.myself.doCall(them);
     }
-  }
-  async start(persona) {
-    // TODO(sjmiles): um 1:n?
-    myself.onstream = this.onstream.bind(this);
-    return myself.start(persona);
   }
   onstream(stream, meta) {
     if (stream && meta.id) {
       // create a resource id for this stream
-      this.streamId = `lobbyStream-${meta.id}`;
+      this.streamId = `${meta.id}-lobby-stream`;
       // stash our stream there
       setResource(this.streamId, stream);
       // remember this stream when asked
@@ -65,10 +61,6 @@ const Lobby = class {
       this.streams.push(info);
       // what we found
       console.log(info);
-      // if (myself.shouldCall(meta.call)) {
-      //   console.log('CALLING', meta.call);
-      //   myself.doCall(meta.call);
-      // }
     }
   }
 };

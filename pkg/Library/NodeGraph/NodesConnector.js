@@ -37,7 +37,7 @@ hasSameNode(node, nodes) {
       return true;
     }
   }
-  log('hasSameNode: FALSE:', nodeInNodes, node);
+  //log('hasSameNode: FALSE:', nodeInNodes, node);
   return false;
 },
 

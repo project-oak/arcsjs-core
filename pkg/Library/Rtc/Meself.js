@@ -1,102 +1,97 @@
-import '../../third_party/peerjs.min.js';
-const {Peer} = globalThis;
+import {Peer} from './Peer.js';
 
-let me;
-let nid;
-
-const calls = {};
-const mediaConnections = {};
-
-const start = () => {
-  me = new Peer();
-  me.on('error', err => console.error(err));
-  // when connection to PeerServer is established, we receive our peerid
-  me.on('open', id => onopen(id));
-  // when a call comes in, answer it
-  me.on('call', mediaConnection => myself.answerCall(mediaConnection));
-};
-
-const onopen = id => {
-  nid = id;
-  console.log('My peer ID is: ' + id);
-  myself.onstart();
-};
-
-export const myself = {
-  async start(name) {
-    myself.name = name;
-    // start my Peer ('me')
-    start();
-    // return a Promise that resolves when onstart is called
-    return new Promise(resolve => myself.onstart = resolve);
-  },
-  get me() {
+export const Myself = class {
+  constructor() {
+    this.name = '';
+    this.mediaStream = null;
+    this.calls = {};
+    this.mediaConnections = {};
+    this.me = this.createMe();
+    this.ready = new Promise(resolve => this.resolveReady = resolve);
+  }
+  createMe() {
+    const me = new Peer();
+    // when connection to PeerServer is established, we receive our peerid
+    me.on('open', id => this.onopen(id));
+    // error events
+    me.on('error', err => this.onerror(err));
+    // when a call comes in, answer it
+    me.on('call', mediaConnection => this.oncall(mediaConnection));
     return me;
-  },
-  get nid() {
-    return nid;
-  },
+  }
+  onopen(id) {
+    console.log('My peer ID is: ' + id);
+    this.peerId = id;
+    // when a connection opens, resolve the ready promise
+    this.resolveReady();
+  }
+  onerror(err) {
+    console.error(err);
+  }
+  oncall(media) {
+    // extract info from metadata
+    const metadata = media.metadata;
+    const {id: name, call: peerId} = metadata;
+    const meta = this.mediaConnections[peerId] = {metadata};
+    // announce important happening
+    console.log('ANSWERING <---', name, peerId);
+    // huh?
+    media.answer(this.mediaStream);
+    // here comes a stream from the caller
+    media.on('stream', stream => {
+      meta.stream = stream;
+      console.log('media:onstream', stream);
+      this.onstream(stream, media.metadata);
+    });
+    media.on('close', () => {
+      console.log('media:close');
+    });
+  }
   // the mediaStream that represents me
   // somebody else has to set it
   get mediaStream() {
     return this._mediaStream;
-  },
+  }
   set mediaStream(stream) {
     this._mediaStream = stream;
     if (stream && !stream.active) {
       this.endStreamCall(stream);
     }
-  },
-  shouldCall: them => {
-    if (!myself.mediaStream) {
-      // console.warn('no media stream');
+  }
+  shouldCall(them) {
+    if (!this.mediaStream) {
+      //console.warn('no media stream to call about');
       return false;
     }
-    return !calls[them];
-  },
+    return !this.calls[them];
+  }
   doCall(them) {
     const metadata = {
-      id: myself.name,
-      call: myself.nid
+      id: this.name,
+      call: this.peerId
     };
-    const call = me.call(them, myself.mediaStream, {metadata});
+    const call = this.me.call(them, this.mediaStream, {metadata});
     // answered calls invoke me.oncall, which invokes 'answerCall'
     if (!call) {
       console.log('failed to place call');
     } else {
       //console.log(call);
-      calls[them] = call;
+      this.calls[them] = call;
       call.on('error', error => console.warn(error));
       call.on('close', () => console.log('call:close'));
     }
-  },
-  answerCall: media => {
-    const metadata = media.metadata;
-    const {id: name, call: nid} = metadata;
-    const meta = mediaConnections[nid] = {metadata};
-    //
-    console.log('ANSWERING <---', name, nid);
-    media.answer(myself.mediaStream);
-    media.on('stream', stream => {
-      meta.stream = stream;
-      console.log('media:onstream', stream);
-      myself.onstream(stream, media.metadata);
-    });
-    media.on('close', () => {
-      console.log('media:close');
-    });
-  },
-  endCall: them => {
+  }
+  endCall(them) {
     if (them) {
       console.log('.........END CALL', them);
-      const call = calls[them];
-      calls[them] = null;
+      const call = this.calls[them];
       call?.close?.();
-      setTimeout(calls[them] = null, 500);
+      this.calls[them] = null;
+      //setTimeout(this.calls[them] = null, 500);
     }
-  },
-  endStreamCall: stream => {
-    myself.endCall(mediaConnections[stream]?.metadata?.call);
+  }
+  endStreamCall(stream) {
+    this.endCall(this.mediaConnections[stream]?.metadata?.call);
   }
 };
 
@@ -106,14 +101,14 @@ export const myself = {
 //   get me() {
 //     return me;
 //   },
-//   get nid() {
-//     return nid;
+//   get peerId() {
+//     return peerId;
 //   },
 //   // look for folks who want to connect
 //   async handshake(onxxx) {
 //     myself.onxxx = onxxx;
-//     if (myself.nid) {
-//       const strangers = await tryst.meetStrangers(myself.nid);
+//     if (myself.peerId) {
+//       const strangers = await tryst.meetStrangers(myself.peerId);
 //       strangers.forAll(pid => pid && myself.maybeConnect(pid, onxxx));
 //       this.onstrangers?.(strangers);
 //     }
@@ -128,7 +123,7 @@ export const myself = {
 //   },
 //   doConnect(them, onxxx) {
 //     console.log('---> CALLING', them);
-//     const call = me.call(them, myself.mediaStream, {metadata: {id: myself.metadata.name, call: myself.nid}});
+//     const call = me.call(them, myself.mediaStream, {metadata: {id: myself.metadata.name, call: myself.peerId}});
 //     if (call) {
 //       calls[them] = call;
 //       call.on('error', error => console.warn(error));
