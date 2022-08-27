@@ -6,20 +6,20 @@
  */
 /* global scope */
 ({
-  async initialize({aeon}, state, {service}) {
-    state.lobby = await service({kind: 'LobbyService', msg: 'createLobby', aeon});
+  async initialize({}, state, {service}) {
+    state.lobby = await service({kind: 'LobbyService', msg: 'createLobby'});
   },
-  async update({stream, profile, persona, returnStream}, state, {service, invalidate}) {
+  async update({group, profile, persona, returnStream}, state, {service, invalidate}) {
     //log(profile);
-    state.persona = persona ?? profile?.displayName ?? state.persona ?? await service({kind: 'App', msg: 'MakeName'});
+    state.persona = persona ?? profile?.displayName ?? state.persona ?? await service({msg: 'makeName'});
     if (state.persona) {
-      scope.timeout(invalidate, 3*1e3);
+      scope.timeout(invalidate, 10*1e3);
     }
-    state.streams = await this.updateStreams({returnStream}, state, {service});
+    state.streams = await this.updateStreams({group, returnStream}, state, {service});
     return this.getOutputTranche(state.streams);
   },
-  async updateStreams({returnStream}, {streams, lobby, persona}, {service}) {
-    const newStreams = await service({kind: 'LobbyService', msg: 'meetStrangers', data: {lobby, persona, returnStream}});
+  async updateStreams({group, returnStream}, {streams, lobby, persona}, {service}) {
+    const newStreams = await service({kind: 'LobbyService', msg: 'meetStrangers', data: {lobby, group, persona, returnStream}});
     streams = [
       ...(streams || []),
       ...(newStreams || [])
@@ -35,9 +35,10 @@
       stream3: tranche[3]
     };
   },
-  render(inputs, {persona, streams}) {
+  render({group}, {persona, streams}) {
     const tvs = values(streams || {}).map(({stream, meta: {name}}) => ({stream, name})).reverse();
     return {
+      group,
       name: persona,
       tvs
     };
@@ -78,7 +79,7 @@
 </style>
 
 <div>
-  <span>{{name}}</span>'s Lobby
+  <span>{{name}}</span>'s Lobby: <i>{{group}}</i>
 </div>
 <hr>
 <div tvs flex scrolling row repeat="video_t">{{tvs}}</div>

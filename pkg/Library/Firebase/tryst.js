@@ -9,8 +9,8 @@
 
 const tryst = `https://arcsjs-apps.firebaseio.com/tryst`;
 
-export const meetStrangers = async (aeon, nid, meta) => {
-  const root = `${tryst}${aeon ? `/${aeon}` : ''}/beacons`;
+export const meetStrangers = async (group, nid, meta) => {
+  const root = `${tryst}${group ? `/${group}` : ''}/beacons`;
   // first get all beacons
   let beacons = await fetchBeacons(root);
   // one-pass gambit: beacons are erased periodically,

@@ -61,7 +61,6 @@ export class ContainerLayout extends DragDrop {
     if (state.selectedJson !== selectedJson || rectsJson !== rectsJson) {
       state.selectedJson = selectedJson;
       state.rectsJson = rectsJson;
-
       setTimeout(() => {
         this.updateSelectionAndPositions(selected, rects);
       }, 100);
@@ -126,7 +125,7 @@ export class ContainerLayout extends DragDrop {
   updateOrders(target) {
     const particleDivs = this.querySelectorAll('[particle]');
     particleDivs.forEach(div => {
-      if (!this.state.rects.find(rect => rect.id === div.id)) {
+      if (!this.rects?.find(rect => rect.id === div.id)) {
         div.style.zIndex = 98;
       } else {
         div.style.zIndex = (div === target ? 100 : 99);
@@ -328,7 +327,7 @@ export class ContainerLayout extends DragDrop {
     cursor: ew-resize;
   }
 </style>
-<style>{{styleOverrides}}</style>
+<style>${'{{styleOverrides}}'}</style>
 <div container on-pointerdown="onContainerDown">
   <slot on-pointerdown="onDown" on-pointerup="onUp"></slot>
 </div>

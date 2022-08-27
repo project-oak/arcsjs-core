@@ -8,7 +8,10 @@
  */
 /* global scope */
 ({
-async update({pipeline}, state, {service}) {
+render({group, persona}) {
+  return {
+    nid: `${group}:${persona}`
+  };
 },
 onAccountClick() {
   return {showFlyout: true};
@@ -27,6 +30,12 @@ template: html`
   /* [frame="tv"] > * {
     flex: 1 !important;
   } */
+  [toolbar] {
+    padding: 6px !important;
+  }
+  icon {
+    font-size: 24px;
+  }
   [frame=camera] {
     display: none !important;
     position: absolute;
@@ -39,11 +48,14 @@ template: html`
     overflow: hidden;
   }
 </style>
-<div row>
+
+<div toolbar>
   <div frame="devices"></div>
   <span flex></span>
-  <div toolbar><icon on-click="onAccountClick">account_circle</icon></div>
+  <span>{{nid}}</span>
+  <icon on-click="onAccountClick">account_circle</icon>
 </div>
+
 <div flex row video>
   <div flex row frame="tv"></div>
   <div frame="camera"></div>

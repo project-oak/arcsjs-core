@@ -6,10 +6,11 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {App, makeName, subscribeToDefaultStream} from '../conf/allowlist.js';
+import {
+  App, makeName, subscribeToStream,
+  tryst, Resources, Myself
+} from '../conf/allowlist.js';
 import {RemoteRecipe} from './RemoteRecipe.js';
-import {meetStrangers} from '../../Library/Firebase/tryst.js';
-import {Myself} from '../../Library/Rtc/Meself.js';
 
 // App class
 export const RemoteApp = class extends App {
@@ -19,50 +20,52 @@ export const RemoteApp = class extends App {
   }
   async spinup() {
     await super.spinup();
-    await this.initPersona();
     await this.initRtc();
+    await this.initPersona();
     await this.initLobby();
+    await this.runLobby();
   }
   async initPersona() {
-    // keep "persona" up to date
-    this.arcs.watch('user', 'persona', persona => this.persona = persona);
-    // fetch system value for persona
-    this.persona = await this.arcs.get('user', 'persona');
-    // initialize persona if needed
-    if (!this.persona) {
-      this.persona = makeName();
-      this.arcs.set('user', 'persona', this.persona);
-    }
+  //   // keep "persona" up to date
+  //   this.arcs.watch('user', 'persona', persona => this.persona = persona);
+  //   // fetch system value for persona
+  //   this.persona = await this.arcs.get('user', 'persona');
+  //   // initialize persona if needed
+  //   if (!this.persona) {
+    this.persona = makeName();
+    this.arcs.set('user', 'persona', this.persona);
+  //   }
   }
   async initRtc() {
     this.myself = new Myself();
     this.myself.onstream = this.onstream.bind(this);
-    subscribeToDefaultStream(stream => this.myself.mediaStream = stream);
+    subscribeToStream('default', stream => this.myself.mediaStream = stream);
     await this.myself.ready;
   }
   async initLobby() {
-    // network id
-    const nid = this.myself.peerId;
-    this.meet(this.persona, nid, 3000);
+    this.group = 'frankencense';
+    this.arcs.set('user', 'group', this.group);
+}
+  async runLobby() {
+    this.meet(this.persona, this.myself.peerId, 3000);
   }
-  async meet(name, nid, pingIntervalMs) {
+  async meet(name, peerId, pingIntervalMs) {
     if (!this.closed) {
-      setTimeout(() => this.meet(name, nid, pingIntervalMs), pingIntervalMs || 1e5);
+      setTimeout(() => this.runLobby(), pingIntervalMs || 1e5);
       this.myself.name = this.persona;
-      const strangers = await meetStrangers(name, {name, nid}) || {};
-      Object.values(strangers).forEach(({name, nid}) => {
-        if (this.myself.shouldCall(nid)) {
-          console.log('CALLING', name);
-          this.myself.doCall(nid);
+      const strangers = await tryst.meetStrangers(this.group, name, {persona: name, peerId}) || {};
+      Object.values(strangers).forEach(({persona, peerId}) => {
+        if (this.myself.shouldCall(peerId)) {
+          console.log('CALLING', persona);
+          this.myself.doCall(peerId);
         }
       });
-      //console.log(strangers);
     }
   }
   onstream(stream, meta) {
     console.log('onstream', meta);
     const id = meta?.id || makeName();
-    setResource(id, stream);
+    Resources.set(id, stream);
     this.arcs.set('user', 'remoteStream', id);
   }
   createTvParticle(name, container, stream) {

@@ -8,17 +8,16 @@
  */
 
 import * as tryst from '../Firebase/tryst.js';
-import {Myself} from './Meself.js';
+import {Myself} from './Myself.js';
 import {Resources} from '../App/Resources.js';
 
 const Lobby = class {
-  constructor(aeon) {
+  constructor() {
     this.allStreams = [];
     this.streams = [];
-    this.aeon = aeon || 'universal';
     this.myself = new Myself();
   }
-  async meetStrangers(persona, returnStream) {
+  async meetStrangers(group, persona, returnStream) {
     await this.myself.ready;
     this.myself.name = persona;
     this.myself.mediaStream = Resources.get(returnStream);
@@ -27,7 +26,7 @@ const Lobby = class {
     const {peerId} = this.myself;
     if (peerId) {
       // be present at the meeting place
-      await tryst.meetStrangers(this.aeon, persona, {persona, nid: peerId});
+      await tryst.meetStrangers(group || 'universal', persona, {persona, peerId});
       // these are the streams we captured since last time
       const {streams} = this;
       // start fresh
@@ -64,10 +63,10 @@ const Lobby = class {
 };
 
 export const LobbyService = {
-  createLobby(aeon) {
-    return Resources.allocate(new Lobby(aeon));
+  createLobby() {
+    return Resources.allocate(new Lobby());
   },
-  async meetStrangers({lobby, persona, returnStream}) {
-    return Resources.get(lobby)?.meetStrangers(lobby, persona, returnStream);
+  async meetStrangers({lobby, group, persona, returnStream}) {
+    return Resources.get(lobby)?.meetStrangers(group, persona, returnStream);
   }
 };

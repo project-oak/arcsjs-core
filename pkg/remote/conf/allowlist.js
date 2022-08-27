@@ -13,3 +13,6 @@ export * from '../../core/utils.min.js';
 export * from '../../Library/App/Worker/App.js';
 export * from '../../Library/App/surface-imports.js';
 export * from '../../Library/Media/media-stream/media-stream.js';
+export * as tryst from '../../Library/Firebase/tryst.js';
+export {Myself} from '../../Library/Rtc/Myself.js';
+export {Resources} from '../../Library/App/Resources.js';

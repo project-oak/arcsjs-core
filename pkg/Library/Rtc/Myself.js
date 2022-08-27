@@ -47,6 +47,9 @@ export const Myself = class {
       console.log('media:close');
     });
   }
+  onstream(stream, metadata) {
+    // abstract!
+  }
   // the mediaStream that represents me
   // somebody else has to set it
   get mediaStream() {
