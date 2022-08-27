@@ -13,7 +13,7 @@ import {meetStrangers} from '../Library/Firebase/tryst.js';
 import {myself} from '../Library/Rtc/myself.js';
 import {subscribeToStream} from '../Library/App/surface-imports.js';
 import {LocalStoragePersistor} from '../Library/LocalStorage/LocalStoragePersistor.js';
-import {makeName, logFactory} from '../core/utils.min.js';
+import {makeName, logFactory} from '../Library/Core/utils.min.js';
 
 const log = logFactory(true, 'LobbyApp', 'navy');
 

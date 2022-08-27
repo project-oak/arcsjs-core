@@ -8,6 +8,7 @@ import '../DevTools/Dom/arcs-elements/arcs-elements.js';
 import '../DevTools/Dom/data-explorer/data-explorer.js';
 import '../DevTools/Dom/surface-walker.js';
 import '../DevTools/Dom/resource-view.js';
+import '../D3/d3p/visual-arc/data-graph.js';
 import '../Media/image-resource.js';
 import '../Media/media-stream/video-view.js';
 import '../Media/media-stream/stream-view.js';

@@ -13,16 +13,21 @@
   async refresh(state, service) {
     const context = await service({msg: 'request-context'});
     assign(state, context);
+    state.kick = Math.random();
   },
-  render({}, {runtime, showTools, om, capturedState}) {
+  render({}, {runtime, showTools, capturedState, kick}) {
     const user = runtime;
     const users = runtime?.users || {user};
     const storeBools = user && keys(user.stores).reduce((map, key) => (map[key] = false, map), {});
+    const hosts = this.renderAllHosts(users);
+    const stores = this.renderAllStores(users);
+
     return {
-      om,
+      kick,
       showTools,
-      particles: this.renderAllHosts(users),
-      stores: this.renderAllStores(users),
+      particles: hosts,
+      stores,
+      context: {stores: stores.user, hosts: hosts.user},
       version: Math.random(),
       storeBools,
       capturedState
@@ -70,7 +75,7 @@
     return state[name] = !state[name];
   },
   async onRefreshClick(inputs, state, {service}) {
-    await this.refresh(state, service);
+    return this.refresh(state, service);
   },
   async onCaptureState(inputs, state, {service}) {
     const capturedState = await service({kind: 'DevToolsService', msg: 'stateCapture'});
@@ -82,6 +87,10 @@
     state.capturedState = {[name]: capturedState};
     const put = (url, body) => fetch(url, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body});
     put(`https://arcsjs-apps.firebaseio.com/test/specs/${name}.json`, JSON.stringify(capturedState));
+  },
+  async onTabSelected(inputs, state, {service}) {
+    log('refreshing');
+    return this.refresh(state, service);
   },
   template: html`
 <style>
@@ -170,7 +179,7 @@
     <mwc-icon-button icon="refresh" on-click="onRefreshClick"></mwc-icon-button>
   </div>
   <!-- tabbed pages -->
-  <mxc-tab-pages dark flex tabs="Stores,Particles,Resources,DOM,Tests,Graphs">
+  <mxc-tab-pages dark flex tabs="Stores,Particles,Resources,DOM,Tests,Graphs" on-selected="onTabSelected">
     <!-- Stores -->
     <data-explorer flex scrolling object="{{stores}}" expand></data-explorer>
     <!-- Arcs -->
@@ -180,7 +189,7 @@
       <resource-view version="{{version}}"></resource-view>
     </div>
     <!-- Surfaces -->
-    <surface-walker flex scrolling></surface-walker>
+    <surface-walker flex scrolling kick="{{kick}}"></surface-walker>
     <!-- Tests -->
     <div flex rows>
       <!-- -->
@@ -201,7 +210,7 @@
     </div>
     <!-- Diagrams -->
     <div flex rows>
-      <!-- <data-graph object="{{context}}" flex x3></data-graph> -->
+      <data-graph object="{{context}}" flex x3></data-graph>
     </div>
   </mxc-tab-pages>
 </div>

@@ -47,13 +47,13 @@ export const SurfaceWalker = class {
 };
 
 const template = Xen.Template.html`
-<mwc-icon-button right-aligned icon="refresh" on-click="onRefreshClick"></mwc-icon-button>
+<!-- <mwc-icon-button right-aligned icon="refresh" on-click="onRefreshClick"></mwc-icon-button> -->
 <data-explorer expand object="{{om}}"></data-explorer>
 `;
 
 export class SurfaceWalkerElement extends Xen.Async {
   static get observedAttributes() {
-    return ['object'];
+    return ['object', 'kick'];
   }
   get template() {
     return template;
@@ -77,6 +77,6 @@ export class SurfaceWalkerElement extends Xen.Async {
   render(inputs, {om}) {
     return {om};
   }
-};
+}
 
 customElements.define('surface-walker', SurfaceWalkerElement);

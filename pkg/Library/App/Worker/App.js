@@ -9,7 +9,7 @@
 import {Arcs} from './Arcs.js';
 import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
-import {logFactory, makeId, makeName} from '../../../core/utils.min.js';
+import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
 
 // n.b. lives in 'top' context
 

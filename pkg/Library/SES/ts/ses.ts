@@ -158,6 +158,7 @@ let privateCtor;
 
 const requireParticle = async () => {
   if (!privateCtor) {
+    // TODO(sjmiles): warning: this has gone stale and will fail. Good luck!
     const baseCode = await requireParticleBaseCode();
     privateCtor = particleCompartment.evaluate(baseCode);
   }

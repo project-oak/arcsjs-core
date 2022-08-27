@@ -140,7 +140,7 @@ class DataItem extends Xen.Base {
       if (Array.isArray(value)) {
         json = `(${keys.length} items)`;
       } else if (keys?.length === 0) {
-        json = '(empty)';
+        json = ''; //'(empty)';
       } else if (!expanded) {
         // json = '...';
         json = this.previewValue(value);
@@ -160,7 +160,7 @@ class DataItem extends Xen.Base {
     const uiIsObject = isobject && expanded && Object.keys(value).length;
     const uiObject = uiIsObject ? value : null;
     return {
-      //expanded
+      //expanded,
       type,
       name,
       value: isnull || isobject ? 'null' : isbool ? value : String(value),

@@ -1,0 +1,115 @@
+<!doctype html>
+<!--
+ Copyright (c) 2022 Google LLC All rights reserved.
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file.
+-->
+
+
+<style>
+  body {
+    margin: 0;
+  }
+  visual-arc {
+    height: 100vh;
+    display: flex;
+  }
+</style>
+
+<script type="module">
+  import {d3} from '../d3.js';
+  //
+  // hierarchy :: Node {children: [Node], data: Object, depth: Integer, id: String, parent: Node}
+  // hierarchy = d3.hierarchy(data: Array, children: node=>Iterable)
+  //
+  const go = () => {
+    const data = {
+        name: "MyParticle",
+        children: [{
+          name: "Properties",
+          children: [{
+            name: "Name"
+          }]
+        },{
+          name: "Templates"
+        },{
+          name: "Code"
+        }]
+      };
+    // make a specific hierarchy data-structure out of arbitrary hierarchical data
+    // if not supplied, `children` function defaults to `node => node.children`
+    const root = d3
+      .hierarchy(data)
+      ;
+    //
+    let i = 0;
+    const tree = d3
+      .tree()
+      // nodeSize sets {y,x} properties on nodes
+      .nodeSize([32, 16])(root)
+      .each(n => [n.x, n.y] = [n.y, n.x + (i++)*32])
+      //.each(n => n.x = n.x - n.x)
+      //.sum(n => 48)
+      //.each(n => n.x += n.depth*32/*= (n.parent?.x || 0)*/)
+      //.each(n => n.y += n.depth*32/*= (n.parent?.x || 0)*/)
+      //.each(n => n.x += n.count().value * 48)
+      ;
+    //console.log(tree);
+    //
+    // only does something if nodes have {y,x} properties
+    let x0 = Infinity;
+    let x1 = -x0;
+    root.each(d => {
+      //console.log(d);
+      if (d.x > x1) x1 = d.x;
+      if (d.x < x0) x0 = d.x;
+    });
+    //console.log(x0, x1);
+    /*
+    // set arbitrary values on root (?)
+    root.dx = 10;
+    // root.height is the depth of the tree
+    root.dy = width / (root.height + 1);
+    const tree =
+      // make a tree layout
+      d3.tree()
+      .nodeSize([root.dx, root.dy])(root)
+      ;
+    return tree;
+    */
+    const svg = d3
+      .create('svg')
+      .attr("viewBox", [0, 0, 1024, 1024])
+      ;
+    const g =svg
+      .append('g')
+      .attr('font-family', 'sans-serif')
+      .attr('font-size', 10)
+      .attr("transform", d => `translate(256, 256)`)
+      //.attr("stroke-linejoin", "round")
+      //.attr("stroke-width", 3)
+      // select existing set of 'g' (from here)
+      ;
+    const node = g
+      .append('g')
+      .selectAll('g')
+        // these are the children to render
+        .data(root.descendants())
+        // convenience for updating the set of 'g'
+        .join('g')
+          //.attr('transform', d => {console.log(d); return `translate(48, 48)`;})
+          .attr("transform", d => {console.log(d.x, d.y, d.data.name); return `translate(${d.x}, ${d.y})`;})
+      ;
+    node.append('text')
+      //.attr("dy", "0.31em")
+      //.attr("x", d => d.children ? -6 : 6)
+      //.attr("text-anchor", d => d.children ? "end" : "start")
+      .text(d => d.data.name)
+      //.clone(true).lower()
+        //.attr("stroke", "white")
+      ;
+    //
+    document.body.appendChild(svg.node());
+  };
+  go();
+</script>

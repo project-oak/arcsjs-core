@@ -10,7 +10,7 @@ import {App} from '../Library/App/Worker/App.js';
 import {NodebaseRecipe} from './Library/NodebaseRecipe.js';
 // import {LocalStoragePersistor} from '../Library/LocalStorage/LocalStoragePersistor.js';
 // import {FissionPersistor} from '../Library/Fission/FissionPersistor.js';
-import {logFactory} from '../core/utils.min.js';
+import {logFactory} from '../Library/Core/utils.min.js';
 import '../Library/App/surface-imports.js';
 
 const log = logFactory(true, 'Nodebase', 'navy');

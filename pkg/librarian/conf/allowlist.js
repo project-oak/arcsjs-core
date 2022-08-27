@@ -7,15 +7,15 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-export * from '../../core/utils.min.js';
+export * from '../../Library/Core/utils.min.js';
 export * from '../../Library/App/surface-imports.js';
 
 // n.b. operates in outer context
 
 // extract an absolute url to the folder 1 above here (aka 'librarian/')
-import {Paths} from '../../core/utils.min.js';
+import {Paths} from '../../Library/Core/utils.min.js';
 const url = Paths.getAbsoluteHereUrl(import.meta, 2);
- 
+
 // calculate important paths
 export const paths = {
   $app: url,
