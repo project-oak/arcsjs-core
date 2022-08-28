@@ -5,6 +5,6 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-export * from './js/crdt/AutomergeStore.js.js';
-export * from './js/crdt/AutomergeNetwork.js.js';
-export * from './js/core/AggregateStore.js.js';
+export * from './js/crdt/AutomergeStore.js';
+export * from './js/crdt/AutomergeNetwork.js';
+export * from './js/core/AggregateStore.js';
