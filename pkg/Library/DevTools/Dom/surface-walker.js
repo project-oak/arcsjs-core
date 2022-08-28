@@ -21,10 +21,11 @@ export const SurfaceWalker = class {
       const id = a$.id?.value;
       const particleName = a$.particle?.value;
       if (id === 'arc') {
-        names.push(`Arc`)
+        names.push(`Arc`);
       }
       if (particleName) {
-        names.push(`${particleName} (Particle)`)
+        names.push(`${particleName}`);
+        // names.push(`${particleName} (Particle)`);
       }
       if (names.length) {
         return names.join(':');
@@ -68,7 +69,8 @@ export class SurfaceWalkerElement extends Xen.Async {
     const data = new SurfaceWalker().from(document.body);
     const stratify = mapped => {
       const strata = {};
-      mapped.children?.forEach((child, i) => strata[`${child.id} (${i})`] = stratify(child));
+      mapped.children?.forEach((child, i) => strata[`${child.id}`] = stratify(child));
+      //mapped.children?.forEach((child, i) => strata[`${child.id} (${i})`] = stratify(child));
       return strata;
     };
     const om = stratify(data);

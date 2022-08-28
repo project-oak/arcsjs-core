@@ -14,10 +14,12 @@ export const TextField = {
   },
   $stores: {
     label: {
-      $type: 'String'
+      $type: 'String',
+      $value: 'text field'
     },
     value: {
-      $type: 'String'
+      $type: 'String',
+      $value: 'value'
     }
   },
   field: {
@@ -34,7 +36,8 @@ export const BooleanField = {
   },
   $stores: {
     label: {
-      $type: 'String'
+      $type: 'String',
+      $value: 'boolean field'
     },
     value: {
       $type: 'Boolean'
@@ -54,10 +57,12 @@ export const TextObject = {
   },
   $stores: {
     text: {
-      $type: 'String'
+      $type: 'String',
+      $value: 'static text'
     },
     textStyle: {
-      $type: 'String'
+      $type: 'String',
+      $value: 'font-weight: bold; color: red; font-size: 18px;'
     }
   },
   text: {

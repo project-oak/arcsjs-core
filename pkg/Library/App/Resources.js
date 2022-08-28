@@ -32,3 +32,16 @@ export const Resources = {
     return resources;
   }
 };
+
+/*export*/ const ResourceService = {
+  allocateResource() {
+    const id = '';
+    return id;
+  },
+  disposeResource(id) {
+  },
+  allocateCanvas() {
+    const id = '';
+    return id;
+  }
+};

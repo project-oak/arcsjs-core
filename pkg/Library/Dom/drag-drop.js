@@ -27,6 +27,7 @@ export const DragDrop = class extends Xen.Async {
     if (!e.buttons) {
       this.onUp(e);
     } else if (this.dragging) {
+      e.preventDefault();
       const {screenX: sx, screenY: sy} = e;
       const {x:x0, y:y0} = this.dragStart;
       const [dx, dy] = [sx-x0, sy-y0];

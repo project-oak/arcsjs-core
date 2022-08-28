@@ -10,12 +10,12 @@
   },
   async update(inputs, state, {service}) {
     //log(inputs.image);
-    const {shader, image} = inputs;
+    const {shader, image, audio} = inputs;
     if (shader !== state.shader) {
       state.shader = shader;
       state.shaderId = await this.updateShaderId(state.shaderId, shader, service);
     }
-    if (state.shaderId && image?.canvas) {
+    if (state.shaderId && image?.canvas || audio) {
       state.output = await this.updateOutputCanvas(inputs, state, {service});
       return {output: state.output};
     }
@@ -35,14 +35,15 @@
     await this.shaderize(state.shaderId, inputs, output, service);
     return output;
   },
-  async shaderize(shaderId, {shader, image, image2, image3, image4}, output, service) {
+  async shaderize(shaderId, {shader, image, image2, image3, image4, audio}, output, service) {
     return service({
       kind: 'ShaderService',
       msg: 'runFragment',
       data: {
-        shaderId,
         shader,
+        shaderId,
         inImageRefs: [image, image2, image3, image4],
+        inAudioRef: audio,
         outImageRef: output
       }
     });

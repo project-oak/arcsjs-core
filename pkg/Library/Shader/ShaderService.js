@@ -12,7 +12,7 @@ const {assign} = Object;
 
 const log = logFactory(logFactory.flags.services || logFactory.flags.ShaderService, 'ShaderService', 'teal');
 
-const isImproperSize = (width, height) => !width || !height;
+//const isImproperSize = (width, height) => !width || !height;
 
 export const ShaderService = {
   makeShader({shader, shaderId}) {
@@ -21,21 +21,30 @@ export const ShaderService = {
     fragShader.init(shader);
     return Resources.allocate(fragShader);
   },
-  async runFragment({shaderId, inImageRefs, outImageRef}) {
+  async runFragment({shaderId, inImageRefs, inAudioRef, outImageRef}) {
+    // get real shader
     const shader = Resources.get(shaderId);
+    // get real output canvas
     const outCanvas = Resources.get(outImageRef?.canvas);
+    // get all the real input canvases
     const inCanvases = inImageRefs.map(ref => ref && Resources.get(ref.canvas));
-    if (inCanvases?.[0] && outCanvas && shader) {
-      const {width, height} = inCanvases[0];
-      if (isImproperSize(width, height)) {
-        log.warn('input canvas is improper', width, height);
-      } else {
-        assign(outCanvas, {width, height});
-        shader?.render(inCanvases, outCanvas);
-      }
+    // get the real audio input
+    const inAudio = Resources.get(inAudioRef);
+    // if (shader) {
+    //   shader?.render(inCanvases, outCanvas);
+    // }
+    // if (inCanvases?.[0] && outCanvas && shader) {
+    if ((inCanvases?.[0] || inAudio) && outCanvas && shader) {
+      const {width, height} = inCanvases?.[0] || {width: 640, height: 480};
+      //   if (isImproperSize(width, height)) {
+      //     log.warn('input canvas is improper', width, height);
+      //   } else {
+      assign(outCanvas, {width, height});
+      shader?.render(inCanvases, inAudio, outCanvas);
+      //   }
     }
     return outImageRef;
-  },
+  }
 };
 
 const ShaderJunk = class {
@@ -80,6 +89,8 @@ const ShaderJunk = class {
     uniforms.iChannel1 = {value: channels[1].texture};
     uniforms.iChannel2 = {value: channels[2].texture};
     uniforms.iChannel3 = {value: channels[3].texture};
+    //this.audioChannel = this.createAudioChannel();
+    //uniforms.iAudioChannel = {value: this.audioChannel.texture};
     // our shader material
     const material = new THREE.ShaderMaterial({
       fragmentShader,
@@ -117,7 +128,7 @@ const ShaderJunk = class {
     texture.wrapT = THREE.RepeatWrapping;
     return {texture, textureCanvas};
   }
-  render(inCanvases, outCanvas) {
+  render(inCanvases, inAudio, outCanvas) {
     // advance time
     this.timeCadence();
     // inCanvases will be stretched to fix textureCanvas dimensions
@@ -127,15 +138,37 @@ const ShaderJunk = class {
         this.updateChannel(channel, canvas);
       }
     });
+    // prepare audio channel data
+    this.updateAudioChannel(inAudio);
     // shadedCanvas will be stretched to fix outCanvas dimensions
     this.privateRender(outCanvas);
   }
   updateChannel(inChannel, inCanvas) {
     // inCanvas will be stretched to fix textureCanvas dimensions
     const {width, height} = inChannel.textureCanvas;
-    inChannel.textureCanvas.getContext('2d')
-      .drawImage(inCanvas, 0, 0, width, height);
+    inChannel.textureCanvas.getContext('2d').drawImage(inCanvas, 0, 0, width, height);
     inChannel.texture.needsUpdate = true;
+  }
+  updateAudioChannel(inAudio) {
+    if (inAudio) {
+      if (!this.buffer) {
+        log('creating audio buffer of length', inAudio.bufferLength);
+        this.buffer = new Uint8Array(inAudio.bufferLength);
+      }
+      inAudio.analyser.getByteTimeDomainData(this.buffer);
+      const {texture} = this.createAudioChannel(this.buffer);
+      this.uniforms.iAudioChannel = {value: texture};
+    }
+  }
+  createAudioChannel(data) {
+    const texture = new THREE.DataArrayTexture(data, 1024, 1, 1028);
+    //log(data);
+    // const texture = new THREE.DataArrayTexture(data);
+    // texture.minFilter = THREE.MinFilter;
+    // texture.magFilter = THREE.Nearest;
+    // //texture.wrapS = THREE.ClampToEdge;
+    // //texture.wrapT = THREE.ClampToEdge;
+    return {texture};
   }
   privateRender(outCanvas) {
     // attempt to render the scene
@@ -150,10 +183,10 @@ const ShaderJunk = class {
       // uhps
       this.ready = false;
       log.error('WebGL renderer failed');
-      console.groupCollapsed('error');
-      console.error(x);
-      console.log(this);
-      console.groupEnd();
+      log.groupCollapsed('error');
+      log.error(x);
+      log.log(this);
+      log.groupEnd();
     }
   }
   timeCadence() {

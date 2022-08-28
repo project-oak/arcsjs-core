@@ -8,7 +8,7 @@
  */
 import './conf/config.js';
 import {paths} from './conf/allowlist.js';
-import {NodebaseApp} from './NodebaseApp.js';
+import {NodebaseApp} from './Library/NodebaseApp.js';
 
 // spin up application instance
 try {

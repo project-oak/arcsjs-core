@@ -4,17 +4,12 @@
  * license that can be found in the LICENSE file.
  */
 
- import {Parser} from '../../../core.js';
- import {Xen} from '../../../Dom/Xen/xen-async.js';
+import {Parser} from '../../../core.js';
+import {Xen} from '../../../Dom/Xen/xen-async.js';
 import {d3} from '../../d3.js';
 import {renderForceGraph} from './d3-render.js';
 
-// import {VivinoAction} from '../../../../Actions/DefaultActions.js';
-// import {OpenFoodFactsAction} from '../../../../Actions/DefaultActions.js';
-
 const recipes = [
-  // ...VivinoAction.recipes,
-  // ...OpenFoodFactsAction.recipes
 ];
 
 const template = Xen.Template.html`
@@ -140,23 +135,31 @@ export class DataGraph extends Xen.Async {
             this.mergeState({selected: id});
           }
         };
+        // links array is primary output of this method
         // build links using bindings
-        h.meta?.inputs && h.meta.inputs.forEach(input => {
-          const key = Object.keys(input)[0];
-          const value = input[key];
+        const io = [];
+        h.meta.inputs?.forEach(input => {
+          const [key, value] = Object.entries(input).pop();
+          io.push({key, value, input: true});
+        });
+        h.meta.outputs?.forEach(output => {
+          const [key, value] = Object.entries(output).pop();
+          io.push({key, value, output: true});
+        });
+        io.forEach(({key, value, input, output}) => {
           // add a link between this particle and the target store
           const target = value || key;
-            links.push({
-              hi,
-              source: id,
-              target,
-              strength: 0.0001
-            });
-            if (hi) {
-              bound.push(target);
-            }
-          }
-        );
+          links.push({
+            hi,
+            source: id,
+            target,
+            strength: 0.0001,
+            input
+          });
+          // if (hi) {
+          //   bound.push(target);
+          // }
+        });
         // return a node for the particle
         return particle;
       })

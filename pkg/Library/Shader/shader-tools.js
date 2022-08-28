@@ -16,6 +16,7 @@ export const uniformsFactory = () => ({
   iChannel1: {value: null},
   iChannel2: {value: null},
   iChannel3: {value: null},
+  iAudioChannel: {value: null},
   // iMouse: {value: null},
   // iDate: {value: null},
   // iSampleRate: {value: 44100}
@@ -33,6 +34,7 @@ uniform sampler2D iChannel0;             // input channel. XX = 2D/Cube
 uniform sampler2D iChannel1;             // input channel. XX = 2D/Cube
 uniform sampler2D iChannel2;             // input channel. XX = 2D/Cube
 uniform sampler2D iChannel3;             // input channel. XX = 2D/Cube
+uniform sampler2D iAudioChannel;         // input channel.
 uniform vec4      iDate;                 // (year, month, day, time in seconds)
 uniform float     iSampleRate;           // sound sample rate (i.e., 44100)
 

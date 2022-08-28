@@ -21,7 +21,6 @@
     const storeBools = user && keys(user.stores).reduce((map, key) => (map[key] = false, map), {});
     const hosts = this.renderAllHosts(users);
     const stores = this.renderAllStores(users);
-
     return {
       kick,
       showTools,
@@ -89,7 +88,6 @@
     put(`https://arcsjs-apps.firebaseio.com/test/specs/${name}.json`, JSON.stringify(capturedState));
   },
   async onTabSelected(inputs, state, {service}) {
-    log('refreshing');
     return this.refresh(state, service);
   },
   template: html`

@@ -1,14 +1,14 @@
 globalThis.config = {
   aeon: 'nod3Base/0.4.0',
   meta: 'nod3Base',
-  theme: 'dark',
+  //theme: 'dark',
   logFlags: {
     app: true,
-    recipe: true,
+    //recipe: true,
     //runtime: true,
     //arc: true,
     particles: true,
-    storage: true,
+    //storage: true,
     //surfaces: true,
     //services: true
   }

@@ -10,6 +10,7 @@ import {Arcs} from './Arcs.js';
 import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
 import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
+import {themeRules} from '../theme.js';
 
 // n.b. lives in 'top' context
 
@@ -31,7 +32,7 @@ export const App = class {
       paths: this.paths,
       root: this.root || document.body,
       onservice: this.service.bind(this),
-      injections: this.injections
+      injections: {themeRules, ...this.injections}
     });
     await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     // TODO(sjmiles): pick a syntax
@@ -39,6 +40,35 @@ export const App = class {
     Arcs.addAssembly(assembly, 'user');
   }
   async service({request}) {
+    // if we are specific
+    if (request?.kind) {
+      // find that kind of service
+      const service = this.services?.[request.kind];
+      if (!service) {
+        // user should know
+        log.warn(`[${request?.kind}] is not registered`);
+        return null;
+      }
+      // service gets request
+      return this.dispatchServiceRequest(service, request);
+    }
+    // otherwise it's an App request
+    return this.appService({request});
+  }
+  async dispatchServiceRequest(service, request) {
+    try {
+      const {kind, msg, data} = request || {};
+      if (service[msg]) {
+        return (service[msg])(data);
+      } else {
+        log.warn(`no handler for "${kind}:${msg}"`);
+      }
+    } catch (e) {
+      log.warn(e.toString());
+    }
+  }
+  async appService({request}) {
+    // magic special services
     switch (request?.msg) {
       case 'makeName':
       case 'MakeName':
@@ -53,38 +83,13 @@ export const App = class {
       case 'restore':
         return this.restore(request);
     }
-    // this code is tricky for performance sake
-    const resultPromise =
-      // may be null
-      this.dispatchServiceRequest({request})
-      // must be a promise
-      || this.appService({request})
-      ;
-    return await resultPromise;
-}
-  async appService({request}) {
-    const value = await this.onservice?.('user', 'host', request);
+    // any old subclass service
+    const value = await this.onservice('user', 'host', request);
     log('service:', `[${request?.kind || 'App'}]`, request?.msg, '=', value);
     return value;
   }
-  dispatchServiceRequest({request}) {
-    if (request?.kind) {
-      const service = this.services?.[request?.kind];
-      if (!service) {
-        log('no service called', request?.kind);
-      } else {
-        try {
-          const {msg, data} = request || {};
-          if (service[msg]) {
-            return (service[msg])(data);
-          } else {
-            log.warn(`no handler for "${request?.kind}:${msg}"`);
-          }
-        } catch (e) {
-          log.warn(e.toString());
-        }
-      }
-    }
+  async onservice(user, host, request) {
+    // abstract
   }
   async persist({storeId, data}) {
     await this.persistor?.persist(storeId, data);

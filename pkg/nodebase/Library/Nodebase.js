@@ -85,10 +85,14 @@ template: html`
         <div flex></div>
         <icon on-click="onToggleRight">{{rightIcon}}</icon>
       </div>
+      <split-panel flex rows>
+        <div slot="startside" flex rows frame="preview"></div>
+        <div slot="endside" flex rows frame="editor"></div>
+      </split-panel>
       <!-- middle 1 -->
-      <div flex x3 rows frame="preview"></div>
+      <!-- <div flex x3 rows frame="preview"></div> -->
       <!-- middle 2 -->
-      <div hidden flex rows frame="editor"></div>
+      <!-- <div flex rows frame="editor"></div> -->
     </div>
     <!-- right -->
     <div right center collapsed$="{{rightCollapsed}}" section frame="inspector"></div>

@@ -143,8 +143,15 @@ export const renderForceGraph = (data, width, height) => {
     .data(links)
     .join("line")
       // .attr("stroke", d => d.hi ? "#eee" : "#555")
-      .attr("stroke", "#eee")
-      .attr("stroke-width", 0.1) //d => Math.sqrt(d.value))
+      .attr("stroke",
+        //'#eee'
+        // TODO(sjmiles): this function should come flying in from outside
+        d => d.input ? 'green' : 'red'
+      )
+      .attr("stroke-width",
+        //"0.4"
+        d => d.input ? '0.6' : '0.2'
+      )
     ;
   // node node gets all the node points
   const node = topG.append("g")
