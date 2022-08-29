@@ -146,7 +146,9 @@ const ShaderJunk = class {
   updateChannel(inChannel, inCanvas) {
     // inCanvas will be stretched to fix textureCanvas dimensions
     const {width, height} = inChannel.textureCanvas;
-    inChannel.textureCanvas.getContext('2d').drawImage(inCanvas, 0, 0, width, height);
+    const ctx = inChannel.textureCanvas.getContext('2d');
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(inCanvas, 0, 0, width, height);
     inChannel.texture.needsUpdate = true;
   }
   updateAudioChannel(inAudio) {
