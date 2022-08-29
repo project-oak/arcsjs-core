@@ -9,7 +9,7 @@
 import {Xen} from './Xen/xen-async.js';
 import {DragDrop} from './drag-drop.js';
 import {IconsCss} from './Material/material-icon-font/icons.css.js';
-import {deepEqual} from '../../core/js/utils/object.js';
+import {deepEqual} from '../../core/utils.min.js';
 
 const {assign} = Object;
 
