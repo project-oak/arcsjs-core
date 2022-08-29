@@ -19,7 +19,16 @@ export class ResourceView extends Xen.Async {
   }
   render({}, {canvases}) {
     return {
-      canvi: canvases?.map(([name, res]) => ({key: name}))
+      resources: entries(Resources.all()).filter(([name, res]) => name && res).map(([name, res]) => ({
+        key: name,
+        notCanvas: res?.localName !== 'canvas',
+        notStream: !(res instanceof MediaStream),
+        typeof:
+          res?.localName === 'canvas' ? 'Canvas'
+          : (res instanceof MediaStream) ? 'Stream'
+          : typeof(res),
+        stream: (res instanceof MediaStream) ? res : null,
+      }))
     };
   }
   _didRender({}, {canvases}) {
@@ -40,23 +49,33 @@ export class ResourceView extends Xen.Async {
   :host {
     display: block;
   }
-  [canvas] {
-    margin: 12px;
-  }
-  canvas {
+  [resource] {
+    display: inline-flex;
+    flex-direction: column;
     border: 1px solid orange;
+    margin: 12px;
+    padding: 8px;
+  }
+  canvas, video {
+    border: 1px solid purple;
+    width: 120px;
+    height: 90px;
+  }
+  i {
+    font-size: 0.75em;
   }
 </style>
 <!-- <data-explorer object="{{resources}}"></data-explorer> -->
-<h4>Canvas Resources</h4>
-<div repeat="canvas_t">{{canvi}}</div>
-<template canvas_t>
-  <div canvas display="inline-block">
-    <canvas key$="{{key}}" width="120" height="90"></canvas><br>
-    <b>{{key}}</b>
+<div repeat="resource_t">{{resources}}</div>
+<template resource_t>
+  <div resource>
+    <b>{{typeof}}</b>
+    <canvas hidden$="{{notCanvas}}" key$="{{key}}" width="120" height="90"></canvas>
+    <video hidden$="{{notStream}}" srcobject="{{srcObject:stream}}" playsinline autoplay muted></video>
+    <i>{{key}}</i>
   </span>
 </template>
-`
+`;
   }
 }
 

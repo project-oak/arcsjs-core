@@ -21,7 +21,7 @@
     return {
       om,
       showTools,
-      //particles: this.renderAllHosts(users),
+      particles: this.renderAllHosts(users),
       stores: this.renderAllStores(users),
       version: Math.random(),
       storeBools,
@@ -39,7 +39,11 @@
   },
   renderHosts(hosts) {
     return this.map(hosts, ({meta, particle: {internal: {state, inputs}}}) => {
-      const {runtime, ...filtered} = state;
+      const filtered = {};
+      keys(state)
+        .filter(key => (key !== 'runtime') && (typeof state[key] !== 'function'))
+        .forEach(key => filtered[key] = state[key])
+        ;
       return {meta, inputs, state: filtered};
     });
   },
@@ -47,13 +51,13 @@
     return this.map(users, user => this.renderSimpleStores(user?.stores));
   },
   renderSimpleStores(stores) {
-    const result = this.map(stores, ({data, meta}) => ({value: data, meta}));
+    const result = {};
+    const mappedStores = this.map(stores, ({data, meta}) => ({value: data, meta}));
     //const kbSize = value => !isNaN(value) ? `${(value / 1024).toFixed(1)} Kb` : '';
-    entries(result).forEach(([name, store]) => {
-      delete result[name];
+    entries(mappedStores).forEach(([name, store]) => {
       // TODO(sjmiles): really slow for big stores
       //result[`${name} (${kbSize(stores[name]?.save()?.length)})`] = store;
-      result[`${name}`] = store;
+      result[name] = store;
     });
     return result;
   },
@@ -166,7 +170,7 @@
     <mwc-icon-button icon="refresh" on-click="onRefreshClick"></mwc-icon-button>
   </div>
   <!-- tabbed pages -->
-  <mxc-tab-pages dark flex tabs="Stores,Arcs,Services,DOM,Tests,Graphs">
+  <mxc-tab-pages dark flex tabs="Stores,Particles,Resources,DOM,Tests,Graphs">
     <!-- Stores -->
     <data-explorer flex scrolling object="{{stores}}" expand></data-explorer>
     <!-- Arcs -->

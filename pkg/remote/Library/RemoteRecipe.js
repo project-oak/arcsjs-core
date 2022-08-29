@@ -14,6 +14,10 @@ export const RemoteRecipe = {
   },
   $stores: {
     persona: {$type: 'Persona'},
+    group: {
+      $type: 'String',
+      $value: 'universal'
+    },
     remoteStream: {$type: 'Stream'},
     showFlyout: {$type: 'Boolean'}
   },
@@ -34,7 +38,7 @@ export const RemoteRecipe = {
   },
   remote: {
     $kind: '$app/Library/Remote',
-    $inputs: ['showFlyout'],
+    $inputs: ['showFlyout', 'persona', 'group'],
     $outputs: ['showFlyout'],
     $slots: {
       devices: DeviceUxRecipe,
