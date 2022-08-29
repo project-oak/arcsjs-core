@@ -17,8 +17,8 @@ shouldUpdate({nodeTypes}) {
 
 update(inputs, state) {
   const {pipeline} = inputs;
-  if (this.pipelineChanged(pipeline, state.pipeline) ||
-      (pipeline?.nodes && this.nodesDidChange(pipeline.nodes, state.nodes))) {
+  if (pipeline?.nodes &&
+      (this.pipelineChanged(pipeline, state.pipeline) || this.nodesDidChange(pipeline.nodes, state.nodes))) {
     state.pipeline = pipeline;
     state.nodes = [...pipeline.nodes];
     return this.updateNodes(inputs, state);

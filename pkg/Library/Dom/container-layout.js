@@ -60,6 +60,7 @@ export class ContainerLayout extends DragDrop {
     const rectsJson = JSON.stringify(rects);
     if (state.selectedJson !== selectedJson || rectsJson !== rectsJson) {
       state.selectedJson = selectedJson;
+      state.rects = rects;
       state.rectsJson = rectsJson;
 
       setTimeout(() => {
