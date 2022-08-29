@@ -9,6 +9,7 @@
 import {Xen} from './Xen/xen-async.js';
 import {DragDrop} from './drag-drop.js';
 import {IconsCss} from './Material/material-icon-font/icons.css.js';
+import {deepEqual} from '../../core/utils.min.js';
 
 const {assign} = Object;
 
@@ -56,11 +57,9 @@ export class ContainerLayout extends DragDrop {
     }
   }
   update({selected, rects}, state) {
-    const selectedJson = JSON.stringify(selected);
-    const rectsJson = JSON.stringify(rects);
-    if (state.selectedJson !== selectedJson || rectsJson !== rectsJson) {
-      state.selectedJson = selectedJson;
-      state.rectsJson = rectsJson;
+    if (!deepEqual(selected, state.selected) || !deepEqual(rects, state.rects)) {
+      state.rects = rects;
+      this.selected = selected;
       setTimeout(() => {
         this.updateSelectionAndPositions(selected, rects);
       }, 100);
