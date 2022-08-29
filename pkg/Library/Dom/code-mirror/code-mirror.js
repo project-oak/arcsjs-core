@@ -84,7 +84,7 @@ export class CodeMirrorElement extends Xen.Async {
     }
   }
   onMirrorBlur() {
-    this.fire('blur');
+    this.fire('code-blur');
   }
 }
 

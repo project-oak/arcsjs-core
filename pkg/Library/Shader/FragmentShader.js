@@ -71,7 +71,7 @@
   </style>
   <mxc-tab-pages flex tabs="Output, Code">
     <image-resource center flex image="{{output}}"></image-resource>
-    <code-mirror flex text="{{code}}" on-blur="onCodeChanged"></code-mirror>
+    <code-mirror flex text="{{code}}" on-code-blur="onCodeChanged"></code-mirror>
   </mxc-tab-pages>
   `
   });
