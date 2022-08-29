@@ -48,11 +48,12 @@ export class CodeMirrorElement extends Xen.Async {
       lineNumbers: true,
       theme: 'material-darker' //'blackboard'
     });
-    this.observeCodeMirror(this.mirror, this.onMirrorChanges.bind(this));
+    this.observeCodeMirror(this.mirror, this.onMirrorChanges.bind(this), this.onMirrorBlur.bind(this));
   }
-  observeCodeMirror(mirror, onchanges) {
+  observeCodeMirror(mirror, onchanges, onblur) {
     // react to edits
     mirror.on('changes', onchanges);
+    mirror.on('blur', onblur);
     // update mirror layout when host size changes
     (new ResizeObserver(() => mirror.refresh())).observe(this);
   }
@@ -81,6 +82,9 @@ export class CodeMirrorElement extends Xen.Async {
     if (!this.squelch) {
       this.fire('changes');
     }
+  }
+  onMirrorBlur() {
+    this.fire('blur');
   }
 }
 
