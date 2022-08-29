@@ -36,6 +36,9 @@ export const NodebaseRecipe = {
     inspectorData: {
       $type: 'Pojo'
     },
+    inspectedNodeType: {
+      $type: 'JSON'
+    },
     recipes: {
       $type: '[Pojo]',
       $value: []
@@ -64,7 +67,8 @@ export const NodebaseRecipe = {
           $outputs: ['records']
         },
         runner: {
-          $kind: '$library/NodeGraph/Runner',
+          //$kind: '$library/NodeGraph/Runner',
+          $kind: '$library/Designer/Designer',
           $inputs: [
             'recipes',
             {pipeline: 'selectedPipeline'},
@@ -107,8 +111,9 @@ export const NodebaseRecipe = {
       'nodeTypes',
     ],
     $outputs: [
-      {node: 'selectedNode'},
-    ],
+      {data: 'inspectorData'},
+      {nodeType: 'inspectedNodeType'}
+    ]
   },
   nodeUpdator: {
     $kind: '$library/NodeGraph/NodeUpdator',

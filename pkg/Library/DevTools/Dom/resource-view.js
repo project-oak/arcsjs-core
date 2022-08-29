@@ -26,6 +26,7 @@ export class ResourceView extends Xen.Async {
         typeof:
           res?.localName === 'canvas' ? 'Canvas'
           : (res instanceof MediaStream) ? 'Stream'
+          : (res?.sampleRate) ? 'Audio'
           : typeof(res),
         stream: (res instanceof MediaStream) ? res : null,
       }))

@@ -32,7 +32,7 @@ template: html`
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 13px 20px;
     color: #5f6368;
   }
   [search-container] input {

@@ -13,6 +13,9 @@ export const NodeCatalogStores = {
   },
   hoveredNodeType: {
     $type: 'JSON'
+  },
+  categories: {
+    $type: 'JSON'
   }
 };
 

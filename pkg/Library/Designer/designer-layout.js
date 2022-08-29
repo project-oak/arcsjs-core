@@ -6,14 +6,13 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Xen} from './Xen/xen-async.js';
-import {DragDrop} from './drag-drop.js';
-import {IconsCss} from './Material/material-icon-font/icons.css.js';
-import {deepEqual} from '../Core/utils.min.js';
+import {Xen} from '../Dom/Xen/xen-async.js';
+import {DragDrop} from '../Dom/drag-drop.js';
+import {IconsCss} from '../Dom/Material/material-icon-font/icons.css.js';
 
 const {assign} = Object;
 
-export class ContainerLayout extends DragDrop {
+export class DesignerLayout extends DragDrop {
   static get observedAttributes() {
     return [
       'selected', 'rects',
@@ -27,39 +26,36 @@ export class ContainerLayout extends DragDrop {
   }
   setupKeyboardShortcut() {
     document.addEventListener('keydown', (event) => {
-      // Don't trigger if any input elements have the focus.
-      const activeEle = this.getActiveElement(document);
-      const isInputElement = activeEle.tagName === 'INPUT' ||
-          activeEle.tagName === 'SELECT' || activeEle.tagName === 'TEXTAREA' ||
-          activeEle.contentEditable === 'true';
-      if (isInputElement) {
-        return;
-      }
-
-      // Delete the selected node or edge when pressing the "backspace" or "delete" key .
-      if (event.key === 'Backspace' || event.key === 'Delete') {
-        if (this.target) {
-          this.key = this.target.id;
-          this.fire('delete');
+      if (!this.hasActiveInput()) {
+        // Delete the selected node or edge when pressing the "backspace" or "delete" key .
+        if (event.key === 'Backspace' || event.key === 'Delete') {
+          this.deleteAction(this.target);
         }
       }
     });
   }
-  getActiveElement(root) {
-    const activeEl = root.activeElement;
-    if (!activeEl) {
-      return null;
-    }
-    if (activeEl.shadowRoot) {
-      return this.getActiveElement(activeEl.shadowRoot);
-    } else {
-      return activeEl;
+  hasActiveInput() {
+    const active = this.getActiveElement(document);
+    return active?.contentEditable
+      || ['INPUT', 'SELECT', 'TEXTAREA'].includes(active?.tagName)
+      ;
+  }
+  getActiveElement({activeElement}) {
+    return activeElement?.shadowRoot ? this.getActiveElement(activeElement.shadowRoot) : activeElement;
+  }
+  deleteAction(target) {
+    if (target) {
+      this.key = target.id;
+      this.fire('delete');
     }
   }
   update({selected, rects}, state) {
-    if (!deepEqual(selected, state.selected) || !deepEqual(rects, state.rects)) {
-      state.rects = rects;
-      this.selected = selected;
+    const selectedJson = JSON.stringify(selected);
+    const rectsJson = JSON.stringify(rects);
+    if (state.selectedJson !== selectedJson || rectsJson !== rectsJson) {
+      state.selectedJson = selectedJson;
+      state.rectsJson = rectsJson;
+      // eek
       setTimeout(() => {
         this.updateSelectionAndPositions(selected, rects);
       }, 100);
@@ -78,6 +74,7 @@ export class ContainerLayout extends DragDrop {
       styleOverrides
     };
   }
+  /**/
   updateSelectionAndPositions(selected, rects) {
     rects?.forEach(({id, position}) => this.position(id, position));
     this.select(null);
@@ -131,6 +128,7 @@ export class ContainerLayout extends DragDrop {
       }
     });
   }
+  /**/
   // deselect when clicking empty backgroud
   onContainerDown(e) {
     this.select(null);
@@ -159,14 +157,14 @@ export class ContainerLayout extends DragDrop {
     // This is to select the node right away when pointer is down.
     this.firePosition(this.target);
     // TODO(sjmiles): hack to allow dragging only from title bar
-    if (from === ':::') {
-      const t0 = e.composedPath?.()?.[0];
-      //console.log(t0 && t0.attributes.title);
-      if (t0 && !t0.attributes.title) {
-        return false;
-      }
-    }
-}
+    // if (from === ':::') {
+    //   const t0 = e.composedPath?.()?.[0];
+    //   //console.log(t0 && t0.attributes.title);
+    //   if (t0 && !t0.attributes.title) {
+    //     return false;
+    //   }
+    // }
+  }
   doMove(dx, dy) {
     // grid-snap
     const snap = rect => DragDrop.snap(rect, 16);
@@ -224,7 +222,6 @@ export class ContainerLayout extends DragDrop {
     };
   }
   setBoxStyle(elt, {l, t, w, h}) {
-    [l, t, w, h] = [l, t, w, h].map(Math.round);
     assign(elt.style, {
       transform: `translate(${l}px, ${t}px)`,
       width: `${!(w>0) ? 0 : w}px`,
@@ -255,11 +252,12 @@ export class ContainerLayout extends DragDrop {
   * {
     box-sizing: border-box;
   }
-  ::slotted(*) {
-    position: absolute;
-  }
   [container] {
     flex: 1;
+  }
+  ::slotted(*) {
+    position: absolute;
+    outline: 1px dotted orange !important;
   }
   [boxer] {
     pointer-events: none;
@@ -344,4 +342,4 @@ export class ContainerLayout extends DragDrop {
   }
 }
 
-customElements.define('container-layout', ContainerLayout);
+customElements.define('designer-layout', DesignerLayout);

@@ -9,7 +9,7 @@
 // import {App} from '../../Library/App/App.js';
 import {App} from '../Library/App/Worker/App.js';
 // import {LocalStoragePersistor} from '../../Library/App/storage.js';
-import {logFactory} from '../core/utils.min.js';
+import {logFactory} from '../Library/Core/utils.min.js';
 import {NodegraphRecipe} from './Library/NodegraphRecipe.js';
 // import {GoogleApisService} from '../../Library/nostalgic/Goog/GoogleApisService.js';
 

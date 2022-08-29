@@ -38,10 +38,9 @@ arcs.blargTheWorker = async ({paths}) => {
 };
 
 arcs.init = async ({root, paths, onservice, injections}) => {
-  console.log(paths);
+  console.log(paths, injections);
   // worker path is document relative
   const worker = await arcs.blargTheWorker({paths});
-  // const worker = new Worker(paths.$arcs, {type: 'module', name: 'arcsjs'});
   // bus to worker
   socket = new MessageBus(worker);
   // listen to worker

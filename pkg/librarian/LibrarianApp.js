@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import {App} from '../Library/App/Worker/App.js';
-import {logFactory, makeName} from '../core/utils.min.js';
+import {logFactory, makeName} from '../Library/Core/utils.min.js';
 import {DeviceUxRecipe} from '../Library/Media/DeviceUxRecipe.js';
 import '../Library/App/surface-imports.js';
 

@@ -6,12 +6,14 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {App} from '../Library/App/Worker/App.js';
-import {NodebaseRecipe} from './Library/NodebaseRecipe.js';
-// import {LocalStoragePersistor} from '../Library/LocalStorage/LocalStoragePersistor.js';
+// main library
+import {App} from '../../Library/App/Worker/App.js';
+import {HistoryService} from '../../Library/App/HistoryService.js';
+import {LocalStoragePersistor} from '../../Library/LocalStorage/LocalStoragePersistor.js';
 // import {FissionPersistor} from '../Library/Fission/FissionPersistor.js';
-import {logFactory} from '../core/utils.min.js';
-import '../Library/App/surface-imports.js';
+import {logFactory} from '../../Library/Core/utils.min.js';
+// local library
+import {NodebaseRecipe} from './NodebaseRecipe.js';
 
 const log = logFactory(true, 'Nodebase', 'navy');
 
@@ -21,8 +23,9 @@ const log = logFactory(true, 'Nodebase', 'navy');
 export const NodebaseApp = class extends App {
   constructor(paths) {
     super(paths);
-    //this.persistor = FissionPersistor;
+    this.persistor = new LocalStoragePersistor('user');
     this.userAssembly = [NodebaseRecipe];
+    this.services = {HistoryService};
     log('Welcome to Nodebase!');
   }
 };

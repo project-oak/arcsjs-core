@@ -124,7 +124,7 @@ export class SplitPanel extends DragDrop {
     //const d = dx;
     const d = dy;
     this.mergeState({
-      divider: this.state.dividerStart + d
+      divider: Math.round(this.state.dividerStart + d)
     });
   }
 }

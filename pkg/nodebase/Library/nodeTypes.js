@@ -11,4 +11,6 @@ import * as FieldNodes from './FieldNodes/FieldNodes.js';
 
 const {values} = Object;
 
-export const nodeTypes = globalThis.nodeTypes = [...values(FieldNodes)];
+export const nodeTypes = globalThis.nodeTypes = [
+  ...values(FieldNodes)
+];

@@ -10,12 +10,10 @@
 template: html`
 <style>
   :host {
-    min-width: 4em;
-    min-height: 1em;
-    background: default;
+    min-width: 2em;
+    min-height: 4em;
   }
 </style>
-
 <div xen:style="{{textStyle}}" flex bar>{{text}}</div>
 `
 });

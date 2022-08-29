@@ -18,7 +18,7 @@ template: html`
   :host {
     padding: 0 6px;
     height: 2em;
-    width: 6em;
+    width: 24em;
   }
   [label] {
     background: inherit;
