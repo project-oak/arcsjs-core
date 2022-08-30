@@ -6,6 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
+//import './configuration.js';
 import {Arcs} from './Arcs.js';
 import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
@@ -37,7 +38,7 @@ export const App = class {
     await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     // TODO(sjmiles): pick a syntax
     const assembly = [DevToolsRecipe, ...(this.userAssembly ?? this.recipes ?? [])];
-    Arcs.addAssembly(assembly, 'user');
+    await Arcs.addAssembly(assembly, 'user');
   }
   async service({request}) {
     // if we are specific
@@ -96,7 +97,7 @@ export const App = class {
     return true;
   }
   async restore({storeId}) {
-    return this.persistor?.restore(storeId);
+    return this.persistor?.restore?.(storeId);
   }
   // (optional) support login convention
   getLoginBindings() {

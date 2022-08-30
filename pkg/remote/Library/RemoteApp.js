@@ -43,7 +43,7 @@ export const RemoteApp = class extends App {
     await this.myself.ready;
   }
   async initLobby() {
-    this.group = 'frankencense';
+    this.group = 'frankincense';
     this.arcs.set('user', 'group', this.group);
 }
   async runLobby() {
@@ -53,7 +53,7 @@ export const RemoteApp = class extends App {
     if (!this.closed) {
       setTimeout(() => this.runLobby(), pingIntervalMs || 1e5);
       this.myself.name = this.persona;
-      const strangers = await tryst.meetStrangers(this.group, name, {persona: name, peerId}) || {};
+      const strangers = await tryst.meetStrangers(this.group, null, {persona: name, peerId}) || {};
       Object.values(strangers).forEach(({persona, peerId}) => {
         if (this.myself.shouldCall(peerId)) {
           console.log('CALLING', persona);

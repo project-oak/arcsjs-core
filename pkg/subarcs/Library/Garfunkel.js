@@ -6,12 +6,6 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-
-export const customInspectors = {
-  MyTestObject: {
-    $meta: {name: 'custom inspect MyTestObject'},
-    inspect: {
-      $kind: '$app/nodegraph/Library/MyTestObjectInspect',
-    }
-  }
-};
+({
+  template: html`<h2>Garfunkel</h2><slot></slot>`
+});

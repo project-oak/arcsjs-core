@@ -177,7 +177,7 @@
     <mwc-icon-button icon="refresh" on-click="onRefreshClick"></mwc-icon-button>
   </div>
   <!-- tabbed pages -->
-  <mxc-tab-pages dark flex tabs="Stores,Particles,Resources,DOM,Tests,Graphs" on-selected="onTabSelected">
+  <mxc-tab-pages dark flex tabs="Stores,Particles,Resources,DOM,Graphs,Tests" on-selected="onTabSelected">
     <!-- Stores -->
     <data-explorer flex scrolling object="{{stores}}" expand></data-explorer>
     <!-- Arcs -->
@@ -188,6 +188,10 @@
     </div>
     <!-- Surfaces -->
     <surface-walker flex scrolling kick="{{kick}}"></surface-walker>
+    <!-- Diagrams -->
+    <div flex rows>
+      <data-graph object="{{context}}" flex x3></data-graph>
+    </div>
     <!-- Tests -->
     <div flex rows>
       <!-- -->
@@ -205,10 +209,6 @@
       </div>
       <data-explorer flex scrolling object="{{capturedState}}" expand></data-explorer>
       <!-- -->
-    </div>
-    <!-- Diagrams -->
-    <div flex rows>
-      <data-graph object="{{context}}" flex x3></data-graph>
     </div>
   </mxc-tab-pages>
 </div>
