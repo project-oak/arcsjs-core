@@ -7,20 +7,36 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-  async initialize({pipelines}, state, {service, output}) {
+  async initialize({pipelines, publicPipelinesUrl}, state, {service, output}) {
+    const publicPipelines = await this.fetchPublicPipelines(publicPipelinesUrl);
     pipelines = await this.backwardCompatibilityPipelines(pipelines, {service, output});
-    const pipeline = await this.retrieveSelectedPipeline(pipelines, service);
-    if (pipeline) {
-      return {pipeline};
-    } else {
-      this.updateSelectedPipelineHistory(null, service);
+    const pipeline = await this.retrieveSelectedPipeline(pipelines, publicPipelines, service);
+    if (!pipeline) {
+      await this.updateSelectedPipelineHistory(null, service);
+    }
+    return {pipeline, publicPipelines};
+  },
+  async fetchPublicPipelines(url) {
+    if (url) {
+      try {
+        const res = await fetch(url);
+        if (res.status === 200) {
+          const text = await res.text();
+          if (text) {
+            return values(JSON.parse(text.replace(/"\*/g, '"$')) ?? Object);
+          }
+        }
+      } catch (e) {
+        log(`Failed fetching pipelines from ${url} (${e.toString()})`);
+      }  
     }
   },
-  async retrieveSelectedPipeline(pipelines, service) {
+  async retrieveSelectedPipeline(pipelines, publicPipelines, service) {
     const pipelineId = await service({kind: 'HistoryService', msg: 'retrieveSelectedPipeline'});
-    let pipeline = this.findPipelineById(pipelineId, pipelines);
+    let pipeline = this.findPipelineById(pipelineId, pipelines) ||
+                   this.findPipelineById(pipelineId, publicPipelines);
     if (!pipeline) {
-      pipeline = await this.backwardCompatibilitySelectedPipeline(pipelineId, pipelines, service);
+      pipeline = await this.backwardCompatibilitySelectedPipeline(pipelineId, pipelines, publicPipelines, service);
     }
     return pipeline;
   },
@@ -35,10 +51,11 @@
     }
     return pipelines;
   },
-  async backwardCompatibilitySelectedPipeline(name, pipelines, service) {
+  async backwardCompatibilitySelectedPipeline(name, pipelines, publicPipelines, service) {
     // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
     // This method selects pipeline by name found in the URL param.
-    const pipeline = this.findPipelineByName(name, pipelines);
+    const pipeline = this.findPipelineByName(name, pipelines) ||
+                     this.findPipelineByName(name, publicPipelines);
     if (pipeline) {
       await this.updateSelectedPipelineHistory(pipeline, service);
     }
@@ -211,6 +228,10 @@
   onPublishPathChanged({eventlet: {value}}, state) {
     state.selectedPublishKey = value;
   },
+  async onRefresh({publicPipelinesUrl}) {
+    const publicPipelines = await this.fetchPublicPipelines(publicPipelinesUrl);
+    return {publicPipelines};
+  },  
   template: html`
 <style>
   :host {
@@ -238,6 +259,7 @@
 
 <div toolbar>
   <div chooser rows frame="chooser" display$="{{showChooser}}"></div>
+  <mwc-icon-button title="Refresh Pipeline List" icon="refresh" on-click="onRefresh"></mwc-icon-button>
   <div column separator></div>
   <mwc-icon-button title="New Pipeline" on-click="onNew" icon="add"></mwc-icon-button>
   <mwc-icon-button title="Duplicate Pipeline" on-click="onCloneClicked" icon="content_copy"></mwc-icon-button>

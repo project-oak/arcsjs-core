@@ -7,25 +7,9 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-async update(inputs, state) {
-  if (!state.publicPipelines) {
-    try {
-      state.publicPipelines = await this.fetchPublicPipelines(inputs);
-    } catch (e) {
-      log(`Failed fetching public pipelines from ${inputs.publicPipelinesUrl} (${e.toString()})`);
-    }
-  }
-},
-async fetchPublicPipelines({publicPipelinesUrl, pipelines}) {
-  if (publicPipelinesUrl) {
-    const res = await fetch(publicPipelinesUrl);
-    if (res.status === 200) {
-      const text = await res.text();
-      if (text) {
-        const publicPipelines = values(JSON.parse(text.replace(/"\*/g, '"$')) ?? Object);
-        return this.filterPublicPipelines(publicPipelines, pipelines);
-      }
-    }
+async update({publicPipelines, pipelines}, state) {
+  if (publicPipelines && !state.publicPipelines) {
+    state.publicPipelines = this.filterPublicPipelines(publicPipelines, pipelines);
   }
 },
 filterPublicPipelines(publicPipelines, pipelines) {
@@ -76,9 +60,6 @@ findPipelineById(id, pipelines) {
 findPipelineByName(name, pipelines) {
   return pipelines?.find?.(({$meta}) => $meta?.name === name);
 },
-onRefresh(inputs, state) {
-  state.publicPipelines = null;
-},
 template: html`
 <style>
   select {
@@ -93,7 +74,6 @@ template: html`
 <div bar>
   <span flex></span>
   <select title="Current Pipeline" repeat="pipeline_t" on-change="onSelect">{{pipelines}}</select>
-  <mwc-icon-button title="Refresh Pipeline List" icon="refresh" on-click="onRefresh"></mwc-icon-button>
 </div>
 
 <template pipeline_t>
