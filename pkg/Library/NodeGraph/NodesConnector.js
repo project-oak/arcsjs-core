@@ -136,6 +136,7 @@ findCandidateInNode(type, node, nodeTypes) {
 
 findMatchingStore(type, stores) {
   const matchingType = (storeType) => {
+    // TODO(b/244191110): Type matching API to be wired here.
     return storeType === type;
   };
   const matchingStore = (store) => matchingType(store.$type) && !store.connection;
