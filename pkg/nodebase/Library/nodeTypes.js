@@ -8,9 +8,11 @@
  */
 
 import * as FieldNodes from './FieldNodes/FieldNodes.js';
+import * as MoreNodes from '../../Library/NewMedia/Fields/Nodes.js';
 
 const {values} = Object;
 
 export const nodeTypes = globalThis.nodeTypes = [
-  ...values(FieldNodes)
+  ...values(FieldNodes),
+  ...values(MoreNodes)
 ];

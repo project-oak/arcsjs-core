@@ -6,6 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
+/* global scope */
 ({
 async update({pipeline}, state, {service}) {
   if (!pipeline) {
@@ -70,6 +71,7 @@ template: html`
   }
 </style>
 
+<div frame="mediaUx" style="border-bottom: 1px solid silver;"></div>
 <page-group flex rows>
   <!-- page 1 -->
   <div flex columns>

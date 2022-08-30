@@ -11,7 +11,7 @@ export const customInspectors = {
   MyTestObject: {
     $meta: {name: 'custom inspect MyTestObject'},
     inspect: {
-      $kind: '$app/nodegraph/Library/MyTestObjectInspect',
+      $kind: '$app/nodegraph/Library/Inspectors/MyTestObjectInspect',
     }
   }
 };

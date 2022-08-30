@@ -14,11 +14,13 @@ import * as testNodes from './TestNodes.js';
 // import * as homescreen from '../../Library/nostalgic/Homescreen/HomescreenRecipes.js';
 // import * as speech from '../../Library/nostalgic/Actions/SpeechRecipes.js';
 // import * as translator from '../../Library/nostalgic/Actions/TranslationDisplayRecipe.js';
+import * as newMediaNodes from '../../../Library/NewMedia/Fields/Nodes.js';
 
 export const nodeTypes = [
   ...Object.values(candyNodes),
   ...Object.values(builderNodes),
   ...Object.values(testNodes),
+  ...Object.values(newMediaNodes),
   // ...Object.values(locationNodes),
   // ...Object.values(homescreen),
   // ...Object.values(speech),
