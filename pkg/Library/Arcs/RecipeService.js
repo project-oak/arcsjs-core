@@ -9,11 +9,8 @@ export const RecipeService = async (runtime, host, request) => {
   switch (request.msg) {
     case 'FinagleRecipe':
       return finagleRecipe(runtime, host, request.data);
-    case 'RemoveStore':
-      return removeStore(request.data.storeId, runtime);
     case 'UpdateConnections': {
-      const {particleId, spec} = request.data;
-      return host.arc.updateParticleMeta(particleId, ParticleCook.specToMeta(spec));
+      return updateConnections(host, request.data);
     }
   }
 };
@@ -23,8 +20,6 @@ const finagleRecipe = async (runtime, host, {recipe, value}) => {
   return recipe && Chef[task](recipe, runtime, host.arc);
 };
 
-const removeStore = (storeId, runtime) => {
-  runtime.removeStore(storeId);
-  Object.values(runtime.arcs).forEach(arc => arc.removeStore(storeId));
-  return true;
+const updateConnections = (host, {particleId, spec}) => {
+  return host.arc.updateParticleMeta(particleId, ParticleCook.specToMeta(spec));
 };
