@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-const log = console.log.bind(console);
+const log = (...args) => console.log.call(console, '(Composer]', ...args);
 log.warn = console.warn.bind(console);
 
 export class Composer {
@@ -26,36 +26,51 @@ export class Composer {
     }
   }
   render(packet) {
-    const {id, container, content: {template, model}} = packet;
-    //log({id, container, model});
-    let slot = this.slots[id];
-    //
+    const {id, container, content: {model}} = packet;
+    if (globalThis.config?.logFlags?.composer) {
+      log({id, container, model});
+    }
     if (model?.$clear) {
+      this._clearSlot(id);
+    } else if (model) {
+      let slot = this.slots[id];
+      if (!slot) {
+        slot = this.maybeGenerateSlot(packet);
+      }
       if (slot) {
-        this.processPendingPackets();
-        this.slots[id] = null;
-        this.clearSlot(slot);
+        this.renderSlot(slot, packet);
       }
-      return;
     }
-    //
-    if (!slot) {
-      const parent = this.findContainer(container);
-      //log.warn(`found parent, needs slot, container = `, container, parent);
-      if (!parent) {
-        this.pendingPackets.push(packet);
-        if ((++packet['pendCount'] % 1e4) === 0) {
-          log.warn(`container [${container}] unavailable for slot [${id}] (x1e4)`);
-        }
-        return;
-      }
-      slot = this.generateSlot(id, template, parent);
+  }
+  renderSlot(slot, {container, content: {model}}) {
+    this.maybeReattachSlot(slot, container);
+    slot.set(model);
+    this.processPendingPackets();
+  }
+  maybeGenerateSlot(packet) {
+    const {id, container, content: {template}} = packet;
+    // slot has a parent container
+    const parent = this.findContainer(container);
+    if (parent) {
+      // generate a slot `id` for `template` under `parent`
+      const slot = this.generateSlot(id, template, parent);
+      // retain
       this.slots[id] = slot;
+      // return
+      return slot;
     }
-    if (slot && model) {
-      this.maybeReattachSlot(slot, container);
-      slot.set(model);
+    // packet has not slot (yet)
+    this.pendingPackets.push(packet);
+    if ((++packet['pendCount'] % 1e4) === 0) {
+      log.warn(`container [${container}] unavailable for slot [${id}] (x1e4)`);
+    }
+  }
+  _clearSlot(id) {
+    const slot = this.slots[id];
+    if (slot) {
       this.processPendingPackets();
+      this.slots[id] = null;
+      this.clearSlot(slot);
     }
   }
   clearSlot(slot) {
