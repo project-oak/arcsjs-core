@@ -17,7 +17,9 @@ export const StoreService = async (runtime, host, request) => {
       return listenToChanges(request.data, runtime) || null;
     case 'ListenToAllChanges':
       return ListenToAllChanges(runtime, host) || null;
-    }
+    case 'RemoveStore':
+      return removeStore(request.data.storeId, runtime);
+  }
 };
 
 const getStoreValue = ({storeId}, runtime) => {
@@ -63,4 +65,10 @@ const ListenToAllChanges = async (runtime, host) => {
     host._storeUpdateServiceListener = runtime.listen('store-changed', handler);
   }
   return new Promise(resolve => host._waitingForChanges = resolve);
+};
+
+const removeStore = (storeId, runtime) => {
+  runtime.removeStore(storeId);
+  Object.values(runtime.arcs).forEach(arc => arc.removeStore(storeId));
+  return true;
 };
