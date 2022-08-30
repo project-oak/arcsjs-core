@@ -22,6 +22,7 @@ const findStores = (runtime: Runtime, criteria: Partial<StoreMeta>) => {
 };
 
 const mapStore = (runtime: Runtime, {name, type}) => {
+  // TODO(b/244191110): Type matching API to be wired here.
   return findStores(runtime, {name, type})?.[0];
 };
 
