@@ -59,7 +59,7 @@ export class Composer {
       // return
       return slot;
     }
-    // packet has not slot (yet)
+    // packet has no slot (yet)
     this.pendingPackets.push(packet);
     if ((++packet['pendCount'] % 1e4) === 0) {
       log.warn(`container [${container}] unavailable for slot [${id}] (x1e4)`);

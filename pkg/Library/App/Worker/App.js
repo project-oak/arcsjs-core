@@ -6,7 +6,6 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-//import './configuration.js';
 import {Arcs} from './Arcs.js';
 import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
