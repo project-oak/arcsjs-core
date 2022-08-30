@@ -19,11 +19,11 @@ export const meetStrangers = async (group, nid, meta) => {
     await clearBeacons(root);
   }
   // ensure our beacon exists at large
-  await placeBeacon(root, nid, meta);
+  nid && (await placeBeacon(root, nid, meta));
   // clean input
   if (beacons) {
     // don't need ours
-    delete beacons[nid];
+    nid && (delete beacons[nid]);
   } else {
     beacons = {};
   }

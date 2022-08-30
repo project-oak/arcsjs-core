@@ -29,10 +29,10 @@
   getOutputTranche(streams) {
     const tranche = streams.length > 4 ? streams.slice(0, -4) : streams;
     return {
-      stream: tranche[0],
-      stream1: tranche[1],
-      stream2: tranche[2],
-      stream3: tranche[3]
+      stream: tranche[0]?.stream,
+      stream1: tranche[1]?.stream,
+      stream2: tranche[2]?.stream,
+      stream3: tranche[3]?.stream
     };
   },
   render({group}, {persona, streams}) {

@@ -8,8 +8,11 @@
  */
 import {MessageBus} from './MessageBus.js';
 import {XenComposer as Composer} from '../../Dom/Surfaces/Default/XenComposer.js';
+import {logFactory} from '../../Core/utils.min.js';
 
 // n.b. lives in 'top' context
+
+const log = logFactory(logFactory.flags.arcs, 'Arcs', 'goldenrod', '#333');
 
 // composer handles render packets
 let composer;
@@ -31,14 +34,14 @@ arcs.blargTheWorker = async ({paths}) => {
   const oUrl = URL.createObjectURL(blob);
   const worker = new Worker(oUrl, {type: 'module', name: 'arcsjs'});
   setTimeout(() => URL.revokeObjectURL(oUrl), 5000);
-  console.groupCollapsed('blarged a worker');
-  console.log(text);
-  console.groupEnd();
+  log.groupCollapsed('Worker launched (blarg!)');
+  log.log(text);
+  log.groupEnd();
   return worker;
 };
 
 arcs.init = async ({root, paths, onservice, injections}) => {
-  console.log(paths, injections);
+  log.log(paths, injections);
   // worker path is document relative
   const worker = await arcs.blargTheWorker({paths});
   // bus to worker

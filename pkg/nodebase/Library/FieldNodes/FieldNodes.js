@@ -86,3 +86,33 @@ export const LineObject = {
     $inputs: ['lineStyle']
   }
 };
+
+export const ImageObject = {
+  $meta: {
+    name: 'Image',
+    category: 'Object'
+  },
+  $stores: {
+    inputStream: {
+      $type: 'Stream',
+      $value: {
+        id: 'default',
+        version: 0
+      }
+    },
+    image: {
+      $type: 'Image',
+      $value: {
+        url: 'https://storage.googleapis.com/tfweb/testpics/strawberry2.jpeg',
+        canvas: {
+          id: 0,
+          version: 0
+        }
+      }
+    }
+  },
+  field: {
+    $kind: '$library/NewMedia/Image',
+    $inputs: ['image']
+  }
+};

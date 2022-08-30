@@ -7,8 +7,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {nodeTypes, categories} from './nodeTypes.js';
-import {customInspectors} from './customInspectors.js';
+import {nodeTypes, categories} from './Nodes/nodeTypes.js';
+import {customInspectors} from './Inspectors/customInspectors.js';
 import {NodeCatalogParticles, NodeCatalogStores} from '../../Library/NodeCatalog/NodeCatalogSpecs.js';
 
 export const NodegraphRecipe = {
