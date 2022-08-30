@@ -28,7 +28,7 @@
         }
       } catch (e) {
         log(`Failed fetching pipelines from ${url} (${e.toString()})`);
-      }  
+      }
     }
   },
   async retrieveSelectedPipeline(pipelines, publicPipelines, service) {
@@ -142,10 +142,23 @@
   },
   async onCloneClicked({pipeline: currentPipeline, pipelines: currentPipelines}, state, {service}) {
     if (currentPipeline) {
-      const {pipeline, pipelines} = await this.addNewPipeline(currentPipelines, `Copy of ${currentPipeline.$meta?.name}`, service);
+      const {pipeline, pipelines} = await this.addNewPipeline(
+        currentPipelines,
+        this.makePipelineCopyName(currentPipeline.$meta?.name, currentPipelines),
+        service);
       pipeline.nodes = currentPipeline.nodes.map(node => ({...node}));
       return {pipeline, pipelines};
     }
+  },
+  makePipelineCopyName(name, pipelines) {
+    const regexp = /Copy (?:\(([0-9]+)\) )?of ([a-zA-Z\-]+)/;
+    const names = pipelines.map(({$meta: {name}}) => name.match(regexp))
+      .filter(match => Boolean(match))
+      .map(match => Number(match?.[1] || 1));
+    const maxCopy = Math.max(...names);
+    const match = name.match(regexp);
+    const nameBase = match?.length > 0 ? match?.[match.length - 1] : name;
+    return `Copy ${maxCopy >= 0 ? `(${maxCopy + 1}) `: ''}of ${nameBase}`;
   },
   async onDelete({pipeline, pipelines, publishPaths}) {
     const index = this.findPipelineIndex(pipeline, pipelines);
