@@ -9,7 +9,15 @@
 
 import {nodeTypes, categories} from './Nodes/nodeTypes.js';
 import {customInspectors} from './Inspectors/customInspectors.js';
+// TODO(sjmiles): should just be a recipe
 import {NodeCatalogParticles, NodeCatalogStores} from '../../Library/NodeCatalog/NodeCatalogSpecs.js';
+
+const NodeCatalogRecipe = {
+  $stores: {
+    ...NodeCatalogStores
+  },
+  ...NodeCatalogParticles,
+};
 
 export const NodegraphRecipe = {
   $meta: {
@@ -38,11 +46,10 @@ export const NodegraphRecipe = {
     categories: {
       $type: 'JSON',
       $value: categories
-    },
-    ...NodeCatalogStores
+    }
   },
   main: {
-    $kind: '$app/Library/Noder',
+    $kind: '$app/Library/Nodegraph',
     $inputs: [
       {pipeline: 'selectedPipeline'}
     ],
@@ -51,11 +58,12 @@ export const NodegraphRecipe = {
     ],
     $slots: {
       catalog: {
-        ...NodeCatalogParticles,
+        ...NodeCatalogRecipe
       },
       preview: {
         runner: {
-          $kind: '$library/NodeGraph/Runner',
+          //$kind: '$library/NodeGraph/Runner',
+          $kind: '$library/Designer/Designer',
           $inputs: [
             'recipes',
             {pipeline: 'selectedPipeline'},

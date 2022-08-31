@@ -224,8 +224,8 @@ export class DesignerLayout extends DragDrop {
   setBoxStyle(elt, {l, t, w, h}) {
     assign(elt.style, {
       transform: `translate(${l}px, ${t}px)`,
-      width: `${!(w>0) ? 0 : w}px`,
-      height: `${!(h>0) ? 0 : h}px`
+      width: `${!(w>0) ? 64 : w}px`,
+      height: `${!(h>0) ? 64 : h}px`
     });
   }
   restyleSelection() {

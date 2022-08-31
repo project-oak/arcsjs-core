@@ -8,7 +8,47 @@
  */
 
 import {nodeTypes} from './nodeTypes.js';
+// TODO(sjmiles): should just be a recipe
 import {NodeCatalogParticles, NodeCatalogStores} from '../../Library/NodeCatalog/NodeCatalogSpecs.js';
+
+const CatalogRecipe = {
+  $stores: {
+    ...NodeCatalogStores
+  },
+  ...NodeCatalogParticles,
+};
+
+const catalog = {
+  ...CatalogRecipe,
+  NodeCatalog: {
+    ...NodeCatalogParticles.NodeCatalog,
+    $container: '#catalog'
+  }
+};
+
+const editor = {
+  Editor: {
+    $kind: '$library/NodeGraph/Editor',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'selectedNode',
+      'nodeTypes'
+    ],
+    $outputs: [
+      {pipeline: 'selectedPipeline'},
+      'selectedNode'
+    ]
+  }
+};
+
+const inspector = {
+  Inspector: {
+    $container: '#inspector',
+    $kind: '$library/NodeGraph/Inspector',
+    $inputs: [{data: 'inspectorData'}],
+    $outputs: [{data: 'inspectorData'}]
+  }
+};
 
 export const StudioRecipe = {
   $meta: {
@@ -33,8 +73,7 @@ export const StudioRecipe = {
     recipes: {
       $type: 'Pojo',
       $value: []
-    },
-    ...NodeCatalogStores
+    }
   },
   main: {
     $container: '#user',
@@ -46,40 +85,9 @@ export const StudioRecipe = {
       {pipeline: 'selectedPipeline'}
     ],
     $slots: {
-      // actually a slot in main
-      editor: {
-        Editor: {
-          $kind: '$library/NodeGraph/Editor',
-          $inputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNode',
-            'nodeTypes'
-          ],
-          $outputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNode'
-          ]
-        }
-      },
-      // uses #container override to project elsewhere
-      catalog: {
-        ...NodeCatalogParticles,
-        ...{
-          NodeCatalog: {
-            ...NodeCatalogParticles.NodeCatalog,
-            $container: '#catalog'
-          }
-        }
-      },
-      // uses #container override to project elsewhere
-      inspector: {
-        Inspector: {
-          $container: '#inspector',
-          $kind: '$library/NodeGraph/Inspector',
-          $inputs: [{data: 'inspectorData'}],
-          $outputs: [{data: 'inspectorData'}]
-        }
-      }
+      editor,
+      catalog,
+      inspector
     }
   },
   nodeInspector: {

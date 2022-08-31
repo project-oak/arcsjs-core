@@ -15,7 +15,7 @@
     category: 'Panels'
   },
   nodeContainer: {
-    $kind: '$app/nodegraph/Library/Container'
+    $kind: '$app/Library/Container'
   }
 };
 

@@ -170,24 +170,26 @@ colorByCategory(category, categories) {
 
 template: html`
 <style>
-:host {
-  color: black;
-  background-color: var(--theme-color-bg-1);
-  min-height: 120px;
-  border-bottom: 1px solid silver;
-}
-[frame="runner"] > * {
-  flex: none !important;
-}
+  :host {
+    color: black;
+    background-color: var(--theme-color-bg-1);
+    min-height: 120px;
+    border-bottom: 1px solid silver;
+  }
+  designer-layout {
+    height: auto !important;
+  }
 </style>
 <div bar frame="chooser"></div>
-<designer-layout flex scrolling column frame="runner"
-                  on-position="onNodePosition"
-                  on-delete="onNodeDelete"
-                  selected="{{selectedKeys}}"
-                  rects="{{rects}}"
-                  color="{{color}}"
-                  hidebox="{{hideBox}}">
-</designer-layout>
+<drop-target flex row on-drop="onDrop">
+  <designer-layout flex scrolling column frame="runner"
+                    on-position="onNodePosition"
+                    on-delete="onNodeDelete"
+                    selected="{{selectedKeys}}"
+                    rects="{{rects}}"
+                    color="{{color}}"
+                    hidebox="{{hideBox}}">
+  </designer-layout>
+</drop-target>
 `
 });

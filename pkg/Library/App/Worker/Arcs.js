@@ -14,8 +14,6 @@ import {logFactory} from '../../Core/utils.min.js';
 
 const log = logFactory(logFactory.flags.arcs, 'Arcs', 'goldenrod', '#333');
 
-// composer handles render packets
-let composer;
 // socket will be our MessageBus
 let socket;
 
@@ -48,12 +46,8 @@ arcs.init = async ({root, paths, onservice, injections}) => {
   socket = new MessageBus(worker);
   // listen to worker
   socket.receiveVibrations(receiveVibrations);
-  // make a composer suitable for rendering on our document
-  composer = new Composer(root, true);
-  // channel local events into vibrations
-  composer.onevent = (pid, eventlet) => {
-    socket.sendVibration({kind: 'handleEvent', pid, eventlet});
-  };
+  // set composer root
+  arcs.setComposerRoot(root);
   // connect app-supplied conduits
   arcs.onservice = onservice;
   // memoize paths
@@ -64,12 +58,32 @@ arcs.init = async ({root, paths, onservice, injections}) => {
   socket.sendVibration({kind: 'secureWorker'});
 };
 
+// composer handles render packets
+
+let composer;
+
+const renderPacket = packet =>  {
+  composer?.render(packet);
+};
+
+arcs.setComposerRoot = root => {
+  if (root) {
+    // make a composer suitable for rendering on our document
+    composer = new Composer(root, true);
+    // channel local events into vibrations
+    composer.onevent = (pid, eventlet) => {
+      socket.sendVibration({kind: 'handleEvent', pid, eventlet});
+    };
+    socket.sendVibration({kind: 'rerender'});
+  }
+};
+
 // n.b. vibrational paths are worker-relative
 
 const receiveVibrations = msg => {
   if (msg.type === 'render') {
     // channel vibrations to the local composer
-    composer.render(msg.packet);
+    renderPacket(msg.packet);
   } else if (msg.type === 'service') {
     // channel vibrations to the arcs service
     handleServiceCall(msg);

@@ -100,12 +100,17 @@ const storeChanged = (arc, storeKey) => {
   }
 };
 
+const {values} = Object;
+
 // the vibrations this worker can handle
 const handlers = {
+  rerender() {
+    values(user.arcs).forEach(arc => arc.rerender());
+  },
   handleEvent: async ({pid, eventlet}) => {
     // TODO(sjmiles): the composer doesn't know from Arcs, so the PID is all we have
     // perhaps we can imbue the PID with the ArcID also
-    const arc = Object.values(user.arcs).find(({hosts}) => hosts[pid]);
+    const arc = values(user.arcs).find(({hosts}) => hosts[pid]);
     arc?.onevent(pid, eventlet);
   },
   addPaths: ({paths}) => {

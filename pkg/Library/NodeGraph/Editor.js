@@ -97,6 +97,13 @@
     };
   },
 
+  onDrop({eventlet}) {
+    log('onDrop', eventlet);
+    // const data = event.dataTransfer.getData("text/plain");
+    // event.target.textContent = data;
+    // event.preventDefault();
+  },
+
   onDeleteAll({pipeline}) {
     pipeline.nodes = [];
     return {
@@ -158,8 +165,8 @@
     <span flex></span>
     <mwc-icon-button on-click="onDeleteAll" icon="delete_forever"></mwc-icon-button>
   </div>
-  <div flex grid scrolling>
+  <drop-target flex grid scrolling on-drop="onDrop">
     <node-graph nodes="{{graphNodes}}" on-select="onNodeSelect" on-delete="onNodeRemove"></node-graph>
-  </div>
+  </drop-target>
   `
   });

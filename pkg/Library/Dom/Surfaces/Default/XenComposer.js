@@ -52,7 +52,7 @@ export class XenComposer extends Composer {
       .appendTo(root)
       .events(this.mapEvent.bind(this, id))
     ;
-    const css = `/*injected by webarcs composer*/${IconsCss}${XenCss}`;
+    const css = `/*injected by arcsjs composer*/${IconsCss}${XenCss}`;
     dom('style', {innerHTML: css}, root);
     return slot;
   }

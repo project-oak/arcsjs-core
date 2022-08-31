@@ -41,6 +41,7 @@ template: html`
     background-color: var(--theme-color-bg-0);
     --mdc-icon-button-size: 24px;
     --mdc-icon-size: 16px;
+    ${globalThis.themeRules}
   }
   [section] {
     border-right: 1px solid var(--theme-color-bg-2);
@@ -68,7 +69,6 @@ template: html`
   [nav] {
     border-bottom: 1px solid var(--theme-color-bg-3);
   }
-  /* $ { themeRules } */
 </style>
 
 <page-group flex rows>
@@ -85,9 +85,10 @@ template: html`
         <icon on-click="onToggleRight">{{rightIcon}}</icon>
       </div>
       <!-- middle 1 -->
-      <div flex x3 rows frame="preview"></div>
-      <!-- middle 2 -->
-      <div flex x2 rows frame="editor"></div>
+      <split-panel flex rows>
+        <div flex rows frame="preview" slot="startside"></div>
+        <div flex rows frame="editor" slot="endside"></div>
+      </split-panel>
     </div>
     <!-- right -->
     <div right center collapsed$="{{rightCollapsed}}" section frame="inspector"></div>
