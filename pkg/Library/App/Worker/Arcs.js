@@ -103,6 +103,8 @@ const handleServiceCall = async msg => {
   socket.sendVibration({kind: 'serviceResult', sid: msg.sid, data});
 };
 
+// public API
+
 // install data watcher
 arcs.watch = (arc, storeKey, handler) => {
   watchers[storeKey] = handler;
@@ -120,7 +122,6 @@ arcs.get = async (arc, storeKey) => {
   });
 };
 
-// public API
 arcs.addPaths         = (paths)                   => socket.sendVibration({kind: 'addPaths', paths});
 arcs.createArc        = (arc)                     => socket.sendVibration({kind: 'createArc', arc});
 arcs.createParticle   = (name, arc, meta, code)   => socket.sendVibration({kind: 'createParticle', name, arc, meta, code});
