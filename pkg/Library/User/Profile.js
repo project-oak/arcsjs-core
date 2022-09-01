@@ -27,16 +27,11 @@ async onLogoutClick(inputs, state, {service}) {
 },
 
 onPersonaChange({eventlet: {value: persona}}) {
-  log(`persona = ${persona}`);
+  log(persona);
   return {persona};
 },
 
-onGroupChange({eventlet: {value: group}}) {
-  log(`group = ${group}`);
-  return {group};
-},
-
-render({group, persona, profile}, state) {
+render({persona, profile}, state) {
   let loggedIn = Boolean(profile?.uid);
   const photoURL = resolve('$library/App/assets/users/ned.png');
   return {
@@ -45,8 +40,7 @@ render({group, persona, profile}, state) {
     email: 'user@google.com',
     loginLabel: loggedIn ? 'Start' : 'Login',
     logoutDisbled: !loggedIn,
-    persona: persona || '',
-    group: group || ''
+    persona: persona || ''
   };
 },
 
@@ -88,7 +82,6 @@ template: html`
       <i>{{email}}</i>
     </div>
 
-    <mwc-textfield helper="Group" helperPersistent outline value="{{group}}" on-change="onGroupChange"></mwc-textfield>
     <mwc-textfield helper="Persona" helperPersistent outline value="{{persona}}" on-change="onPersonaChange"></mwc-textfield>
 
     <div toolbar>

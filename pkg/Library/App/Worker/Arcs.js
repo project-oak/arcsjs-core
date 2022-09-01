@@ -38,26 +38,6 @@ arcs.blargTheWorker = async ({paths}) => {
   return worker;
 };
 
-arcs.init = async ({root, paths, onservice, injections}) => {
-  log.log(paths, injections);
-  // worker path is document relative
-  const worker = await arcs.blargTheWorker({paths});
-  // bus to worker
-  socket = new MessageBus(worker);
-  // listen to worker
-  socket.receiveVibrations(receiveVibrations);
-  // set composer root
-  arcs.setComposerRoot(root);
-  // connect app-supplied conduits
-  arcs.onservice = onservice;
-  // memoize paths
-  arcs.addPaths(paths);
-  // initialize particle scope
-  socket.sendVibration({kind: 'setInjections', injections});
-  // initiate security procedures
-  socket.sendVibration({kind: 'secureWorker'});
-};
-
 // composer handles render packets
 
 let composer;
@@ -104,6 +84,26 @@ const handleServiceCall = async msg => {
 };
 
 // public API
+
+arcs.init = async ({root, paths, onservice, injections}) => {
+  log.log(paths, injections);
+  // worker path is document relative
+  const worker = await arcs.blargTheWorker({paths});
+  // bus to worker
+  socket = new MessageBus(worker);
+  // listen to worker
+  socket.receiveVibrations(receiveVibrations);
+  // set composer root
+  arcs.setComposerRoot(root);
+  // connect app-supplied conduits
+  arcs.onservice = onservice;
+  // memoize paths
+  arcs.addPaths(paths);
+  // initialize particle scope
+  socket.sendVibration({kind: 'setInjections', injections});
+  // initiate security procedures
+  socket.sendVibration({kind: 'secureWorker'});
+};
 
 // install data watcher
 arcs.watch = (arc, storeKey, handler) => {
