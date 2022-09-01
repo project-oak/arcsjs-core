@@ -127,14 +127,16 @@
     } while (this.findPipelineById(id, pipelines));
     return id;
   },
-  render({pipeline, pipelines, publishPaths}, {renaming, selectedPublishKey}) {
+  render({pipeline, pipelines, publishPaths, publicPipelinesUrl}, {renaming, selectedPublishKey}) {
     const isOwned = this.findPipelineIndex(pipeline, pipelines) >= 0;
     const publishKeys = keys(publishPaths || {}).map(key => ({key, selected: key === selectedPublishKey}));
+    const showRefreshIcon = String(Boolean(publicPipelinesUrl));
     return {
       showRenameIcon: String(!renaming && isOwned),
       showRenameInput: String(Boolean(renaming) && isOwned),
       showChooser: String(!renaming),
       showDeleteIcon: String(isOwned),
+      showRefreshIcon,
       publishKeys,
       showPublish: String(isOwned && publishKeys.length > 0),
       showUnpublish: String(Boolean(pipeline?.$meta?.isPublished) && isOwned),
@@ -155,13 +157,18 @@
     }
   },
   makePipelineCopyName(name, pipelines) {
-    const regexp = /Copy (?:\(([0-9]+)\) )?of ([a-zA-Z\-]+)/;
-    const names = pipelines.map(({$meta: {name}}) => name.match(regexp))
+    // Copies of a pipeline are named:
+    // 'Foo', 'Copy of Foo', 'Copy (2) of Foo', etc
+    // Copy of 'Copy (N) of Foo' will be named 'Copy (M) of Foo'.
+
+    const regexp = (nameRegex) => new RegExp(`Copy (?:\\(([0-9]+)\\) )?of ${nameRegex}`);
+    const match = name.match(regexp('([a-zA-Z\\-]+)'));
+    const nameBase = match?.length > 0 ? match?.[match.length - 1] : name;
+    const copyRegex = regexp(nameBase);
+    const names = pipelines.map(({$meta: {name}}) => name.match(copyRegex))
       .filter(match => Boolean(match))
       .map(match => Number(match?.[1] || 1));
     const maxCopy = Math.max(...names);
-    const match = name.match(regexp);
-    const nameBase = match?.length > 0 ? match?.[match.length - 1] : name;
     return `Copy ${maxCopy >= 0 ? `(${maxCopy + 1}) `: ''}of ${nameBase}`;
   },
   async onDelete({pipeline, pipelines, publishPaths}) {
@@ -276,7 +283,7 @@
 
 <div toolbar>
   <div chooser rows frame="chooser" display$="{{showChooser}}"></div>
-  <mwc-icon-button title="Refresh Pipeline List" icon="refresh" on-click="onRefresh"></mwc-icon-button>
+  <mwc-icon-button title="Refresh Pipeline List" icon="refresh" display$={{showRefreshIcon}} on-click="onRefresh"></mwc-icon-button>
   <div column separator></div>
   <mwc-icon-button title="New Pipeline" on-click="onNew" icon="add"></mwc-icon-button>
   <mwc-icon-button title="Duplicate Pipeline" on-click="onCloneClicked" icon="content_copy"></mwc-icon-button>
