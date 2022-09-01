@@ -3,16 +3,23 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Chef, ParticleCook} from '../core.js';
+import {Chef, ParticleCook, Parser} from '../core.js';
 
 export const RecipeService = async (runtime, host, request) => {
   switch (request.msg) {
     case 'FinagleRecipe':
       return finagleRecipe(runtime, host, request.data);
-    case 'UpdateConnections': {
+    case 'UpdateConnections':
       return updateConnections(host, request.data);
-    }
+    case 'ParseRecipe':
+      return parseRecipe(request.data);
   }
+};
+
+const parseRecipe =  ({recipe}) => {
+  const parser = new Parser.parse(recipe);
+  const {stores, particles, slots, meta} = parser;
+  return {stores, particles, slots, meta};
 };
 
 const finagleRecipe = async (runtime, host, {recipe, value}) => {

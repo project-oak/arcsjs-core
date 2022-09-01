@@ -9,15 +9,7 @@
 
 import {nodeTypes, categories} from './Nodes/nodeTypes.js';
 import {customInspectors} from './Inspectors/customInspectors.js';
-// TODO(sjmiles): should just be a recipe
-import {NodeCatalogParticles, NodeCatalogStores} from '../../Library/NodeCatalog/NodeCatalogSpecs.js';
-
-const NodeCatalogRecipe = {
-  $stores: {
-    ...NodeCatalogStores
-  },
-  ...NodeCatalogParticles,
-};
+import {NodeCatalogRecipe} from '../../Library/NodeCatalog/NodeCatalogRecipe.js';
 
 const PipelineToolbar = {
   $kind: '$library/NodeGraph/PipelineToolbar',
@@ -32,7 +24,7 @@ const PipelineToolbar = {
   },
   $outputs: [
     {pipeline: 'selectedPipeline'},
-    'pipelines',
+    'pipelines'
   ],
   $slots: {
     chooser: {
@@ -40,7 +32,7 @@ const PipelineToolbar = {
         $kind: '$library/NodeGraph/PipelineChooser',
         $inputs: [
           {pipeline: 'selectedPipeline'},
-          'pipelines',
+          'pipelines'
         ],
         $outputs: [{pipeline: 'selectedPipeline'}]
       }
@@ -85,15 +77,12 @@ export const NodegraphRecipe = {
   main: {
     $kind: '$app/Library/Nodegraph',
     $slots: {
-      catalog: {
-        ...NodeCatalogRecipe
-      },
+      catalog: NodeCatalogRecipe,
       toolbar: {
         PipelineToolbar
       },
       preview: {
         runner: {
-          //$kind: '$library/NodeGraph/Runner',
           $kind: '$library/Designer/Designer',
           $inputs: [
             'recipes',
