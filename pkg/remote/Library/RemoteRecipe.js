@@ -31,7 +31,9 @@ export const RemoteRecipe = {
     $slots: {
       flyout: {
         profile: {
-          $kind: '$library/User/Profile'
+          $kind: '$app/Library/LobbySettings',
+          $inputs: ['group', 'persona'],
+          $outputs: ['group', 'showFlyout']
         }
       }
     }

@@ -13,7 +13,7 @@ render({group, persona}) {
     nid: `${group}:${persona}`
   };
 },
-onAccountClick() {
+onSettingsClick() {
   return {showFlyout: true};
 },
 template: html`
@@ -53,7 +53,7 @@ template: html`
   <div frame="devices"></div>
   <span flex></span>
   <span>{{nid}}</span>
-  <icon on-click="onAccountClick">account_circle</icon>
+  <icon on-click="onSettingsClick">settings</icon>
 </div>
 
 <div flex row video>
