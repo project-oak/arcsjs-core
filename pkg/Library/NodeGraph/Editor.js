@@ -7,6 +7,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
  ({
+  catalogDelimiter: '$$',
+
   update({pipeline, selectedNode}, state) {
     if (pipeline?.$meta?.name !== state.selectedPipelineName) {
       state.selectedPipelineName = pipeline?.$meta.name;
@@ -97,11 +99,28 @@
     };
   },
 
-  onDrop({eventlet}) {
-    log('onDrop', eventlet);
-    // const data = event.dataTransfer.getData("text/plain");
-    // event.target.textContent = data;
-    // event.preventDefault();
+  onDrop({eventlet: {value}, pipeline, nodeTypes}) {
+    if (pipeline) {
+      const name = value.split(this.catalogDelimiter)[1];
+      const nodeType = this.findNodeType(name, nodeTypes);
+      const newNode = this.makeNewNode(nodeType, pipeline.nodes);
+      pipeline.nodes = [...pipeline.nodes, newNode];
+      return {pipeline};
+    }
+  },
+
+  makeNewNode({$meta: {name}}, nodes) {
+    const typedNodes = nodes.filter(node => name === node.name);
+    const index = (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
+    return {
+      name,
+      index,
+      key: this.formatNodeKey({name, index}),
+    };
+  },
+
+  formatNodeKey({name, index}) {
+    return `${name}${index}`.replace(/ /g,'');
   },
 
   onDeleteAll({pipeline}) {
