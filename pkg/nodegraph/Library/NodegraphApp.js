@@ -8,6 +8,7 @@
  */
 import {App} from '../../Library/App/Worker/App.js';
 import {LocalStoragePersistor} from '../../Library/LocalStorage/LocalStoragePersistor.js';
+import {HistoryService} from '../../Library/App/HistoryService.js';
 import {logFactory} from '../../Library/Core/utils.min.js';
 import {NodegraphRecipe} from './NodegraphRecipe.js';
 // import {GoogleApisService} from '../../Library/nostalgic/Goog/GoogleApisService.js';
@@ -19,7 +20,7 @@ export const NodegraphApp = class extends App {
   constructor(paths) {
     super(paths);
     this.persistor = new LocalStoragePersistor('user');
-    this.services = [];
+    this.services = {HistoryService};
     this.userAssembly = [NodegraphRecipe];
     log('Welcome!');
   }

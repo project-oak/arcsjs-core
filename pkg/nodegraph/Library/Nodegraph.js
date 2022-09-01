@@ -7,19 +7,6 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-async update({pipeline}, state, {service}) {
-  if (!pipeline) {
-    //log('created pipeline!')
-    return {
-      pipeline: {
-        $meta: {
-          name: await service({msg: 'MakeName'})
-        },
-        nodes: []
-      }
-    };
-  }
-},
 render(inputs, {leftCollapsed, rightCollapsed}) {
   return {
     leftCollapsed,

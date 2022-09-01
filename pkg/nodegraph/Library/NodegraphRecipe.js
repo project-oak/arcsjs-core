@@ -19,14 +19,48 @@ const NodeCatalogRecipe = {
   ...NodeCatalogParticles,
 };
 
+const PipelineToolbar = {
+  $kind: '$library/NodeGraph/PipelineToolbar',
+  $inputs: [
+    {pipeline: 'selectedPipeline'},
+    'pipelines',
+  ],
+  $staticInputs: {
+    publishPaths: {
+    },
+    // publicPipelinesUrl: '...'
+  },
+  $outputs: [
+    {pipeline: 'selectedPipeline'},
+    'pipelines',
+  ],
+  $slots: {
+    chooser: {
+      PipelineChooser: {
+        $kind: '$library/NodeGraph/PipelineChooser',
+        $inputs: [
+          {pipeline: 'selectedPipeline'},
+          'pipelines',
+        ],
+        $outputs: [{pipeline: 'selectedPipeline'}]
+      }
+    }
+  }
+};
+
 export const NodegraphRecipe = {
   $meta: {
     description: 'Node Editor Recipe'
   },
   $stores: {
+    pipelines: {
+      $type: '[JSON]',
+      $tags: ['persisted'],
+      $value: []
+    },
     selectedPipeline: {
       $type: 'JSON',
-      $tags: ['persisted'],
+      // $tags: ['persisted'],
       $value: null
     },
     selectedNode: {
@@ -50,15 +84,12 @@ export const NodegraphRecipe = {
   },
   main: {
     $kind: '$app/Library/Nodegraph',
-    $inputs: [
-      {pipeline: 'selectedPipeline'}
-    ],
-    $outputs: [
-      {pipeline: 'selectedPipeline'}
-    ],
     $slots: {
       catalog: {
         ...NodeCatalogRecipe
+      },
+      toolbar: {
+        PipelineToolbar
       },
       preview: {
         runner: {
