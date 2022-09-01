@@ -58,6 +58,9 @@ export class Arc extends EventEmitter {
       this.composer.onevent = this.onevent.bind(this);
     }
   }
+  rerender() {
+    values(this.hosts).forEach(h => h.rerender());
+  }
   removeHost(id) {
     this.hosts[id]?.detach();
     delete this.hosts[id];

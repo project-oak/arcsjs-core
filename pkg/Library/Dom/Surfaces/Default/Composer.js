@@ -7,8 +7,13 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-const log = (...args) => console.log.call(console, '(Composer]', ...args);
+let log = () => {};
 log.warn = console.warn.bind(console);
+
+if (globalThis.config?.logFlags?.composer) {
+  const style = `background: #333; color: #eee; padding: 1px 6px 2px 7px; border-radius: 6px 0 0 6px;`;
+  log = console.log.bind(console, `%cComposer`, style);
+}
 
 export class Composer {
   constructor() {
@@ -26,13 +31,11 @@ export class Composer {
     }
   }
   render(packet) {
-    const {id, container, content: {model}} = packet;
-    if (globalThis.config?.logFlags?.composer) {
-      log({id, container, model});
-    }
+    const {id, container, content: {model, template}} = packet;
+    log({id, container, model});
     if (model?.$clear) {
       this._clearSlot(id);
-    } else if (model) {
+    } else if (template) {
       let slot = this.slots[id];
       if (!slot) {
         slot = this.maybeGenerateSlot(packet);
@@ -61,6 +64,7 @@ export class Composer {
     }
     // packet has no slot (yet)
     this.pendingPackets.push(packet);
+    log(`container [${container}] unavailable for slot [${id}]`);
     if ((++packet['pendCount'] % 1e4) === 0) {
       log.warn(`container [${container}] unavailable for slot [${id}] (x1e4)`);
     }

@@ -6,8 +6,8 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
+/* global themeRules */
 ({
-
 runnerDelimiter: '$$',
 
 async initialize(inputs, state) {
@@ -121,7 +121,7 @@ isUIHidden(node) {
 
 onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
-  pipeline.nodes = pipeline.nodes.filter(n => n.key !== node.key);
+  pipeline.nodes = pipeline?.nodes.filter(n => n.key !== node.key);
   return {pipeline, selectedNode: null};
 },
 
@@ -141,7 +141,7 @@ onNodePosition({eventlet: {key, value}, pipeline}, {recipes}) {
 },
 
 findNodeByParticle(particleName, pipeline, recipes) {
-  return pipeline.nodes.find(node => {
+  return pipeline?.nodes?.find(node => {
     const names = this.getParticleNamesForNode(node, pipeline, recipes);
     return names?.find(name => name === particleName);
   });
@@ -159,8 +159,8 @@ encodeFullNodeKey({key}, {$meta}) {
 },
 
 updateNodeInPipeline(node, pipeline) {
-  const index = pipeline.nodes.findIndex(n => n.key === node.key);
-  pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
+  const index = pipeline?.nodes?.findIndex(n => n.key === node.key);
+  pipeline.nodes = assign([], pipeline?.nodes, {[index]: node});
   return pipeline;
 },
 
@@ -174,20 +174,30 @@ template: html`
   color: black;
   background-color: var(--theme-color-bg-1);
   min-height: 120px;
-  border-bottom: 1px solid silver;
+  font-family: Google Sans, Roboto, sans-serif;
+  ${themeRules || ''}
 }
 [frame="runner"] > * {
   flex: none !important;
 }
+container-layout {
+  height: auto !important;
+}
 </style>
+
 <div bar frame="chooser"></div>
-<container-layout flex scrolling column frame="runner"
-                  on-position="onNodePosition"
-                  on-delete="onNodeDelete"
-                  selected="{{selectedKeys}}"
-                  rects="{{rects}}"
-                  color="{{color}}"
-                  hidebox="{{hideBox}}">
-</container-layout>
+
+<drop-target flex row on-drop="onDrop">
+  <container-layout
+    flex scrolling column frame="runner"
+    on-position="onNodePosition"
+    on-delete="onNodeDelete"
+    selected="{{selectedKeys}}"
+    rects="{{rects}}"
+    color="{{color}}"
+    hidebox="{{hideBox}}">
+  </container-layout>
+</drop-target>
+
 `
 });

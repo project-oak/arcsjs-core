@@ -41,6 +41,7 @@ export class Host extends EventEmitter {
   arc;
   id;
   lastOutput;
+  lastPacket;
   log;
   meta: ParticleMeta;
   particle: Particle;
@@ -93,9 +94,17 @@ export class Host extends EventEmitter {
       this.render(renderModel);
     }
   }
+  rerender() {
+    if (this.lastPacket) {
+      this.arc?.render(this.lastPacket);
+    }
+  }
   protected render(model) {
     const {id, container, template} = this;
-    this.arc?.render({id, container, content: {template, model}});
+    const content = {model, template};
+    const packet = {id, container, content};
+    this.arc?.render(packet);
+    this.lastPacket = packet;
   }
   set inputs(inputs) {
     if (this.particle && inputs) {

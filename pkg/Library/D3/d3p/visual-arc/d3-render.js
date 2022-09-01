@@ -96,7 +96,7 @@ export const renderForceGraph = (data, width, height) => {
     )
     // make a radial force to push nodes outwards based on group
     .force("radial", d3.forceRadial(500, cx, cy)
-      .radius(d => [0, 30, 5][d.group] || 0)
+      .radius(d => [0, 30, 10][d.group] || 0)
     )
     // make a charge force so nodes repel each other
     .force("charge", d3.forceManyBody())

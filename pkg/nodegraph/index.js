@@ -8,9 +8,8 @@
  */
 import './conf/config.js';
 import {paths} from './conf/allowlist.js';
-import {NodegraphApp} from './NodegraphApp.js';
+import {NodegraphApp} from './Library/NodegraphApp.js';
 
-// spin up application instance
 try {
   const app = globalThis.app = new NodegraphApp(paths);
   await app.spinup();
