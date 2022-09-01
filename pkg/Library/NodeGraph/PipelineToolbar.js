@@ -78,7 +78,11 @@
       }
     } else {
       state.renaming = false;
-      return this.addNewPipeline(pipelines, /* name */null, service);
+      if (pipelines?.length > 0) {
+        return {pipeline: pipelines[0]};
+      } else {
+        return this.addNewPipeline(pipelines, /* name */null, service);
+      }
     }
   },
   async updateSelectedPipelineHistory(pipeline, service) {
