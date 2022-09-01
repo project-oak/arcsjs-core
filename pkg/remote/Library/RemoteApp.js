@@ -45,7 +45,10 @@ export const RemoteApp = class extends App {
   async initLobby() {
     this.group = 'frankincense';
     this.arcs.set('user', 'group', this.group);
-}
+    this.arcs.watch('user', 'group', (group) => {
+      this.group = group;
+    });
+  }
   async runLobby() {
     this.meet(this.persona, this.myself.peerId, 3000);
   }
