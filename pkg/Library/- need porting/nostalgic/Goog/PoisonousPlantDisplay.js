@@ -11,7 +11,7 @@ render({plantInfo}) {
   if (plantInfo) {
     const {name, isPoisonous} = plantInfo;
     const showPoisonous = display(Boolean(isPoisonous));
-    const showNotPoisonous = display(isPoisonous !== undefined && !Boolean(isPoisonous));
+    const showNotPoisonous = display(isPoisonous !== undefined && !isPoisonous);
     return {
       name,
       showAll: display(true),
