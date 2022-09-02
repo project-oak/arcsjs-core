@@ -7,9 +7,9 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
- import * as candyNodes from './CandyNodes.js';
+import {NodeCatalogRecipe} from '../../../Library/NodeCatalog/NodeCatalogRecipe.js';
 
- export const Container = {
+export const Container = {
   $meta: {
     name: 'Container',
     category: 'Panels'
@@ -20,21 +20,22 @@
 };
 
 export const NodeCatalog = {
+  ...NodeCatalogRecipe,
   $meta: {
     name: 'Node Catalog',
     category: 'Panels'
-  },
-  $stores: {
-    nodeTypes: {
-      $type: '[JSON]',
-      $value: Object.values(candyNodes),
-      noinspect: true
-    },
-  },
-  nodeCatalog: {
-    $kind: '$library/NodeCatalog/NodeCatalog',
-    $inputs: ['nodeTypes']
   }
+  // $stores: {
+  //   nodeTypes: {
+  //     $type: '[JSON]',
+  //     $value: Object.values(candyNodes),
+  //     noinspect: true
+  //   },
+  // },
+  // nodeCatalog: {
+  //   $kind: '$library/NodeCatalog/NodeCatalog',
+  //   $inputs: ['nodeTypes']
+  // }
 };
 
 export const ObjectInspector = {
