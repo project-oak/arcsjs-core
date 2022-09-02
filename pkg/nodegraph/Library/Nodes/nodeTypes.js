@@ -28,11 +28,11 @@ const fieldNodes = Object.values(baseFieldNodes).map(node => {
 });
 
 export const nodeTypes = [
-  ...Object.values(candyNodes),
   ...Object.values(builderNodes),
-  ...Object.values(testNodes),
   ...Object.values(newMediaNodes),
   ...fieldNodes,
+  ...Object.values(testNodes),
+  ...Object.values(candyNodes),
   // ...Object.values(locationNodes),
   // ...Object.values(homescreen),
   // ...Object.values(speech),

@@ -84,7 +84,7 @@ return class extends Particle {
   async fetchArtist(find) {
     this.state = {receiving: true};
     try {
-      const response = await Particle.utils.fetch(`${service}&query=${encodeURI(find.name)}`);
+      const response = await fetch(`${service}&query=${encodeURI(find.name)}`);
       const artists = await response.json();
       this.receiveArtists(artists);
     } finally {

@@ -9,6 +9,40 @@
 
 import {NodeCatalogRecipe} from '../../../Library/NodeCatalog/NodeCatalogRecipe.js';
 
+export const isPoisonous = {
+  $meta: {
+    name: 'Is Poisonous',
+    category: 'Panels'
+  },
+  $stores: {
+    entityInfo: {
+      $type: 'EntityInfo',
+      $value: {
+        name: 'Poison Ivy'
+      }
+    },
+    isPoisonous: {
+      $type: 'Boolean',
+      noinspect: true
+    }
+  },
+  nodeContainer: {
+    $kind: '$library/Goog/isPoisonous',
+    $inputs: ['entityInfo'],
+    $outputs: ['isPoisonous']
+  }
+};
+
+export const Haiku = {
+  $meta: {
+    name: 'Haiku',
+    category: 'Panels'
+  },
+  nodeContainer: {
+    $kind: '$library/Goog/HaikuWriter'
+  }
+};
+
 export const Container = {
   $meta: {
     name: 'Container',
@@ -25,17 +59,6 @@ export const NodeCatalog = {
     name: 'Node Catalog',
     category: 'Panels'
   }
-  // $stores: {
-  //   nodeTypes: {
-  //     $type: '[JSON]',
-  //     $value: Object.values(candyNodes),
-  //     noinspect: true
-  //   },
-  // },
-  // nodeCatalog: {
-  //   $kind: '$library/NodeCatalog/NodeCatalog',
-  //   $inputs: ['nodeTypes']
-  // }
 };
 
 export const ObjectInspector = {
