@@ -13,15 +13,20 @@ import {StoreService} from '../../Arcs/StoreService.js';
 
 // n.b. lives in Worker context
 
-// bus
-export const WorkerBus = new MessageBus(globalThis);
+// aliases
+const {values, keys} = Object;
 
 // log
 const log = logFactory(logFactory.flags.worker, 'worker', 'darkgreen');
 log('worker is up');
 
+// bus
+export const WorkerBus = new MessageBus(globalThis);
+
 // runtime represents a persona on this machine
 const user = new Runtime('user');
+// for use in console (might need to choose `arcsjs` thread)
+globalThis.user = user;
 
 // proxy persistance messages
 user.persistor = {
@@ -65,6 +70,22 @@ const serviceHandler = async (arc, host, request) => {
     log('StoreService', request, value);
     return value;
   }
+  // TODO(sjmiles): this is a fundamentally new behavior
+  // (ability to re-target the Render output of a Host)
+  // so this is work-in-progress
+  if (request?.msg === 'getContainer') {
+    const hosts = request.data?.node?.position?.preview;
+    const hostName = (hosts ? keys(hosts) : []).pop();
+    const host = arc.hosts[hostName];
+    // TODO(sjmiles): this works, now we need to control it
+    //host.meta.container = 'Container1nodeContainer#items';
+    // TODO(sjmiles): elements moved out of the layout-container
+    // into ... somewhere else ... are no longer 'selectable'
+    // by the layout-container.
+    host.render({});
+    //log.warn('getContainer', hostName, host);
+    return true;
+  }
   return serviceRequest(request);
 };
 
@@ -99,8 +120,6 @@ const storeChanged = (arc, storeKey) => {
     }
   }
 };
-
-const {values} = Object;
 
 // the vibrations this worker can handle
 const handlers = {

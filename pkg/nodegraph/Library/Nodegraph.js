@@ -33,23 +33,33 @@ template: html`
   [section] {
     border-right: 1px solid var(--theme-color-bg-2);
   }
+  /**/
   [left] {
     width: 250px;
     transition: all 200ms ease-in;
   }
   [left][collapsed] {
-    transform: translate(-160px, 0);
+    transform: translate(-250px, 0);
     width: 0;
     white-space: nowrap;
   }
+  [left] > * {
+    min-width: 250px;
+  }
+  /**/
   [right] {
+    width: 280px;
     transition: all 200ms ease-in;
   }
   [right][collapsed] {
-    transform: translate(100%, 0);
+    /* transform: translate(280px, 0); */
     width: 0;
     white-space: nowrap;
   }
+  [right] > * {
+    min-width: 280px;
+  }
+  /**/
   [frame="toolbar"] [toolbar] {
     padding: 0;
   }
@@ -78,7 +88,7 @@ template: html`
       </split-panel>
     </div>
     <!-- right -->
-    <div right center collapsed$="{{rightCollapsed}}" section frame="inspector"></div>
+    <div right rows collapsed$="{{rightCollapsed}}" section frame="inspector"></div>
   </div>
   <!-- page 2 -->
   <div flex rows frame="pipelines"></div>

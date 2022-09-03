@@ -1,7 +1,4 @@
-import '../Dom/modal-view.js';
-import '../Dom/fancy-image.js';
-import '../Dom/split-panel.js';
-import '../Dom/drop-target.js';
+import '../Dom/common.js';
 import '../Dom/code-mirror/code-mirror.js';
 import '../Dom/Material/material-xen/material-xen.js';
 import '../Dom/Material/mwc/mwc.min.js';
@@ -10,6 +7,7 @@ import '../DevTools/Dom/data-explorer/data-explorer.js';
 import '../DevTools/Dom/surface-walker.js';
 import '../DevTools/Dom/resource-view.js';
 import '../D3/d3p/visual-arc/data-graph.js';
+import '../Goog/good-map/good-map.js';
 import '../Media/image-resource.js';
 import '../Media/media-stream/video-view.js';
 import '../Media/media-stream/stream-view.js';

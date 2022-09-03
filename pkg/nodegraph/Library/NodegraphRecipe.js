@@ -18,9 +18,7 @@ const PipelineToolbar = {
     'pipelines',
   ],
   $staticInputs: {
-    publishPaths: {
-    },
-    // publicPipelinesUrl: '...'
+    publishPaths: {}
   },
   $outputs: [
     {pipeline: 'selectedPipeline'},
@@ -118,6 +116,19 @@ export const NodegraphRecipe = {
           $inputs: [{data: 'inspectorData'}],
           $outputs: [{data: 'inspectorData'}],
           $staticInputs: {customInspectors}
+        },
+        NodeTree: {
+          $kind: '$library/NodeGraph/NodeTree',
+          $inputs: [
+            {pipeline: 'selectedPipeline'},
+            'selectedNode',
+            'nodeTypes',
+            'categories'
+          ],
+          $outputs: [
+            {pipeline: 'selectedPipeline'},
+            'selectedNode',
+          ]
         }
       }
     }
