@@ -282,7 +282,7 @@ onDelete({data}) {
 template: html`
 <style>
   :host {
-    height: 100%;
+    /* height: 100%; */
     width: 280px;
     white-space: nowrap;
     background-color: var(--theme-color-bg-0);

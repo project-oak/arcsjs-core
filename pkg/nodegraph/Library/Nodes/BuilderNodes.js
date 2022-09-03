@@ -26,20 +26,44 @@ export const isPoisonous = {
       noinspect: true
     }
   },
-  nodeContainer: {
+  isPoisonous: {
     $kind: '$library/Goog/isPoisonous',
     $inputs: ['entityInfo'],
     $outputs: ['isPoisonous']
   }
 };
 
-export const Haiku = {
+export const Poem = {
   $meta: {
-    name: 'Haiku',
+    name: 'Poem',
     category: 'Panels'
   },
-  nodeContainer: {
-    $kind: '$library/Goog/HaikuWriter'
+  poem: {
+    $kind: '$library/Goog/PoemWriter'
+  }
+};
+
+export const GoogleMap = {
+  $meta: {
+    name: 'Google Maps',
+    category: 'Panels'
+  },
+  $stores: {
+    geolocation: {
+      $type: 'Geolocation',
+      $value: {
+        latitude: 38.1904808,
+        longitude: -122.2901155
+      }
+    }
+  },
+  locator: {
+    $kind: '$library/Geolocation/Geolocation',
+    $outputs: ['geolocation']
+  },
+  map: {
+    $kind: '$library/Goog/GoogleMap',
+    $inputs: ['geolocation']
   }
 };
 

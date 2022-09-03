@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import * as candyNodes from './CandyNodes.js';
+//import * as candyNodes from './CandyNodes.js';
 import * as builderNodes from './BuilderNodes.js';
 import * as testNodes from './TestNodes.js';
 // import * as locationNodes from '../../Library/nostalgic/Goog/LocationNodes.js';
@@ -32,7 +32,7 @@ export const nodeTypes = [
   ...Object.values(newMediaNodes),
   ...fieldNodes,
   ...Object.values(testNodes),
-  ...Object.values(candyNodes),
+  //...Object.values(candyNodes),
   // ...Object.values(locationNodes),
   // ...Object.values(homescreen),
   // ...Object.values(speech),

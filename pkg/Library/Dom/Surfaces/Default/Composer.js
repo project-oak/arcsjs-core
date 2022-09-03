@@ -37,6 +37,10 @@ export class Composer {
       this._clearSlot(id);
     } else if (template) {
       let slot = this.slots[id];
+      if (slot && slot.container !== container) {
+        this._clearSlot(id);
+        slot = null;
+      }
       if (!slot) {
         slot = this.maybeGenerateSlot(packet);
       }
@@ -57,6 +61,8 @@ export class Composer {
     if (parent) {
       // generate a slot `id` for `template` under `parent`
       const slot = this.generateSlot(id, template, parent);
+      // memoize the container
+      slot.container = container;
       // retain
       this.slots[id] = slot;
       // return
