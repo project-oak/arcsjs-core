@@ -8,20 +8,12 @@
  */
 
 import {nodeTypes} from './nodeTypes.js';
-// TODO(sjmiles): should just be a recipe
-import {NodeCatalogParticles, NodeCatalogStores} from '../../Library/NodeCatalog/NodeCatalogSpecs.js';
-
-const CatalogRecipe = {
-  $stores: {
-    ...NodeCatalogStores
-  },
-  ...NodeCatalogParticles,
-};
+import {NodeCatalogRecipe} from '../../Library/NodeCatalog/NodeCatalogRecipe.js';
 
 const catalog = {
-  ...CatalogRecipe,
+  ...NodeCatalogRecipe,
   NodeCatalog: {
-    ...NodeCatalogParticles.NodeCatalog,
+    ...NodeCatalogRecipe.NodeCatalog,
     $container: '#catalog'
   }
 };
@@ -78,12 +70,8 @@ export const StudioRecipe = {
   main: {
     $container: '#user',
     $kind: '$app/Library/Studio',
-    $inputs: [
-      {pipeline: 'selectedPipeline'}
-    ],
-    $outputs: [
-      {pipeline: 'selectedPipeline'}
-    ],
+    $inputs: [{pipeline: 'selectedPipeline'}],
+    $outputs: [{pipeline: 'selectedPipeline'}],
     $slots: {
       editor,
       catalog,
@@ -97,9 +85,7 @@ export const StudioRecipe = {
       {pipeline: 'selectedPipeline'},
       'nodeTypes',
     ],
-    $outputs: [
-      {data: 'inspectorData'}
-    ]
+    $outputs: [{data: 'inspectorData'}]
   },
   nodeUpdator: {
     $kind: '$library/NodeGraph/NodeUpdator',

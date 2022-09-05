@@ -7,6 +7,18 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
+render({layout}) {
+  const model = {};
+  switch (layout) {
+    case 'column':
+      model.isColumn = true;
+      break;
+    case 'row':
+      model.isRow = true;
+      break;
+  }
+  return model;
+},
 template: html`
 <style>
   :host {
@@ -24,7 +36,7 @@ template: html`
     );
   }
 </style>
-<div flex column frame="items"></div>
+<div flex column$="{{isColumn}}" row$="{{isRow}}" frame="content"></div>
 <!-- <container-layout flex column frame="items"></container-layout> -->
 `
 });

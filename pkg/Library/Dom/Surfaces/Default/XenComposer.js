@@ -42,7 +42,7 @@ export class XenComposer extends Composer {
       throw Error('Cannot generateSlot without a parent node');
     }
     const container = dom('div', {
-      style: 'flex: 1; display: flex; flex-direction: column;',
+      style: 'flex: 1; display: flex; flex-direction: column; overflow: hidden;',
       id: sanitizeId(id)
     }, parent);
     container.setAttribute('particle', id);

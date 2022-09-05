@@ -105,7 +105,10 @@ render({pipeline, selectedNode, nodeTypes, categories}, {recipes}) {
         this.getParticleNamesForNode(node, pipeline, recipes)) ||
       [];
   const rects = pipeline?.nodes?.map(
-    node => idsForNode(node).map(id => ({id, position: node.position?.preview?.[id]}))).flat();
+    node => idsForNode(node).map(
+      id => ({id, position: node.position?.preview?.[id]})
+    )
+  ).flat();
   const nodeType =
       nodeTypes?.find(({$meta: {name}}) => selectedNode?.name === name);
   return {

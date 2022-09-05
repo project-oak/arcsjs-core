@@ -116,7 +116,9 @@ export const NodegraphRecipe = {
           $inputs: [{data: 'inspectorData'}],
           $outputs: [{data: 'inspectorData'}],
           $staticInputs: {customInspectors}
-        },
+        }
+      },
+      tree: {
         NodeTree: {
           $kind: '$library/NodeGraph/NodeTree',
           $inputs: [

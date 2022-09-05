@@ -101,19 +101,21 @@
 
   onDrop({eventlet: {value}, pipeline, nodeTypes}) {
     if (pipeline) {
-      const name = value.split(this.catalogDelimiter)[1];
-      const nodeType = this.findNodeType(name, nodeTypes);
-      const newNode = this.makeNewNode(nodeType, pipeline.nodes);
+      const type = value.split(this.catalogDelimiter)[1];
+      const newNode = this.indexNewNode(type, nodeTypes, pipeline.nodes);
       pipeline.nodes = [...pipeline.nodes, newNode];
       return {pipeline};
     }
   },
 
-  makeNewNode({$meta: {name}}, nodes) {
-    const typedNodes = nodes.filter(node => name === node.name);
+  indexNewNode(type, nodeTypes, existingNodes) {
+    const nodeType = this.findNodeType(type, nodeTypes);
+    const name = nodeType.$meta.name;
+    const typedNodes = existingNodes.filter(node => name === node.name);
     const index = (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
     return {
       name,
+      type,
       index,
       key: this.formatNodeKey({name, index}),
     };
@@ -180,10 +182,10 @@
       border-color: grey;
     }
   </style>
-  <div toolbar>
+  <!-- <div toolbar>
     <span flex></span>
     <mwc-icon-button on-click="onDeleteAll" icon="delete_forever"></mwc-icon-button>
-  </div>
+  </div> -->
   <drop-target flex grid scrolling on-drop="onDrop">
     <node-graph nodes="{{graphNodes}}" on-select="onNodeSelect" on-delete="onNodeRemove"></node-graph>
   </drop-target>

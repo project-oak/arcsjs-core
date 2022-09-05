@@ -282,8 +282,6 @@ onDelete({data}) {
 template: html`
 <style>
   :host {
-    /* height: 100%; */
-    width: 280px;
     white-space: nowrap;
     background-color: var(--theme-color-bg-0);
     color: var(--them-color-fg-4);
@@ -421,6 +419,7 @@ template: html`
   </div>
   <div frame="info"></div>
 </div>
+
 <div title properties>Properties</div>
 <div controls repeat="prop_t">{{props}}</div>
 <div noSelectionMsg display$="{{showNothingToInspect}}">Nothing to inspect</div>

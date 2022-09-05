@@ -3,7 +3,6 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-
 ({
 catalogDelimiter: '$$',
 
@@ -34,31 +33,33 @@ keyFromMeta({category, name}) {
 
 async onItemClick({eventlet: {key}, selectedNodeTypes, pipeline}) {
   if (pipeline) {
-    const [category, name] = key.split(this.catalogDelimiter);
-    const nodeType = this.findNodeType({name, category}, selectedNodeTypes);
-    const newNode = this.makeNewNode(nodeType, pipeline.nodes);
+    const [category, type] = key.split(this.catalogDelimiter);
+    const newNode = this.indexNewNode(type, selectedNodeTypes, pipeline.nodes);
     pipeline.nodes = [...pipeline.nodes, newNode];
     return {pipeline};
   }
 },
 
-findNodeType(node, nodeTypes) {
-  return nodeTypes.find(({$meta: {name}}) => node.name === name);
-},
-
-findNodeTypeIndex(node, nodeTypes) {
-  return nodeTypes.findIndex(({$meta: {name}}) => node.name === name);
-},
-
-makeNewNode({$meta: {name}}, nodes) {
-  const typedNodes = nodes.filter(node => name === node.name);
+indexNewNode(type, nodeTypes, existingNodes) {
+  const nodeType = this.findNodeType(type, nodeTypes);
+  const name = nodeType.$meta.name;
+  const typedNodes = existingNodes.filter(node => name === node.name);
   const index = (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
   return {
     name,
+    type,
     index,
     key: this.formatNodeKey({name, index}),
     position: {}
   };
+},
+
+findNodeType(type, nodeTypes) {
+  return nodeTypes.find(({$meta: {name}}) => name === type);
+},
+
+findNodeTypeIndex(node, nodeTypes) {
+  return nodeTypes.findIndex(({$meta: {name}}) => node.name === name);
 },
 
 formatNodeKey({name, index}) {

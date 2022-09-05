@@ -52,6 +52,28 @@ const composer = {
   }
 };
 
+const ComposerService = {
+  // TODO(sjmiles): Ability to re-target the Render output of a Host
+  // is a fundamentally new behavior ... so this is work-in-progress
+  getContainer(arc, host, request) {
+    const containerHost = ComposerService.getContainerHost(arc, host, request);
+    return containerHost?.container;
+  },
+  getContainerHost(arc, host, request) {
+    const {node} = request.data;
+    const hosts = node?.position?.preview;
+    const hostName = (hosts ? keys(hosts) : []).pop();
+    return arc.hosts[hostName];
+  },
+  setContainer(arc, host, request) {
+    const containerHost = ComposerService.getContainerHost(arc, host, request);
+    log(containerHost, request.data.container);
+    containerHost.meta.container = request.data.container;
+    containerHost.render({});
+    return containerHost.container;
+  }
+};
+
 // map of service-ids to resolve-functions waiting for return values
 const serviceCalls = {};
 
@@ -73,19 +95,32 @@ const serviceHandler = async (arc, host, request) => {
   // TODO(sjmiles): this is a fundamentally new behavior
   // (ability to re-target the Render output of a Host)
   // so this is work-in-progress
-  if (request?.msg === 'getContainer') {
-    const hosts = request.data?.node?.position?.preview;
-    const hostName = (hosts ? keys(hosts) : []).pop();
-    const host = arc.hosts[hostName];
-    // TODO(sjmiles): this works, now we need to control it
-    //host.meta.container = 'Container1nodeContainer#items';
-    // TODO(sjmiles): elements moved out of the layout-container
-    // into ... somewhere else ... are no longer 'selectable'
-    // by the layout-container.
-    host.render({});
-    //log.warn('getContainer', hostName, host);
-    return true;
+  if (request?.kind === 'ComposerService') {
+    return ComposerService[request?.msg]?.(arc, host, request);
   }
+  // if (request?.msg === 'getContainer') {
+  //   return ComposerService.getContainer(arc, host, request);
+  //   // const hosts = request.data?.node?.position?.preview;
+  //   // const hostName = (hosts ? keys(hosts) : []).pop();
+  //   // const host = arc.hosts[hostName];
+  //   // return host?.container;
+  // }
+  // if (request?.msg === 'setContainer') {
+  //   return ComposerService.setContainer(arc, host, request);
+  //   // const {node, container} = request.data;
+  //   // const hosts =node?.position?.preview;
+  //   // const hostName = (hosts ? keys(hosts) : []).pop();
+  //   // const host = arc.hosts[hostName];
+  //   // log(host, container);
+  //   // // TODO(sjmiles): this works, now we need to control it
+  //   // host.meta.container = container;
+  //   // // TODO(sjmiles): elements moved out of the layout-container
+  //   // // into ... somewhere else ... are no longer 'selectable'
+  //   // // by the layout-container.
+  //   // host.render({});
+  //   // //log.warn('getContainer', hostName, host);
+  //   // return host.container;
+  // }
   return serviceRequest(request);
 };
 

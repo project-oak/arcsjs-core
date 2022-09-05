@@ -72,8 +72,18 @@ export const Container = {
     name: 'Container',
     category: 'Panels'
   },
-  nodeContainer: {
-    $kind: '$app/Library/Container'
+  $stores: {
+    layout: {
+      $type: 'String',
+      $value: 'column'
+    }
+  },
+  container: {
+    $kind: '$app/Library/Container',
+    $inputs: ['layout'],
+    $slots: {
+      content: {}
+    }
   }
 };
 
