@@ -689,6 +689,7 @@ var Host = class extends EventEmitter {
   id;
   lastOutput;
   lastPacket;
+  lastRenderModel;
   log;
   meta;
   particle;
@@ -737,12 +738,13 @@ var Host = class extends EventEmitter {
     if (this.template) {
       Decorator.maybeDecorateModel(renderModel, this.particle);
       this.log(renderModel);
+      this.lastRenderModel = renderModel;
       this.render(renderModel);
     }
   }
   rerender() {
-    if (this.lastPacket) {
-      this.arc?.render(this.lastPacket);
+    if (this.lastRenderModel) {
+      this.render(this.lastRenderModel);
     }
   }
   render(model) {

@@ -16,8 +16,8 @@ safeKeys(o) {
 
 update({pipeline, selectedNode, nodeTypes}, state) {
   // build a map of nodeTypes
-  state.nodeTypes = {};
-  values(nodeTypes).forEach(t => state.nodeTypes[t.$meta.name] = t);
+  state.nodeTypesMap = {};
+  values(nodeTypes).forEach(t => state.nodeTypesMap[t.$meta.name] = t);
   // when switching pipelines, we reset some state
   if (pipeline?.$meta?.name !== state.selectedPipelineName) {
     state.selectedPipelineName = pipeline?.$meta.name;
@@ -37,114 +37,95 @@ updateSelectedNode({pipeline, selectedNode}, state) {
   return selectedNode;
 },
 
-render({pipeline, categories, selectedNode}, {nodeTypes}) {
+render({pipeline, categories, selectedNode}, state) {
   const nodes = pipeline?.nodes;
-  return {
-    containers: this.renderContainerOptions(nodes, nodeTypes),
-    graphNodes: this.renderGraphNodes(nodes, selectedNode, nodeTypes, categories)
-  };
+  const key = selectedNode?.key;
+  const graphNodes = this.renderGraphNodes(nodes, state.nodeTypesMap, key, categories);
+  const containers = this.renderContainers(nodes, state.nodeTypesMap, key);
+  state.selectedContainer = containers[0];
+  return {containers, graphNodes};
 },
 
-renderContainerOptions(nodes, nodeTypes) {
-  let containers = [];
-  nodes?.forEach(node => {
-    containers.push(...this.containersForNode(node, nodeTypes));
-  });
-  return containers;
-},
-
-containersForNode(node, nodeTypes) {
-  const nodes = node?.position?.preview;
-  if (nodes) {
-    const hostName = keys(nodes)?.[0];
-    const nodeType = nodeTypes[node.type];
-    return this.containersForNodeType(hostName, nodeType);
-  }
-  return [];
-},
-
-containersForNodeType(hostName, nodeType) {
-  const containers = [];
-  entries(nodeType).forEach(([key, value]) => {
-    if (key[0] !== '$') {
-      const $slots = value?.$slots;
-      if ($slots) {
-        keys($slots).forEach(slotName => {
-          containers.push({icon: 'apps', key: `${hostName}#${slotName}`, name: `${hostName}:${slotName}`});
-        });
-      }
-    }
-  });
-  return containers;
-},
-
-renderGraphNodes(nodes, selectedNode, nodeTypes, categories) {
+renderGraphNodes(nodes, nodeTypesMap, nodeKey, categories) {
   const graph = {name: 'root', graphNodes: []};
   const graphNodes = nodes?.map(node => {
     const {key} = node;
-    const name = this.nodeDisplay(node);
-    const nodeType = nodeTypes[node.name];
-    const category = nodeType?.$meta?.category;
-    const containers = this.containersForNode(node, nodeTypes);
+    const name = node.name;
+    const nodeType = nodeTypesMap[node.name];
+    const categoryName = nodeType?.$meta?.category;
+    const category = categories?.[categoryName];
+    const containers = this.containersForNode(node, nodeTypesMap);
     return {
       key,
       name,
-      icon: 'settings',
-      //displayName: key ? `${key} [${name}]` : name,
-      color: this.colorByCategory(category, categories),
-      bgColor: this.bgColorByCategory(category, categories),
-      selected: key == selectedNode?.key,
-      //conn: this.renderConnections(node),
+      icon: category.icon || 'settings',
+      color: category.color || 'crimson',
+      bgColor: category.bgColor || 'gray',
+      selected: key == nodeKey,
       graphNodes: containers
     };
   });
   graphNodes?.forEach(gn => {
-    const parent = /*(gn.conn && graphNodes.find(p => p.key === gn.conn)) ||*/ graph;
+    const parent = graph;
     parent.graphNodes.push(gn);
   });
   return [graph];
 },
 
-findParent(node, graphNodes) {
-  // n
-  // graphNodes.find
-  // (gn.conn && graphNodes.find(p => p.key === gn.conn)) || graph
+containersForNode(node, nodeTypesMap) {
+  // state of each host in the 'preview' layout (Runner)
+  const hosts = node?.position?.preview;
+  if (hosts) {
+    // get first one only
+    const hostName = keys(hosts)?.[0];
+    // nodeType contains slot information
+    // smush it together with hostName for container id
+    return this.containersFromNodeType(hostName, node, nodeTypesMap);
+  }
+  return [];
 },
 
-renderConnections(node, pipeline) {
-  return this.safeKeys(node.connections || {})
-    .map(storeName => this.renderStoreConnections(storeName, node, pipeline))
-    .flat();
+containersFromNodeType(hostName, node, nodeTypesMap) {
+  // results go here
+  const containers = [];
+  // TODO(sjmiles): use Parser (?!)
+  // scan nodeType for slots
+  entries(nodeTypesMap[node.type] ?? 0).forEach(([key, value]) => {
+    // looking for Host identifiers
+    if (key[0] !== '$') {
+      // each slot is potentially a container
+      const eachName = slotName => this.makeContainerModel(hostName, slotName);
+      const models = keys(value?.$slots ?? 0).map(eachName);
+      // remember any that we found
+      containers.push(...models);
+    }
+  });
+  // here go results
+  return containers;
 },
 
-nodeDisplay({name, index}) {
-  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
-  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
-},
-
-colorByCategory(category, categories) {
-  return categories?.[category]?.color || 'crimson';
-},
-
-bgColorByCategory(category, categories) {
-  return categories?.[category]?.bgColor || 'lightgrey';
-},
-
-onNodeRemove({eventlet: {key}, pipeline, selectedNode}) {
-  pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
+makeContainerModel(hostName, slotName) {
   return {
-    pipeline,
-    selectedNode: key === selectedNode.key ? null : pipeline.nodes.find(n => n.key === selectedNode.key)
+    icon: 'apps',
+    key: `${hostName}#${slotName}`,
+    name: `${hostName}:${slotName}`,
+    isContainer: true
   };
 },
 
+renderContainers(nodes, nodeTypesMap, nodeKey) {
+  // function mapping nodes to lists of containers
+  const mapFn = node => this.containersForNode(node, nodeTypesMap);
+  // nodes may have multiple containers, flatten the list, remove selected node
+  // (it cannot be it's own container)
+  return nodes?.map(mapFn).flat().filter(n => !n.key.startsWith(nodeKey));
+},
+
 async onNodeSelect({eventlet: {key}, pipeline}, state, {service}) {
-  const node = pipeline.nodes.find(node => node.key === key);
-  if (node) {
-    log(await service({kind: 'ComposerService', msg: 'getContainer', data: {node}}));
-    return {
-      selectedNode: node
-    };
+  const selectedNode = pipeline.nodes.find(node => node.key === key);
+  if (selectedNode) {
+    //log(await service({kind: 'ComposerService', msg: 'getContainer', data: {node}}));
+    return {selectedNode};
   }
 },
 
@@ -182,6 +163,14 @@ async onSetContainer({selectedNode: node}, {selectedContainer: container}, {serv
 //   return `${name}${index}`.replace(/ /g,'');
 // },
 
+// onNodeRemove({eventlet: {key}, pipeline, selectedNode}) {
+//   pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
+//   return {
+//     pipeline,
+//     selectedNode: key === selectedNode.key ? null : pipeline.nodes.find(n => n.key === selectedNode.key)
+//   };
+// },
+
 // onDeleteAll({pipeline}) {
 //   pipeline.nodes = [];
 //   return {
@@ -194,10 +183,9 @@ template: html`
 <style>
   :host {
     display: block;
-    /* height: 100%; */
     font-size: 16px;
-    color: var(--theme-color-fg-1);
-    background-color: var(--theme-color-bg-1);
+    color: var(--theme-color-fg-0);
+    background-color: var(--theme-color-bg-0);
     --edge-border: 1px solid #555;
     --mdc-icon-size: 18px;
     --mdc-icon-button-size: 26px;
@@ -213,10 +201,8 @@ template: html`
     height: 28px;
   }
   [selected] {
-    background-color: var(--theme-color-bg-2);
-  }
-  multi-select {
-    /* padding: 4px; */
+    background-color: var(--theme-color-bg-1);
+    border-radius: 4px;
   }
 </style>
 
@@ -235,7 +221,10 @@ template: html`
 <template node_t>
   <div node selected$="{{selected}}" key="{{key}}" on-click="onNodeSelect">
     <div bar>
-      <icon>{{icon}}</icon>&nbsp;<span>{{name}}</span>
+      <icon>{{icon}}</icon>
+      <draggable-item flex disabled="{{isContainer}}" key="{{key}}" name="{{name}}">
+        &nbsp;<span>{{name}}</span>
+      </draggable-item>
     </div>
     <div style="padding-left: 12px;" repeat="node_t">{{graphNodes}}</div>
   </div>

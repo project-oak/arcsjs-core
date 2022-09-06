@@ -12,24 +12,27 @@ const template = Xen.Template.html`
   :host {
     width: 100%;
     height: 100%;
+    --resizer-size: 11px;
+    --handle-size: 16px;
     display: flex;
-    --resizer-size: 12px;
-    --handle-size: 12px;
+    background-color: var(--theme-color-bg-4);
   }
   [resizer] {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
+    /* padding: 2px; */
   }
   [resizer]:not([vertical]) {
-    border-top: 1px solid #ffffff;
-    border-bottom: 1px solid #e6e6e6;
+    /* border-top: 1px solid #ffffff;
+    border-bottom: 1px solid #e6e6e6; */
     height: var(--resizer-size);
     cursor: ns-resize;
   }
   [vertical][resizer] {
-    border-right: 1px solid #ffffff;
-    border-left: 1px solid #e6e6e6;
+    /* border-right: 1px solid #ffffff;
+    border-left: 1px solid #e6e6e6; */
     width: var(--resizer-size);
     cursor: ew-resize;
   }
@@ -38,7 +41,8 @@ const template = Xen.Template.html`
   }
   [handle] {
     background-color: #ccc;
-    border: 1px solid white;
+    border: 1px solid #eeeeee;
+    border-radius: 4px;
   }
   [handle]:not([vertical]) {
     width: var(--handle-size);

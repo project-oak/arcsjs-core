@@ -25,6 +25,11 @@ template: html`
     min-width: 120px;
     min-height: 120px;
     display: flex;
+    border: 3px dotted darkorange;
+    padding: 2px;
+  }
+  [frame="content"] > * {
+    border-color: blue !important;
   }
   container-layout {
     background: repeating-linear-gradient(
