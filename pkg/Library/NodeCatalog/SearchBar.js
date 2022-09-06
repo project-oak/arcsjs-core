@@ -28,12 +28,12 @@ template: html`
   }
   [search-container] {
     position: relative;
-    background-color: #e8eaed;
+    background-color: var(--theme-color-bg-0);
+    color: var(--theme-color-fg-0);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 13px 20px;
-    color: #5f6368;
   }
   [search-container] input {
     width: 100%;

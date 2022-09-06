@@ -9,7 +9,8 @@
 /* global scope */
 ({
 
-connectorDelimiter: '$$',
+connectorDelim: '$$',
+nameDelim: ':',
 
 shouldUpdate({nodeTypes}) {
   return !nodeTypes.empty;
@@ -17,11 +18,13 @@ shouldUpdate({nodeTypes}) {
 
 update(inputs, state) {
   const {pipeline} = inputs;
-  if (pipeline?.nodes &&
-      (this.pipelineChanged(pipeline, state.pipeline) || this.nodesDidChange(pipeline.nodes, state.nodes))) {
-    state.pipeline = pipeline;
-    state.nodes = [...pipeline.nodes];
-    return this.updateNodes(inputs, state);
+  if (pipeline?.nodes) {
+    if (this.pipelineChanged(pipeline, state.pipeline)
+        || this.nodesDidChange(pipeline.nodes, state.nodes)) {
+      state.pipeline = pipeline;
+      state.nodes = [...pipeline.nodes];
+      return this.updateNodes(inputs, state);
+    }
   }
 },
 
@@ -53,7 +56,9 @@ hasSameNode(node, nodes) {
 },
 
 updateNodes({pipeline, selectedNode, nodeTypes, customInspectors, inspectorData, globalStores}) {
-  pipeline.nodes = pipeline.nodes.map(node => this.updateNodeConnectionCandidates(node, pipeline, nodeTypes, globalStores));
+  pipeline.nodes = pipeline.nodes.map(
+    node => this.updateNodeConnectionCandidates({node, pipeline, nodeTypes, globalStores})
+  );
   const recipes = pipeline.nodes
     .map(node => this.recipeForNode(node, nodeTypes, pipeline, customInspectors, inspectorData || 'inspectorData'))
     .filter(recipe => recipe)
@@ -65,7 +70,7 @@ updateNodes({pipeline, selectedNode, nodeTypes, customInspectors, inspectorData,
   };
 },
 
-updateNodeConnectionCandidates(node, pipeline, nodeTypes, globalStores) {
+updateNodeConnectionCandidates({node, pipeline, nodeTypes, globalStores}) {
   const connections = this.updateNodeStoreConnections(node, pipeline, nodeTypes, globalStores);
   return {
     ...node,
@@ -186,7 +191,7 @@ recipeForNode(node, nodeTypes, pipeline, customInspectors, inspectorData) {
   const nodeType = this.findNodeType(node.name, nodeTypes);
   const recipe = this.buildParticleSpecs(nodeType, node);
   recipe.$meta = {
-    name: this.encodeFullNodeKey(node, pipeline, this.connectorDelimiter)
+    name: this.encodeFullNodeKey(node, pipeline, this.connectorDelim)
   };
   if (nodeType?.$stores) {
     recipe.$stores = this.buildStoreSpecs(node, nodeType, nodeTypes, pipeline);
@@ -225,7 +230,8 @@ buildParticleSpecs(nodeType, node) {
   const specs = {};
   const names = this.getParticleNames(nodeType) || [];
   for (const particleName of names) {
-    specs[`${node.key}${particleName}`] = this.buildParticleSpec(nodeType, node, particleName);
+    //specs[`${node.key}${this.nameDelim}${particleName}`] = this.buildParticleSpec(nodeType, node, particleName);
+    specs[`${node.key}`] = this.buildParticleSpec(nodeType, node, particleName);
   }
   return specs;
 },
@@ -270,7 +276,7 @@ resolveGroup(bindings, node, {$stores}) {
 resolveBinding(binding, node, $stores) {
   const boundStore = $stores?.[binding];
   if (boundStore && !boundStore.connection) {
-    return [`${node.key}${binding}`];
+    return [`${node.key}${this.nameDelim}${binding}`];
   } else {
     const selectedConnections = node.connections?.[binding]?.candidates?.filter(c => c.selected);
     return selectedConnections?.map(connection => this.constructStoreId(connection));
@@ -289,7 +295,7 @@ buildStoreSpecs(node, nodeType, nodeTypes, pipeline) {
         specs[this.constructStoreId(connection)] = {...spec, connection: true};
       });
     } else {
-      specs[`${node.key}${name}`] = this.buildStoreSpec(store, node.props?.[name], node);
+      specs[`${node.key}${this.nameDelim}${name}`] = this.buildStoreSpec(store, node.props?.[name], node);
     }
   });
   return specs;

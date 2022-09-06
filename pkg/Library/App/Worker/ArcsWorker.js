@@ -10,6 +10,7 @@ import {Paths, Runtime, Arc, Decorator, Chef, logFactory, utils} from '../../cor
 import {MessageBus} from './MessageBus.js';
 import {RecipeService} from '../../Arcs/RecipeService.js';
 import {StoreService} from '../../Arcs/StoreService.js';
+import {ComposerService} from '../../Arcs/ComposerService.js';
 
 // n.b. lives in Worker context
 
@@ -70,21 +71,11 @@ const serviceHandler = async (arc, host, request) => {
     log('StoreService', request, value);
     return value;
   }
-  // TODO(sjmiles): this is a fundamentally new behavior
-  // (ability to re-target the Render output of a Host)
-  // so this is work-in-progress
-  if (request?.msg === 'getContainer') {
-    const hosts = request.data?.node?.position?.preview;
-    const hostName = (hosts ? keys(hosts) : []).pop();
-    const host = arc.hosts[hostName];
-    // TODO(sjmiles): this works, now we need to control it
-    //host.meta.container = 'Container1nodeContainer#items';
-    // TODO(sjmiles): elements moved out of the layout-container
-    // into ... somewhere else ... are no longer 'selectable'
-    // by the layout-container.
-    host.render({});
-    //log.warn('getContainer', hostName, host);
-    return true;
+  if (request?.kind === 'ComposerService') {
+    // TODO(sjmiles): this is a fundamentally new behavior
+    // (ability to re-target the Render output of a Host)
+    // so this is work-in-progress
+    return ComposerService[request?.msg]?.(arc, host, request);
   }
   return serviceRequest(request);
 };

@@ -48,7 +48,7 @@ template: html`
   }
   /**/
   [right] {
-    width: 280px;
+    min-width: 280px;
     transition: all 200ms ease-in;
   }
   [right][collapsed] {
@@ -68,30 +68,36 @@ template: html`
   }
 </style>
 
-<page-group flex rows>
+<page-group flex column>
   <!-- page 1 -->
-  <div flex columns>
+  <div flex row>
     <!-- left -->
-    <div left collapsed$="{{leftCollapsed}}" rows section frame="catalog"></div>
+    <div left collapsed$="{{leftCollapsed}}" column section frame="catalog"></div>
     <!-- center -->
-    <div flex section rows>
-      <!-- top -->
-      <div nav toolbar>
-        <icon on-click="onToggleLeft">{{leftIcon}}</icon>
-        <div flex frame="toolbar"></div>
-        <icon on-click="onToggleRight">{{rightIcon}}</icon>
+    <split-panel vertical flex section row>
+      <div flex column slot="one">
+        <!-- top -->
+        <div nav toolbar>
+          <icon on-click="onToggleLeft">{{leftIcon}}</icon>
+          <div flex frame="toolbar"></div>
+          <icon on-click="onToggleRight">{{rightIcon}}</icon>
+        </div>
+        <!-- middle 1 -->
+        <split-panel flex column divider="280">
+          <div flex column frame="preview" slot="one"></div>
+          <div flex column frame="editor" slot="two"></div>
+        </split-panel>
       </div>
-      <!-- middle 1 -->
-      <split-panel flex rows>
-        <div flex rows frame="preview" slot="startside"></div>
-        <div flex rows frame="editor" slot="endside"></div>
+    <!-- right -->
+    <div slot="two" right flex column collapsed$="{{rightCollapsed}}" section>
+      <split-panel flex column>
+        <div flex column frame="inspector" slot="one"></div>
+        <div flex column frame="tree" slot="two"></div>
       </split-panel>
     </div>
-    <!-- right -->
-    <div right rows collapsed$="{{rightCollapsed}}" section frame="inspector"></div>
   </div>
   <!-- page 2 -->
-  <div flex rows frame="pipelines"></div>
+  <div flex column frame="pipelines"></div>
 </page-group>
 `
 });

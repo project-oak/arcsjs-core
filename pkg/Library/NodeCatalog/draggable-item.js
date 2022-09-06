@@ -13,13 +13,14 @@ const template = Xen.Template.html`
     cursor: grab;
     padding: 9px 0 9px 30px;
     color: var(--theme-color-fg-4);
+    user-select: none;
   }
 
-  [container]:hover {
+  [container][draggable="true"]:hover {
     background: var(--theme-color-bg-4);
   }
 
-  [container]:hover icon {
+  [container][draggable="true"]:hover icon {
     display: flex;
     align-items: center;
   }
@@ -51,11 +52,7 @@ const template = Xen.Template.html`
   }
 </style>
 
-<div container
-     draggable="true"
-     on-mouseenter="onEnter"
-     on-mouseleave="onLeave"
-     on-dragstart="onDragStart">
+<div container draggable="{{draggable}}" on-mouseenter="onEnter" on-mouseleave="onLeave" on-dragstart="onDragStart">
   <icon>drag_indicator</icon>
   <div label on-click="onItemClick">{{name}}</div>
 </div>
@@ -78,16 +75,17 @@ const template = Xen.Template.html`
  */
 export class DraggableItem extends Xen.Async {
   static get observedAttributes() {
-    return ['key', 'name'];
+    return ['key', 'name', 'disabled'];
   }
 
   get template() {
     return template;
   }
 
-  render({name}) {
+  render({name, disabled}) {
     return {
-      name
+      name,
+      draggable: !disabled
     };
   }
 
@@ -98,7 +96,6 @@ export class DraggableItem extends Xen.Async {
   onDragStart(e) {
     // This will hide the popup panel for the hovered item.
     this.fire('leave');
-
     e.dataTransfer.setData('text/plain', this.key);
   }
 

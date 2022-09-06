@@ -15,7 +15,8 @@ const {assign} = Object;
 export class DesignerLayout extends DragDrop {
   static get observedAttributes() {
     return [
-      'selected', 'rects',
+      'selected',
+      'rects',
       // The color of the boxer.
       'color'
     ];
