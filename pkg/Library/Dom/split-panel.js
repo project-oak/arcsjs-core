@@ -22,17 +22,12 @@ const template = Xen.Template.html`
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    /* padding: 2px; */
   }
   [resizer]:not([vertical]) {
-    /* border-top: 1px solid #ffffff;
-    border-bottom: 1px solid #e6e6e6; */
     height: var(--resizer-size);
     cursor: ns-resize;
   }
   [vertical][resizer] {
-    /* border-right: 1px solid #ffffff;
-    border-left: 1px solid #e6e6e6; */
     width: var(--resizer-size);
     cursor: ew-resize;
   }
