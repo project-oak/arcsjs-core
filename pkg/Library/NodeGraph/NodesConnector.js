@@ -16,14 +16,14 @@ shouldUpdate({nodeTypes}) {
   return !nodeTypes.empty;
 },
 
-update(inputs, state) {
+async update(inputs, state, {service}) {
   const {pipeline} = inputs;
   if (pipeline?.nodes) {
     if (this.pipelineChanged(pipeline, state.pipeline)
         || this.nodesDidChange(pipeline.nodes, state.nodes)) {
       state.pipeline = pipeline;
       state.nodes = [...pipeline.nodes];
-      return this.updateNodes(inputs, state);
+      return this.updateNodes(inputs, /*state,*/ service);
     }
   }
 },
@@ -55,14 +55,14 @@ hasSameNode(node, nodes) {
   return false;
 },
 
-updateNodes({pipeline, selectedNode, nodeTypes, customInspectors, inspectorData, globalStores}) {
+async updateNodes({pipeline, selectedNode, nodeTypes, customInspectors, inspectorData, globalStores}, service) {
   pipeline.nodes = pipeline.nodes.map(
-    node => this.updateNodeConnectionCandidates({node, pipeline, nodeTypes, globalStores})
-  );
-  const recipes = pipeline.nodes
-    .map(node => this.recipeForNode(node, nodeTypes, pipeline, customInspectors, inspectorData || 'inspectorData'))
+    node => this.updateNodeConnectionCandidates(node, pipeline, nodeTypes, globalStores));
+  const recipes = (await Promise.all(pipeline.nodes
+    .map(async node => this.recipeForNode(node, nodeTypes, pipeline, customInspectors, inspectorData || 'inspectorData', service))))
     .filter(recipe => recipe)
     ;
+  // const r = await service({kind: 'RecipeService', msg: 'ParseRecipe', data: {recipe: recipes?.[0]}});
   return {
     pipeline,
     recipes,
@@ -187,9 +187,10 @@ findNodeType(name, nodeTypes) {
   return nodeTypes.find(({$meta}) => $meta.name === name);
 },
 
-recipeForNode(node, nodeTypes, pipeline, customInspectors, inspectorData) {
+async recipeForNode(node, nodeTypes, pipeline, customInspectors, inspectorData, service) {
   const nodeType = this.findNodeType(node.name, nodeTypes);
-  const recipe = this.buildParticleSpecs(nodeType, node);
+  const parsedNodeType = await service({kind: 'RecipeService', msg: 'ParseRecipe', data: {recipe: nodeType}});
+  const recipe = this.buildParticleSpecs(parsedNodeType, node);
   recipe.$meta = {
     name: this.encodeFullNodeKey(node, pipeline, this.connectorDelim)
   };
@@ -245,10 +246,12 @@ buildParticleSpec(nodeType, node, particleName) {
   const particleSpec = nodeType[particleName];
   const $container = this.resolveContainer(node.key, particleSpec.$container);
   const bindings = this.resolveBindings(nodeType, node, particleSpec);
+  const $slots = this.resolveSlots(nodeType, node, particleSpec);
   return {
-    $slots: {},
+    // $slots, //: {},
     ...particleSpec,
     ...bindings,
+    $slots,
     $container
   };
 },
@@ -281,6 +284,10 @@ resolveBinding(binding, node, $stores) {
     const selectedConnections = node.connections?.[binding]?.candidates?.filter(c => c.selected);
     return selectedConnections?.map(connection => this.constructStoreId(connection));
   }
+},
+
+resolveSlots(nodeType, node, {$slots}) {
+  return $slots;
 },
 
 buildStoreSpecs(node, nodeType, nodeTypes, pipeline) {
