@@ -42,7 +42,8 @@ render({pipeline, categories, selectedNode}, state) {
   const key = selectedNode?.key;
   const graphNodes = this.renderGraphNodes(nodes, state.nodeTypesMap, key, categories);
   const containers = this.renderContainers(nodes, state.nodeTypesMap, key);
-  if (!state.selectedContainer || !containers.find(c => c.key === state.selectedContainer)) {
+  if (!state.selectedContainer ||
+      (containers?.length > 0 && containers?.find(c => c.key === state.selectedContainer))) {
     state.selectedContainer = containers?.[0]?.key;
   }
   return {containers, graphNodes};
