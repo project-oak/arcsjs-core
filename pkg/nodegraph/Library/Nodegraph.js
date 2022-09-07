@@ -48,16 +48,12 @@ template: html`
   }
   /**/
   [right] {
-    min-width: 280px;
     transition: all 200ms ease-in;
   }
   [right][collapsed] {
     /* transform: translate(280px, 0); */
     width: 0;
     white-space: nowrap;
-  }
-  [right] > * {
-    min-width: 280px;
   }
   /**/
   [frame="toolbar"] [toolbar] {

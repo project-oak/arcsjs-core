@@ -160,7 +160,7 @@ encodeFullNodeKey({key}, {$meta}) {
 
 updateNodeInPipeline(node, pipeline) {
   const index = pipeline.nodes.findIndex(n => n.key === node.key);
-  pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
+  pipeline.nodes[index] = node;
   return pipeline;
 },
 
