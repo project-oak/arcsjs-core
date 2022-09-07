@@ -138,19 +138,16 @@ onSelect({eventlet: {value: container}}, state) {
 
 async onSetContainer({selectedNode: node, pipeline}, {selectedContainer: container}, {service}) {
   if (container) {
-    await service({kind: 'ComposerService', msg: 'setContainer', data: {node, container}});
     const hosts = node?.position?.preview;
-    const hostId = hosts ? Object.keys(hosts).pop() : '';
+    const hostId = hosts ? Object.keys(hosts).pop().split(':')?.[0] : '';
+    await service({kind: 'ComposerService', msg: 'setContainer', data: {/*node*/hostId, container}});
     node = {
       ...node,
       position: {
         ...node.position,
         preview: {
           ...node.position.preview,
-          [`${hostId}:Container`]: {
-            ...(node.position.preview[hostId]),
-            container
-          }
+          [`${hostId}:Container`]: container
         }
       }
     };

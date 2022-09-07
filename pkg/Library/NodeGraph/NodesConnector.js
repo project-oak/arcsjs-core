@@ -257,7 +257,7 @@ buildParticleSpecs(nodeType, node, globalStores) {
   const names = this.getParticleNames(nodeType) || [];
   for (const particleName of names) {
     specs[`${node.key}${particleName}`] =
-        this.buildParticleSpec(nodeType, node, nodeType[particleName], `main#runner`, globalStores);
+        this.buildParticleSpec(nodeType, node, particleName, `main#runner`, globalStores);
   }
   return specs;
 },
@@ -267,8 +267,13 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-buildParticleSpec(nodeType, node, particleSpec, defaultContainer, globalStores) {
-  const $container = this.resolveContainer(node.key, particleSpec.$container, defaultContainer);
+buildParticleSpec(nodeType, node, particleName, defaultContainer, globalStores) {
+  const particleSpec = nodeType[particleName];
+  const $container = this.resolveContainer(
+    node.key,
+    particleSpec.$container, 
+    node.position?.preview?.[`${node.key}${particleName}:Container`] || defaultContainer
+  );
   const bindings = this.resolveBindings(nodeType, node, particleSpec, globalStores);
   const resolvedSpec = {
     $slots: {},
