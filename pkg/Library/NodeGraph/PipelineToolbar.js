@@ -7,8 +7,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-  async initialize({pipelines, publicPipelinesUrl}, state, {service, output}) {
-    const publicPipelines = await this.fetchPublicPipelines(publicPipelinesUrl);
+  async initialize({pipelines, publishPaths}, state, {service, output}) {
+    const publicPipelines = await this.fetchPublicPipelines(publishPaths);
     pipelines = await this.backwardCompatibilityPipelines(pipelines, {service, output});
     const pipeline = await this.retrieveSelectedPipeline(pipelines, publicPipelines, service);
     if (!pipeline) {
@@ -16,9 +16,23 @@
     }
     return {pipeline, publicPipelines};
   },
-  async fetchPublicPipelines(url) {
+  async fetchPublicPipelines(urls) {
+    const pipelines = (await Promise.all(values(urls).map(url => this.fetchPublicPipelinesFromUrl(url)))).flat();
+    const names = {};
+    return pipelines.filter(({$meta: {name}}) => {
+      if (names[name]) {
+        return false;
+      }
+      names[name] = true;
+      return true;
+    });
+  },
+  async fetchPublicPipelinesFromUrl(url) {
     if (url) {
       try {
+        if (url.endsWith('/')) {
+          url = `${url.substring(0, url.length - 1)}.json`;
+        }
         const res = await fetch(url);
         if (res.status === 200) {
           const text = await res.text();
