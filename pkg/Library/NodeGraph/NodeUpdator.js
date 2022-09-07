@@ -116,7 +116,7 @@ updatePropInNode(name, value, node, service) {
 },
 
 fullStoreId({key}, storeId) {
-  return `${key}${storeId}`;
+  return `${key}:${storeId}`;
 },
 
 updateStoreValue(storeId, value, service) {
