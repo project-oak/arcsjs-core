@@ -173,7 +173,8 @@ export const NodegraphRecipe = {
       inspectorData: 'inspectorData',
       globalStores: [
         'selectedNode',
-        'selectedPipeline'
+        'selectedPipeline',
+        'nodeTypes',
       ]
     }
   }
