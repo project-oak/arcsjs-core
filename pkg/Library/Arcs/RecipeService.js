@@ -17,7 +17,7 @@ export const RecipeService = async (runtime, host, request) => {
 };
 
 const parseRecipe =  ({recipe}) => {
-  const parser = new Parser.parse(recipe);
+  const parser = new Parser(recipe);
   const {stores, particles, slots, meta} = parser;
   return {stores, particles, slots, meta};
 };
