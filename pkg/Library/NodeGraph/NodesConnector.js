@@ -28,7 +28,7 @@ async update(inputs, state, {service}) {
         || this.nodesDidChange(pipeline.nodes, state.nodes)) {
       state.pipeline = pipeline;
       state.nodes = [...pipeline.nodes];
-      return this.updateNodes(inputs, state, service);
+      return this.updateNodes(inputs, state);
     }
   }
 },
