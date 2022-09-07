@@ -42,11 +42,15 @@ render({pipeline, categories, selectedNode}, state) {
   const key = selectedNode?.key;
   const graphNodes = this.renderGraphNodes(nodes, state.nodeTypesMap, key, categories);
   const containers = this.renderContainers(nodes, state.nodeTypesMap, key);
-  if (!state.selectedContainer ||
-      (containers?.length > 0 && containers?.find(c => c.key === state.selectedContainer))) {
-    state.selectedContainer = containers?.[0]?.key;
-  }
+  state.selectedContainer = this.updateSelectedContainer(containers, state);
   return {containers, graphNodes};
+},
+
+updateSelectedContainer(containers, {selectedContainer}) {
+  if (selectedContainer && containers?.find(c => c.key === selectedContainer)) {
+    return selectedContainer;
+  }
+  return containers?.[0]?.key;
 },
 
 renderGraphNodes(nodes, nodeTypesMap, nodeKey, categories) {
@@ -136,23 +140,30 @@ onSelect({eventlet: {value: container}}, state) {
   state.selectedContainer = container;
 },
 
-async onSetContainer({selectedNode: node, pipeline}, {selectedContainer: container}, {service}) {
+async onSetContainer({selectedNode, pipeline}, {selectedContainer: container}, {service}) {
   if (container) {
-    const hosts = node?.position?.preview;
+    const hosts = selectedNode?.position?.preview;
     const hostId = hosts ? Object.keys(hosts).pop().split(':')?.[0] : '';
-    await service({kind: 'ComposerService', msg: 'setContainer', data: {/*node*/hostId, container}});
-    node = {
-      ...node,
-      position: {
-        ...node.position,
-        preview: {
-          ...node.position.preview,
-          [`${hostId}:Container`]: container
-        }
-      }
+    await service({kind: 'ComposerService', msg: 'setContainer', data: {hostId, container}});
+    selectedNode = this.updateContainerInNode(selectedNode, hostId, container);
+    return {
+      selectedNode,
+      pipeline: this.updateNodeInPipeline(selectedNode, pipeline)
     };
-    return {selectedNode: node, pipeline: this.updateNodeInPipeline(node, pipeline)};
   }
+},
+
+updateContainerInNode(node, hostId, container) {
+  return {
+    ...node,
+    position: {
+      ...node.position,
+      preview: {
+        ...node.position.preview,
+        [`${hostId}:Container`]: container
+      }
+    }
+  };
 },
 
 updateNodeInPipeline(node, pipeline) {
