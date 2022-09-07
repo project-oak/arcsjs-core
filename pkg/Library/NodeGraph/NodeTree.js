@@ -42,7 +42,9 @@ render({pipeline, categories, selectedNode}, state) {
   const key = selectedNode?.key;
   const graphNodes = this.renderGraphNodes(nodes, state.nodeTypesMap, key, categories);
   const containers = this.renderContainers(nodes, state.nodeTypesMap, key);
-  state.selectedContainer = containers[0];
+  if (!state.selectedContainer || !containers.find(c => c.key === state.selectedContainer)) {
+    state.selectedContainer = containers?.[0]?.key;
+  }
   return {containers, graphNodes};
 },
 
@@ -133,10 +135,32 @@ onSelect({eventlet: {value: container}}, state) {
   state.selectedContainer = container;
 },
 
-async onSetContainer({selectedNode: node}, {selectedContainer: container}, {service}) {
+async onSetContainer({selectedNode: node, pipeline}, {selectedContainer: container}, {service}) {
   if (container) {
     await service({kind: 'ComposerService', msg: 'setContainer', data: {node, container}});
+    const hosts = node?.position?.preview;
+    const hostId = hosts ? Object.keys(hosts).pop() : '';
+    node = {
+      ...node,
+      position: {
+        ...node.position,
+        preview: {
+          ...node.position.preview,
+          [`${hostId}:Container`]: {
+            ...(node.position.preview[hostId]),
+            container
+          }
+        }
+      }
+    };
+    return {selectedNode: node, pipeline: this.updateNodeInPipeline(node, pipeline)};
   }
+},
+
+updateNodeInPipeline(node, pipeline) {
+  const index = pipeline.nodes.findIndex(n => n.key === node.key);
+  pipeline.nodes[index] = node;
+  return pipeline;
 },
 
 // onDrop({eventlet: {value}, pipeline, nodeTypes}) {
