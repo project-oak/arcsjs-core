@@ -42,8 +42,15 @@ render({pipeline, categories, selectedNode}, state) {
   const key = selectedNode?.key;
   const graphNodes = this.renderGraphNodes(nodes, state.nodeTypesMap, key, categories);
   const containers = this.renderContainers(nodes, state.nodeTypesMap, key);
-  state.selectedContainer = containers[0];
+  state.selectedContainer = this.updateSelectedContainer(containers, state);
   return {containers, graphNodes};
+},
+
+updateSelectedContainer(containers, {selectedContainer}) {
+  if (selectedContainer && containers?.find(c => c.key === selectedContainer)) {
+    return selectedContainer;
+  }
+  return containers?.[0]?.key;
 },
 
 renderGraphNodes(nodes, nodeTypesMap, nodeKey, categories) {
@@ -133,10 +140,43 @@ onSelect({eventlet: {value: container}}, state) {
   state.selectedContainer = container;
 },
 
-async onSetContainer({selectedNode: node}, {selectedContainer: container}, {service}) {
+async onSetContainer({selectedNode, pipeline}, {selectedContainer: container}, {service}) {
   if (container) {
-    await service({kind: 'ComposerService', msg: 'setContainer', data: {node, container}});
+    const hosts = selectedNode?.position?.preview;
+    const hostId = hosts ? Object.keys(hosts).pop().split(':')?.[0] : '';
+    await service({kind: 'ComposerService', msg: 'setContainer', data: {hostId, container}});
+    selectedNode = this.updateContainerInNode(selectedNode, hostId, container);
+    return {
+      selectedNode,
+      pipeline: this.updateNodeInPipeline(selectedNode, pipeline)
+    };
   }
+},
+
+updateContainerInNode(node, hostId, container) {
+  // TODO (b/245770204): avoid copying objects
+  // node.position = node.position || {};
+  // node.position.preview = node.position.preview || {};
+  // node.position.preview[`${hostId}:Container`] = container;
+  // return node;
+  return {
+    ...node,
+    position: {
+      ...node.position,
+      preview: {
+        ...node.position.preview,
+        [`${hostId}:Container`]: container
+      }
+    }
+  };
+},
+
+updateNodeInPipeline(node, pipeline) {
+  const index = pipeline.nodes.findIndex(n => n.key === node.key);
+  // TODO (b/245770204): avoid copying objects
+  // pipeline.nodes[index] = node;
+  pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
+  return pipeline;
 },
 
 // onDrop({eventlet: {value}, pipeline, nodeTypes}) {

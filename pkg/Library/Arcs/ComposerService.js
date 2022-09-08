@@ -12,22 +12,18 @@ export const ComposerService = {
     const containerHost = ComposerService.getContainerHost(arc, host, request);
     return containerHost?.container;
   },
-  getContainerHostName(request) {
-    const hosts = request.data?.node?.position?.preview;
-    return hosts ? Object.keys(hosts).pop() : '';
-  },
   getContainerHost(arc, _, request) {
     const hostName = this.getContainerHostName(request);
     return arc.hosts[hostName];
   },
   setContainer(arc, _, request) {
-    const hostName = this.getContainerHostName(request);
-    const containerHost = arc.hosts[hostName];
-    log(containerHost, request.data.container);
-    if (request.data.container.startsWith(hostName)) {
-      log.error(hostName, 'cannot contain itself');
+    const {hostId, container} = request.data;
+    const containerHost = arc.hosts[hostId];
+    log(containerHost, container);
+    if (container.startsWith(hostId)) {
+      log.error(hostId, 'cannot contain itself');
     } else {
-      containerHost.meta.container = request.data.container;
+      containerHost.meta.container = container;
       containerHost.rerender();
       return containerHost.container;
     }
