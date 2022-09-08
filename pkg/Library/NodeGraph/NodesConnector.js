@@ -272,7 +272,7 @@ buildParticleSpec(nodeType, node, particleName, defaultContainer, globalStores) 
   const $container = this.resolveContainer(
     node.key,
     particleSpec.$container, 
-    node.position?.preview?.[`${node.key}${particleName}:Container`] || defaultContainer
+    node.position?.preview?.[`${node.key}${particleName}:Container`]/*?.container*/ || defaultContainer
   );
   const bindings = this.resolveBindings(nodeType, node, particleSpec, globalStores);
   const resolvedSpec = {

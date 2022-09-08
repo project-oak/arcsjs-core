@@ -154,6 +154,11 @@ async onSetContainer({selectedNode, pipeline}, {selectedContainer: container}, {
 },
 
 updateContainerInNode(node, hostId, container) {
+  // TODO (b/245770204): avoid copying objects
+  // node.position = node.position || {};
+  // node.position.preview = node.position.preview || {};
+  // node.position.preview[`${hostId}:Container`] = container;
+  // return node;
   return {
     ...node,
     position: {
@@ -168,7 +173,9 @@ updateContainerInNode(node, hostId, container) {
 
 updateNodeInPipeline(node, pipeline) {
   const index = pipeline.nodes.findIndex(n => n.key === node.key);
-  pipeline.nodes[index] = node;
+  // TODO (b/245770204): avoid copying objects
+  // pipeline.nodes[index] = node;
+  pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
   return pipeline;
 },
 
