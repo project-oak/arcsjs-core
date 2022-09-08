@@ -86,6 +86,7 @@ export class Host extends EventEmitter {
   }
   protected output(outputModel, renderModel) {
     if (outputModel) {
+      Decorator.processOutputModel(outputModel);
       this.lastOutput = outputModel;
       this.arc?.assignOutputs(this, outputModel);
     }

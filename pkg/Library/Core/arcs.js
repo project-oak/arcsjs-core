@@ -597,6 +597,16 @@ var Decorator = {
   getOpaqueData(name) {
     return opaqueData[name];
   },
+  processOutputModel({ privateData }) {
+    if (privateData) {
+      const key2 = privateData.__privateKey;
+      if (key2) {
+        const data = Object.values(opaqueData).pop();
+        const { _privateKey, ...privy } = privateData;
+        data["privateData"] = privy;
+      }
+    }
+  },
   maybeDecorateModel(model, particle) {
     if (model && !Array.isArray(model)) {
       values2(model).forEach((item) => {
@@ -631,11 +641,11 @@ var maybeDecorate = (models, decorator, particle) => {
   if (decorator) {
     const immutableInputs = Object.freeze(deepCopy(inputs));
     const immutableState = Object.freeze(deepCopy(state));
-    models = models.map((model) => {
+    models = models.map((model, i) => {
       model.privateData = model.privateData || {};
       const immutableModel = Object.freeze(deepCopy(model));
       const decorated = decorator(immutableModel, immutableInputs, immutableState);
-      model.privateData = decorated.privateData;
+      model.privateData = { ...decorated.privateData, __privateKey: i };
       return { ...decorated, ...model };
     });
     models.sort(sortByLc("sortKey"));
@@ -732,6 +742,7 @@ var Host = class extends EventEmitter {
   }
   output(outputModel, renderModel) {
     if (outputModel) {
+      Decorator.processOutputModel(outputModel);
       this.lastOutput = outputModel;
       this.arc?.assignOutputs(this, outputModel);
     }
