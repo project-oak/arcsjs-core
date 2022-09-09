@@ -271,7 +271,7 @@ buildParticleSpec(nodeType, node, particleName, defaultContainer, globalStores) 
   const particleSpec = nodeType[particleName];
   const $container = this.resolveContainer(
     node.key,
-    particleSpec.$container, 
+    particleSpec.$container,
     node.position?.preview?.[`${node.key}${particleName}:Container`]/*?.container*/ || defaultContainer
   );
   const bindings = this.resolveBindings(nodeType, node, particleSpec, globalStores);
@@ -362,7 +362,7 @@ formatStoreValue(store, value, node) {
 },
 
 constructStoreId({from, store}) {
-  return `${from === 'global' ? '' : from}${store}`;
+  return `${from === 'global' ? '' : `${from}${this.nameDelim}`}${store}`;
 },
 
 findGlobalSpec(connection, nodeType) {
