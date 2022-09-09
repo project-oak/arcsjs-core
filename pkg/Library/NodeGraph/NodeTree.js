@@ -54,7 +54,7 @@ updateSelectedContainer(containers, {selectedContainer}) {
 },
 
 renderGraphNodes(nodes, nodeTypesMap, nodeKey, categories) {
-  const graph = {name: 'root', graphNodes: []};
+  const graph = {name: 'root', graphNodes: [], isContainer: "false"};
   const graphNodes = nodes?.map(node => {
     const {key} = node;
     const name = node.name;
@@ -69,6 +69,7 @@ renderGraphNodes(nodes, nodeTypesMap, nodeKey, categories) {
       color: category.color || 'crimson',
       bgColor: category.bgColor || 'gray',
       selected: key == nodeKey,
+      isContainer: 'false',
       graphNodes: containers
     };
   });
@@ -116,7 +117,7 @@ makeContainerModel(hostName, slotName) {
     icon: 'apps',
     key: `${hostName}#${slotName}`,
     name: `${hostName}:${slotName}`,
-    isContainer: true
+    isContainer: "true"
   };
 },
 
@@ -179,45 +180,11 @@ updateNodeInPipeline(node, pipeline) {
   return pipeline;
 },
 
-// onDrop({eventlet: {value}, pipeline, nodeTypes}) {
-//   if (pipeline) {
-//     const type = value.split(this.catalogDelimiter)[1];
-//     const nodeType = nodeTypes[type];
-//     const newNode = this.makeNewNode(nodeType, pipeline.nodes);
-//     pipeline.nodes = [...pipeline.nodes, newNode];
-//     return {pipeline};
-//   }
-// },
-
-// makeNewNode({$meta: {name}}, nodes) {
-//   const typedNodes = nodes.filter(node => name === node.name);
-//   const index = (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
-//   return {
-//     name,
-//     index,
-//     key: this.formatNodeKey({name, index}),
-//   };
-// },
-
-// formatNodeKey({name, index}) {
-//   return `${name}${index}`.replace(/ /g,'');
-// },
-
-// onNodeRemove({eventlet: {key}, pipeline, selectedNode}) {
-//   pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
-//   return {
-//     pipeline,
-//     selectedNode: key === selectedNode.key ? null : pipeline.nodes.find(n => n.key === selectedNode.key)
-//   };
-// },
-
-// onDeleteAll({pipeline}) {
-//   pipeline.nodes = [];
-//   return {
-//     pipeline,
-//     selectedNode: null
-//   };
-// },
+async onDrop({eventlet: {key: container, value: key}, pipeline, nodeTypes}, state, {service}) {
+  //log('onDrop:', key, container);
+  const node = pipeline.nodes.find(node => node.key === key);
+  await service({kind: 'ComposerService', msg: 'setContainer', data: {node, container}});
+},
 
 template: html`
 <style>
@@ -251,10 +218,10 @@ template: html`
   <mwc-icon-button on-click="onDeleteAll" icon="delete_forever"></mwc-icon-button>
 </div> -->
 
-<div toolbar>
+<!-- <div toolbar>
   <multi-select flex options="{{containers}}" on-change="onSelect"></multi-select>
   <mwc-icon-button on-click="onSetContainer" icon="tune"></mwc-icon-button>
-</div>
+</div> -->
 
 <div repeat="node_t">{{graphNodes}}</div>
 
@@ -262,16 +229,15 @@ template: html`
   <div node selected$="{{selected}}" key="{{key}}" on-click="onNodeSelect">
     <div bar>
       <icon>{{icon}}</icon>
-      <draggable-item flex disabled="{{isContainer}}" key="{{key}}" name="{{name}}">
+      <draggable-item flex hide$="{{isContainer}}" key="{{key}}" name="{{name}}">
         &nbsp;<span>{{name}}</span>
       </draggable-item>
+      <drop-target key="{{key}}" show$="{{isContainer}}" on-target-drop="onDrop">
+        &nbsp;<span>{{name}}</span>
+      </drop-target>
     </div>
     <div style="padding-left: 12px;" repeat="node_t">{{graphNodes}}</div>
   </div>
 </template>
-
-<!-- <drop-target flex grid scrolling on-drop="onDrop">
-  <node-graph nodes="{{graphNodes}}" on-select="onNodeSelect" on-delete="onNodeRemove"></node-graph>
-</drop-target> -->
 `
 });

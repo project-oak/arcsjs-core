@@ -71,7 +71,7 @@ template: html`
     <div left collapsed$="{{leftCollapsed}}" column section frame="catalog"></div>
     <!-- center -->
     <split-panel vertical flex section row>
-      <div flex column slot="one">
+      <div slot="left" flex column>
         <!-- top -->
         <div nav toolbar>
           <icon on-click="onToggleLeft">{{leftIcon}}</icon>
@@ -80,15 +80,15 @@ template: html`
         </div>
         <!-- middle 1 -->
         <split-panel flex column divider="280">
-          <div flex column frame="preview" slot="one"></div>
-          <div flex column frame="editor" slot="two"></div>
+          <div flex column frame="preview" slot="top"></div>
+          <div flex column frame="editor" slot="bottom"></div>
         </split-panel>
       </div>
     <!-- right -->
-    <div slot="two" right flex column collapsed$="{{rightCollapsed}}" section>
+    <div slot="right" right flex column collapsed$="{{rightCollapsed}}" section>
       <split-panel flex column>
-        <div flex column frame="inspector" slot="one"></div>
-        <div flex column frame="tree" slot="two"></div>
+        <div flex column frame="inspector" slot="top"></div>
+        <div flex column frame="tree" slot="bottom"></div>
       </split-panel>
     </div>
   </div>

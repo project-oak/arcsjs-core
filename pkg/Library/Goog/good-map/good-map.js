@@ -68,7 +68,7 @@ const GoodMap = (() => {
           lng: this.longitude ?? 0
         };
       }
-      console.log('[good-map] mapOptions:', mapOptions);
+      //console.log('[good-map] mapOptions:', mapOptions);
       return mapOptions;
     }
   };

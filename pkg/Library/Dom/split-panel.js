@@ -62,14 +62,18 @@ const template = Xen.Template.html`
   }
 </style>
 
-<div startside flex frame="startside">
+<div startside flex>
   <slot name="one"></slot>
+  <slot name="left"></slot>
+  <slot name="top"></slot>
 </div>
 <div resizer vertical$="{{vertical}}" dragging$="{{dragging}}" on-pointerdown="onDown">
   <div handle vertical$="{{vertical}}" ></div>
 </div>
-<div endside xen:style="{{endStyle}}" frame="endside">
+<div endside xen:style="{{endStyle}}">
   <slot name="two"></slot>
+  <slot name="right"></slot>
+  <slot name="bottom"></slot>
 </div>
 
 `;
@@ -120,7 +124,8 @@ export class SplitPanel extends DragDrop {
       dividerStart: this.state.divider
     });
   }
-  doMove(dx, dy) {
+  doMove(dx, dy, sx, sy) {
+    //console.log(this.state.dividerStart, sy, dy);
     const d = this.state.vertical ? dx : dy;
     this.mergeState({
       divider: Math.round(this.state.dividerStart - d)

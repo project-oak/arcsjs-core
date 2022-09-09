@@ -9,14 +9,19 @@
 
 import {Xen} from './Xen/xen-async.js';
 
+/**
+ * originally intended to provide custom (non-DOM) dragging operations
+ * mostly used for resizing, dragging, panning, and so on
+ */
 export const DragDrop = class extends Xen.Async {
   onDown(e) {
-    const {screenX: x, screenY: y} = e;
     if (this.doDown(e) !== false) {
       this.dragging = true;
-      this.dragStart = {x, y};
       window.onmousemove = this.onMove.bind(this);
       window.onmouseup = this.onUp.bind(this);
+      const {pageX, pageY} = e;
+      const [x, y] = [pageX, pageY].map(Math.round);
+      this.dragStart = {x, y};
     } else {
       this.dragging = false;
     }
@@ -28,10 +33,10 @@ export const DragDrop = class extends Xen.Async {
       this.onUp(e);
     } else if (this.dragging) {
       e.preventDefault();
-      const {screenX: sx, screenY: sy} = e;
-      const {x:x0, y:y0} = this.dragStart;
-      const [dx, dy] = [sx-x0, sy-y0];
-      this.doMove(dx, dy, sx, sy, x0, y0);
+      const {x, y} = this.dragStart;
+      const {pageX, pageY} = e;
+      const [dx, dy] = [pageX-x, pageY-y];
+      this.doMove(dx, dy, pageX, pageY, x, y);
     }
   }
   onUp(e) {
