@@ -1,4 +1,7 @@
 import {Peer} from './Peer.js';
+import {logFactory} from '../Core/utils.js';
+
+const log = logFactory(logFactory.flags.rtc, 'WebRtc', 'cyan', '#444');
 
 export const Myself = class {
   constructor() {
@@ -20,7 +23,7 @@ export const Myself = class {
     return me;
   }
   onopen(id) {
-    console.log('My peer ID is: ' + id);
+    log('My peer ID is: ' + id);
     this.peerId = id;
     // when a connection opens, resolve the ready promise
     this.resolveReady();
@@ -34,17 +37,17 @@ export const Myself = class {
     const {id: name, call: peerId} = metadata;
     const meta = this.mediaConnections[peerId] = {metadata};
     // announce important happening
-    console.log('ANSWERING <---', name, peerId);
+    log('ANSWERING <---', name, peerId);
     // huh?
     media.answer(this.mediaStream);
     // here comes a stream from the caller
     media.on('stream', stream => {
       meta.stream = stream;
-      console.log('media:onstream', stream);
+      log('media:onstream', stream);
       this.onstream(stream, media.metadata);
     });
     media.on('close', () => {
-      console.log('media:close');
+      log('media:close');
     });
   }
   onstream(stream, metadata) {
@@ -76,17 +79,17 @@ export const Myself = class {
     const call = this.me.call(them, this.mediaStream, {metadata});
     // answered calls invoke me.oncall, which invokes 'answerCall'
     if (!call) {
-      console.log('failed to place call');
+      log('failed to place call');
     } else {
       //console.log(call);
       this.calls[them] = call;
-      call.on('error', error => console.warn(error));
-      call.on('close', () => console.log('call:close'));
+      call.on('error', error => log.warn(error));
+      call.on('close', () => log('call:close'));
     }
   }
   endCall(them) {
     if (them) {
-      console.log('.........END CALL', them);
+      log('.........END CALL', them);
       const call = this.calls[them];
       call?.close?.();
       this.calls[them] = null;

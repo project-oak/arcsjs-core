@@ -8,16 +8,19 @@
  */
 ({
 
-catalogDelimiter: '$$',
+//catalogDelimiter: '$$',
 
 safeKeys(o) {
   return o ? Object.keys(o) : [];
 },
 
+mapBy(array, keyGetter) {
+  return values(array).reduce((map, item) => (map[keyGetter(item)] = item, map), {});
+},
+
 update({pipeline, selectedNode, nodeTypes}, state) {
   // build a map of nodeTypes
-  state.nodeTypesMap = {};
-  values(nodeTypes).forEach(t => state.nodeTypesMap[t.$meta.name] = t);
+  state.nodeTypesMap = this.mapBy(nodeTypes, t => t.$meta.name);
   // when switching pipelines, we reset some state
   if (pipeline?.$meta?.name !== state.selectedPipelineName) {
     state.selectedPipelineName = pipeline?.$meta.name;
@@ -42,6 +45,7 @@ render({pipeline, categories, selectedNode}, state) {
   const key = selectedNode?.key;
   const graphNodes = this.renderGraphNodes(nodes, state.nodeTypesMap, key, categories);
   const containers = this.renderContainers(nodes, state.nodeTypesMap, key);
+  containers.unshift(this.makeContainerModel('main', 'runner'));
   state.selectedContainer = this.updateSelectedContainer(containers, state);
   return {containers, graphNodes};
 },
@@ -160,16 +164,32 @@ updateContainerInNode(node, hostId, container) {
   // node.position.preview = node.position.preview || {};
   // node.position.preview[`${hostId}:Container`] = container;
   // return node;
-  return {
-    ...node,
-    position: {
-      ...node.position,
-      preview: {
-        ...node.position.preview,
-        [`${hostId}:Container`]: container
-      }
+  // TODO(sjmiles): avoid cloning objects _without rationale_,
+  // In this case, we may have to construct intermediate objects,
+  // which provides rationale.
+  // There is no reason to clone `node` itself.
+  // The original syntax was elegant, just slightly amiss, and
+  // I didn't recognize the 'may be null' bits at first.
+  node.position = {
+    // may be null
+    ...node.position,
+    preview: {
+      // may be null
+      ...node.position?.preview,
+      [`${hostId}:Container`]: container
     }
   };
+  return node;
+  // return {
+  //   ...node,
+  //   position: {
+  //     ...node.position,
+  //     preview: {
+  //       ...node.position.preview,
+  //       [`${hostId}:Container`]: container
+  //     }
+  //   }
+  // };
 },
 
 updateNodeInPipeline(node, pipeline) {

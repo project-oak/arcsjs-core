@@ -39,7 +39,7 @@
     const tvs = values(streams || {}).map(({stream, meta: {name}}) => ({stream, name})).reverse();
     return {
       group,
-      name: persona,
+      name: persona || '...',
       tvs
     };
   },
@@ -67,7 +67,7 @@
     font-family: "Google Sans", sans-serif;
   }
   [stream] {
-    width: 80px;
+    width: 24%;
     margin: 4px;
   }
   [name] {
