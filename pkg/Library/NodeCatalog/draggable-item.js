@@ -96,6 +96,8 @@ export class DraggableItem extends Xen.Async {
   onDragStart(e) {
     // This will hide the popup panel for the hovered item.
     this.fire('leave');
+    //console.log('[onDragStart]', this.key);
+    //e.dataTransfer.setData('arcs/drag', this.key);
     e.dataTransfer.setData('text/plain', this.key);
   }
 

@@ -19,7 +19,9 @@ Xen.DropTarget = class extends Xen.Async {
     e.preventDefault();
   }
   onDrop(e) {
+    e.preventDefault();
     this.value = e.dataTransfer?.getData('text/plain') || 'no dataTransfer';
+    this.fire('target-drop');
   }
 };
 
@@ -32,9 +34,19 @@ const template = Xen.Template.html`
 `;
 
 export class DropTarget extends Xen.DropTarget {
+  static get observedAttributes() {
+    return ['accepts'];
+  }
   get template() {
     return template;
   }
+  // onDragOver(e) {
+  //   e.preventDefault();
+  // }
+  // onDragEnter(e) {
+  //   console.log(e.dataTransfer);
+  //   e.preventDefault();
+  // }
   _didMount() {
     this.enableDrop();
   }
