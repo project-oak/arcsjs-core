@@ -9,6 +9,7 @@
 ({
 
 catalogDelimiter: '$$',
+emptyContainerKey: 'main#runner',
 
 safeKeys(o) {
   return o ? Object.keys(o) : [];
@@ -25,6 +26,7 @@ update({pipeline, selectedNode, nodeTypes}, state) {
   }
   // maybe find a new selected node
   const node = this.updateSelectedNode({pipeline, selectedNode}, state);
+  state.selectedContainer = this.getContainer(node);
   if (node !== selectedNode) {
     return {selectedNode: node};
   }
@@ -43,6 +45,7 @@ render({pipeline, categories, selectedNode}, state) {
   const graphNodes = this.renderGraphNodes(nodes, state.nodeTypesMap, key, categories);
   const containers = this.renderContainers(nodes, state.nodeTypesMap, key);
   state.selectedContainer = this.updateSelectedContainer(containers, state);
+  containers?.forEach(container => container.selected = container.key === (state.selectedContainer || this.emptyContainerKey));
   return {containers, graphNodes};
 },
 
@@ -125,7 +128,11 @@ renderContainers(nodes, nodeTypesMap, nodeKey) {
   const mapFn = node => this.containersForNode(node, nodeTypesMap);
   // nodes may have multiple containers, flatten the list, remove selected node
   // (it cannot be it's own container)
-  return nodes?.map(mapFn).flat().filter(n => !n.key.startsWith(nodeKey));
+  const containers = nodes?.map(mapFn).flat().filter(n => !n.key.startsWith(nodeKey));
+  if (containers?.length > 0) {
+    containers.splice(0, 0, {key: this.emptyContainerKey, name: ''});
+  }
+  return containers;
 },
 
 async onNodeSelect({eventlet: {key}, pipeline}, state, {service}) {
@@ -142,14 +149,31 @@ onSelect({eventlet: {value: container}}, state) {
 
 async onSetContainer({selectedNode, pipeline}, {selectedContainer: container}, {service}) {
   if (container) {
-    const hosts = selectedNode?.position?.preview;
-    const hostId = hosts ? Object.keys(hosts).pop().split(':')?.[0] : '';
-    await service({kind: 'ComposerService', msg: 'setContainer', data: {hostId, container}});
-    selectedNode = this.updateContainerInNode(selectedNode, hostId, container);
-    return {
-      selectedNode,
-      pipeline: this.updateNodeInPipeline(selectedNode, pipeline)
-    };
+    const hostId = this.getHostId(selectedNode);
+    if (hostId) {
+      await service({kind: 'ComposerService', msg: 'setContainer', data: {hostId, container}});
+      selectedNode = this.updateContainerInNode(selectedNode, hostId, container);
+      return {
+        selectedNode,
+        pipeline: this.updateNodeInPipeline(selectedNode, pipeline)
+      };
+    }
+  }
+},
+
+containerKey(hostId) {
+  return `${hostId}:Container`;
+},
+
+getHostId(node) {
+  const hosts = node?.position?.preview;
+  return hosts ? Object.keys(hosts).pop().split(':')?.[0] : null;
+},
+
+getContainer(node) {
+  const hostId = this.getHostId(node);
+  if (hostId) {
+    return node.position?.preview?.[this.containerKey(hostId)];
   }
 },
 
@@ -157,8 +181,11 @@ updateContainerInNode(node, hostId, container) {
   // TODO (b/245770204): avoid copying objects
   // node.position = node.position || {};
   // node.position.preview = node.position.preview || {};
-  // node.position.preview[`${hostId}:Container`] = container;
+  // node.position.preview[this.containerKey(hostId)] = container;
   // return node;
+  if (container === this.emptyContainerKey) {
+    delete node.position?.preview?.[this.containerKey(hostId)];
+  }
   return {
     ...node,
     position: {
