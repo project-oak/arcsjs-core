@@ -9,14 +9,17 @@
 ({
 template: html`
 <style>
-  [frame=lobby] {
+  :host {
+    flex: none !important;
     height: 120px;
   }
   [frame=grabber] {
-    
+    width: 128px;
   }
 </style>
-<div column frame="lobby"></div>
-<div flex column frame="grabber"></div>
+<div flex row>
+  <div column flex frame="lobby"></div>
+  <div column frame="grabber"></div>
+</div>
 `
 });

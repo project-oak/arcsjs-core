@@ -93,6 +93,9 @@ export const XenCss = `
 [invisible] {
   visibility: hidden;
 }
+[clip] {
+  overflow: hidden;
+}
 [noclip] {
   overflow: visible;
 }

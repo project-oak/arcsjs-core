@@ -82,6 +82,25 @@ const requireImplFactory = async (kind, options) => {
   return globalThis.harden(factory);
 };
 
+const {assign, keys, entries, values, create} = Object;
+
+globalThis.SafeObject = {
+  create,
+  assign,
+  keys(o) {
+    return o ? keys(o) : [];
+  },
+  values(o) {
+    return o ? values(o) : [];
+  },
+  entries(o) {
+    return o ? entries(o) : [];
+  },
+  mapBy(a, keyGetter) {
+    return a ? values(a).reduce((map, item) => (map[keyGetter(item)] = item, map), {}) : {};
+  }
+};
+
 const repackageImplFactory = (factory, kind) => {
   const {constNames, rewriteConsts, funcNames, rewriteFuncs} = collectDecls(factory);
   const proto = `{${[...constNames, ...funcNames]}}`;
@@ -90,7 +109,7 @@ const repackageImplFactory = (factory, kind) => {
 // protect utils
 globalThis.harden(utils);
 // these are just handy
-const {assign, keys, entries, values, create} = Object;
+const {assign, keys, entries, values, create, mapBy} = globalThis.SafeObject;
 // declarations
 ${[...rewriteConsts, ...rewriteFuncs].join('\n\n')}
 // hardened Object (map) of declarations,

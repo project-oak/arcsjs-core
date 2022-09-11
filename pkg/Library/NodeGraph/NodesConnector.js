@@ -22,7 +22,6 @@ async update(inputs, state, {service}) {
     state.nodeTypeMap = {};
     values(nodeTypes).forEach(t => state.nodeTypeMap[t.$meta.name] = this.flattenNodeType(t));
   }
-
   if (pipeline?.nodes) {
     if (this.pipelineChanged(pipeline, state.pipeline)
         || this.nodesDidChange(pipeline.nodes, state.nodes)) {

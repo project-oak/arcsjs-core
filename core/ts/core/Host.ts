@@ -91,8 +91,7 @@ export class Host extends EventEmitter {
     }
     if (this.template) {
       Decorator.maybeDecorateModel(renderModel, this.particle);
-      this.log(renderModel);
-      this.lastRenderModel = renderModel;
+      this.lastRenderModel = {...renderModel};
       this.render(renderModel);
     }
   }
@@ -100,6 +99,9 @@ export class Host extends EventEmitter {
     if (this.lastRenderModel) {
       this.render(this.lastRenderModel);
     }
+
+    // must contend with Frames/Slots
+
     // if (this.lastPacket) {
     //   this.arc?.render(this.lastPacket);
     // }

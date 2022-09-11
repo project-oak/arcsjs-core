@@ -7,17 +7,21 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import './arcs/config.js';
-import {Paths, Params} from './arcs/arcs.js';
+import {Paths, Params, Resources} from './arcs/arcs.js';
 import {LobbyApp} from './arcs/LobbyApp.js';
 
 const group = Params.getParam('group');
 const persona = Params.getParam('user');
 
+let app;
+
 try {
-  const app = globalThis.app = new LobbyApp(Paths.map);
+  app = globalThis.app = new LobbyApp(Paths.map);
   await app.spinup(persona, group);
 } catch(x) {
   console.error(x);
 }
+
+export {app, Resources};
 
 export const canvas = await new Promise(r => setTimeout(() => r(globalThis.app?.canvas), 500));

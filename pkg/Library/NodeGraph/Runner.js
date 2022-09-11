@@ -164,8 +164,8 @@ encodeFullNodeKey({key}, {$meta}) {
 updateNodeInPipeline(node, pipeline) {
   const index = pipeline?.nodes?.findIndex(n => n.key === node.key);
   // TODO (b/245770204): avoid copying objects
-  // pipeline.nodes[index] = node;
-  pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
+  pipeline.nodes[index] = node;
+  //pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
   return pipeline;
 },
 

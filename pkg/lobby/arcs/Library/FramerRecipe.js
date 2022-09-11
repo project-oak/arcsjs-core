@@ -2,16 +2,12 @@ import {LobbyRecipe} from './LobbyRecipe.js';
 
 const FrameGrabberRecipe = {
   $stores: {
-    // grabberStream: {
-    //   $type: 'Stream',
-    //   connection: true
-    // },
     grabberImage: {
       $type: 'Image'
     },
     grabberFrequency: {
       $type: 'number',
-      $value: 40
+      $value: null
     }
   },
   camera: {
@@ -37,7 +33,7 @@ export const FramerRecipe = {
     $kind: '$app/Library/Framer',
     $slots: {
       lobby: LobbyRecipe,
-      grabber: FrameGrabberRecipe,
+      grabber: FrameGrabberRecipe
     }
   }
 };

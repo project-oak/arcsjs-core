@@ -6,7 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {App, logFactory, LobbyService, deepQuerySelector} from './arcs.js';
+import {App, logFactory, LocalStoragePersistor, LobbyService, deepQuerySelector} from './arcs.js';
 import {FramerRecipe} from './Library/FramerRecipe.js';
 
 const log = logFactory(true, 'LobbyApp', 'navy');
@@ -14,7 +14,7 @@ const log = logFactory(true, 'LobbyApp', 'navy');
 export const LobbyApp = class extends App {
   constructor(paths) {
     super(paths);
-    //this.persistor = new LocalStoragePersistor('user');
+    this.persistor = new LocalStoragePersistor('user');
     this.services = {LobbyService};
     this.userAssembly = [FramerRecipe];
     log('Hello');

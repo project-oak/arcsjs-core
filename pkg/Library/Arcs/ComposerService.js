@@ -18,14 +18,18 @@ export const ComposerService = {
   },
   setContainer(arc, _, request) {
     const {hostId, container} = request.data;
-    const containerHost = arc.hosts[hostId];
-    log(containerHost, container);
+    const host = arc.hosts[hostId];
+    log(host, container);
     if (container.startsWith(hostId)) {
       log.error(hostId, 'cannot contain itself');
     } else {
-      containerHost.meta.container = container;
-      containerHost.rerender();
-      return containerHost.container;
+      host.meta.container = container;
+      //host.rerender();
+      this.rerender(arc);
+      return host.container;
     }
+  },
+  rerender(arc) {
+    Object.values(arc.hosts).forEach(host => host.rerender());
   }
 };
