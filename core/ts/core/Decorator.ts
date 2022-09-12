@@ -24,6 +24,15 @@ export const Decorator = {
   getOpaqueData(name) {
     return opaqueData[name];
   },
+  processOutputModel({privateData}) {
+    if (privateData) {
+      const {__privateKey: key, ...privy} = privateData;
+      if (key) {
+        const data = Object.values(opaqueData).pop();
+        data[key]['privateData'] = privy;
+      }
+    }
+  },
   maybeDecorateModel(model, particle) {
     if (model && !Array.isArray(model)) {
       // for each item in model, regardless of key
@@ -73,7 +82,7 @@ const maybeDecorate = (models, decorator, particle) => {
     // we don't want the decorator to have access to mutable globals
     const immutableState = Object.freeze(deepCopy(state));
     // models become decorous
-    models = models.map(model => {
+    models = models.map((model, i) => {
       // use previously mutated data or initialize
       // TODO(cromwellian): I'd like to do Object.freeze() here, also somehow not mutate the models inplace
       // Possibly have setOpaqueData wrap the data so the privateData lives on the wrapper + internal immutable data
@@ -82,7 +91,7 @@ const maybeDecorate = (models, decorator, particle) => {
       const immutableModel = Object.freeze(deepCopy(model));
       const decorated = decorator(immutableModel, immutableInputs, immutableState);
       // set new privateData from returned
-      model.privateData = decorated.privateData;
+      model.privateData = {...decorated.privateData, __privateKey: i};
       return { ...decorated, ...model,  };
     });
     // sort (possible that all values undefined)
