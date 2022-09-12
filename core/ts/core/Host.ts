@@ -96,15 +96,11 @@ export class Host extends EventEmitter {
     }
   }
   rerender() {
+    // does not re-render Frame/Slot content
+    // you probably want Arc::rerender
     if (this.lastRenderModel) {
       this.render(this.lastRenderModel);
     }
-
-    // must contend with Frames/Slots
-
-    // if (this.lastPacket) {
-    //   this.arc?.render(this.lastPacket);
-    // }
   }
   protected render(model) {
     const {id, container, template} = this;
