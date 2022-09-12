@@ -10,14 +10,14 @@ import './arcs/config.js';
 import {Paths, Params, Resources} from './arcs/arcs.js';
 import {LobbyApp} from './arcs/LobbyApp.js';
 
+const user = Params.getParam('user');
 const group = Params.getParam('group');
-const persona = Params.getParam('user');
 
 let app;
 
 try {
   app = globalThis.app = new LobbyApp(Paths.map);
-  await app.spinup(persona, group);
+  await app.spinup(user, group);
 } catch(x) {
   console.error(x);
 }

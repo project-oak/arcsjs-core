@@ -154,17 +154,19 @@ async constructConnections({connections}, pipeline, nodeTypes, service) {
 },
 
 async renderBinding(name, connection, pipeline, nodeTypes, service) {
-  const froms = connection.candidates.map(candidate => this.renderCandidate(candidate, pipeline)).filter(from => from);
-  const selected = connection.candidates.filter(candidate => candidate.selected);
-  const multiple = connection.store.multiple;
-  const value = selected?.map(s => this.encodeConnectionValue(s));
-  const connectedStore = await this.constructConnectedStore(connection, selected, pipeline, nodeTypes, service);
-  return {
-    name,
-    store: {...connection.store, $type: 'Connection', multiple, values: froms},
-    value,
-    connectedStore
-  };
+  if (connection.candidates) {
+    const froms = connection.candidates.map(candidate => this.renderCandidate(candidate, pipeline)).filter(from => from);
+    const selected = connection.candidates.filter(candidate => candidate.selected);
+    const multiple = connection.store.multiple;
+    const value = selected?.map(s => this.encodeConnectionValue(s));
+    const connectedStore = await this.constructConnectedStore(connection, selected, pipeline, nodeTypes, service);
+    return {
+      name,
+      store: {...connection.store, $type: 'Connection', multiple, values: froms},
+      value,
+      connectedStore
+    };
+  }
 },
 
 async constructConnectedStore(connection, selected, pipeline, nodeTypes, service) {

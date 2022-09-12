@@ -30,7 +30,7 @@ dataChanged(data, oldData) {
 updateValues(node, pipeline, data, state, service) {
   let changed = false;
   data?.props?.forEach((prop, index) => {
-    if (!prop.store.noinspect) {
+    if (prop && !prop.store.noinspect) {
       const currentValue = state.data?.props?.[index]?.value;
       const updatedNode = this.updatePropValue(prop, currentValue, node, service);
       if (updatedNode) {

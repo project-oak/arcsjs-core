@@ -11,6 +11,7 @@ export const paths = {
 // other stuff we want in the outer context
 export * from '../../Library/Core/utils.min.js';
 export * from '../../Library/App/Worker/App.js';
+export * from '../../Library/App/Params.js';
 export * from '../../Library/App/surface-imports.js';
 export * from '../../Library/Media/media-stream/media-stream.js';
 export * as tryst from '../../Library/Firebase/tryst.js';

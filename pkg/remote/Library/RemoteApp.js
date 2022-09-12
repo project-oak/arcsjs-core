@@ -7,10 +7,12 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import {
-  App, makeName, subscribeToStream,
-  tryst, Resources, Myself
+  App, Resources, makeName, logFactory,
+  subscribeToStream, tryst, Myself
 } from '../conf/allowlist.js';
 import {RemoteRecipe} from './RemoteRecipe.js';
+
+const log = logFactory(true, 'RemoteApp', 'yellow', 'navy');
 
 // App class
 export const RemoteApp = class extends App {
@@ -18,23 +20,16 @@ export const RemoteApp = class extends App {
     super(paths, root);
     this.userAssembly = [RemoteRecipe];
   }
-  async spinup() {
+  async spinup(user, group) {
     await super.spinup();
     await this.initRtc();
-    await this.initPersona();
-    await this.initLobby();
+    await this.initPersona(user);
+    await this.initLobby(group);
     await this.runLobby();
   }
-  async initPersona() {
-  //   // keep "persona" up to date
-  //   this.arcs.watch('user', 'persona', persona => this.persona = persona);
-  //   // fetch system value for persona
-  //   this.persona = await this.arcs.get('user', 'persona');
-  //   // initialize persona if needed
-  //   if (!this.persona) {
-    this.persona = makeName();
+  async initPersona(user) {
+    this.persona = user || makeName();
     this.arcs.set('user', 'persona', this.persona);
-  //   }
   }
   async initRtc() {
     this.myself = new Myself();
@@ -42,12 +37,10 @@ export const RemoteApp = class extends App {
     subscribeToStream('default', stream => this.myself.mediaStream = stream);
     await this.myself.ready;
   }
-  async initLobby() {
-    this.group = 'frankincense';
+  async initLobby(group) {
+    this.group = group || 'frankincense';
     this.arcs.set('user', 'group', this.group);
-    this.arcs.watch('user', 'group', (group) => {
-      this.group = group;
-    });
+    this.arcs.watch('user', 'group', group => this.group = group);
   }
   async runLobby() {
     this.meet(this.persona, this.myself.peerId, 3000);
@@ -59,14 +52,14 @@ export const RemoteApp = class extends App {
       const strangers = await tryst.meetStrangers(this.group, null, {persona: name, peerId}) || {};
       Object.values(strangers).forEach(({persona, peerId}) => {
         if (this.myself.shouldCall(peerId)) {
-          console.log('CALLING', persona);
+          log('CALLING', persona);
           this.myself.doCall(peerId);
         }
       });
     }
   }
   onstream(stream, meta) {
-    console.log('onstream', meta);
+    log('onstream', meta);
     const id = meta?.id || makeName();
     Resources.set(id, stream);
     this.arcs.set('user', 'remoteStream', id);
