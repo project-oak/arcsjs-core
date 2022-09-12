@@ -6,16 +6,22 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import './conf/config.js';
-import {paths, Params} from './conf/allowlist.js';
-import {RemoteApp} from './Library/RemoteApp.js';
+import './arcs/config.js';
+import {Paths, Params, Resources} from './arcs/arcs.js';
+import {LobbyApp} from './arcs/LobbyApp.js';
 
 const user = Params.getParam('user');
 const group = Params.getParam('group');
 
+let app;
+
 try {
-  const app = globalThis.app = new RemoteApp(paths);
+  app = globalThis.app = new LobbyApp(Paths.map);
   await app.spinup(user, group);
 } catch(x) {
   console.error(x);
 }
+
+export {app, Resources};
+
+export const canvas = await new Promise(r => setTimeout(() => r(globalThis.app?.canvas), 500));

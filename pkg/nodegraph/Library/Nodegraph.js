@@ -76,7 +76,7 @@ template: html`
         <div nav toolbar>
           <icon on-click="onToggleLeft">{{leftIcon}}</icon>
           <div flex frame="toolbar"></div>
-          <icon on-click="onToggleRight">{{rightIcon}}</icon>
+          <!-- <icon on-click="onToggleRight">{{rightIcon}}</icon> -->
         </div>
         <!-- middle 1 -->
         <split-panel flex column divider="280">

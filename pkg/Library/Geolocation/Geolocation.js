@@ -16,7 +16,7 @@ template: html`
 `,
 
 async onCoords({eventlet: {value}}, state, {service}) {
-  log(`coords: ${JSON.stringify(value)}`);
+  //log(`coords: ${JSON.stringify(value)}`);
   const {latitude, longitude} = value;
   // if (latitude && longitude && this.coordsChanged({latitude, longitude}, state.coords)) {
     //state.coords = value;

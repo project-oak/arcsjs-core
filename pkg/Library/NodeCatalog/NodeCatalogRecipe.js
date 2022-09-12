@@ -11,15 +11,18 @@ export const NodeCatalogRecipe = {
   $stores: {
     selectedNodeTypes: {
       $type: '[JSON]',
+      noinspect: true
     },
     nodeSearch: {
       $type: 'String',
     },
     hoveredNodeType: {
-      $type: 'JSON'
+      $type: 'JSON',
+      noinspect: true
     },
     categories: {
-      $type: 'JSON'
+      $type: 'JSON',
+      noinspect: true
     }
   },
   NodeCatalog: {

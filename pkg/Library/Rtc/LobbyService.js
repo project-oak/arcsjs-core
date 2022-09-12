@@ -7,9 +7,12 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import * as tryst from '../Firebase/tryst.js';
 import {Myself} from './Myself.js';
 import {Resources} from '../App/Resources.js';
+import * as tryst from '../Firebase/tryst.js';
+import {logFactory} from '../Core/utils.js';
+
+const log = logFactory(logFactory.flags.rtc, 'LobbyService', 'lightblue', '#333');
 
 const Lobby = class {
   constructor() {
@@ -22,7 +25,7 @@ const Lobby = class {
     this.myself.name = persona;
     this.myself.mediaStream = Resources.get(returnStream);
     this.myself.onstream = this.onstream.bind(this);
-    //console.log(persona, returnStream);
+    //log(persona, returnStream);
     const {peerId} = this.myself;
     if (peerId) {
       // be present at the meeting place
@@ -41,9 +44,9 @@ const Lobby = class {
   }
   maybeTryBack(stream) {
     const them = stream?.meta?.call;
-    //console.log('maybeTryBack', them);
+    //log('maybeTryBack', them);
     if (this.myself.shouldCall(them)) {
-      console.log('CALLING', them);
+      log('CALLING', them);
       this.myself.doCall(them);
     }
   }
@@ -57,7 +60,7 @@ const Lobby = class {
       const info = {stream: this.streamId, meta: {name: meta.id, ...meta}};
       this.streams.push(info);
       // what we found
-      console.log(info);
+      log(info);
     }
   }
 };

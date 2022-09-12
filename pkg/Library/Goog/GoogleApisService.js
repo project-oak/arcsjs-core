@@ -36,9 +36,9 @@ export class GoogleApisService {
   }
   static async runMacro({macroId, inputs}) {
     const formData = new FormData();
-    formData.append("id", macroId);
-    formData.append("userInputs", JSON.stringify(inputs));
-    formData.append("temperature", 0.1);
+    formData.set("id", macroId);
+    formData.set("userInputs", JSON.stringify(inputs));
+    formData.set("temperature", 0.1);
     const payload = {
       credentials: 'include',
       method: 'POST',

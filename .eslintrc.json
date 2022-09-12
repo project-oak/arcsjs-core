@@ -41,6 +41,10 @@
     "log": "readonly",
     "create": "readonly",
     "assign": "readonly",
+    "keys": "readonly",
+    "entries": "readonly",
+    "values": "readonly",
+    "mapBy": "readonly",
     "timeout": "readonly",
     "resolve": "readonly"
   }

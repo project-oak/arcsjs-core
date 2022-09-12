@@ -129,7 +129,7 @@ export const NodegraphRecipe = {
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNode',
+            'selectedNode'
           ]
         }
       }

@@ -193,7 +193,7 @@ const ShaderJunk = class {
   }
   timeCadence() {
     // now is now
-    const now = Date.now();
+    const now = performance.now();
     this.start = this.start || now;
     // time since last time, otherwise 16ms
     const delta = this.last ? now - this.last : 16;

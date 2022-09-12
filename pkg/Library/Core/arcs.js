@@ -60,11 +60,11 @@ var init_Particle = __esm({
       setByIndex(index, value) {
         this.data[this.keys[index]] = value;
       }
-      add(...values5) {
-        values5.forEach((value) => this.data[scope.makeKey()] = value);
+      add(...values6) {
+        values6.forEach((value) => this.data[scope.makeKey()] = value);
       }
-      push(...values5) {
-        this.add(...values5);
+      push(...values6) {
+        this.add(...values6);
       }
       remove(value) {
         entries5(this.data).find(([key2, entry]) => {
@@ -737,8 +737,7 @@ var Host = class extends EventEmitter {
     }
     if (this.template) {
       Decorator.maybeDecorateModel(renderModel, this.particle);
-      this.log(renderModel);
-      this.lastRenderModel = renderModel;
+      this.lastRenderModel = { ...renderModel };
       this.render(renderModel);
     }
   }
@@ -1447,7 +1446,7 @@ var initVanilla = (options) => {
   }
 };
 var resolve = Paths.resolve.bind(Paths);
-var html = (strings, ...values5) => `${strings[0]}${values5.map((v, i) => `${v}${strings[i + 1]}`).join("")}`.trim();
+var html = (strings, ...values6) => `${strings[0]}${values6.map((v, i) => `${v}${strings[i + 1]}`).join("")}`.trim();
 var createParticleFactory = async (kind, options) => {
   const { Particle: Particle2 } = await Promise.resolve().then(() => (init_Particle(), Particle_exports));
   const implFactory = await requireImplFactory(kind, options);
@@ -1473,6 +1472,23 @@ var requireImplFactory = async (kind, options) => {
   }
   return globalThis.harden(factory);
 };
+var { assign: assign3, keys: keys6, entries: entries6, values: values5, create: create5 } = Object;
+globalThis.SafeObject = {
+  create: create5,
+  assign: assign3,
+  keys(o) {
+    return o ? keys6(o) : [];
+  },
+  values(o) {
+    return o ? values5(o) : [];
+  },
+  entries(o) {
+    return o ? entries6(o) : [];
+  },
+  mapBy(a, keyGetter) {
+    return a ? values5(a).reduce((map, item) => (map[keyGetter(item)] = item, map), {}) : {};
+  }
+};
 var repackageImplFactory = (factory, kind) => {
   const { constNames, rewriteConsts, funcNames, rewriteFuncs } = collectDecls(factory);
   const proto = `{${[...constNames, ...funcNames]}}`;
@@ -1481,7 +1497,7 @@ var repackageImplFactory = (factory, kind) => {
 // protect utils
 globalThis.harden(utils);
 // these are just handy
-const {assign, keys, entries, values, create} = Object;
+const {assign, keys, entries, values, create, mapBy} = globalThis.SafeObject;
 // declarations
 ${[...rewriteConsts, ...rewriteFuncs].join("\n\n")}
 // hardened Object (map) of declarations,

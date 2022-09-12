@@ -30,16 +30,16 @@
     const tranche = streams.length > 4 ? streams.slice(0, -4) : streams;
     return {
       stream: tranche[0]?.stream,
-      stream1: tranche[1]?.stream,
-      stream2: tranche[2]?.stream,
-      stream3: tranche[3]?.stream
+      stream2: tranche[1]?.stream,
+      stream3: tranche[2]?.stream,
+      stream4: tranche[3]?.stream
     };
   },
   render({group}, {persona, streams}) {
     const tvs = values(streams || {}).map(({stream, meta: {name}}) => ({stream, name})).reverse();
     return {
       group,
-      name: persona,
+      name: persona || '...',
       tvs
     };
   },
@@ -67,7 +67,7 @@
     font-family: "Google Sans", sans-serif;
   }
   [stream] {
-    width: 80px;
+    width: 24%;
     margin: 4px;
   }
   [name] {
