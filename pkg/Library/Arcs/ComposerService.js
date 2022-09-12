@@ -24,7 +24,6 @@ export const ComposerService = {
       log.error(hostId, 'cannot contain itself');
     } else {
       host.meta.container = container;
-      //host.rerender();
       this.rerender(arc);
       return host.container;
     }
