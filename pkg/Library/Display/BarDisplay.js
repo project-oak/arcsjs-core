@@ -5,16 +5,10 @@
  */
 ({
 
-update({classifierResults}, state) {
-  const hasResults = classifierResults?.length;
-  if (hasResults) {
-    state.details = classifierResults;
-  }
-},
-
-render({}, {details}) {
+render({classifierResults}) {
+  const hasResults = classifierResults?.length > 0;
   return {
-    details: this.renderDetails(details)
+    details: hasResults ? this.renderDetails(classifierResults) : []
   };
 },
 

@@ -162,7 +162,13 @@ async renderBinding(name, connection, pipeline, nodeTypes, service) {
     const connectedStore = await this.constructConnectedStore(connection, selected, pipeline, nodeTypes, service);
     return {
       name,
-      store: {...connection.store, $type: 'Connection', multiple, values: froms},
+      store: {
+        ...connection.store,
+        $type: 'Connection',
+        noinspect: connection.store.nodisplay,
+        multiple,
+        values: froms
+      },
       value,
       connectedStore
     };
