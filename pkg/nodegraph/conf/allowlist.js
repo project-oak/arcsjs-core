@@ -10,6 +10,7 @@ export * from '../../Library/Dom/container-layout.js';
 export * from '../../Library/Designer/designer-layout.js';
 export * from '../../Library/Dom/multi-select.js';
 export * from '../../Library/NodeGraph/dom/node-graph.js';
+export * from '../../Library/NodeGraph/dom/node-graph-editor.js';
 export * from '../../Library/NodeCatalog/draggable-item.js';
 
 // n.b. operates in outer context

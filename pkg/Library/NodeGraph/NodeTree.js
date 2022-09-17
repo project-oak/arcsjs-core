@@ -6,6 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
+/* global mapBy */
 ({
 async update(input, state, tools) {
   // build a map of nodeTypes
@@ -25,7 +26,7 @@ async update(input, state, tools) {
 async constructContainerGraph({pipeline}, {nodeTypesMap}, {service}) {
   let parsed, tree;
   // a pipeline is a set of Nodes + metadata (name, id)
-  const nodes = pipeline?.nodes;
+  const nodes = pipeline?.nodes || [];
   for (const node of nodes) {
     // name, type, index, key, props, position: {preview: {host: {data}...}, other: {host: {data}...}}
     const nodeType = nodeTypesMap[node.type];
@@ -58,7 +59,7 @@ async constructContainerGraph({pipeline}, {nodeTypesMap}, {service}) {
       return treeNode;
     };
     tree = makeTree(slots, 'root');
-    tree.chiles.length && log(tree);
+    //tree.chiles.length && log(tree);
   }
   return {parsed, tree};
 },

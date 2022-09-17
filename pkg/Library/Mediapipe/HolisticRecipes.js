@@ -6,14 +6,21 @@
 
 export const HolisticRecipe = {
   $meta: {
-    description: 'Mediapipe: Holistic',
+    description: 'Mediapipe Holistic',
     name: 'Holistic',
-    group: 'classifier'
+    group: 'model'
   },
   $stores: {
+    image: {
+      $type: 'Image'
+    },
+    output: {
+      $type: 'Pojo'
+    }
   },
   Holistic: {
-    $container: 'VideoFeed#overlay',
-    $kind: 'Mediapipe/Holistic'
+    $kind: 'Mediapipe/Holistic',
+    $inputs: ['image'],
+    $outputs: ['output']
   }
 };

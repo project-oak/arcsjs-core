@@ -5,10 +5,10 @@
  * license that can be found in the LICENSE file.
  */
 
-import './mediapipe/holistic.js';
+import '../mediapipe/holistic.js';
 // import './mediapipe/camera_utils.js';
 // import './mediapipe/control_utils.js';
-import './mediapipe/drawing_utils.js';
+import '../mediapipe/drawing_utils.js';
 
 const local = import.meta.url.split('/').slice(0, -1).join('/');
 
