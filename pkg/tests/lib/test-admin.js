@@ -1,6 +1,6 @@
 
-import {Xen} from '../../Library/Dom/xen/xen-async.js';
-import {XenCss} from '../../Library/Dom/material-xen/xen.css.js';
+import {Xen} from '../../Library/Dom/Xen/xen-async.js';
+import {XenCss} from '../../Library/Dom/Material/material-xen/xen.css.js';
 
 class TestAdmin extends Xen.Async {
   static get observedAttributes() {
