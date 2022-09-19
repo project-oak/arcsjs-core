@@ -13,7 +13,8 @@ shouldUpdate({data}) {
 },
 async update({data}, state, {service}) {
   await service({kind: 'MediapipeService', msg: 'clear', data: {target: state.target}});
-  await service({kind: 'MediapipeService', msg: 'renderSticker', data: {data: data.results, target: state.target}});
+  await service({kind: 'MediapipeService', msg: 'renderFace', data: {data: data.results, target: state.target}});
+  await service({kind: 'MediapipeService', msg: 'renderHands', data: {data: data.results, target: state.target}});
   state.outputImage = {
     canvas: state.target,
     version: Math.random()

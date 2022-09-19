@@ -22,7 +22,7 @@ const masque = await loadImage(`assets/masquerade.png`);
 const scalar = 25;
 
 // const masque = await loadImage(`assets/fawkes.png`);
-// const scalar = 23;
+// const scalar = 30;
 
 export const MediapipeService = {
   async holistic({image}) {
@@ -32,13 +32,34 @@ export const MediapipeService = {
     }
     return {};
   },
+  async clear({target}) {
+    const realTarget = Resources.get(target);
+    if (realTarget) {
+      const ctx = realTarget.getContext('2d');
+      ctx.clearRect(0, 0, realTarget.width, realTarget.height);
+    }
+  },
   async renderSticker({data, sticker, target}) {
     const faceLandmarks = data?.faceLandmarks;
     const realTarget = Resources.get(target);
     if (faceLandmarks && realTarget) {
       const ctx = realTarget.getContext('2d');
-      ctx.clearRect(0, 0, realTarget.width, realTarget.height);
       Mediapipe.renderSticker(ctx, {faceLandmarks});
+    }
+  },
+  async renderFace({data, target}) {
+    const faceLandmarks = data?.faceLandmarks;
+    const realTarget = Resources.get(target);
+    if (faceLandmarks && realTarget) {
+      const ctx = realTarget.getContext('2d');
+      Mediapipe.renderFace(ctx, {faceLandmarks});
+    }
+  },
+  async renderHands({data, target}) {
+    const realTarget = Resources.get(target);
+    if (data && realTarget) {
+      const ctx = realTarget.getContext('2d');
+      Mediapipe.renderHands(ctx, data);
     }
   }
 };
@@ -126,6 +147,7 @@ export const Mediapipe = {
       const {FACEMESH_RIGHT_EYEBROW: REB} = mpHolistic;
       const p1 = faceLandmarks?.[REB[REB.length-1]?.[0] || 0];
       const [x, y, z] = [(p0.x+p1.x)/2, (p0.y+p1.y)/2, (p0.z+p1.z)/2];
+      //const [x, y, z] = faceLandmarks?.[index][0] || 0;
       // map sticker to centroid
       const [sx, sy] = [x*ctx.canvas.width, y*ctx.canvas.height];
       // resize sticker

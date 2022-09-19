@@ -17,23 +17,23 @@ async update({image}, state, {service}) {
   }
   return {data};
 },
-render({image}, {data}) {
-  return {
-    image: data?.image,
-    stream: image?.stream
-  };
-},
-template: html`
-<style>
-  :host {
-    position: relative;
-  }
-  image-resource {
-    position: absolute;
-    inset: 0;
-  }
-</style>
-<stream-view flex stream="{{stream}}"></stream-view>
-<image-resource flex image="{{image}}"></image-resource>
-`
+// render({image}, {data}) {
+//   return {
+//     image: data?.image,
+//     stream: image?.stream
+//   };
+// },
+// template: html`
+// <style>
+//   :host {
+//     position: relative;
+//   }
+//   image-resource {
+//     position: absolute;
+//     inset: 0;
+//   }
+// </style>
+// <stream-view flex stream="{{stream}}"></stream-view>
+// <image-resource flex image="{{image}}"></image-resource>
+// `
 });

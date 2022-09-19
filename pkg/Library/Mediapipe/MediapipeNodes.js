@@ -38,6 +38,32 @@ export const Holistic = {
   }
 };
 
+export const HolisticFace = {
+  $meta: {
+    description: 'Mediapipe Holistic Face',
+    name: 'Holistic Face',
+    category: 'Effect'
+  },
+  $stores: {
+    data: {
+      $type: 'HolisticData',
+      nomonitor: true,
+      noinspect: true,
+      connection: true
+    },
+    outputImage: {
+      $type: 'Image',
+      noinspect: true,
+      nomonitor: true
+    }
+  },
+  Holistic: {
+    $kind: 'Mediapipe/HolisticFace',
+    $inputs: ['data'],
+    $outputs: ['outputImage']
+  }
+};
+
 export const HolisticSticker = {
   $meta: {
     description: 'Mediapipe Holistic Sticker',
