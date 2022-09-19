@@ -6,8 +6,8 @@ globalThis.config = {
   theme: 'dark',
   logFlags: {
     app: true,
-    //arcs: true,
     //arc: true,
+    //arcs: true,
     //bus: true,
     //composer: true,
     media: true,

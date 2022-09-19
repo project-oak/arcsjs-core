@@ -10,10 +10,10 @@
 import * as nodeGraphNodes from './NodeGraphNodes.js';
 import * as testNodes from './TestNodes.js';
 import * as miscNodes from './MiscNodes.js';
-import * as newMediaNodes from '../../../Library/NewMedia/Fields/Nodes.js';
-import * as baseFieldNodes from '../../../nodebase/Library/FieldNodes/FieldNodes.js';
+import * as baseFieldNodes from '../FieldNodes/FieldNodes.js';
 import * as candyNodes from './CandyNodes.js';
-import * as mediapipeNodes from './MediapipeNodes.js';
+import * as mediapipeNodes from '../../../Library/Mediapipe/MediapipeNodes.js';
+import * as newMediaNodes from '../../../Library/NewMedia/Nodes/Nodes.js';
 
 const fieldNodes = Object.values(baseFieldNodes).map(node => {
   const newNode = {...node};
@@ -28,13 +28,13 @@ const fieldNodes = Object.values(baseFieldNodes).map(node => {
 const {values} = Object;
 
 export const nodeTypes = [
-  ...fieldNodes,
-  ...values(nodeGraphNodes),
   ...values(newMediaNodes),
+  ...values(mediapipeNodes),
+  ...values(nodeGraphNodes),
+  ...fieldNodes,
   ...values(miscNodes),
   ...values(testNodes),
   ...values(candyNodes),
-  ...values(mediapipeNodes)
   // ...values(locationNodes),
   // ...values(homescreen),
   // ...values(speech),

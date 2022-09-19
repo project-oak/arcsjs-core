@@ -10,7 +10,7 @@
 export const Sugar = {
   $meta: {
     name: 'sugar',
-    category: 'input'
+    category: 'Input'
   },
   $stores: {
     sugar: {
@@ -30,7 +30,7 @@ export const Sugar = {
 export const Melting = {
   $meta: {
     name: 'Melting',
-    category: 'effect',
+    category: 'Effect',
   },
   $stores: {
     sugar: {
@@ -53,7 +53,7 @@ export const Melting = {
 export const Lollipop = {
   $meta: {
     name: 'Lollipop',
-    category: 'model',
+    category: 'Model',
   },
   $stores: {
     sugar: {
@@ -87,7 +87,7 @@ export const Lollipop = {
 export const CottonCandy = {
   $meta: {
     name: 'Cotton Candy',
-    category: 'model',
+    category: 'Model',
   },
   $stores: {
     sugar: {

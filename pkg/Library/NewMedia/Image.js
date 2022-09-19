@@ -5,10 +5,8 @@
  * license that can be found in the LICENSE file.
  */
 ({
-render({image}) {
-  return {
-    image
-  };
+onCanvas({eventlet: {value}}) {
+  return {image: value};
 },
 template: html`
 <style>
@@ -18,6 +16,6 @@ template: html`
     background: transparent;
   }
 </style>
-<image-resource center flex image="{{image}}"></image-resource>
+<image-resource center flex image="{{image}}" on-canvas="onCanvas"></image-resource>
 `
 });

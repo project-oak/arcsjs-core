@@ -5,9 +5,9 @@
  */
 
  import {Xen} from '../../Dom/Xen/xen-async.js';
- import {subscribeToStream, unsubscribeFromStream} from './media-stream.js';
  import {Resources} from '../../App/Resources.js';
  import {logFactory} from '../../Core/utils.js';
+ import {subscribeToStream, unsubscribeFromStream} from './media-stream.js';
 
  const log = logFactory(logFactory.flags.media, 'stream-view', 'green');
 
@@ -45,7 +45,7 @@
          state.realStream = realStream;
          this.video.srcObject = realStream;
        }
-       if (realStream && frequency) {
+       if (realStream?.active && frequency) {
          this.doCanvasCadence(Number(frequency), stream);
        }
      }

@@ -8,14 +8,12 @@
   (function() {
    var loadPackage = function(metadata) {
   
-      var PACKAGE_PATH;
+      var PACKAGE_PATH = '';
       if (typeof window === 'object') {
         PACKAGE_PATH = window['encodeURIComponent'](window.location.pathname.toString().substring(0, window.location.pathname.toString().lastIndexOf('/')) + '/');
-      } else if (typeof location !== 'undefined') {
-        // worker
+      } else if (typeof process === 'undefined' && typeof location !== 'undefined') {
+        // web worker
         PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
-      } else {
-        throw 'using preloaded data can only be done on a web page or in a web worker';
       }
       var PACKAGE_NAME = 'blaze-out/k8-opt/genfiles/third_party/mediapipe/web/solutions/holistic/holistic_solution_packed_assets.data';
       var REMOTE_PACKAGE_BASE = 'holistic_solution_packed_assets.data';
@@ -29,6 +27,18 @@
       var PACKAGE_UUID = metadata['package_uuid'];
     
       function fetchRemotePackage(packageName, packageSize, callback, errback) {
+        
+        if (typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node === 'string') {
+          require('fs').readFile(packageName, function(err, contents) {
+            if (err) {
+              errback(err);
+            } else {
+              callback(contents.buffer);
+            }
+          });
+          return;
+        }
+      
         var xhr = new XMLHttpRequest();
         xhr.open('GET', packageName, true);
         xhr.responseType = 'arraybuffer';
@@ -105,6 +115,8 @@ Module['FS_createPath']("/third_party/mediapipe/modules", "palm_detection", true
 Module['FS_createPath']("/third_party/mediapipe/modules", "holistic_landmark", true, true);
 Module['FS_createPath']("/third_party/mediapipe/modules", "hand_landmark", true, true);
 Module['FS_createPath']("/third_party/mediapipe/modules", "face_landmark", true, true);
+Module['FS_createPath']("/third_party/mediapipe/modules", "face_geometry", true, true);
+Module['FS_createPath']("/third_party/mediapipe/modules/face_geometry", "data", true, true);
 Module['FS_createPath']("/third_party/mediapipe/modules", "face_detection", true, true);
 
           /** @constructor */
@@ -185,7 +197,7 @@ Module['FS_createPath']("/third_party/mediapipe/modules", "face_detection", true
     }
   
    }
-   loadPackage({"files": [{"filename": "/third_party/mediapipe/modules/pose_detection/pose_detection.tflite", "start": 0, "end": 2961104, "audio": 0}, {"filename": "/third_party/mediapipe/modules/palm_detection/palm_detection.tflite", "start": 2961104, "end": 6838992, "audio": 0}, {"filename": "/third_party/mediapipe/modules/holistic_landmark/hand_recrop.tflite", "start": 6838992, "end": 6962784, "audio": 0}, {"filename": "/third_party/mediapipe/modules/hand_landmark/handedness.txt", "start": 6962784, "end": 6962795, "audio": 0}, {"filename": "/third_party/mediapipe/modules/hand_landmark/hand_landmark.tflite", "start": 6962795, "end": 10755415, "audio": 0}, {"filename": "/third_party/mediapipe/modules/face_landmark/face_landmark.tflite", "start": 10755415, "end": 13194691, "audio": 0}, {"filename": "/third_party/mediapipe/modules/face_detection/face_detection_short_range.tflite", "start": 13194691, "end": 13423723, "audio": 0}], "remote_package_size": 13423723, "package_uuid": "5388f09b-5ce1-4a9b-859f-aea0099b8d20"});
+   loadPackage({"files": [{"filename": "/third_party/mediapipe/modules/pose_detection/pose_detection.tflite", "start": 0, "end": 2962288, "audio": 0}, {"filename": "/third_party/mediapipe/modules/palm_detection/palm_detection_lite.tflite", "start": 2962288, "end": 4947728, "audio": 0}, {"filename": "/third_party/mediapipe/modules/palm_detection/palm_detection_full.tflite", "start": 4947728, "end": 7289008, "audio": 0}, {"filename": "/third_party/mediapipe/modules/holistic_landmark/hand_recrop.tflite", "start": 7289008, "end": 7412800, "audio": 0}, {"filename": "/third_party/mediapipe/modules/hand_landmark/handedness.txt", "start": 7412800, "end": 7412811, "audio": 0}, {"filename": "/third_party/mediapipe/modules/hand_landmark/hand_landmark_full.tflite", "start": 7412811, "end": 12891499, "audio": 0}, {"filename": "/third_party/mediapipe/modules/face_landmark/face_landmark_with_attention.tflite", "start": 12891499, "end": 15387451, "audio": 0}, {"filename": "/third_party/mediapipe/modules/face_landmark/face_landmark.tflite", "start": 15387451, "end": 16629347, "audio": 0}, {"filename": "/third_party/mediapipe/modules/face_geometry/data/geometry_pipeline_metadata_landmarks.binarypb", "start": 16629347, "end": 16648723, "audio": 0}, {"filename": "/third_party/mediapipe/modules/face_detection/face_detection_short_range.tflite", "start": 16648723, "end": 16877755, "audio": 0}], "remote_package_size": 16877755, "package_uuid": "ae959d57-f008-4fa8-81e3-d2180f7564f5"});
   
   })();
   

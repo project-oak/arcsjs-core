@@ -463,7 +463,7 @@ var Arc = class extends EventEmitter {
     }
   }
   findOutputByName(outputs, name) {
-    const output = outputs?.find((output2) => keys(output2)[0] === name);
+    const output = outputs?.find((output2) => keys(output2 || 0)[0] === name);
     if (output) {
       return values(output)[0];
     }

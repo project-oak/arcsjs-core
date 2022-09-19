@@ -95,7 +95,7 @@ renderGraphNodes(nodes, nodeTypesMap, nodeKey, categories) {
     const name = node.name;
     const nodeType = nodeTypesMap[node.name];
     const categoryName = nodeType?.$meta?.category;
-    const category = categories?.[categoryName];
+    const category = categories?.[categoryName] || 0;
     const containers = this.containersForNode(node, nodeTypesMap);
     return {
       key,

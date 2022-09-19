@@ -5,20 +5,22 @@
  * license that can be found in the LICENSE file.
  */
 ({
-update({stream}, state, {invalidate}) {
-  timeout(invalidate, 3000);
+render({fps, stream}, {}) {
   return {
-    image: {version: Math.random()}
+    fps,
+    stream
+  };
+},
+onCanvas({eventlet: {value: ref}, stream}) {
+  return {
+    frame: {
+      canvas: ref,
+      version: Math.random(),
+      stream
+    }
   };
 },
 template: html`
-<!-- <style>
-  /* :host {
-  } */
-  image-resource {
-    background: transparent;
-  }
-</style>
-<image-resource center flex image="{{image}}"></image-resource> -->
+<stream-view flex stream="{{stream}}" frequency="{{fps}}" on-canvas="onCanvas"></stream-view>
 `
 });

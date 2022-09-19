@@ -21,5 +21,6 @@ template: html`
   /* :host {
   } */
 </style>
+<canvas></canvas>
 `
 });

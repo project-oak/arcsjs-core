@@ -23,6 +23,8 @@ export class ResourceView extends Xen.Async {
         key: name,
         notCanvas: res?.localName !== 'canvas',
         notStream: !(res instanceof MediaStream),
+        size: res?.width ? `(${res?.width} x ${res?.height})` : '',
+        canvasRatio: `aspect-ratio: ${res?.width} / ${res?.height};`,
         typeof:
           res?.localName === 'canvas' ? 'Canvas'
           : (res instanceof MediaStream) ? 'Stream'
@@ -61,6 +63,7 @@ export class ResourceView extends Xen.Async {
     border: 1px solid purple;
     width: 120px;
     height: 90px;
+    object-fit: contain;
   }
   i {
     font-size: 0.75em;
@@ -71,9 +74,9 @@ export class ResourceView extends Xen.Async {
 <template resource_t>
   <div resource>
     <b>{{typeof}}</b>
-    <canvas hidden$="{{notCanvas}}" key$="{{key}}" width="120" height="90"></canvas>
+    <canvas xen:style="{{canvasRatio}}" hidden$="{{notCanvas}}" key$="{{key}}" width="120" height="90"></canvas>
     <video hidden$="{{notStream}}" srcobject="{{srcObject:stream}}" playsinline autoplay muted></video>
-    <i>{{key}}</i>
+    <span>{{size}}</span><i>{{key}}</i>
   </span>
 </template>
 `;

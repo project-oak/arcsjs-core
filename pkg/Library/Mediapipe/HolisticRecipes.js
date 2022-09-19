@@ -8,19 +8,41 @@ export const HolisticRecipe = {
   $meta: {
     description: 'Mediapipe Holistic',
     name: 'Holistic',
-    group: 'model'
+    category: 'Model'
   },
   $stores: {
     image: {
-      $type: 'Image'
+      $type: 'Image',
+      noinspect: true,
+      nomonitor: true
     },
     output: {
-      $type: 'Pojo'
+      $type: 'Pojo',
+      nomonitor: true
     }
   },
   Holistic: {
     $kind: 'Mediapipe/Holistic',
     $inputs: ['image'],
     $outputs: ['output']
+  }
+};
+
+export const HolisticSticker = {
+  $meta: {
+    description: 'MpHolistic Sticker',
+    name: 'Holistic Sticker',
+    category: 'Effect'
+  },
+  $stores: {
+    image: {
+      $type: 'Image',
+      noinspect: true,
+      nomonitor: true
+    }
+  },
+  Holistic: {
+    $kind: 'Mediapipe/HolisticSticker',
+    $inputs: ['frame']
   }
 };

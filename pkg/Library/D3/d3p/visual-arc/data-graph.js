@@ -143,8 +143,10 @@ export class DataGraph extends Xen.Async {
           io.push({key, value, input: true});
         });
         h.meta.outputs?.forEach(output => {
-          const [key, value] = Object.entries(output).pop();
-          io.push({key, value, output: true});
+          if (output) {
+            const [key, value] = Object.entries(output).pop();
+            io.push({key, value, output: true});
+          }
         });
         io.forEach(({key, value, input, output}) => {
           // add a link between this particle and the target store

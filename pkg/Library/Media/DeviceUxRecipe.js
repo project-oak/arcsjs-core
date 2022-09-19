@@ -17,10 +17,12 @@ export const DeviceUxRecipe = {
         isAudioEnabled: false,
         // videoDeviceId
         // audioOutputDeviceId
-      }
+      },
+      noinspect: true
     },
     mediaDevices: {
-      $type: '[JSON]'
+      $type: '[JSON]',
+      noinspect: true
     },
   },
   deviceUx: {
@@ -30,12 +32,8 @@ export const DeviceUxRecipe = {
   },
   defaultStream: {
     $kind: 'Media/MediaStream',
-    $inputs: [
-      'mediaDeviceState'
-    ],
-    $outputs: [
-      'mediaDevices'
-    ]
+    $inputs: ['mediaDeviceState'],
+    $outputs: ['mediaDevices']
   }
 };
 

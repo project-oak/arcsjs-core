@@ -46,6 +46,7 @@
     "values": "readonly",
     "mapBy": "readonly",
     "timeout": "readonly",
-    "resolve": "readonly"
+    "resolve": "readonly",
+    "deepEqual": "readonly"
   }
 }
