@@ -7,13 +7,14 @@
 
 import {Resources} from '../App/Resources.js';
 import {loadImage} from '../Media/ImageLoader.js';
-import './mediapipe/holistic.js';
+//
+import '../../third_party/mediapipe/holistic.js';
 const {Holistic} = globalThis;
-import './mediapipe/drawing_utils.js';
+import '../../third_party/mediapipe/drawing_utils.js';
 const {drawLandmarks, drawConnectors, lerp} = globalThis;
 
 const local = import.meta.url.split('/').slice(0, -1).join('/');
-const locateFile = file => `${local}/mediapipe/${file}`;
+const locateFile = file => `${local}/../../third_party/mediapipe/${file}`;
 
 const mpHolistic = globalThis;
 
