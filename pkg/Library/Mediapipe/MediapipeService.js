@@ -19,7 +19,7 @@ const locateFile = file => `${local}/../../third_party/mediapipe/${file}`;
 const mpHolistic = globalThis;
 
 const masque = await loadImage(`assets/masquerade.png`);
-const scalar = 15;
+const scalar = 25;
 
 // const masque = await loadImage(`assets/fawkes.png`);
 // const scalar = 23;
