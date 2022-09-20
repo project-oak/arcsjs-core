@@ -79,7 +79,7 @@ template: html`
           <!-- <icon on-click="onToggleRight">{{rightIcon}}</icon> -->
         </div>
         <!-- middle 1 -->
-        <split-panel flex column divider="280">
+        <split-panel flex column divider="480">
           <div flex column frame="preview" slot="top"></div>
           <div flex column frame="editor" slot="bottom"></div>
         </split-panel>

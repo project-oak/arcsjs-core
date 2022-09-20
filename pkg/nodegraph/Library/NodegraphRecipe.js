@@ -11,11 +11,19 @@ import {nodeTypes, categories} from './Nodes/nodeTypes.js';
 import {customInspectors} from './Inspectors/customInspectors.js';
 import {NodeCatalogRecipe} from '../../Library/NodeCatalog/NodeCatalogRecipe.js';
 
+const globalStores = [
+  'selectedNode',
+  'selectedPipeline',
+  'nodeTypes',
+  'hoveredNodeKey',
+  'categories'
+];
+
 const PipelineToolbar = {
   $kind: '$library/NodeGraph/PipelineToolbar',
   $inputs: [
     {pipeline: 'selectedPipeline'},
-    'pipelines',
+    'pipelines'
   ],
   $staticInputs: {
     publishPaths: {}
@@ -50,7 +58,6 @@ export const NodegraphRecipe = {
     },
     selectedPipeline: {
       $type: 'JSON',
-      // $tags: ['persisted'],
       $value: null
     },
     selectedNode: {
@@ -59,6 +66,9 @@ export const NodegraphRecipe = {
     nodeTypes: {
       $type: '[JSON]',
       $value: nodeTypes
+    },
+    hoveredNodeKey: {
+      $type: 'String'
     },
     inspectorData: {
       $type: 'JSON'
@@ -97,16 +107,19 @@ export const NodegraphRecipe = {
       },
       editor: {
         Editor: {
-          $kind: '$library/NodeGraph/Editor',
+          //$kind: 'https://rapsai-core.web.app/0.5.1/Library/Editor',
+          $kind: 'http://localhost:9876/Library/Editor',
+          //$kind: '$library/NodeGraph/Editor',
           $inputs: [
             {pipeline: 'selectedPipeline'},
             'selectedNode',
             'nodeTypes',
+            'hoveredNodeKey',
             'categories'
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNode',
+            'selectedNode'
           ]
         }
       },
@@ -140,7 +153,7 @@ export const NodegraphRecipe = {
     $inputs: [
       {node: 'selectedNode'},
       {pipeline: 'selectedPipeline'},
-      'nodeTypes',
+      'nodeTypes'
     ],
     $outputs: [{data: 'inspectorData'}]
   },
@@ -153,7 +166,7 @@ export const NodegraphRecipe = {
     ],
     $outputs: [
       {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'},
+      {pipeline: 'selectedPipeline'}
     ]
   },
   nodesConnector: {
@@ -161,7 +174,7 @@ export const NodegraphRecipe = {
     $inputs: [
       {pipeline: 'selectedPipeline'},
       'selectedNode',
-      'nodeTypes',
+      'nodeTypes'
     ],
     $outputs: [
       {pipeline: 'selectedPipeline'},
@@ -171,11 +184,7 @@ export const NodegraphRecipe = {
     $staticInputs: {
       customInspectors,
       inspectorData: 'inspectorData',
-      globalStores: [
-        'selectedNode',
-        'selectedPipeline',
-        'nodeTypes',
-      ]
+      globalStores
     }
   }
 };

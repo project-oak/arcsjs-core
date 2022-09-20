@@ -156,7 +156,7 @@ export class Arc extends EventEmitter {
     }
   }
   findOutputByName(outputs, name) {
-    const output = outputs?.find(output => keys(output)[0] === name);
+    const output = outputs?.find(output => keys(output || 0)[0] === name);
     if (output) {
       return values(output)[0];
     }

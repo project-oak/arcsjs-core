@@ -176,7 +176,7 @@ template: html`
     color: black;
     background-color: var(--theme-color-bg-1);
     min-height: 120px;
-    border-bottom: 1px solid silver;
+    border-bottom: 1px solid #f7f7f7;
   }
   designer-layout {
     height: auto !important;

@@ -48,3 +48,4 @@ export async function loadImage(src) {
     img.src = src;
   });
 }
+

@@ -7,15 +7,13 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-//import * as candyNodes from './CandyNodes.js';
-import * as builderNodes from './BuilderNodes.js';
+import * as nodeGraphNodes from './NodeGraphNodes.js';
 import * as testNodes from './TestNodes.js';
-// import * as locationNodes from '../../Library/nostalgic/Goog/LocationNodes.js';
-// import * as homescreen from '../../Library/nostalgic/Homescreen/HomescreenRecipes.js';
-// import * as speech from '../../Library/nostalgic/Actions/SpeechRecipes.js';
-// import * as translator from '../../Library/nostalgic/Actions/TranslationDisplayRecipe.js';
-import * as newMediaNodes from '../../../Library/NewMedia/Fields/Nodes.js';
-import * as baseFieldNodes from '../../../nodebase/Library/FieldNodes/FieldNodes.js';
+import * as miscNodes from './MiscNodes.js';
+import * as baseFieldNodes from '../FieldNodes/FieldNodes.js';
+import * as candyNodes from './CandyNodes.js';
+import * as mediapipeNodes from '../../../Library/Mediapipe/MediapipeNodes.js';
+import * as newMediaNodes from '../../../Library/NewMedia/Nodes/Nodes.js';
 
 const fieldNodes = Object.values(baseFieldNodes).map(node => {
   const newNode = {...node};
@@ -27,16 +25,20 @@ const fieldNodes = Object.values(baseFieldNodes).map(node => {
   return newNode;
 });
 
+const {values} = Object;
+
 export const nodeTypes = [
-  ...Object.values(builderNodes),
-  ...Object.values(newMediaNodes),
+  ...values(newMediaNodes),
+  ...values(mediapipeNodes),
+  ...values(nodeGraphNodes),
   ...fieldNodes,
-  ...Object.values(testNodes),
-  //...Object.values(candyNodes),
-  // ...Object.values(locationNodes),
-  // ...Object.values(homescreen),
-  // ...Object.values(speech),
-  // ...Object.values(translator)
+  ...values(miscNodes),
+  ...values(testNodes),
+  ...values(candyNodes),
+  // ...values(locationNodes),
+  // ...values(homescreen),
+  // ...values(speech),
+  // ...values(translator)
 ];
 
 const icons = ['coffee', 'shower', 'chair', 'flatware', 'light', 'casino', 'escalator', 'umbrella', 'theater_comedy', 'diamond'];

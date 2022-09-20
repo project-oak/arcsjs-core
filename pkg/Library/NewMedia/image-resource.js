@@ -13,12 +13,12 @@ const template = Xen.Template.html`
     overflow: hidden;
     font-size: 10px;
     color: black;
-    background-color: black;
+    /* background-color: black; */
   }
   * {
     box-sizing: border-box;
   }
-  canvas, img {
+  canvas {
     object-fit: contain;
     width: 100%;
     height: 100%;
@@ -26,17 +26,13 @@ const template = Xen.Template.html`
   [flip] {
     transform: scaleX(-1);
   }
-  [show=false], [hide=true] {
-    display: none !important;
-  }
 </style>
 
-<canvas show$="{{canvasNotImage}}"></canvas>
-<img flex hide$="{{canvasNotImage}}" src="{{src}}" draggable="false">
+<canvas></canvas>
 
 `;
 
-const oneTransparentPixel = `data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==`;
+//const oneTransparentPixel = `data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==`;
 
 export class ImageResource extends Xen.Async {
   static get observedAttributes() {
@@ -47,10 +43,10 @@ export class ImageResource extends Xen.Async {
   }
   _didMount() {
     this.canvas = this._dom.$('canvas');
-    this.image = this._dom.$('image');
+    this.canvasId = Resources.allocate(this.canvas);
   }
   update({image, masks}, state, {service}) {
-    // TODO(sjmiles): temporary duck-typing
+    // manage inputs
     let useMasks = masks;
     if (!useMasks && image?.masksResource) {
       useMasks = image;
@@ -72,51 +68,76 @@ export class ImageResource extends Xen.Async {
     }
   }
   updateImage(image, state) {
-    if (image !== state.image) {
-      state.image = image;
-      state.canvas = Resources.get(image?.canvas);
+    if (!image?.canvas && image?.url) {
+      image.canvas = this.canvasId;
+      this.updateImageCanvas(image);
+      this.value = image;
+      this.fire('canvas');
+    }
+    if (image?.canvas && image.canvas !== this.canvasId) {
+      const realCanvas = Resources.get(image.canvas);
+      this.copyImage(realCanvas);
     }
   }
-  render({image}, state) {
-    const model = {};
-    const canvas = state.canvas;
-    if (canvas && canvas.width && canvas.height) {
-      this.canvas.width = canvas.width;
-      this.canvas.height = canvas.height;
-      const ctx = this.canvas.getContext('2d');
-      ctx.drawImage(canvas, 0, 0);
-    } else {
-      // TODO(sjmiles): seeing repeated Network hits when setting image.src = image.src,
-      // so doing some jumping about here to avoid this (bogus) side-effect
-      const src = image?.url || oneTransparentPixel;
-      if (state.src !== src) {
-        model.src = state.src = src;
+  copyImage(image) {
+    if (image) {
+      const {width, height} = image;
+      if (width && height) {
+        Object.assign(this.canvas, {width, height});
+        const ctx = this.canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0);
       }
     }
-    return {
-      canvasNotImage: Boolean(canvas).toString(),
-      ...model
-    };
   }
-  renderImage({image}, {canvas, src}) {
-    const model = {};
-    if (canvas && canvas.width && canvas.height) {
-      this.canvas.width = canvas.width;
-      this.canvas.height = canvas.height;
-      const ctx = this.canvas.getContext('2d');
-      ctx.drawImage(canvas, 0, 0);
-    } else {
-      // TODO(sjmiles): seeing repeated Network hits when setting image.src = image.src,
-      // so doing some jumping about here to avoid this side-effect
-      const src = image?.url || oneTransparentPixel;
-      if (src !== src) {
-        model.src = src;
-      }
-    }
-    return {
-      canvasNotImage: Boolean(canvas).toString(),
-      ...model
-    };
+  updateImageCanvas(image) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = image.url;
+    (async () => {
+      await img.decode();
+      this.copyImage(img);
+    })();
   }
+  // render({image}, state) {
+  //   const model = {};
+  //   const canvas = state.canvas;
+  //   if (canvas && canvas.width && canvas.height) {
+  //     this.canvas.width = canvas.width;
+  //     this.canvas.height = canvas.height;
+  //     const ctx = this.canvas.getContext('2d');
+  //     ctx.drawImage(canvas, 0, 0);
+  //   } else {
+  //     // TODO(sjmiles): seeing repeated Network hits when setting image.src = image.src,
+  //     // so doing some jumping about here to avoid this (bogus) side-effect
+  //     const src = image?.url || oneTransparentPixel;
+  //     if (state.src !== src) {
+  //       model.src = state.src = src;
+  //     }
+  //   }
+  //   return {
+  //     canvasNotImage: Boolean(canvas).toString(),
+  //     ...model
+  //   };
+  // }
+  // renderImage({image}, {canvas, src}) {
+  //   const model = {};
+  //   if (canvas && canvas.width && canvas.height) {
+  //     this.canvas.width = canvas.width;
+  //     this.canvas.height = canvas.height;
+  //     const ctx = this.canvas.getContext('2d');
+  //     ctx.drawImage(canvas, 0, 0);
+  //   } else {
+  //     // TODO(sjmiles): seeing repeated Network hits when setting image.src = image.src,
+  //     // so doing some jumping about here to avoid this side-effect
+  //     const src = image?.url || oneTransparentPixel;
+  //     if (src !== src) {
+  //       model.src = src;
+  //     }
+  //   }
+  //   return {
+  //     canvasNotImage: Boolean(canvas).toString(),
+  //     ...model
+  //   };
+  // }
 }
 customElements.define('image-resource', ImageResource);

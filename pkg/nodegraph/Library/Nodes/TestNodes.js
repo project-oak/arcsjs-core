@@ -10,7 +10,7 @@
 export const Test = {
   $meta: {
     name: 'test',
-    category: 'test'
+    category: 'Test'
   },
   $stores: {
     // Primitive types with/without default values / values.
@@ -107,7 +107,7 @@ export const Test = {
 export const TestStrList = {
   $meta: {
     name: 'test strings list',
-    category: 'test'
+    category: 'Test'
   },
   $stores: {
     stringsList: {
@@ -123,7 +123,7 @@ export const TestStrList = {
 export const TestObjList = {
   $meta: {
     name: 'test objects list',
-    category: 'test'
+    category: 'Test'
   },
   $stores: {
     objectsList: {
@@ -139,7 +139,7 @@ export const TestObjList = {
 export const InspectedTest = {
   $meta: {
     name: 'inspected test',
-    category: 'test'
+    category: 'Test'
   },
   $stores: {
     txt: {
