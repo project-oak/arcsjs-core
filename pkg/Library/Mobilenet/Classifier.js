@@ -37,6 +37,9 @@ async perceive({imageRef, model}, service) {
       modelKind: 'mobilenet'
     }
   };
+  /////////////////
+  // HACKALERT!
+  // TODO(mariakleiner): actually run the service, instead of using hardcoded results.
   // const classifierResults = await service(args);
   const classifierResults = [
     {
@@ -52,6 +55,7 @@ async perceive({imageRef, model}, service) {
       score: 0.00008958124089986086
     }
   ];
+  /////////////////
   return {
     status: classifierResults ? 'complete' : 'failed',
     classifierResults

@@ -30,7 +30,7 @@ export const Mobilenet = {
     }
   },
   classifier: {
-    $kind: '$library/Model/Classifier',
+    $kind: '$library/Mobilenet/Classifier',
     $inputs: [
       {imageRef: 'Image'},
       {model: 'Model'},
