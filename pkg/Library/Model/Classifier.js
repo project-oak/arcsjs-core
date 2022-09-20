@@ -37,7 +37,21 @@ async perceive({imageRef, model}, service) {
       modelKind: 'mobilenet'
     }
   };
-  const classifierResults = await service(args);
+  // const classifierResults = await service(args);
+  const classifierResults = [
+    {
+      displayName: "strawberry",
+      score: 0.9991282820701599
+    },
+    {
+      displayName: "ice cream, icecream",
+      score :0.00010875583393499255
+    },
+    {
+      displayName: "thimble",
+      score: 0.00008958124089986086
+    }
+  ];
   return {
     status: classifierResults ? 'complete' : 'failed',
     classifierResults

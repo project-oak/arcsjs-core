@@ -14,6 +14,10 @@ import {GoogleApisService} from '../../Library/Goog/GoogleApisService.js';
 import {MediapipeService} from '../../Library/Mediapipe/MediapipeService.js';
 import {NodegraphRecipe} from './NodegraphRecipe.js';
 import {logFactory} from '../../Library/Core/utils.min.js';
+import {TensorFlowService} from '../../Library/TensorFlow/TensorFlowService.js';
+import {ShaderService} from '../../Library/Shader/ShaderService.js';
+import {ThreejsService} from '../../Library/Threejs/ThreejsService.js';
+
 const log = logFactory(true, 'Nodegraph', 'navy');
 
 // App class
@@ -21,7 +25,7 @@ export const NodegraphApp = class extends App {
   constructor(paths) {
     super(paths);
     this.persistor = new LocalStoragePersistor('user');
-    this.services = {HistoryService, MediaService, GoogleApisService, MediapipeService, TfjsService};
+    this.services = {HistoryService, MediaService, GoogleApisService, MediapipeService, TensorFlowService, ShaderService, ThreejsService},
     this.userAssembly = [NodegraphRecipe];
     log('Welcome!');
   }
