@@ -85,7 +85,11 @@ onMouseOutNodeType(inputs, state) {
 template: html`
 <style>
   :host {
-    background-color: #f8f9fa;
+    /* --nodelist-bg: #f8f9fa; */
+    --nodelist-bg: var(--theme-color-bg-2);
+    --nodelist-container-fg: var(--theme-color-fg-3);
+    --nodelist-container-hi: var(--theme-color-bg-3);
+    background-color: var(--nodelist-bg);
     height: 100%;
     overflow: hidden;
   }
@@ -104,12 +108,11 @@ template: html`
     position: relative;
     cursor: grab;
     padding: 9px 0 9px 30px;
-    color: var(--theme-color-fg-4);
+    color: var(--nodelist-container-fg);
   }
   [container]:hover {
-    background: var(--theme-color-bg-4);
+    background: var(--nodelist-container-hi);
   }
-
   [container]:hover icon {
     display: flex;
     align-items: center;
@@ -155,22 +158,20 @@ template: html`
     display: none;
   }
 </style>
+
 <div nodetypes-container>
   <div repeat="nodetype_t">{{nodeTypes}}</div>
   <div no-matched-nodes hide$="{{hideNoMatchedNodesLabel}}">No matched nodes</div>
 </div>
-<div info-panel-container xen:style="{{infoPanelContainerStyle}}"
-     display$="{{showInfoPanel}}">
+
+<div info-panel-container xen:style="{{infoPanelContainerStyle}}" display$="{{showInfoPanel}}">
   <div frame="typeInfo"></div>
 </div>
 
 <template nodetype_t>
-  <draggable-item key="{{key}}"
-                  name="{{name}}"
-                  on-enter="onHoverNodeType"
-                  on-leave="onMouseOutNodeType"
-                  on-item-clicked="onItemClick">
- </draggable-item>
+  <draggable-item key="{{key}}" name="{{name}}"
+    on-enter="onHoverNodeType" on-leave="onMouseOutNodeType"
+    on-item-clicked="onItemClick"></draggable-item>
 </template>
 
 `

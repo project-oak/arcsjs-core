@@ -291,7 +291,6 @@ template: html`
   }
   [info-container] {
     border-bottom: 1px solid var(--theme-color-bg-3);
-    color: #3c4043;
     padding: 8px 16px 16px;
   }
   [title-container] {
@@ -309,7 +308,6 @@ template: html`
     text-transform: capitalize;
   }
   [title][properties] {
-    color: #3c4043;
     padding: 16px 0 0 16px;
     flex-shrink: 0;
   }
@@ -361,10 +359,11 @@ template: html`
     padding: 12px;
   }
   [select] {
+    color: #555;
     width: 100%;
   }
   [subprop] {
-    border-top: 1px dotted var(--theme-color-5);
+    border-top: 1px dotted var(--theme-color-bg-5);
     padding: 8px 0 0 16px;
   }
   [subprop] [subprop]:first-child {

@@ -91,8 +91,7 @@ export class DesignerLayout extends DragDrop {
       const target = this.getChildById(id);
       const rect = target && this.getRect(target);
       if (rect) {
-        rect.t = 16;
-        rect.l = 16;
+        assign(rect, {l: 16, t: 16, w: 240, h: 180});
         this.setBoxStyle(target, rect);
         this.firePosition(target);
       }
