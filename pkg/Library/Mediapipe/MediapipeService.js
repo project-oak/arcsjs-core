@@ -42,9 +42,10 @@ export const MediapipeService = {
   async renderSticker({data, sticker, target}) {
     const faceLandmarks = data?.faceLandmarks;
     const realTarget = Resources.get(target);
+    const realSticker = sticker ? Resources.get(sticker) : masque;
     if (faceLandmarks && realTarget) {
       const ctx = realTarget.getContext('2d');
-      Mediapipe.renderSticker(ctx, {faceLandmarks});
+      Mediapipe.renderSticker(ctx, {faceLandmarks}, realSticker);
     }
   },
   async renderFace({data, target}) {
@@ -139,7 +140,7 @@ export const Mediapipe = {
     dc(h.FACEMESH_FACE_OVAL, {color: '#E0E0E0', lineWidth: 5});
     dc(h.FACEMESH_LIPS, {color: '#E0E0E0', lineWidth: 5});
   },
-  renderSticker(ctx, {faceLandmarks}) {
+  renderSticker(ctx, {faceLandmarks}, sticker) {
     if (faceLandmarks) {
       // find a centroid
       const {FACEMESH_LEFT_EYEBROW: LEB} = mpHolistic;
@@ -156,7 +157,7 @@ export const Mediapipe = {
       const [sw, sh] = [masque.width*size, masque.height*size];
       // offset to top-left sticker corner
       const [cx, cy] = [sw/2, sh/2];
-      ctx.drawImage(masque, sx-cx, sy-cy, sw, sh);
+      ctx.drawImage(sticker, sx-cx, sy-cy, sw, sh);
     }
   }
 };
