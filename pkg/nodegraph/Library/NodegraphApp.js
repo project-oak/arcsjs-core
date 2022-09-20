@@ -21,7 +21,7 @@ export const NodegraphApp = class extends App {
   constructor(paths) {
     super(paths);
     this.persistor = new LocalStoragePersistor('user');
-    this.services = {HistoryService, MediaService, GoogleApisService, MediapipeService};
+    this.services = {HistoryService, MediaService, GoogleApisService, MediapipeService, TfjsService};
     this.userAssembly = [NodegraphRecipe];
     log('Welcome!');
   }

@@ -14,6 +14,7 @@ import * as baseFieldNodes from '../FieldNodes/FieldNodes.js';
 import * as candyNodes from './CandyNodes.js';
 import * as mediapipeNodes from '../../../Library/Mediapipe/MediapipeNodes.js';
 import * as newMediaNodes from '../../../Library/NewMedia/Nodes/Nodes.js';
+import {Mobilenet} from '../../../Library/Model/Mobilenet.js';
 
 const fieldNodes = Object.values(baseFieldNodes).map(node => {
   const newNode = {...node};
@@ -35,6 +36,8 @@ export const nodeTypes = [
   ...values(miscNodes),
   ...values(testNodes),
   ...values(candyNodes),
+  // ...values()
+  Mobilenet,
   // ...values(locationNodes),
   // ...values(homescreen),
   // ...values(speech),
