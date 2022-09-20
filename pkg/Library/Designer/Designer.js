@@ -173,10 +173,10 @@ colorByCategory(category, categories) {
 template: html`
 <style>
   :host {
-    color: black;
+    color: var(--theme-color-fg-1);
     background-color: var(--theme-color-bg-1);
     min-height: 120px;
-    border-bottom: 1px solid #f7f7f7;
+    /* border-bottom: 1px solid #f7f7f7; */
   }
   designer-layout {
     height: auto !important;

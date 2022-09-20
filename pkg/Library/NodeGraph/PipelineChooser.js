@@ -47,7 +47,7 @@ pipelineId(pipeline) {
   return pipeline?.$meta.id || pipeline?.$meta?.name || null;
 },
 onSelect({eventlet: {value}, pipelines}, {publicPipelines}) {
-  const pipeline = this.findPipelineById(value, pipelines) 
+  const pipeline = this.findPipelineById(value, pipelines)
     || this.findPipelineById(value, publicPipelines)
     // Backward compatibility: prior to 0.4.0 pipelines were created with `name` only.
     || this.findPipelineByName(value, publicPipelines);
@@ -62,11 +62,14 @@ findPipelineByName(name, pipelines) {
 },
 template: html`
 <style>
+  :host {
+    border-radius: 8px;
+  }
   select {
     font-family: 'Google Sans', sans-serif;
-    font-size: 0.8rem;
-    padding: 3px 6px;
-    border-radius: 6px;
+    font-size: 0.75rem;
+    padding: 4px 6px;
+    border-radius: 8px;
     width: 100%;
   }
 </style>

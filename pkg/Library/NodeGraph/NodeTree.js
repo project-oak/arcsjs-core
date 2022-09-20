@@ -260,7 +260,7 @@ template: html`
     height: 28px;
   }
   [selected] {
-    background-color: var(--theme-color-bg-1);
+    background-color: var(--theme-color-bg-2);
     border-radius: 4px;
   }
   [name] {

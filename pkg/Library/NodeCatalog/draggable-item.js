@@ -12,7 +12,7 @@ const template = Xen.Template.html`
     position: relative;
     cursor: grab;
     padding: 9px 0 9px 30px;
-    color: var(--theme-color-fg-4);
+    /* color: var(--theme-color-fg-4); */
     user-select: none;
   }
 

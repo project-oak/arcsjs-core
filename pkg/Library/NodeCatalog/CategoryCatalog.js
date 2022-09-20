@@ -85,8 +85,8 @@ template: html`
   [category-container] {
     display: flex;
     flex-direction: column;
-    color: #5F6368;
-    background-color: #e8eaed;
+    color: var(--theme-color-fg-0);
+    background-color: var(--theme-color-bg-0);
     height: 100%;
     flex-shrink: 0;
     overflow-y: auto;
@@ -102,10 +102,10 @@ template: html`
     position: relative;
   }
   [category]:hover {
-    background-color: #e0e1e2;
+    background-color: var(--theme-color-bg-3);
   }
   [category][selected] {
-    background-color: white;
+    background-color: var(--theme-color-bg-2);
   }
   [category-name] {
     font-size: 14px;
