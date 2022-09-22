@@ -44,12 +44,9 @@ export class DesignerLayout extends DragDrop {
   getActiveElement({activeElement}) {
     return activeElement?.shadowRoot ? this.getActiveElement(activeElement.shadowRoot) : activeElement;
   }
-  getTargetKey(target) {
-    return target?.getAttribute('particle');
-  }
   deleteAction(target) {
     if (target) {
-      this.key = this.getTargetKey(target);
+      this.key = target.id;
       this.fire('delete');
     }
   }
@@ -113,7 +110,7 @@ export class DesignerLayout extends DragDrop {
     this.updateOrders(this.target);
   }
   firePosition(target) {
-    this.key = this.getTargetKey(target);
+    this.key = target?.id;
     this.value = null;
     if (target) {
       const {l, t, w, h} = this.getRect(target);
@@ -204,11 +201,8 @@ export class DesignerLayout extends DragDrop {
     }
   }
   //
-  sanitizeId(id) {
-    return id?.replace(/[)(:]/g, '_');
-  }
   getChildById(id) {
-    return this.querySelector(`#${this.sanitizeId(id)}`);
+    return this.querySelector(`#${id}`);
   }
   getEventTarget(e) {
     const p = e.composedPath();

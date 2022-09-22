@@ -39,7 +39,7 @@ export class ContainerLayout extends DragDrop {
       // Delete the selected node or edge when pressing the "backspace" or "delete" key .
       if (event.key === 'Backspace' || event.key === 'Delete') {
         if (this.target) {
-          this.key = this.getTargetKey(this.target);
+          this.key = this.target.id;
           this.fire('delete');
         }
       }
@@ -55,9 +55,6 @@ export class ContainerLayout extends DragDrop {
     } else {
       return activeEl;
     }
-  }
-  getTargetKey(target) {
-    return target?.getAttribute('particle');
   }
   update({selected, rects}, state) {
     if (!deepEqual(selected, state.selected) || !deepEqual(rects, state.rects)) {
@@ -116,7 +113,7 @@ export class ContainerLayout extends DragDrop {
     this.updateOrders(this.target);
   }
   firePosition(target) {
-    this.key = this.getTargetKey(target);
+    this.key = target?.id;
     this.value = null;
     if (target) {
       const {l, t, w, h} = this.getRect(target);
@@ -206,11 +203,8 @@ export class ContainerLayout extends DragDrop {
     }
   }
   //
-  sanitizeId(id) {
-    return id?.replace(/[)(:]/g, '_');
-  }
   getChildById(id) {
-    return this.querySelector(`#${this.sanitizeId(id)}`);
+    return this.querySelector(`#${id}`);
   }
   getEventTarget(e) {
     const p = e.composedPath();
