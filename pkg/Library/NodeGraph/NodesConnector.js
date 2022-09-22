@@ -255,7 +255,7 @@ buildParticleSpecs(nodeType, node, globalStores) {
   const specs = {};
   const names = this.getParticleNames(nodeType) || [];
   for (const particleName of names) {
-    specs[`${node.key}${particleName}`] =
+    specs[`${node.key}${this.nameDelim}${particleName}`] =
         this.buildParticleSpec(nodeType, node, particleName, `main#runner`, globalStores);
   }
   return specs;
