@@ -107,7 +107,6 @@ export const Mediapipe = {
     //
     const fullResults = await promise;
     const {canvas, ...results} = fullResults;
-    //
     return {results, canvas: 'landmarksCanvas'};
   },
   render(results) {
@@ -142,7 +141,7 @@ export const Mediapipe = {
   },
   renderSticker(ctx, {faceLandmarks}, sticker, index) {
     if (faceLandmarks) {
-      // find a centroid
+      // find a centroid between the eybrows
       const {FACEMESH_LEFT_EYEBROW: LEB} = mpHolistic;
       const p0 = faceLandmarks?.[LEB[LEB.length-1]?.[0] || 0];
       const {FACEMESH_RIGHT_EYEBROW: REB} = mpHolistic;

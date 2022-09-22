@@ -7,16 +7,17 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import * as nodeGraphNodes from './NodeGraphNodes.js';
-import * as testNodes from './TestNodes.js';
-import * as miscNodes from './MiscNodes.js';
-import * as baseFieldNodes from '../FieldNodes/FieldNodes.js';
-import * as candyNodes from './CandyNodes.js';
-import * as mediapipeNodes from '../../../Library/Mediapipe/MediapipeNodes.js';
-import * as newMediaNodes from '../../../Library/NewMedia/Nodes/Nodes.js';
-import * as mobilenetNodes from '../../../Library/Mobilenet/MobilenetNodes.js';
-import * as displayNodes from '../../../Library/Display/DisplayNodes.js';
-import * as shaderNodes from '../../../Library/Shader/ShaderNodes.js';
+import * as nodeGraphNodes from './Nodes/NodeGraphNodes.js';
+import * as testNodes from './Nodes/TestNodes.js';
+import * as miscNodes from './Nodes/MiscNodes.js';
+import * as baseFieldNodes from './FieldNodes/FieldNodes.js';
+import * as candyNodes from './Nodes/CandyNodes.js';
+import * as mediapipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
+import * as newMediaNodes from '../../Library/NewMedia/Nodes/Nodes.js';
+import * as mobilenetNodes from '../../Library/Mobilenet/MobilenetNodes.js';
+import * as displayNodes from '../../Library/Display/DisplayNodes.js';
+import * as shaderNodes from '../../Library/Shader/ShaderNodes.js';
+import {SceneNode} from '../../Library/AFrame/SceneNode.js';
 
 const fieldNodes = Object.values(baseFieldNodes).map(node => {
   const newNode = {...node};
@@ -41,6 +42,7 @@ export const nodeTypes = [
   ...values(mobilenetNodes),
   ...values(displayNodes),
   ...values(shaderNodes)
+  //SceneNode,
   // ...values(locationNodes),
   // ...values(homescreen),
   // ...values(speech),
