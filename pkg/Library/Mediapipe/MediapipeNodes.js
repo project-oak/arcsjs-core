@@ -81,11 +81,15 @@ export const HolisticSticker = {
       $type: 'Image',
       noinspect: true,
       nomonitor: true
+    },
+    sticker: {
+      $type: 'Image',
+      connection: true
     }
   },
   Holistic: {
     $kind: 'Mediapipe/HolisticSticker',
-    $inputs: ['data'],
+    $inputs: ['data', 'sticker'],
     $outputs: ['outputImage']
   }
 };
