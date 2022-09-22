@@ -58,6 +58,14 @@ const serviceCalls = {};
 
 // Arc service calls come here first
 const serviceHandler = async (arc, host, request) => {
+  if (Array.isArray(request)) {
+    return Promise.all(request.map(r => handleRequest(arc, host, r)));
+  } else {
+    return handleRequest(arc, host, request);
+  }
+};
+
+const handleRequest = async(arc, host, request) => {
   if (request?.msg === 'request-context') {
     return ({runtime: user});
   }
