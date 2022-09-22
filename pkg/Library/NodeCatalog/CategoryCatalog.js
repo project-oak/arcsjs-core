@@ -85,8 +85,8 @@ template: html`
   [category-container] {
     display: flex;
     flex-direction: column;
-    color: var(--theme-color-fg-0);
-    background-color: var(--theme-color-bg-0);
+    color: var(--category-catalog-fg-color, --theme-color-fg-0);
+    background-color: var(--category-catalog-bg-color, --theme-color-bg-0);
     height: 100%;
     flex-shrink: 0;
     overflow-y: auto;
@@ -105,7 +105,7 @@ template: html`
     background-color: var(--theme-color-bg-3);
   }
   [category][selected] {
-    background-color: var(--theme-color-bg-2);
+    background-color: var(--category-catalog-selected-color, --theme-color-bg-2);
   }
   [category-name] {
     font-size: 14px;
