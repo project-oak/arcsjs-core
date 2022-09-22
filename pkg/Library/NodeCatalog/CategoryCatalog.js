@@ -86,7 +86,7 @@ template: html`
     display: flex;
     flex-direction: column;
     color: var(--theme-color-fg-0);
-    background-color: var(--theme-color-bg-0);
+    background-color: var(--theme-color-bg-2);
     height: 100%;
     flex-shrink: 0;
     overflow-y: auto;
@@ -105,7 +105,7 @@ template: html`
     background-color: var(--theme-color-bg-3);
   }
   [category][selected] {
-    background-color: var(--theme-color-bg-2);
+    background-color: var(--theme-color-bg-0);
   }
   [category-name] {
     font-size: 14px;

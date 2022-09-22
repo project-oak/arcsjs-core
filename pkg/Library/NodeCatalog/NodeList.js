@@ -69,8 +69,8 @@ formatNodeKey({name, index}) {
 onHoverNodeType({eventlet: {key, value}, selectedNodeTypes}, state) {
   const [category, name] = key.split(this.catalogDelimiter);
   state.showInfoPanel = true;
-  // 44 is the height of the toolbar.
-  state.infoPanelTop = value + 44;
+  // 34 is the height of the toolbar.
+  state.infoPanelTop = value + 34;
   const index = this.findNodeTypeIndex({name, category}, selectedNodeTypes.sort(this.sortNodeTypes));
   return {
     hoveredNodeType: selectedNodeTypes[index],
@@ -86,7 +86,7 @@ template: html`
 <style>
   :host {
     /* --nodelist-bg: #f8f9fa; */
-    --nodelist-bg: var(--theme-color-bg-2);
+    --nodelist-bg: var(--theme-color-bg-0);
     --nodelist-container-fg: var(--theme-color-fg-3);
     --nodelist-container-hi: var(--theme-color-bg-3);
     background-color: var(--nodelist-bg);

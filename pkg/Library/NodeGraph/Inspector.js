@@ -287,7 +287,8 @@ template: html`
     background-color: var(--theme-color-bg-0);
     color: var(--them-color-fg-4);
     position: relative;
-    overflow-y: auto;
+    height: 100%;
+    overflow-y: auto !important;
   }
   [info-container] {
     border-bottom: 1px solid var(--theme-color-bg-3);
