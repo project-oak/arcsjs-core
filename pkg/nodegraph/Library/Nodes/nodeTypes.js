@@ -12,6 +12,7 @@ import * as testNodes from './TestNodes.js';
 import * as miscNodes from './MiscNodes.js';
 import * as baseFieldNodes from '../FieldNodes/FieldNodes.js';
 import * as candyNodes from './CandyNodes.js';
+import * as customNodes from './CustomNodes.js';
 import * as mediapipeNodes from '../../../Library/Mediapipe/MediapipeNodes.js';
 import * as newMediaNodes from '../../../Library/NewMedia/Nodes/Nodes.js';
 import * as mobilenetNodes from '../../../Library/Mobilenet/MobilenetNodes.js';
@@ -40,7 +41,8 @@ export const nodeTypes = [
   ...values(candyNodes),
   ...values(mobilenetNodes),
   ...values(displayNodes),
-  ...values(shaderNodes)
+  ...values(shaderNodes),
+  ...values(customNodes)
   // ...values(locationNodes),
   // ...values(homescreen),
   // ...values(speech),

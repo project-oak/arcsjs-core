@@ -13,5 +13,11 @@ export const customInspectors = {
     inspect: {
       $kind: '$app/nodegraph/Library/Inspectors/MyTestObjectInspect',
     }
+  },
+  '[Particle]': {
+    $meta: {name: 'custom inspect MyTestObject'},
+    inspect: {
+      $kind: '$app/../librarian/Library/Librarian.js',
+    }
   }
 };
