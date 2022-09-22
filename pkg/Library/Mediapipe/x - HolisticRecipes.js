@@ -39,10 +39,13 @@ export const HolisticSticker = {
       $type: 'Image',
       noinspect: true,
       nomonitor: true
+    },
+    index: {
+      $type: 'Number'
     }
   },
   Holistic: {
     $kind: 'Mediapipe/HolisticSticker',
-    $inputs: ['frame']
+    $inputs: ['frame', 'index']
   }
 };

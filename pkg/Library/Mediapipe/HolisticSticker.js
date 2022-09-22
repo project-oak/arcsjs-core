@@ -5,20 +5,23 @@
  * license that can be found in the LICENSE file.
  */
 ({
-async initialize(_, state, {service}) {
+async initialize({index}, state, {service}) {
   state.target = await service({kind: 'MediaService', msg: 'allocateCanvas', data: {width: 640, height: 480}});
+  state.media = (msg, data) => service({kind: 'MediapipeService', msg, data});
 },
 shouldUpdate({data}) {
   return Boolean(data);
 },
-async update({data, sticker}, state, {service}) {
-  await service({kind: 'MediapipeService', msg: 'clear', data: {target: state.target}});
-  await service({kind: 'MediapipeService', msg: 'renderSticker', data: {data: data.results, sticker: sticker?.canvas, target: state.target}});
-  state.outputImage = {
-    canvas: state.target,
-    version: Math.random()
-  };
+async update(inputs, state) {
+  state.outputImage = await this.updateTarget(inputs, state);
   return {outputImage: state.outputImage};
+},
+async updateTarget({index, data: {results}, sticker}, {media, target}) {
+  sticker = sticker?.canvas;
+  // TODO(sjmiles): use one 'media' call not two
+  await media('clear', {target});
+  await media('renderSticker', {data: results, target, sticker, index});
+  return {canvas: target, version: Math.random()};
 },
 render({data}, {outputImage}) {
   return {

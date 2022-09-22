@@ -77,6 +77,10 @@ export const HolisticSticker = {
       noinspect: true,
       connection: true
     },
+    index: {
+      $type: 'Number',
+      range: {min: 0, max: 468, step: 1}
+    },
     outputImage: {
       $type: 'Image',
       noinspect: true,
@@ -89,7 +93,7 @@ export const HolisticSticker = {
   },
   Holistic: {
     $kind: 'Mediapipe/HolisticSticker',
-    $inputs: ['data', 'sticker'],
+    $inputs: ['data', 'sticker', 'index'],
     $outputs: ['outputImage']
   }
 };

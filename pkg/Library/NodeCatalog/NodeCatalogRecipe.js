@@ -29,11 +29,11 @@ export const NodeCatalogRecipe = {
     $kind:'$library/NodeCatalog/NodeCatalog',
     $slots: {
       nodeSearch: {
-        // SearchBar: {
-        //   $kind: '$library/NodeCatalog/SearchBar',
-        //   $inputs: [{'search': 'nodeSearch'}],
-        //   $outputs: [{'search': 'nodeSearch'}]
-        // }
+        SearchBar: {
+          $kind: '$library/NodeCatalog/SearchBar',
+          $inputs: [{'search': 'nodeSearch'}],
+          $outputs: [{'search': 'nodeSearch'}]
+        }
       },
       categories: {
         CategoryCatalog: {

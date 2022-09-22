@@ -3,13 +3,8 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-/* global scope */
+/* global themeRules */
 ({
-  async update({show}, state, {service}) {
-    // if (show === true) {
-    //   state.showTools = true;
-    // }
-  },
   render({show}, {showTools}) {
     return {
       showTools: show
@@ -17,34 +12,14 @@
   },
   async onToggleFlyOverClick({show}, state, {service}) {
     return {show: false};
-    //state.showTools = !state.showTools;
   },
   template: html`
 <style>
   :host {
     position: absolute;
     flex: 0 !important;
+    ${themeRules}
   }
-  /* beachball */
-  /* [tools-button] {
-    position: fixed;
-    bottom: -15px;
-    right: -15px;
-    width: 32px;
-    height: 32px;
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 1s ease-out;
-    border-radius: 50%;
-  }
-  [tools-button]:hover {
-    opacity: 1;
-  }
-  [tools-button] > img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-  } */
   [scrim],[flyout] {
     z-index: 10000;
   }
@@ -86,10 +61,6 @@
     height: 50%;
     left: 0;
     transform: translateY(-120%);
-    /*
-    min-width: min(320px, 100vw);
-    max-width: min(100vw, 800px);
-    */
   }
   [bottom] {
     transform: translateY(120%);
@@ -99,12 +70,6 @@
   }
 </style>
 
-<!-- flyout button -->
-<!-- <div tools-button on-click="onToggleFlyOverClick">
-  <img src=${scope.resolve('$library/App/assets/rainbow-128-opt.gif')}>
-</div> -->
-
-<!-- flyout -->
 <div scrim show$="{{showTools}}" on-click="onToggleFlyOverClick"></div>
 <div top flyout flex rows show$="{{showTools}}" frame="flyout"></div>
 `
