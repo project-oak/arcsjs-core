@@ -352,19 +352,16 @@ export class TensorFlowService  {
   static async preprocessImage(
       {image, resize, normalize, expandDim, existingTensorId}) {
     const canvas = await requireImage(image);
-
     if (canvas?.width > 0 && canvas?.height > 0) {
       const outputTensor = tf.tidy(() => {
         // Image to tensor
         //
         let tensor = tf.browser.fromPixels(canvas);
-
         // Expend dim.
         //
         if (expandDim) {
           tensor = tf.expandDims(tensor);
         }
-
         // Resize.
         //
         // For target resize size, first try using the given size. If not
@@ -380,7 +377,6 @@ export class TensorFlowService  {
           tensor = tf.image.resizeBilinear(
               tensor, [Math.floor(resizeHeight), Math.floor(resizeWidth)]);
         }
-
         // Normalize.
         //
         if (normalize) {
@@ -392,7 +388,6 @@ export class TensorFlowService  {
             tensor = tf.add(tf.mul(tensor, scale), offset);
           }
         }
-
         return tensor;
       });
       return this.storeTensorInResources(existingTensorId, outputTensor);
@@ -403,34 +398,27 @@ export class TensorFlowService  {
   //
   static async postprocessDepthModel({tensorId, size, config, existingTensorId}) {
     const tensor = Resources.get(tensorId);
-
     if (tensor) {
-
       const outputTensor = tf.tidy(() => {
         // Divided by 2.
         //
         let outputTensor = tf.div(tensor, tf.scalar(2));
-
         // Remap to min/max depth
         //
         const {scale, offset} = this.transformValueRange(
             0, 1, config.minDepth, config.maxDepth);
         outputTensor = tf.add(tf.mul(outputTensor, scale), offset);
-
         // Clip to [0, 1]
         //
         outputTensor = tf.clipByValue(outputTensor, 0,  1);
-
         // Resize to the size of the original image.
         //
         if (size) {
           outputTensor = tf.image.resizeBilinear(
               outputTensor, [Math.floor(size.height), Math.floor(size.width)]);
         }
-
         return outputTensor;
       });
-
       return this.storeTensorInResources(existingTensorId, outputTensor);
     }
   }
@@ -445,7 +433,6 @@ export class TensorFlowService  {
         existingTensor.dispose();
       }
     }
-
     // Allocate a resource id (if necessary) and store the given tensor with
     // the id.
     const tensorId = existingTensorId || Resources.newId();

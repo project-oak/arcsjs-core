@@ -24,6 +24,11 @@ export class DesignerLayout extends DragDrop {
   _didMount() {
     this.boxer = this._dom.$('[boxer]');
     this.setupKeyboardShortcut();
+    this.setupObserver();
+  }
+  setupObserver() {
+    const observer = new MutationObserver(info => this.updateSelectionAndPositions(this.selected, this.rects));
+    observer.observe(this, {childList: true});
   }
   setupKeyboardShortcut() {
     document.addEventListener('keydown', (event) => {
@@ -50,18 +55,6 @@ export class DesignerLayout extends DragDrop {
       this.fire('delete');
     }
   }
-  update({selected, rects}, state) {
-    const selectedJson = JSON.stringify(selected);
-    const rectsJson = JSON.stringify(rects);
-    if (state.selectedJson !== selectedJson || rectsJson !== rectsJson) {
-      state.selectedJson = selectedJson;
-      state.rectsJson = rectsJson;
-      // eek
-      setTimeout(() => {
-        this.updateSelectionAndPositions(selected, rects);
-      }, 100);
-    }
-  }
   render({color}) {
     const styleOverrides = `
       [edge] {
@@ -79,7 +72,7 @@ export class DesignerLayout extends DragDrop {
   updateSelectionAndPositions(selected, rects) {
     rects?.forEach(({id, position}) => this.position(id, position));
     this.select(null);
-    selected.forEach(id => {
+    selected?.forEach(id => {
       if (this.getChildById(id)) {
         this.select(id);
       }
@@ -93,7 +86,7 @@ export class DesignerLayout extends DragDrop {
       if (rect) {
         assign(rect, {l: 16, t: 16, w: 240, h: 180});
         this.setBoxStyle(target, rect);
-        this.firePosition(target);
+        //this.firePosition(target);
       }
     } else {
       const child = this.getChildById(id);

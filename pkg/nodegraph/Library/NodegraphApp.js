@@ -12,11 +12,11 @@ import {HistoryService} from '../../Library/App/HistoryService.js';
 import {MediaService} from '../../Library/NewMedia/MediaService.js';
 import {GoogleApisService} from '../../Library/Goog/GoogleApisService.js';
 import {MediapipeService} from '../../Library/Mediapipe/MediapipeService.js';
-import {NodegraphRecipe} from './NodegraphRecipe.js';
-import {logFactory} from '../../Library/Core/utils.min.js';
+import {ThreejsService} from '../../Library/Threejs/ThreejsService.js';
 import {TensorFlowService} from '../../Library/TensorFlow/TensorFlowService.js';
 import {ShaderService} from '../../Library/Shader/ShaderService.js';
-import {ThreejsService} from '../../Library/Threejs/ThreejsService.js';
+import {NodegraphRecipe} from './NodegraphRecipe.js';
+import {logFactory} from '../../Library/Core/utils.min.js';
 
 const log = logFactory(true, 'Nodegraph', 'navy');
 
@@ -25,7 +25,7 @@ export const NodegraphApp = class extends App {
   constructor(paths) {
     super(paths);
     this.persistor = new LocalStoragePersistor('user');
-    this.services = {HistoryService, MediaService, GoogleApisService, MediapipeService, TensorFlowService, ShaderService, ThreejsService},
+    this.services = {HistoryService, MediaService, GoogleApisService, ThreejsService, ShaderService, MediapipeService, TensorFlowService};
     this.userAssembly = [NodegraphRecipe];
     log('Welcome!');
   }

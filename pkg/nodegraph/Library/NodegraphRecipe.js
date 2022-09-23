@@ -7,8 +7,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {nodeTypes, categories} from './Nodes/nodeTypes.js';
-import {customInspectors} from './Inspectors/customInspectors.js';
+import {nodeTypes, categories} from './nodeTypes.js';
+import {customInspectors} from './customInspectors.js';
 import {NodeCatalogRecipe} from '../../Library/NodeCatalog/NodeCatalogRecipe.js';
 
 const globalStores = [
@@ -82,6 +82,9 @@ export const NodegraphRecipe = {
       $value: categories
     }
   },
+  // 'a_frame': {
+  //   $kind: '$library/AFrame/Scene.js'
+  // },
   main: {
     $kind: '$app/Library/Nodegraph',
     $slots: {

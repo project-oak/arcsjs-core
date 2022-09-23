@@ -34,6 +34,10 @@ template: html`
     border-right: 1px solid var(--theme-color-bg-2);
   }
   /**/
+  a-scene > canvas {
+    position: static !important;
+  }
+  /**/
   [left] {
     width: 250px;
     transition: all 200ms ease-in;
@@ -68,7 +72,9 @@ template: html`
   <!-- page 1 -->
   <div flex row>
     <!-- left -->
-    <div left collapsed$="{{leftCollapsed}}" column section frame="catalog"></div>
+    <div left collapsed$="{{leftCollapsed}}" column section>
+      <div flex frame="catalog"></div>
+    </div>
     <!-- center -->
     <split-panel vertical flex section row>
       <div slot="left" flex column>

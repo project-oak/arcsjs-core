@@ -46,7 +46,8 @@ export class XenComposer extends Composer {
       id: sanitizeId(id)
     }, parent);
     container.setAttribute('particle', id);
-    const root = this.useShadowRoot ? container.attachShadow({mode: `open`}) : container;
+    // TODO(sjmiles): a_ hack is for a_frame elements that cannot live in ShadowDOM
+    const root = (!id.toLowerCase().startsWith('a_') && this.useShadowRoot) ? container.attachShadow({mode: `open`}) : container;
     const slot = Template
       .stamp(template)
       .appendTo(root)
