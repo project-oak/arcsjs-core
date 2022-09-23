@@ -80,7 +80,7 @@ export const Test = {
     }
   },
   test: {
-    $kind: '$app/nodegraph/Library/Test',
+    $kind: '$app/Library/Test',
     $inputs: [
       'theString',
       'stringWithDefault',
@@ -116,7 +116,7 @@ export const TestStrList = {
     },
   },
   test: {
-    $kind: '$app/nodegraph/Library/Noop',
+    $kind: '$library/Noop',
   }
 };
 
@@ -132,7 +132,7 @@ export const TestObjList = {
     },
   },
   test: {
-    $kind: '$app/nodegraph/Library/Noop',
+    $kind: '$library/Noop',
   }
 };
 
@@ -174,6 +174,6 @@ export const InspectedTest = {
     }
   },
   testInspected: {
-    $kind: '$app/nodegraph/Library/Noop',
+    $kind: '$library/Noop',
   }
 };
