@@ -172,7 +172,11 @@ const handlers = {
     }
   },
   destroyParticle: async ({name, arc}) => {
-    getArc(arc)?.hosts[name]?.detach();
+    const host = getArc(arc)?.hosts[name];
+    if (host) {
+      host.detach();
+      delete getArc(arc)?.hosts[name];
+    }
   },
   setInputs: async ({arc, particle, inputs}) => {
     const realArc = getArc(arc);

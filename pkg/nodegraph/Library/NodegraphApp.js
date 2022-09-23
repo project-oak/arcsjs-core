@@ -17,8 +17,6 @@ import {logFactory} from '../../Library/Core/utils.min.js';
 import {TensorFlowService} from '../../Library/TensorFlow/TensorFlowService.js';
 import {ShaderService} from '../../Library/Shader/ShaderService.js';
 import {ThreejsService} from '../../Library/Threejs/ThreejsService.js';
-import {makeName} from '../../Library/Core/utils.min.js';
-
 
 const log = logFactory(true, 'Nodegraph', 'navy');
 
@@ -31,64 +29,22 @@ export const NodegraphApp = class extends App {
     this.userAssembly = [NodegraphRecipe];
     log('Welcome!');
   }
-//};
 
-// application service
-async onservice(runtime, host, {msg, data}) {
-  switch (msg) {
-    // case 'makeName':
-    //   return makeName();
-    case 'addEditor':
-      return this.addEditor(runtime, host, data);
-    case 'addParticle':
-      return this.addParticle(runtime, host, data);
-  }
-}
-async addEditor(runtime, host, props) {
-  this.arcs.createParticle('editor', 'user', makeEditorParticleMeta(props));
-  return true;
-}
-async addParticle(runtime, host, props) {
-  const name = makeName();
-  const code = packageParticleSource(props);
-  const meta = {
-    ...this.getMeta(props),
-    kind: name,
-    container: 'librarian#canvas'
-  };
-  log(meta);
-  this.arcs.createParticle(name, 'user', meta, code);
-  return true;
-}
-getMeta(props) {
-  try {
-    const userMeta = JSON.parse(`{${props.meta}}`);
-    return (typeof userMeta === 'object') ? {...userMeta} : null;
-  } catch(x) {
-    // warn user somehow
-  }
-  return null;
-}
-};
-
-const makeEditorParticleMeta = props => ({
-  kind: '$app/../librarian/Library/Editor.js',
-  container: 'librarian#editors',
-  staticInputs: {
-    name: props?.name ?? makeName(),
-    particle: {
-      code: props?.code ?? '',
-      html: props?.html ?? ''
+  // application service
+  async onservice(runtime, host, {msg, data}) {
+    switch (msg) {
+      case 'addParticle':
+        return this.addParticle(runtime, host, data);
+      case 'destroyParticle':
+        return this.destroyParticle(runtime, host, data);
     }
-  },
-  inputs: [{library: 'library'}],
-  outputs: [{library: 'library'}]
-});
-
-const packageParticleSource = props =>
-  `({
-  ${props?.code ? `${props?.code},
-  ` : ''}${props?.html ? `template: html\`
-  ${props?.html}
-  \`` : ''}});
-`;
+  }
+  async addParticle(runtime, host, {name, meta, code}) {
+    this.arcs.createParticle(name, 'user', meta, code);
+    return true;
+  }
+  async destroyParticle(runtime, host, {name}) {
+    this.arcs.destroyParticle(name, 'user');
+    return true;
+  }
+};
