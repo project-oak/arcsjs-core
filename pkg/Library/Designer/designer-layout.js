@@ -23,22 +23,18 @@ export class DesignerLayout extends DragDrop {
   }
   _didMount() {
     this.boxer = this._dom.$('[boxer]');
-    this.setupKeyboardShortcut();
-    this.setupObserver();
+    document.addEventListener('keydown', event => this.onKeydown(event));
   }
-  setupObserver() {
-    const observer = new MutationObserver(info => this.updateSelectionAndPositions(this.selected, this.rects));
-    observer.observe(this, {childList: true});
+  update() {
+    this.updateGeometry();
   }
-  setupKeyboardShortcut() {
-    document.addEventListener('keydown', (event) => {
-      if (!this.hasActiveInput()) {
-        // Delete the selected node or edge when pressing the "backspace" or "delete" key .
-        if (event.key === 'Backspace' || event.key === 'Delete') {
-          this.deleteAction(this.target);
-        }
+  onKeydown(event) {
+    if (!this.hasActiveInput()) {
+      // Delete the selected node or edge when pressing the "backspace" or "delete" key .
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        this.deleteAction(this.target);
       }
-    });
+    }
   }
   hasActiveInput() {
     const active = this.getActiveElement(document);
@@ -48,12 +44,6 @@ export class DesignerLayout extends DragDrop {
   }
   getActiveElement({activeElement}) {
     return activeElement?.shadowRoot ? this.getActiveElement(activeElement.shadowRoot) : activeElement;
-  }
-  deleteAction(target) {
-    if (target) {
-      this.key = target.id;
-      this.fire('delete');
-    }
   }
   render({color}) {
     const styleOverrides = `
@@ -69,6 +59,18 @@ export class DesignerLayout extends DragDrop {
     };
   }
   /**/
+  deleteAction(target) {
+    if (target) {
+      this.key = target.id;
+      this.fire('delete');
+    }
+  }
+  onSlotChange() {
+    this.updateGeometry();
+  }
+  updateGeometry() {
+    this.updateSelectionAndPositions(this.selected, this.rects);
+  }
   updateSelectionAndPositions(selected, rects) {
     rects?.forEach(({id, position}) => this.position(id, position));
     this.select(null);
@@ -84,7 +86,9 @@ export class DesignerLayout extends DragDrop {
       const target = this.getChildById(id);
       const rect = target && this.getRect(target);
       if (rect) {
-        assign(rect, {l: 16, t: 16, w: 240, h: 180});
+        this.newbies = (this.newbies || 0) + 1;
+        const [m, n] = [this.newbies * 8, this.newbies * 8];
+        assign(rect, {l: 16 + m, t: 16 + n, w: 240, h: 180});
         this.setBoxStyle(target, rect);
         //this.firePosition(target);
       }
@@ -320,7 +324,7 @@ export class DesignerLayout extends DragDrop {
 </style>
 <style>${'{{styleOverrides}}'}</style>
 <div container on-pointerdown="onContainerDown">
-  <slot on-pointerdown="onDown" on-pointerup="onUp"></slot>
+  <slot on-pointerdown="onDown" on-pointerup="onUp" on-slotchange="onSlotChange"></slot>
 </div>
 <div boxer on-pointerdown="onDown">
   <div top edge></div>
