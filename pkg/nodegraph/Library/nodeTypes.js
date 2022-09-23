@@ -17,7 +17,8 @@ import * as newMediaNodes from '../../Library/NewMedia/Nodes/Nodes.js';
 import * as mobilenetNodes from '../../Library/Mobilenet/MobilenetNodes.js';
 import * as displayNodes from '../../Library/Display/DisplayNodes.js';
 import * as shaderNodes from '../../Library/Shader/ShaderNodes.js';
-import {SceneNode} from '../../Library/AFrame/SceneNode.js';
+// import {SceneNode} from '../../Library/AFrame/SceneNode.js';
+import {ThreejsEditorNode} from '../../Library/Threejs/ThreejsEditorNode.js';
 
 const fieldNodes = Object.values(baseFieldNodes).map(node => {
   const newNode = {...node};
@@ -41,8 +42,9 @@ export const nodeTypes = [
   ...values(candyNodes),
   ...values(mobilenetNodes),
   ...values(displayNodes),
-  ...values(shaderNodes)
+  ...values(shaderNodes),
   //SceneNode,
+  ThreejsEditorNode
   // ...values(locationNodes),
   // ...values(homescreen),
   // ...values(speech),

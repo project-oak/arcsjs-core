@@ -12,7 +12,7 @@ const create = (tag, props) => Object.assign(document.createElement(tag), props 
 
 export const dom = (tag, props, parent) => parent ? parent.appendChild(create(tag, props)) : create(tag, props);
 
-export const loadScript = async props => new Promise(resolve => dom('script', {type: 'module', ...props, onload: resolve}, document.head));
+export const loadScript = async props => new Promise(resolve => dom('script', {/*type: 'module',*/ ...props, onload: resolve}, document.head));
 
 export const loadCss = async href => dom('link', {type: 'text/css', rel: 'stylesheet', href}, document.head);
 
