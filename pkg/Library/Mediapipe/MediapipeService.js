@@ -78,10 +78,6 @@ export const MediapipeService = {
   }
 };
 
-//const landmarksCanvas = new OffscreenCanvas(640, 480);
-const landmarksCanvas = Object.assign(document.createElement('canvas'), {width: 880, height: 880});
-Resources.set('landmarksCanvas', landmarksCanvas);
-
 export const Mediapipe = {
   getFaceMesh() {
     const locateFile = file => `${local}/../../third_party/mediapipe/face_mesh/${file}`;
@@ -121,7 +117,7 @@ export const Mediapipe = {
   },
   async classify(classifier, testImage) {
     if (Mediapipe.busy) {
-      return {}; //{canvas: 'landmarksCanvas'};
+      return {};
     }
     // TODO(sjmiles): probably want some timeout protection to keep
     // this from becoming stuck true in case of error
@@ -132,24 +128,14 @@ export const Mediapipe = {
         Mediapipe.busy = false;
       });
       classifier.send({image: testImage});
-      // if (testImage && testImage.width && testImage.height) {
-      //   Object.assign(landmarksCanvas, {width: testImage.width, height: testImage.height});
-      // }
     });
     //
     const fullResults = await promise;
     const {canvas, image, ...results} = fullResults;
-    //return {results};
-    return {results: {...results, width: testImage.width, height: testImage.height}}; //, canvas: 'landmarksCanvas'};
+    return {
+      results: {...results, width: testImage.width, height: testImage.height}
+    };
   },
-  // render(results) {
-  //   const {width, height} = landmarksCanvas;
-  //   const ctx = landmarksCanvas.getContext('2d');
-  //   ctx.clearRect(0, 0, width, height);
-  //   this.renderHands(ctx, results);
-  //   //this.renderFace(ctx, results);
-  //   //this.renderSticker(ctx, results);
-  // },
   renderHands(ctx, {rightHandLandmarks, leftHandLandmarks}) {
     const radius = data => lerp(data.from.z, -0.15, .1, 10, 1);
     drawLandmarks(ctx, rightHandLandmarks, {
