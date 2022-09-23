@@ -8,13 +8,16 @@
 import {Resources} from '../App/Resources.js';
 import {loadImage} from '../Media/ImageLoader.js';
 //
-import '../../third_party/mediapipe/holistic.js';
+import '../../third_party/mediapipe/holistic/holistic.js';
 const {Holistic} = globalThis;
+
+import '../../third_party/mediapipe/face_mesh/face_mesh.js';
+const {FaceMesh} = globalThis;
+
 import '../../third_party/mediapipe/drawing_utils.js';
 const {drawLandmarks, drawConnectors, lerp} = globalThis;
 
 const local = import.meta.url.split('/').slice(0, -1).join('/');
-const locateFile = file => `${local}/../../third_party/mediapipe/${file}`;
 
 const mpHolistic = globalThis;
 
@@ -27,10 +30,16 @@ const scalar = 25;
 export const MediapipeService = {
   async holistic({image}) {
     const realCanvas = Resources.get(image?.canvas);
+    return realCanvas ? Mediapipe.holistic(realCanvas) : {};
+  },
+  async faceMesh({image}) {
+    const realCanvas = Resources.get(image?.canvas);
+    let results = {};
     if (realCanvas) {
-      return Mediapipe.holistic(realCanvas);
+      results = await Mediapipe.faceMesh(realCanvas);
+      results.image = {canvas: results?.canvas, stream: image?.stream, version: Math.random()};
     }
-    return {};
+    return results;
   },
   async clear({target}) {
     const realTarget = Resources.get(target);
@@ -40,18 +49,22 @@ export const MediapipeService = {
     }
   },
   async renderSticker({data, sticker, target, index}) {
-    const faceLandmarks = data?.faceLandmarks;
+    const faceLandmarks = data?.faceLandmarks ?? data?.multiFaceLandmarks?.[0];
     const realTarget = Resources.get(target);
     const realSticker = sticker ? Resources.get(sticker) : masque;
-    if (faceLandmarks && realTarget) {
+    const {width, height} = data ?? 0;
+    if (faceLandmarks && realTarget && width && height) {
+      Object.assign(realTarget, {width, height});
       const ctx = realTarget.getContext('2d');
       Mediapipe.renderSticker(ctx, {faceLandmarks}, realSticker, index);
     }
   },
   async renderFace({data, target}) {
-    const faceLandmarks = data?.faceLandmarks;
+    const faceLandmarks = data?.faceLandmarks ?? data?.multiFaceLandmarks?.[0];
     const realTarget = Resources.get(target);
-    if (faceLandmarks && realTarget) {
+    const {width, height} = data ?? 0;
+    if (faceLandmarks && realTarget && width && height) {
+      Object.assign(realTarget, {width, height});
       const ctx = realTarget.getContext('2d');
       Mediapipe.renderFace(ctx, {faceLandmarks});
     }
@@ -70,14 +83,30 @@ const landmarksCanvas = Object.assign(document.createElement('canvas'), {width: 
 Resources.set('landmarksCanvas', landmarksCanvas);
 
 export const Mediapipe = {
+  getFaceMesh() {
+    const locateFile = file => `${local}/../../third_party/mediapipe/face_mesh/${file}`;
+    const facemesh = new FaceMesh({locateFile});
+    facemesh.setOptions({
+      modelComplexity: 1, // 0, 1, 2
+      smoothLandmarks: true, // reduce jitter in landmarks
+      //enableSegmentation: true, // also produce segment mask
+      //smoothSegmentation: true, // reduce jitter in segment mask
+      //refineFaceLandmarks: true, // more detail in mouth and iris
+      minDetectionConfidence: 0.5, // human detection thresholds
+      minTrackingConfidence: 0.5
+    });
+    Mediapipe.getFaceMesh = () => facemesh;
+    return facemesh;
+  },
   getHolistic() {
+    const locateFile = file => `${local}/../../third_party/mediapipe/holistic/${file}`;
     const holistic = new Holistic({locateFile});
     holistic.setOptions({
       modelComplexity: 1, // 0, 1, 2
       smoothLandmarks: true, // reduce jitter in landmarks
-      enableSegmentation: true, // also produce segment mask
-      smoothSegmentation: true, // reduce jitter in segment mask
-      refineFaceLandmarks: true, // more detail in mouth and iris
+      //enableSegmentation: true, // also produce segment mask
+      //smoothSegmentation: true, // reduce jitter in segment mask
+      //refineFaceLandmarks: true, // more detail in mouth and iris
       minDetectionConfidence: 0.5, // human detection thresholds
       minTrackingConfidence: 0.5
     });
@@ -85,38 +114,42 @@ export const Mediapipe = {
     return holistic;
   },
   async holistic(image) {
+    return this.classify(Mediapipe.getHolistic(), image);
+  },
+  async faceMesh(image) {
+    return this.classify(Mediapipe.getFaceMesh(), image);
+  },
+  async classify(classifier, testImage) {
     if (Mediapipe.busy) {
-      return {canvas: 'landmarksCanvas'};
+      return {}; //{canvas: 'landmarksCanvas'};
     }
     // TODO(sjmiles): probably want some timeout protection to keep
     // this from becoming stuck true in case of error
     Mediapipe.busy = true;
-    //
-    const classifier = Mediapipe.getHolistic();
     const promise = new Promise(resolve => {
       classifier.onResults(results => {
-        Mediapipe.render(results);
         resolve(results);
         Mediapipe.busy = false;
       });
-      classifier.send({image});
-      if (image && image.width && image.height) {
-        Object.assign(landmarksCanvas, {width: image.width, height: image.height});
-      }
+      classifier.send({image: testImage});
+      // if (testImage && testImage.width && testImage.height) {
+      //   Object.assign(landmarksCanvas, {width: testImage.width, height: testImage.height});
+      // }
     });
     //
     const fullResults = await promise;
-    const {canvas, ...results} = fullResults;
-    return {results, canvas: 'landmarksCanvas'};
+    const {canvas, image, ...results} = fullResults;
+    //return {results};
+    return {results: {...results, width: testImage.width, height: testImage.height}}; //, canvas: 'landmarksCanvas'};
   },
-  render(results) {
-    const {width, height} = landmarksCanvas;
-    const ctx = landmarksCanvas.getContext('2d');
-    ctx.clearRect(0, 0, width, height);
-    this.renderHands(ctx, results);
-    //this.renderFace(ctx, results);
-    //this.renderSticker(ctx, results);
-  },
+  // render(results) {
+  //   const {width, height} = landmarksCanvas;
+  //   const ctx = landmarksCanvas.getContext('2d');
+  //   ctx.clearRect(0, 0, width, height);
+  //   this.renderHands(ctx, results);
+  //   //this.renderFace(ctx, results);
+  //   //this.renderSticker(ctx, results);
+  // },
   renderHands(ctx, {rightHandLandmarks, leftHandLandmarks}) {
     const radius = data => lerp(data.from.z, -0.15, .1, 10, 1);
     drawLandmarks(ctx, rightHandLandmarks, {

@@ -10,7 +10,7 @@
 export const Holistic = {
   $meta: {
     description: 'Mediapipe Holistic',
-    name: 'Holistic',
+    name: 'Mediapipe Holistic',
     category: 'Model'
   },
   $stores: {
@@ -38,15 +38,46 @@ export const Holistic = {
   }
 };
 
-export const HolisticFace = {
+export const MediapipeFaceMesh = {
   $meta: {
-    description: 'Mediapipe Holistic Face',
-    name: 'Holistic Face',
+    description: 'Mediapipe FaceMesh',
+    name: 'Mediapipe FaceMesh',
+    category: 'Model'
+  },
+  $stores: {
+    image: {
+      $type: 'Image',
+      noinspect: true,
+      nomonitor: true,
+      connection: true
+    },
+    outputImage: {
+      $type: 'Image',
+      noinspect: true,
+      nomonitor: true
+    },
+    data: {
+      $type: 'FaceData',
+      nomonitor: true,
+      noinspect: true
+    }
+  },
+  FaceMesh: {
+    $kind: 'Mediapipe/FaceMesh',
+    $inputs: ['image'],
+    $outputs: ['data']
+  }
+};
+
+export const MediapipeFaceMeshFace = {
+  $meta: {
+    description: 'FaceMesh',
+    name: 'FaceMesh',
     category: 'Effect'
   },
   $stores: {
     data: {
-      $type: 'HolisticData',
+      $type: 'FaceData',
       nomonitor: true,
       noinspect: true,
       connection: true
@@ -57,22 +88,22 @@ export const HolisticFace = {
       nomonitor: true
     }
   },
-  Holistic: {
-    $kind: 'Mediapipe/HolisticFace',
+  FaceMeshFace: {
+    $kind: 'Mediapipe/FaceMeshFace',
     $inputs: ['data'],
     $outputs: ['outputImage']
   }
 };
 
-export const HolisticSticker = {
+export const MediapipeFaceSticker = {
   $meta: {
-    description: 'Mediapipe Holistic Sticker',
-    name: 'Holistic Sticker',
+    description: 'Mediapipe Face Sticker',
+    name: 'Face Sticker',
     category: 'Effect'
   },
   $stores: {
     data: {
-      $type: 'HolisticData',
+      $type: 'FaceData',
       nomonitor: true,
       noinspect: true,
       connection: true
@@ -91,8 +122,8 @@ export const HolisticSticker = {
       connection: true
     }
   },
-  Holistic: {
-    $kind: 'Mediapipe/HolisticSticker',
+  FaceSticker: {
+    $kind: 'Mediapipe/FaceSticker',
     $inputs: ['data', 'sticker', 'index'],
     $outputs: ['outputImage']
   }
