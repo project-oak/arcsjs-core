@@ -12,6 +12,7 @@ import * as testNodes from './Nodes/TestNodes.js';
 import * as miscNodes from './Nodes/MiscNodes.js';
 import * as baseFieldNodes from './FieldNodes/FieldNodes.js';
 import * as candyNodes from './Nodes/CandyNodes.js';
+import * as customNodes from '../Librarian/CustomNodes.js';
 import * as mediapipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
 import * as newMediaNodes from '../../Library/NewMedia/Nodes/Nodes.js';
 import * as mobilenetNodes from '../../Library/Mobilenet/MobilenetNodes.js';
@@ -44,7 +45,8 @@ export const nodeTypes = [
   ...values(displayNodes),
   ...values(shaderNodes),
   //SceneNode,
-  ThreejsEditorNode
+  ThreejsEditorNode,
+  ...values(customNodes)
   // ...values(locationNodes),
   // ...values(homescreen),
   // ...values(speech),

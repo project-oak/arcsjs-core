@@ -29,4 +29,22 @@ export const NodegraphApp = class extends App {
     this.userAssembly = [NodegraphRecipe];
     log('Welcome!');
   }
+
+  // application service
+  async onservice(runtime, host, {msg, data}) {
+    switch (msg) {
+      case 'addParticle':
+        return this.addParticle(runtime, host, data);
+      case 'destroyParticle':
+        return this.destroyParticle(runtime, host, data);
+    }
+  }
+  async addParticle(runtime, host, {name, meta, code}) {
+    this.arcs.createParticle(name, 'user', meta, code);
+    return true;
+  }
+  async destroyParticle(runtime, host, {name}) {
+    this.arcs.destroyParticle(name, 'user');
+    return true;
+  }
 };

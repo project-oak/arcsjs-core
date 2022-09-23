@@ -16,7 +16,8 @@ const globalStores = [
   'selectedPipeline',
   'nodeTypes',
   'hoveredNodeKey',
-  'categories'
+  'categories',
+  'nodeKey',
 ];
 
 const PipelineToolbar = {
