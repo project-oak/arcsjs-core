@@ -61,7 +61,10 @@ export const NodegraphRecipe = {
       $type: 'JSON',
       $value: null
     },
-    selectedNode: {
+    selectedNodeKey: {
+      $type: 'String', //'JSON'
+    },
+    candidates: {
       $type: 'JSON'
     },
     nodeTypes: {
@@ -87,108 +90,108 @@ export const NodegraphRecipe = {
   //   $kind: '$library/AFrame/Scene.js'
   // },
   main: {
-    $kind: '$app/Library/Nodegraph',
-    $slots: {
-      catalog: NodeCatalogRecipe,
-      toolbar: {
-        PipelineToolbar
-      },
-      preview: {
-        runner: {
-          $kind: '$library/Designer/Designer',
-          $inputs: [
-            'recipes',
-            {pipeline: 'selectedPipeline'},
-            'selectedNode',
-            'nodeTypes',
-            'categories',
-          ],
-          $outputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNode'
-          ]
-        }
-      },
-      editor: {
-        Editor: {
-          $kind: 'https://rapsai-core.web.app/0.5.1/Library/Editor',
-          // $kind: 'http://localhost:9876/Library/Editor',
-          //$kind: '$library/NodeGraph/Editor',
-          $inputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNode',
-            'nodeTypes',
-            'hoveredNodeKey',
-            'categories'
-          ],
-          $outputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNode'
-          ]
-        }
-      },
-      inspector: {
-        Inspector: {
-          $kind: '$library/NodeGraph/Inspector',
-          $inputs: [{data: 'inspectorData'}],
-          $outputs: [{data: 'inspectorData'}],
-          $staticInputs: {customInspectors}
-        }
-      },
-      tree: {
-        NodeTree: {
-          $kind: '$library/NodeGraph/NodeTree',
-          $inputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNode',
-            'nodeTypes',
-            'categories'
-          ],
-          $outputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNode'
-          ]
-        }
-      }
-    }
+  $kind: '$app/Library/Nodegraph',
+  $slots: {
+    catalog: NodeCatalogRecipe,
+    toolbar: {
+      PipelineToolbar
+    },
+    // preview: {
+    //   runner: {
+    //     $kind: '$library/Designer/Designer',
+    //     $inputs: [
+    //       'recipes',
+    //       {pipeline: 'selectedPipeline'},
+    //       'selectedNode',
+    //       'nodeTypes',
+    //       'categories',
+    //     ],
+    //     $outputs: [
+    //       {pipeline: 'selectedPipeline'},
+    //       'selectedNode'
+    //     ]
+    //   }
+    // },
+    // editor: {
+    // Editor: {
+    // $kind: 'https://rapsai-core.web.app/0.5.1/Library/Editor',
+    // // $kind: 'http://localhost:9876/Library/Editor',
+    // //$kind: '$library/NodeGraph/Editor',
+    // $inputs: [
+    // {pipeline: 'selectedPipeline'},
+    // 'selectedNode',
+    // 'nodeTypes',
+    // 'hoveredNodeKey',
+    // 'categories'
+    // ],
+    // $outputs: [
+    // {pipeline: 'selectedPipeline'},
+    // 'selectedNode'
+    // ]
+    // }
+    // },
+    // inspector: {
+    // Inspector: {
+    // $kind: '$library/NodeGraph/Inspector',
+    // $inputs: [{data: 'inspectorData'}],
+    // $outputs: [{data: 'inspectorData'}],
+    // $staticInputs: {customInspectors}
+    // }
+    // },
+    // tree: {
+    // NodeTree: {
+    // $kind: '$library/NodeGraph/NodeTree',
+    // $inputs: [
+    // {pipeline: 'selectedPipeline'},
+    // 'selectedNode',
+    // 'nodeTypes',
+    // 'categories'
+    // ],
+    // $outputs: [
+    // {pipeline: 'selectedPipeline'},
+    // 'selectedNode'
+    // ]
+    // }
+    // }
+    // }
   },
-  nodeInspector: {
-    $kind: '$library/NodeGraph/NodeInspector',
-    $inputs: [
-      {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'},
-      'nodeTypes'
-    ],
-    $outputs: [{data: 'inspectorData'}]
-  },
-  nodeUpdator: {
-    $kind: '$library/NodeGraph/NodeUpdator',
-    $inputs: [
-      {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'},
-      {data: 'inspectorData'}
-    ],
-    $outputs: [
-      {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'}
-    ]
-  },
-  nodesConnector: {
-    $kind: '$library/NodeGraph/NodesConnector',
-    $inputs: [
-      {pipeline: 'selectedPipeline'},
-      'selectedNode',
-      'nodeTypes'
-    ],
-    $outputs: [
-      {pipeline: 'selectedPipeline'},
-      'selectedNode',
-      'recipes'
-    ],
-    $staticInputs: {
-      customInspectors,
-      inspectorData: 'inspectorData',
-      globalStores
-    }
+  // nodeInspector: {
+  // $kind: '$library/NodeGraph/NodeInspector',
+  // $inputs: [
+  // {node: 'selectedNode'},
+  // {pipeline: 'selectedPipeline'},
+  // 'nodeTypes'
+  // ],
+  // $outputs: [{data: 'inspectorData'}]
+  // },
+  // nodeUpdator: {
+  // $kind: '$library/NodeGraph/NodeUpdator',
+  // $inputs: [
+  // {node: 'selectedNode'},
+  // {pipeline: 'selectedPipeline'},
+  // {data: 'inspectorData'}
+  // ],
+  // $outputs: [
+  // {node: 'selectedNode'},
+  // {pipeline: 'selectedPipeline'}
+  // ]
+  // },
+  // nodesConnector: {
+  // $kind: '$library/NodeGraph/NodesConnector',
+  // $inputs: [
+  // {pipeline: 'selectedPipeline'},
+  // 'selectedNode',
+  // 'nodeTypes'
+  // ],
+  // $outputs: [
+  // {pipeline: 'selectedPipeline'},
+  // 'selectedNode',
+  // 'recipes'
+  // ],
+  // $staticInputs: {
+  // customInspectors,
+  // inspectorData: 'inspectorData',
+  // globalStores
+  // }
   }
 };
