@@ -4,76 +4,77 @@
  * license that can be found in the LICENSE file.
  */
 ({
-catalogDelimiter: '$$',
+// catalogDelimiter: '$$',
 
-render({selectedNodeTypes}, {showInfoPanel, infoPanelTop}) {
+update({selectedNodeTypes}, state) {
+  state.nodeTypeList = values(selectedNodeTypes).sort(this.sortNodeTypes);
+},
+
+render({}, {nodeTypeList, showInfoPanel, infoPanelTop}) {
   return {
-    nodeTypes: this.renderNodeTypes(selectedNodeTypes),
-    hideNoMatchedNodesLabel: selectedNodeTypes.length !== 0,
+    nodeTypes: this.renderNodeTypes(nodeTypeList),
+    hideNoMatchedNodesLabel: nodeTypeList.length !== 0,
     showInfoPanel: String(Boolean(showInfoPanel)),
     infoPanelContainerStyle: {top: `${infoPanelTop}px`}
   };
 },
 
-renderNodeTypes(nodeTypes) {
-  return nodeTypes.sort(this.sortNodeTypes).map(this.renderNodeType.bind(this));
+renderNodeTypes(nodeTypeList) {
+  return nodeTypeList.map(this.renderNodeType.bind(this));
 },
 
-renderNodeType({$meta}) {
-  return {name: $meta.name, key: this.keyFromMeta($meta)};
+renderNodeType({$meta: {name, key}}) {
+  return {name, key};
 },
 
 sortNodeTypes(t1, t2) {
   return t1.$meta.name.toLowerCase().localeCompare(t2.$meta.name.toLowerCase());
 },
 
-keyFromMeta({category, name}) {
-  return `${category}${this.catalogDelimiter}${name}`;
-},
-
 async onItemClick({eventlet: {key}, selectedNodeTypes, pipeline}) {
   if (pipeline) {
-    const [category, type] = key.split(this.catalogDelimiter);
-    const newNode = this.indexNewNode(type, selectedNodeTypes, pipeline.nodes);
-    pipeline.nodes = [...pipeline.nodes, newNode];
+    // TODO(mariakleiner): nodes should be a map!
+    pipeline.nodes = [
+      ...pipeline.nodes,
+      this.makeNewNode(key, this.indexNewNode(key, pipeline.nodes), selectedNodeTypes)
+    ];
     return {pipeline};
   }
 },
 
-indexNewNode(type, nodeTypes, existingNodes) {
-  const nodeType = this.findNodeType(type, nodeTypes);
-  const name = nodeType.$meta.name;
-  const typedNodes = existingNodes.filter(node => name === node.name);
-  const index = (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
+makeNewNode(key, index, nodeTypes) {
+  const name = nodeTypes[key].$meta.name;
   return {
-    name,
-    type,
+    type: key,
     index,
-    key: this.formatNodeKey({name, index}),
-    position: {}
+    key: this.formatNodeKey(key, index),
+    name: this.displayName(name, index)
   };
 },
 
-findNodeType(type, nodeTypes) {
-  return nodeTypes.find(({$meta: {name}}) => name === type);
+indexNewNode(key, nodes) {
+  const typedNodes = nodes.filter(node => key === node.type);
+  return (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
 },
 
-findNodeTypeIndex(node, nodeTypes) {
-  return nodeTypes.findIndex(({$meta: {name}}) => node.name === name);
+displayName(name, index) {
+  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
+  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
 },
 
-formatNodeKey({name, index}) {
-  return `${name}${index}`.replace(/ /g,'');
+formatNodeKey(key, index) {
+  return `${key}${index}`.replace(/ /g,'');
 },
 
 onHoverNodeType({eventlet: {key, value}, selectedNodeTypes}, state) {
-  const [category, name] = key.split(this.catalogDelimiter);
-  state.showInfoPanel = true;
-  // 34 is (approximately) the height of the toolbar
-  state.infoPanelTop = value + 34;
-  const index = this.findNodeTypeIndex({name, category}, selectedNodeTypes.sort(this.sortNodeTypes));
+  assign(state, {
+    showInfoPanel: true,
+    // 34 is (approximately) the height of the toolbar
+    // TODO(mariakleiner): should use node's position!
+    infoPanelTop: value + 34
+  });
   return {
-    hoveredNodeType: selectedNodeTypes[index],
+    hoveredNodeType: selectedNodeTypes[key],
   };
 },
 

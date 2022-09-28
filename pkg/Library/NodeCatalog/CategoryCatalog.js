@@ -6,7 +6,7 @@
 
 ({
 initialize({nodeTypes}, state) {
-  state.selectedCategory = nodeTypes?.[0]?.$meta?.category;
+  state.selectedCategory = values(nodeTypes)?.[0]?.$meta?.category;
 },
 
 update({nodeTypes, search}, state) {
@@ -21,46 +21,69 @@ selectCategory(nodeTypes, category, search) {
 
 filter(nodeTypes, category, search) {
   const matchSearch = (name) => (!search || name.toLowerCase().includes(search.toLowerCase()));
-  return nodeTypes.filter(({$meta}) => ($meta.category === category && matchSearch($meta.name)));
+  // return nodeTypes.filter(({$meta}) => ($meta.category === category && matchSearch($meta.name)));
+  const selectedNodeTypes = {};
+  // return values(nodeTypes)?.filter(({$meta}) => ($meta.category === category && matchSearch($meta.name)));
+  keys(nodeTypes)?.forEach(key => {
+    const nodeType = nodeTypes[key];
+    if (nodeType.$meta.category === category && matchSearch(nodeType.$meta.name)) {
+      selectedNodeTypes[key] = nodeType;
+    }
+  });
+  return selectedNodeTypes;
 },
 
-render({nodeTypes, categories, search}, state) {
+render(inputs, state) {
   return {
-    nodeGroups: this.groupByCategory(nodeTypes, categories, search, state)
+    nodeGroups: this.groupByCategory(inputs, state)
   };
 },
 
-groupByCategory(nodeTypes, categories, search, state) {
-  const groups = [];
-  nodeTypes.forEach(({$meta: {category}}) => this.requireGroup(category, groups, categories));
-  groups.forEach(group => {
-    const selected = group.category === state.selectedCategory;
-    const numSearchResults = search ? this.filter(nodeTypes, group.category, search)?.length : 0;
-    assign(group, {
-      selected,
-      colorStyle: {color: selected ? this.colorByCategory(group.category, categories) : 'inherit'},
-      numSearchResults,
-      hideSearchCount: numSearchResults === 0
-    });
-  });
-  return groups;
+groupByCategory({nodeTypes, categories, search}, state) {
+  const groups = {};
+  values(nodeTypes).forEach(({$meta: {category}}) => this.requireGroup(category, groups, categories));
+  return values(groups).map(group => this.renderGroup(group, nodeTypes, search, categories,state));
+  //   group => {
+  //   const selected = group.category === state.selectedCategory;
+  //   const numSearchResults = search ? keys(this.filter(nodeTypes, group.category, search)).length : 0;
+  //   assign(group, {
+  //     selected,
+  //     colorStyle: {color: selected ? this.colorByCategory(group.category, categories) : 'inherit'},
+  //     numSearchResults,
+  //     hideSearchCount: numSearchResults === 0
+  //   });
+  // });
+  // return groups;
 },
 
 requireGroup(category, groups, categories) {
-  return this.findGroup(category, groups) ?? this.createGroup(category, groups, categories);
+  //return this.findGroup(category, groups) 
+  return groups[category] ?? this.createGroup(category, groups, categories);
 },
 
-findGroup(category, groups) {
-  return groups.find(g => g.category === category);
-},
+// findGroup(category, groups) {
+//   return groups.find(g => g.category === category);
+// },
 
 createGroup(category, groups, categories) {
   const group = {
     category,
     icon: this.iconByCategory(category, categories),
   };
-  groups.push(group);
+  groups[category] = group;
   return group;
+},
+
+renderGroup(group, nodeTypes, search, categories, {selectedCategory}) {
+  const selected = group.category === selectedCategory;
+  const numSearchResults = search ? keys(this.filter(nodeTypes, group.category, search)).length : 0;
+  return {
+    ...group,
+    selected,
+    colorStyle: {color: selected ? this.colorByCategory(group.category, categories) : 'inherit'},
+    numSearchResults,
+    hideSearchCount: numSearchResults === 0
+  };
 },
 
 iconByCategory(category, categories) {

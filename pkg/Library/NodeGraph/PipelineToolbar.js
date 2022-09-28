@@ -195,7 +195,8 @@
     }
     return {
       pipelines,
-      pipeline: pipelines.length > 0 ? pipelines[0] : null
+      pipeline: pipelines.length > 0 ? pipelines[0] : null,
+      selectedNodeKey: null
     };
   },
   onShare({pipeline, pipelines, publishPaths}, {selectedPublishKey}) {

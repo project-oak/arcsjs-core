@@ -9,38 +9,34 @@
  ({
   catalogDelimiter: '$$',
 
-  update({pipeline, selectedNode}, state) {
+  update({pipeline, selectedNodeKey}, state) {
     if (pipeline?.$meta?.name !== state.selectedPipelineName) {
       state.selectedPipelineName = pipeline?.$meta.name;
-      selectedNode = null;
+      selectedNodeKey = null;
     }
-    if (!selectedNode && pipeline?.nodes?.length) {
-      selectedNode = pipeline.nodes[0];
+    if (!selectedNodeKey && pipeline?.nodes?.length) {
+      selectedNodeKey = pipeline.nodes[0].key;
     }
-    return {selectedNode};
+    return {selectedNodeKey};
   },
 
-  findNodeType(name, nodeTypes) {
-    return nodeTypes.find(({$meta}) => $meta.name === name);
-  },
-
-  render({pipeline, nodeTypes, categories, selectedNode}) {
+  render({pipeline, nodeTypes, categories, selectedNodeKey}) {
     return {
-      graphNodes: this.renderGraphNodes(pipeline?.nodes, selectedNode, nodeTypes, categories),
+      graphNodes: this.renderGraphNodes(pipeline?.nodes, selectedNodeKey, nodeTypes, categories),
     };
   },
 
-  renderGraphNodes(nodes, selectedNode, nodeTypes, categories) {
+  renderGraphNodes(nodes, selectedNodeKey, nodeTypes, categories) {
     const graph = {name: 'pipeline', children: []};
     const graphNodes = nodes?.map(node => {
-      const nodeType = this.findNodeType(node.name, nodeTypes);
+      const nodeType = nodeTypes[node.type];
       const category = nodeType?.$meta?.category;
       return {
         key: node.key,
         name: this.nodeDisplay(node),
         color: this.colorByCategory(category, categories),
         bgColor: this.bgColorByCategory(category, categories),
-        strokeWidth: node.key == selectedNode?.key ? 3 : 1,
+        strokeWidth: node.key == selectedNodeKey ? 3 : 1,
         conn: this.renderConnections(node),
         children: []
       };
@@ -52,9 +48,8 @@
     return graph;
   },
 
-  nodeDisplay({name, index}) {
-    const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
-    return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
+  nodeDisplay(node) {
+    return node.displayName || node.name;
   },
 
   colorByCategory(category, categories) {
@@ -66,17 +61,15 @@
   },
 
   renderConnections(node) {
-    if (node.connections) {
-      const selectedCandidates = values(node.connections).map(conn => conn.candidates.find(c => c.selected));
-      return selectedCandidates?.[0]?.from;
-    }
+    const connections = values(node.connections)?.[0];
+    return connections?.[0]?.from;
   },
 
-  onNodeRemove({eventlet: {key}, pipeline, selectedNode}) {
+  onNodeRemove({eventlet: {key}, pipeline, selectedNodeKey}) {
     pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
     return {
       pipeline,
-      selectedNode: key === selectedNode.key ? null : pipeline.nodes.find(n => n.key === selectedNode.key)
+      selectedNodeKey: key === selectedNodeKey ? null : selectedNodeKey
     };
   },
 
@@ -93,43 +86,49 @@
     };
   },
 
-  onNodeSelect({eventlet: {key}, pipeline}) {
-    return {
-      selectedNode: pipeline.nodes.find(node => node.key === key)
-    };
+  onNodeSelect({eventlet: {key}}) {
+    return {selectedNodeKey: key};
   },
 
   onDrop({eventlet: {value}, pipeline, nodeTypes}) {
     if (pipeline) {
-      const type = value.split(this.catalogDelimiter)[1];
-      const newNode = this.indexNewNode(type, nodeTypes, pipeline.nodes);
-      pipeline.nodes = [...pipeline.nodes, newNode];
+      pipeline.nodes = [
+        ...pipeline.nodes,
+        this.makeNewNode(value, this.indexNewNode(value, pipeline.nodes), nodeTypes)
+      ];
       return {pipeline};
     }
   },
 
-  indexNewNode(type, nodeTypes, existingNodes) {
-    const nodeType = this.findNodeType(type, nodeTypes);
-    const name = nodeType.$meta.name;
-    const typedNodes = existingNodes.filter(node => name === node.name);
-    const index = (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
+  makeNewNode(key, index, nodeTypes) {
+    const name = nodeTypes[key].$meta.name;
     return {
-      name,
-      type,
+      type: key,
       index,
-      key: this.formatNodeKey({name, index}),
+      key: this.formatNodeKey(key, index),
+      name: this.displayName(name, index)
     };
   },
-
-  formatNodeKey({name, index}) {
-    return `${name}${index}`.replace(/ /g,'');
+  
+  indexNewNode(key, nodes) {
+    const typedNodes = nodes.filter(node => key === node.type);
+    return (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
+  },
+  
+  displayName(name, index) {
+    const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
+    return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
+  },
+  
+  formatNodeKey(key, index) {
+    return `${key}${index}`.replace(/ /g,'');
   },
 
   onDeleteAll({pipeline}) {
     pipeline.nodes = [];
     return {
       pipeline,
-      selectedNode: null
+      selectedNodeKey: null
     };
   },
 
@@ -186,7 +185,7 @@
     <span flex></span>
     <mwc-icon-button on-click="onDeleteAll" icon="delete_forever"></mwc-icon-button>
   </div> -->
-  <drop-target flex grid scrolling on-drop="onDrop">
+  <drop-target flex grid scrolling on-target-drop="onDrop">
     <node-graph nodes="{{graphNodes}}" on-select="onNodeSelect" on-delete="onNodeRemove"></node-graph>
   </drop-target>
   `

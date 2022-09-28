@@ -52,34 +52,34 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
       connection: true,
       nomonitor: true
     },
-    image2: {
-      $type: 'Image',
-      connection: true,
-      nomonitor: true
-    },
-    image3: {
-      $type: 'Image',
-      connection: true,
-      nomonitor: true
-    },
-    image4: {
-      $type: 'Image',
-      connection: true,
-      nomonitor: true
-    },
-    audio: {
-      $type: `AudioStream`,
-      connection: true
-    },
-    outputImage: {
-      $type: 'Image',
-      noinspect: true,
-      nomonitor: true
-    },
+    // image2: {
+    //   $type: 'Image',
+    //   connection: true,
+    //   nomonitor: true
+    // },
+    // image3: {
+    //   $type: 'Image',
+    //   connection: true,
+    //   nomonitor: true
+    // },
+    // image4: {
+    //   $type: 'Image',
+    //   connection: true,
+    //   nomonitor: true
+    // },
+    // audio: {
+    //   $type: `AudioStream`,
+    //   connection: true
+    // },
+    // outputImage: {
+    //   $type: 'Image',
+    //   noinspect: true,
+    //   nomonitor: true
+    // },
   },
   shader: {
     $kind: '$library/Shader/FragmentShader',
-    $inputs: ['shader', 'image', 'image2', 'image3', 'image4', 'audio'],
-    $outputs: ['shader', 'outputImage']
+    $inputs: ['shader', 'image'], // 'image2', 'image3', 'image4', 'audio'],
+    $outputs: ['shader']//, 'outputImage']
   }
 };

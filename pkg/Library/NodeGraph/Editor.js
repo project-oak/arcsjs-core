@@ -8,73 +8,13 @@
 catalogDelimeter: '$$',
 edgeIdDelimeter: '$$',
 
-update({pipeline, selectedNode, nodeTypes}, state) {
-  state.nodeTypeMap = mapBy(nodeTypes, n => n?.$meta?.name);
+update({pipeline, selectedNodeKey}, state) {
   if (pipeline?.$meta?.name !== state.selectedPipelineName) {
     state.selectedPipelineName = pipeline?.$meta.name;
     // new pipeline, choose a selectedNode if there isn't one
-    selectedNode = selectedNode || pipeline?.nodes?.[0];
-  }
-  selectedNode = this.processPostDuplicationData({selectedNode, pipeline}, state);
-  return {
-    selectedNode,
-    ...this.processPostAddCandidateData({selectedNode, pipeline}, state)
-  };
-},
-
-/**
- * Post-processes the nodes that were just duplicated from the node graph
- * editor.
- */
-processPostDuplicationData({selectedNode, pipeline}, state) {
-  const {postDuplicationData: data} = state;
-  // Set the newly duplicated nodes as the local selected nodes in graph.
-  // Will be `undefined` if `!postDuplicationData`
-  state.graphLocalSelectedNodeKeys = data?.graphLocalSelectedNodeKeys;
-  // do nothing else without data
-  if (data) {
-    // Set the main selected node.
-    selectedNode = pipeline.nodes.find(
-      ({key}) => key === data.newSelectedNodeKey
-    );
-    state.postDuplicationData = null;
-  }
-  return selectedNode;
-},
-
-/**
- * Post-processes the data for the candidate that was just added when user drops
- * an edge from a node's output onto the empty space in node graph editor.
- */
-processPostAddCandidateData({pipeline}, state) {
-  if (state.postAddCandidateData) {
-    const {newNodeKey, fromKey, fromStore, toStoreType, nodeType} =
-        state.postAddCandidateData;
-    const node = this.findNodeByKey(newNodeKey, pipeline);
-    // Wait for the connections data to be populated.
-    if (!node.connections) {
-      return;
+    if (!selectedNodeKey) {
+      return {selectedNodeKey: pipeline?.nodes?.[0]?.key};
     }
-    // Connect to the first store that matches toStoreType.
-    // TODO(b/244191110): Type matching API to be wired here.
-    const toStore = keys(nodeType.$stores).find(
-      storeName => nodeType.$stores[storeName].$type === toStoreType
-    );
-    const toConnection = node.connections[toStore].candidates.find(
-      candidate => candidate.from === fromKey
-    );
-    if (!toConnection?.selected) {
-      pipeline = this.updateStoreConn(
-        pipeline,
-        {fromKey, fromStore, toKey: newNodeKey, toStore},
-        true
-      );
-      return {pipeline};
-    } else {
-      state.postAddCandidateData = undefined;
-    }
-    // TODO(jingjin): put the runner UI for the just-added candidate node next
-    // to its "fromNode".
   }
 },
 
@@ -100,25 +40,26 @@ render(inputs, state) {
 renderGraph(inputs, state) {
   return {
     name: inputs.pipeline?.$meta?.name,
-    localSelectedNodeKeys: state.graphLocalSelectedNodeKeys,
-    graphNodes: this.renderGraphNodes(inputs, state),
-    connectableCandidates: inputs.selectedNode && this.renderConnectableCandidates(inputs, state)
+    // localSelectedNodeKeys: state.graphLocalSelectedNodeKeys,
+    graphNodes: this.renderGraphNodes(inputs),
+    connectableCandidates: inputs.selectedNodeKey && this.renderConnectableCandidates(inputs)
   };
 },
 
-renderGraphNodes(inputs, state) {
+renderGraphNodes(inputs) {
   const {pipeline} = inputs;
   return pipeline?.nodes?.map(
-    node => this.renderNode({node, ...inputs}, state)
+    node => this.renderNode({node, ...inputs}) //, state)
   );
 },
 
-renderNode({node, categories, pipeline, hoveredNodeKey, selectedNode}, {nodeTypeMap}) {
-  const nodeType = nodeTypeMap[node.name];
+renderNode({node, categories, pipeline, hoveredNodeKey, selectedNodeKey, candidates, nodeTypes}) {
+  const nodeType = nodeTypes[node.type];
   const {category} = nodeType?.$meta || {category: 'n/a'};
   const color = this.colorByCategory(category, categories);
   const bgColor = this.bgColorByCategory(category, categories);
-  const {x, y} = node.position?.nodegraph || {x: 0, y: 0};
+  // >>>> const {x, y} = node.position?.nodegraph || {x: 0, y: 0};
+  const {x, y} = node.position?.nodegraph || {x: node.key.length * 40 , y: node.key.length * 10};
   const hasUI = keys(nodeType).some(key => key.endsWith('___frame'));
   const hiddenUI = node.props?.hideUI === true;
   return {
@@ -128,19 +69,18 @@ renderNode({node, categories, pipeline, hoveredNodeKey, selectedNode}, {nodeType
     position: {x, y},
     color,
     bgColor,
-    selected: node.key === selectedNode?.key,
+    selected: node.key === selectedNodeKey,
     hovered: node.key === hoveredNodeKey,
     hasUI,
     hiddenUI,
-    inputs: this.renderInputs(node, nodeType),
+    inputs: this.renderInputs(node, nodeType, candidates),
     outputs: this.renderOutputs(nodeType),
     conns: this.renderConnections(node, pipeline),
   };
 },
 
-nodeDisplay({name, index}) {
-  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
-  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
+nodeDisplay(node) {
+  return node.displayName || node.name;
 },
 
 colorByCategory(category, categories) {
@@ -163,14 +103,10 @@ renderConnections(node, pipeline) {
 },
 
 renderStoreConnections(storeName, node, pipeline) {
-  return this.getStoreConnections(storeName, node)
+  return node.connections[storeName]
     .filter(conn => this.findNodeByKey(conn.from, pipeline))
-    .map(conn => this.formatConnection(conn.from, conn.store, node.key, storeName))
+    .map(conn => this.formatConnection(conn.from, conn.storeName, node.key, storeName))
     ;
-},
-
-getStoreConnections(storeName, node) {
-  return node.connections[storeName]?.candidates?.filter(c => c.selected) || [];
 },
 
 formatConnection(fromKey, fromStore, toKey, toStore) {
@@ -183,13 +119,14 @@ formatConnection(fromKey, fromStore, toKey, toStore) {
   };
 },
 
-renderConnectableCandidates({selectedNode, nodeTypes, categories}, {nodeTypeMap}) {
+renderConnectableCandidates({selectedNodeKey, pipeline, nodeTypes, categories}) { //, {nodeTypeMap}) {
   // Store type -> [matching node types grouped by categories]
   const storeTypeToCandidates = {};
   // Go through the selected node's outputs. For each output, find the store
   // type, find the connectable node types for that store type, and group those
   // node types by categories.
-  const nodeType = nodeTypeMap[selectedNode?.name];
+  const selectedNode = pipeline.nodes.find(node => node.key === selectedNodeKey);
+  const nodeType = nodeTypes[selectedNode?.type]; //name];
   const particles = this.getParticles(nodeType);
   for (const particle of particles) {
     for (const output of particle.$outputs || []) {
@@ -201,7 +138,7 @@ renderConnectableCandidates({selectedNode, nodeTypes, categories}, {nodeTypeMap}
       const storeType = nodeType.$stores[storeName]?.$type;
       // Find and group connectable candidates.
       if (storeType && !storeTypeToCandidates[storeType]) {
-        const candidateNodeTypes = nodeTypes.filter(nodeType => this.isCandidate(nodeType, storeType));
+        const candidateNodeTypes = values(nodeTypes).filter(nodeType => this.isCandidate(nodeType, storeType));
         storeTypeToCandidates[storeType] =
           this.groupNodeTypesByCategories(candidateNodeTypes, categories);
       }
@@ -258,38 +195,53 @@ findInput({$inputs}, name) {
   return input && this.decodeBinding(input).binding;
 },
 
-renderInputs(node, nodeType) {
-  return entries(node.connections || {}).map(([name, connection]) => ({
+renderInputs(node, nodeType, candidates) {
+  return this.getInputStores(nodeType).map(([name, store]) => ({
     name,
-    ...connection,
-    type: connection.store.$type,
-    multiple: connection.store.multiple
-  })).filter(({name}) => !nodeType?.$stores[name]?.nodisplay);
+    ...(node.connections?.[name] || {}),
+    candidates: candidates?.[node.key]?.[name] || [],
+    type: store.$type,
+    multiple: store.multiple
+  }));
+},
+
+getInputStores(nodeType) {
+  return entries(nodeType?.$stores).filter(([name, store]) => this.isInput(nodeType, name) && !store.nodisplay);
+},
+
+isInput(nodeType, storeName) {
+  return this.getParticles(nodeType).some(particle => this.hasMatchingStore(particle.$inputs, storeName));
 },
 
 renderOutputs(nodeType) {
-  return entries(nodeType?.$stores || {})
-    .filter (([name, store]) => this.isOutput(nodeType, name) && !store.nodisplay)
-    .map(([name, store]) => ({name, type: store.$type}))
-    ;
+  return this.getOutputStores(nodeType).map(([name, store]) => ({name, type: store.$type}));
 },
 
-isOutput(recipe, storeName) {
-  const isMatching = (output) => {
-    const {key, binding} = this.decodeBinding(output);
-    return (binding || key) == storeName;
-  };
-  return this.getParticles(recipe).some(particle => particle.$outputs?.some(o => isMatching(o)));
+getOutputStores(nodeType) {
+  return entries(nodeType?.$stores).filter(([name, store]) => this.isOutput(nodeType, name) && !store.nodisplay);
 },
 
-getParticleNames(recipe) {
+isOutput(nodeType, storeName) {
+  return this.getParticles(nodeType).some(particle => this.hasMatchingStore(particle.$outputs, storeName));
+},
+
+hasMatchingStore(bindings, storeName) {
+  return bindings?.some(binding => this.isMatchingStore(storeName, binding))
+},
+
+isMatchingStore(storeName, connection) {
+  const {key, binding} = this.decodeBinding(connection);
+  return (binding || key) == storeName;
+},
+
+getParticleNames(nodeType) {
   // TODO(mariakleiner): refactor to make iterator for particles in recipe.
   const isKeyword = name => name.startsWith('$');
-  return keys(recipe).filter(name => !isKeyword(name));
+  return keys(nodeType).filter(name => !isKeyword(name));
 },
 
-getParticles(recipe) {
-  return this.getParticleNames(recipe).map(name => recipe[name]);
+getParticles(nodeType) {
+  return this.getParticleNames(nodeType).map(name => nodeType[name]);
 },
 
 onNodeRemove({eventlet: {key}, pipeline, selectedNode}) {
@@ -303,12 +255,13 @@ onNodeRemove({eventlet: {key}, pipeline, selectedNode}) {
 },
 
 onNodeRenamed({eventlet: {key, value}, pipeline}) {
+  // >>> TODO START HERE STARTHERE VERIFY IT WORKS!
   const node = pipeline.nodes.find(node => node.key === key);
   node.displayName = value.trim();
   return {pipeline: this.updateNodeInPipeline(node, pipeline)};
 },
 
-onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNode}, state) {
+onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeTypes}, state) {
   // Keys for duplicated nodes.
   const newNodeKeys = [];
   // A map from original node key to its duplicated node key.
@@ -320,7 +273,7 @@ onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNode}, state) 
   const newNodes = [];
   nodes.forEach(node => {
     // Duplicate the node.
-    const newNode = this.duplicateNode(node, pipeline);
+    const newNode = this.duplicateNode(node, pipeline, nodeTypes);
     // Update the pipeline with the new node.
     pipeline.nodes = [...pipeline.nodes, newNode];
     // keep the books
@@ -329,42 +282,21 @@ onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNode}, state) 
     keyMap[node.key] = newNode.key;
   });
 
-  // Process connections in duplicated nodes to make sure they now connect to
-  // duplicated nodes instead of the original nodes..
-  // for each node
+  // Connect duplicated nodes to duplicated nodes (instead of the original ones).
   newNodes.forEach(({connections}) => {
-    // for each connection object
-    values(connections).forEach(({candidates}) => {
-      // for each candidate
-      candidates.forEach(candidate => {
-        if (candidate.selected) {
-          // If a candidate is selected, and its "from" node is among the
-          // current selection, replace the "from" node with its duplication.
-          if (nodeKeys.includes(candidate.from)) {
-            candidate.from = keyMap[candidate.from];
-          }
-          // Otherwise, disconnect it.
-          else {
-            candidate.selected = undefined;
-          }
-        }
-      });
+    values(connections).forEach(options => {
+      options.forEach(connection => connection.from = keyMap[connection.from]);
     });
   });
 
-  // Set post-duplication data which will be processed in `update`.
-  state.postDuplicationData = {
-    newSelectedNodeKey: keyMap[selectedNode.key],
-    graphLocalSelectedNodeKeys: newNodeKeys
-  };
-
   return {
-    pipeline
+    pipeline,
+    selectedNodeKey: keyMap[selectedNodeKey]
   };
 },
 
-duplicateNode(node, pipeline) {
-  const newNode = this.makeNewNode({$meta: {name: node.name}}, pipeline.nodes);
+duplicateNode(node, pipeline, nodeTypes) {
+  const newNode = this.makeNewNode(nodeTypes[node.type], pipeline.nodes);
   // Copy props.
   if (node.props) {
     newNode.props = {...node.props};
@@ -432,41 +364,34 @@ duplicateDisplayName(displayName, pipeline) {
   return parts.join(' ');
 },
 
-onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType, svgX, svgY}}, pipeline}, state) {
+onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType, svgX, svgY}}, pipeline, nodeTypes}, state) {
   // Add the new node.
-  const newNode = this.makeNewNode(nodeType, pipeline.nodes);
+  const newNode = this.makeNewNode(nodeType, pipeline.nodes, nodeTypes);
   newNode.position = {nodegraph: {x: svgX, y: svgY}};
+  // Connect to the first store that matches toStoreType.
+  // TODO(b/244191110): Type matching API to be wired here.
+  const toStore = this.getInputStores(nodeType)
+    .find(([_, store]) => store.$type === targetStoreType)[0];
+  newNode.connections = {[toStore]: [{from: fromKey, storeName: fromStore}]};
   pipeline.nodes = [...pipeline.nodes, newNode];
-
-  // Set post-add-candidate data which will be processed in `update` where we
-  // do the edge connection. We cannot do it here since the `connections` field
-  // of the newly added node has not been populated.
-  state.postAddCandidateData = {
-    newNodeKey: newNode.key,
-    fromKey,
-    fromStore,
-    toStoreType: targetStoreType,
-    nodeType,
-  };
-
   return {
     pipeline,
-    selectedNode: newNode
+    selectedNodeKey: newNode.key
   };
 },
 
 onNodeSelect({eventlet: {key}, pipeline}, state) {
-  return {selectedNode: this.findNodeByKey(key, pipeline)};
+  return {selectedNodeKey: key}; //this.findNodeByKey(key, pipeline)};
 },
 
-onNodeTypeDropped({eventlet: {key, value}, pipeline}, {nodeTypeMap}) {
+onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes}) { //, {nodeTypeMap}) {
   if (pipeline) {
     // When a node type is dropped onto node-graph-editor, create a new node,
     // and set its svg position (nodegraph: {x, y}).
-    const name = key.split(this.catalogDelimeter)[1];
+    // const name = key.split(this.catalogDelimeter)[1];
     const {svgPoint} = value;
-    const nodeType = nodeTypeMap[name];
-    const newNode = this.makeNewNode(nodeType, pipeline.nodes);
+    // const nodeType = nodeTypes[name];
+    const newNode = this.makeNewNode(nodeTypes[key], pipeline.nodes, nodeTypes);
     newNode.position = {nodegraph: {x: svgPoint.x, y: svgPoint.y}};
     pipeline.nodes = [...pipeline.nodes, newNode];
     return {
@@ -509,20 +434,13 @@ onEdgeConnected({eventlet: {value}, pipeline}) {
 
 updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
   let node = this.findNodeByKey(toKey, pipeline);
-  const connection = node.connections[toStore];
-  const index = connection.candidates.findIndex(({from, store}) => from === fromKey && store === fromStore);
-  node = {
-    ...node,
-    connections: {
-      ...node.connections,
-      [toStore]: {
-        ...node.connections[toStore],
-        candidates: assign([], connection.candidates, {
-          [index]: {...connection.candidates[index], selected: isSelected}
-        })
-      }
-    }
-  };
+  if (isSelected) {
+    node.connections = node.connections || {};
+    node.connections[toStore] = node.connections[toStore] || [];
+    node.connections[toStore].push({from: fromKey, storeName: fromStore});
+  } else {
+    delete node.connections[toStore];
+  }
   return this.updateNodeInPipeline(node, pipeline);
 },
 
@@ -532,18 +450,30 @@ updateNodeInPipeline(node, pipeline) {
   return pipeline;
 },
 
-makeNewNode({$meta: {name}}, nodes) {
-  const typedNodes = nodes.filter(node => name === node.name);
-  const index = (typedNodes[typedNodes.length - 1]?.index || 0) + 1;
+makeNewNode({$meta: {key, name}}, nodes) { //, nodeTypes) {
+  // const name = nodeType.$meta.name;
+  //nodeTypes[key].$meta.name;
+  const index = this.indexNewNode(key, nodes);
   return {
-    name,
+    type: key,
     index,
-    key: this.formatNodeKey({name, index}),
+    key: this.formatNodeKey(key, index),
+    name: this.displayName(name, index)
   };
 },
 
-formatNodeKey({name, index}) {
-  return `${name}${index}`.replace(/ /g,'');
+indexNewNode(key, nodes) {
+  const typedNodes = nodes.filter(node => key === node.type);
+  return (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
+},
+
+displayName(name, index) {
+  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
+  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
+},
+
+formatNodeKey(key, index) {
+  return `${key}${index}`.replace(/ /g,'');
 },
 
 template: html`
