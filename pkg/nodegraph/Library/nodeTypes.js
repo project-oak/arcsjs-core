@@ -68,7 +68,7 @@ nodeTypesList.forEach(nodeType => {
 });
 
 const icons = ['coffee', 'shower', 'chair', 'flatware', 'light', 'casino', 'escalator', 'umbrella', 'theater_comedy', 'diamond'];
-const colors = ['#540d6e', '#ee4266', '#ffd23f', '#3bceac', '#0ead69', '#335c67', '#fff3b0', '#e09f3e', '#9e2a2b', '#540b0e'];
+const colors = ['#540d6e', '#ee4266', '#ffd23f', '#3bceac', '#0ead69', '#335c67', '#aaa390', '#e09f3e', '#9e2a2b', '#540b0e'];
 export const categories = {};
 [...new Set(nodeTypesList.map(n => n.$meta.category))].forEach((category, i) => {
   categories[category] = {

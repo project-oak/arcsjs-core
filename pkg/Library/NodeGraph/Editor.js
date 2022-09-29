@@ -37,7 +37,7 @@ render(inputs, state) {
   };
 },
 
-renderGraph(inputs, state) {
+renderGraph(inputs) { // , state) {
   return {
     name: inputs.pipeline?.$meta?.name,
     // localSelectedNodeKeys: state.graphLocalSelectedNodeKeys,
@@ -244,13 +244,11 @@ getParticles(nodeType) {
   return this.getParticleNames(nodeType).map(name => nodeType[name]);
 },
 
-onNodeRemove({eventlet: {key}, pipeline, selectedNode}) {
+onNodeRemove({eventlet: {key}, pipeline, selectedNodeKey}) {
   pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
   return {
     pipeline,
-    selectedNode: (key === selectedNode?.key)
-      ? null
-      : this.findNodeByKey(selectedNode?.key, pipeline)
+    selectedNodeKey: (key === selectedNodeKey) ? null : selectedNodeKey
   };
 },
 
@@ -380,23 +378,22 @@ onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType
   };
 },
 
-onNodeSelect({eventlet: {key}, pipeline}, state) {
-  return {selectedNodeKey: key}; //this.findNodeByKey(key, pipeline)};
+onNodeSelect({eventlet: {key}}) {
+  return {selectedNodeKey: key};
 },
 
-onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes}) { //, {nodeTypeMap}) {
+onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes}) {
   if (pipeline) {
     // When a node type is dropped onto node-graph-editor, create a new node,
     // and set its svg position (nodegraph: {x, y}).
     // const name = key.split(this.catalogDelimeter)[1];
     const {svgPoint} = value;
-    // const nodeType = nodeTypes[name];
     const newNode = this.makeNewNode(nodeTypes[key], pipeline.nodes, nodeTypes);
     newNode.position = {nodegraph: {x: svgPoint.x, y: svgPoint.y}};
     pipeline.nodes = [...pipeline.nodes, newNode];
     return {
       pipeline,
-      selectedNode: newNode
+      selectedNodeKey: newNode.key
     };
   }
 },
@@ -434,9 +431,11 @@ onEdgeConnected({eventlet: {value}, pipeline}) {
 
 updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
   let node = this.findNodeByKey(toKey, pipeline);
+  node = {
+    ...node,
+    connections: {...(node.connections || {}), [toStore]: [...(node.connections?.[toStore] || [])]}
+  };
   if (isSelected) {
-    node.connections = node.connections || {};
-    node.connections[toStore] = node.connections[toStore] || [];
     node.connections[toStore].push({from: fromKey, storeName: fromStore});
   } else {
     delete node.connections[toStore];
@@ -450,9 +449,7 @@ updateNodeInPipeline(node, pipeline) {
   return pipeline;
 },
 
-makeNewNode({$meta: {key, name}}, nodes) { //, nodeTypes) {
-  // const name = nodeType.$meta.name;
-  //nodeTypes[key].$meta.name;
+makeNewNode({$meta: {key, name}}, nodes) {
   const index = this.indexNewNode(key, nodes);
   return {
     type: key,

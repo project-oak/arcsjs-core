@@ -97,22 +97,22 @@ export const NodegraphRecipe = {
       toolbar: {
         PipelineToolbar
       },
-      // preview: {
-      //   runner: {
-      //     $kind: '$library/Designer/Designer',
-      //     $inputs: [
-      //       'recipes',
-      //       {pipeline: 'selectedPipeline'},
-      //       'selectedNode',
-      //       'nodeTypes',
-      //       'categories',
-      //     ],
-      //     $outputs: [
-      //       {pipeline: 'selectedPipeline'},
-      //       'selectedNode'
-      //     ]
-      //   }
-      // },
+      preview: {
+        runner: {
+          $kind: '$library/Designer/Designer',
+          $inputs: [
+            'recipes',
+            {pipeline: 'selectedPipeline'},
+            'selectedNodeKey',
+            'nodeTypes',
+            'categories',
+          ],
+          $outputs: [
+            {pipeline: 'selectedPipeline'},
+            'selectedNodeKey'
+          ]
+        }
+      },
       editor: {
         Editor: {
           // $kind: 'https://rapsai-core.web.app/0.5.1/Library/Editor',
@@ -141,22 +141,21 @@ export const NodegraphRecipe = {
           $staticInputs: {customInspectors}
         }
       },
-      // tree: {
-      // NodeTree: {
-      // $kind: '$library/NodeGraph/NodeTree',
-      // $inputs: [
-      // {pipeline: 'selectedPipeline'},
-      // 'selectedNode',
-      // 'nodeTypes',
-      // 'categories'
-      // ],
-      // $outputs: [
-      // {pipeline: 'selectedPipeline'},
-      // 'selectedNode'
-      // ]
-      // }
-      // }
-      // }
+      tree: {
+        NodeTree: {
+          $kind: '$library/NodeGraph/NodeTree',
+          $inputs: [
+            {pipeline: 'selectedPipeline'},
+            'selectedNodeKey',
+            'nodeTypes',
+            'categories'
+          ],
+          $outputs: [
+            {pipeline: 'selectedPipeline'},
+            'selectedNodeKey'
+          ]
+        }
+      }
     }
   },
   nodeInspector: {
@@ -167,6 +166,10 @@ export const NodegraphRecipe = {
       'candidates',
       'nodeTypes'
     ],
+    $staticInputs: {
+      customInspectors,
+      inspectorData: 'inspectorData',
+    },
     $outputs: [{data: 'inspectorData'}]
   },
   candidateFinder: {
@@ -190,22 +193,12 @@ export const NodegraphRecipe = {
       {pipeline: 'selectedPipeline'}
     ]
   },
-  // nodesConnector: {
-  // $kind: '$library/NodeGraph/NodesConnector',
-  // $inputs: [
-  // {pipeline: 'selectedPipeline'},
-  // 'selectedNode',
-  // 'nodeTypes'
-  // ],
-  // $outputs: [
-  // {pipeline: 'selectedPipeline'},
-  // 'selectedNode',
-  // 'recipes'
-  // ],
-  // $staticInputs: {
-  // customInspectors,
-  // inspectorData: 'inspectorData',
-  // globalStores
-  // }
-  // }
+  recipeBuilder: {
+    $kind: '$library/NodeGraph/RecipeBuilder',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'nodeTypes'
+    ],
+    $outputs: ['recipes'],
+  }
 };

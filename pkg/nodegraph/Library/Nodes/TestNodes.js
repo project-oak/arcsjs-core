@@ -93,7 +93,7 @@ export const Test = {
       'booleanDefaultFalse',
       'booleanDefaultTrue',
       'theObject',
-      'selectedNode'
+      'selectedNodeKey'
     ],
     $outputs: [
       'theString',

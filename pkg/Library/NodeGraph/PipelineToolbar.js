@@ -87,7 +87,8 @@
         state.pipeline = pipeline;
         return {
           pipeline,
-          pipelines: this.updateItemInPipelines(pipeline, pipelines)
+          pipelines: this.updateItemInPipelines(pipeline, pipelines),
+          selectedNodeKey: null
         };
       }
     } else {

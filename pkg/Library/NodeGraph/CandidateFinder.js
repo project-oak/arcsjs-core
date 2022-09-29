@@ -65,7 +65,7 @@ findConnectionCandidates(storeName, {$type}, node, {nodes}, nodeTypes, globalSto
 
 findGlobalCandidate(storeName, type, globalStores) {
   if (globalStores?.find(name => name === storeName)) {
-    return {from: 'global', storeName, type};
+    return {/*from: 'global', */storeName, type};
   }
 },
 

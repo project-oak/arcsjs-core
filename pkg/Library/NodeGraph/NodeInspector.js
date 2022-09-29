@@ -7,18 +7,20 @@
 ({
 
 inspectorDelimiter: '$$',
+defaultInspectorDataProp: 'inspectorData',
 
-async update({selectedNodeKey, pipeline, nodeTypes, candidates}, state, {service, output, invalidate}) {
+async update({selectedNodeKey, pipeline, nodeTypes, candidates, customInspectors, inspectorData}, state, {service, output, invalidate}) {
   if (pipeline && selectedNodeKey) {
     if (selectedNodeKey !== state.node?.key) {
       assign(state, {data: null, hasMonitor: false});
     }
     const node = pipeline.nodes.find(node => node.key === selectedNodeKey);
-    if (this.pipelineChanged(pipeline, state.pipeline) ||
-        (node && this.nodeChanged(node, state.node) || !state.hasMonitor)) {
-      state.pipeline = pipeline;
-      state.node = node;
-      const data = await this.constructData(node, pipeline, nodeTypes, candidates, service);
+    if (node && 
+        (this.pipelineChanged(pipeline, state.pipeline) || this.nodeChanged(node, state.node) || !state.hasMonitor)) {
+      await this.finagleCustomRecipes(state.recipes, service, false);
+      assign(state, {pipeline, node, recipes: []});
+      const data = await this.constructData(node, pipeline, nodeTypes, candidates, customInspectors, inspectorData || this.defaultInspectorDataProp, state, service);
+      await this.finagleCustomRecipes(state.recipes, service, true);
       await output({data});
     }
     if (!state.hasMonitor) {
@@ -49,6 +51,12 @@ pipelineId(pipeline) {
   return pipeline?.$meta?.id || pipeline?.$meta?.name;
 },
 
+async finagleCustomRecipes(recipes, service, finagle) {
+  return Promise.all(recipes?.map(
+    recipe => service({kind: 'RecipeService', msg: 'FinagleRecipe', data: {recipe, value: finagle}})
+  ) || []);
+},
+
 async monitorStores(state, nodeTypes, {service, invalidate}) {
   const nodeType = nodeTypes[state.node.type];
   if (nodeType) {
@@ -77,8 +85,8 @@ getMonitoredNodeStoreIds(node, {$stores}) {
     ;
 },
 
-async constructData(node, pipeline, nodeTypes, candidates, service) {
-  const props = await this.constructProps(node, pipeline, nodeTypes, candidates, service);
+async constructData(node, pipeline, nodeTypes, candidates, customInspectors, inspectorData, state, service) {
+  const props = await this.constructProps(node, pipeline, nodeTypes, candidates, customInspectors, inspectorData, state,  service);
   return  {
     key: this.encodeFullNodeKey(node, pipeline, this.inspectorDelimiter),
     title: this.nodeDisplay(node),
@@ -86,9 +94,9 @@ async constructData(node, pipeline, nodeTypes, candidates, service) {
   };
 },
 
-async constructProps(node, pipeline, nodeTypes, candidates, service) {
+async constructProps(node, pipeline, nodeTypes, candidates, customInspectors, inspectorData, state, service) {
   const props = [];
-  this.pushToProps(props, await this.constructStoreProps(node, pipeline, nodeTypes, service));
+  this.pushToProps(props, await this.constructStoreProps(node, pipeline, nodeTypes, customInspectors, inspectorData, state, service));
   this.pushToProps(props, await this.constructConnections(node, pipeline, nodeTypes, candidates, service));
   return props;
 },
@@ -99,7 +107,7 @@ pushToProps(props, moreProps) {
   }
 },
 
-constructStoreProps(node, pipeline, nodeTypes, service) {
+constructStoreProps(node, pipeline, nodeTypes, customInspectors, inspectorData, state, service) {
   // construct property objects from Stores
   const nodeType = node && nodeTypes[node.type];
   const stores = nodeType?.$stores;
@@ -107,14 +115,17 @@ constructStoreProps(node, pipeline, nodeTypes, service) {
     return Promise.all(
       entries(stores)
         .filter(([name, store]) => !store.connection)
-        .map(([name, store]) => this.computeProp(node, this.encodeFullNodeKey(node, pipeline, ''), {name, store}, service))
+        .map(([name, store]) => this.computeProp(node, pipeline, {name, store}, customInspectors, inspectorData, state, service))
     );
   }
 },
 
-async computeProp(node, fullNodeKey, {name, store}, service) {
+async computeProp(node, pipeline, {name, store},  customInspectors, inspectorData, state, service) {
+  const fullNodeKey = this.encodeFullNodeKey(node, pipeline, '');
   let value = await this.getBindingValue(name, store, node, service);
-  if (store?.$type === 'Boolean') {
+  if (customInspectors?.[store.$type]) {
+    state.recipes.push(this.constructInspectRecipe(this.encodeFullNodeKey(node, pipeline, this.inspectorDelimiter), name, customInspectors?.[store.$type], inspectorData));
+  } else if (store?.$type === 'Boolean') {
     value = Boolean(value);
   } else if (store?.$type === 'Image') {
     value = value?.url;
@@ -169,6 +180,29 @@ async renderBinding(node, name, candidates, pipeline, nodeTypes, service) {
     };
   }
 },
+
+constructInspectRecipe(nodeKey, storeName, inspector, inspectorData) {
+  const recipe = {
+    $meta: {...inspector.$meta},
+    $stores: {
+      [inspectorData]: {$type: 'JSON', connection: true},
+    }
+  };
+  this.getParticleNames(inspector).forEach(particleName => {
+    const particle = {...inspector[particleName]};
+    particle.$container = `Inspector#custom${this.sanitize(nodeKey)}${storeName}`;
+    particle.$inputs = particle.$outputs = [{data: inspectorData}];
+    particle.$staticInputs = {key: nodeKey, propName: storeName};
+    recipe[`${particleName}${this.inspectorDelimiter}${nodeKey}`] = particle;
+  });
+  return recipe;
+},
+
+getParticleNames(recipe) {
+  const notKeyword = name => !name.startsWith('$');
+  return recipe && keys(recipe).filter(notKeyword);
+},
+
 
 // SOMEHOW USER IN SHADERTOY! WHY???
 // async constructConnectedStore(connection, selected, pipeline, nodeTypes, service) {

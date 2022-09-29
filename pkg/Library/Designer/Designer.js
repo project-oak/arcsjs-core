@@ -99,17 +99,17 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-render({pipeline, selectedNode, nodeTypes, categories}, {recipes}) {
+render({pipeline, selectedNodeKey, nodeTypes, categories}, {recipes}) {
   const idsForNode = (node) =>
       (node && !this.isUIHidden(node) &&
         this.getParticleNamesForNode(node, pipeline, recipes)) ||
       [];
   const rects = pipeline?.nodes?.map(
     node => idsForNode(node).map(id => ({id, position: node.position?.preview?.[id]}))).flat();
-  const nodeType =
-      nodeTypes?.find(({$meta: {name}}) => selectedNode?.name === name);
+  const node = pipeline?.nodes.find(({key}) => key === selectedNodeKey);
+  const nodeType = nodeTypes?.[node?.type];
   return {
-    selectedKeys: idsForNode(selectedNode),
+    selectedKeys: idsForNode(node),
     rects,
     color: this.colorByCategory(nodeType?.$meta?.category, categories),
   };
@@ -122,20 +122,22 @@ isUIHidden(node) {
 onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
   pipeline.nodes = pipeline.nodes.filter(n => n.key !== node.key);
-  return {pipeline, selectedNode: null};
+  return {pipeline, selectedNodeKey: null};
 },
 
 onNodePosition({eventlet: {key, value}, pipeline}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
   if (node) {
-    const selectedNode = {...node, position: {...node.position, preview: {...node.position?.preview, [key]: value}}};
+    // const selectedNode = {...node, position: {...node.position, preview: {...node.position?.preview, [key]: value}}};
     return {
-      selectedNode,
-      pipeline: this.updateNodeInPipeline(selectedNode, pipeline)
+      selectedNodeKey: node.key,
+      pipeline: this.updateNodeInPipeline(
+          {...node, position: {...node.position, preview: {...node.position?.preview, [key]: value}}},
+          pipeline)
     };
   } else {
     return {
-      selectedNode: null
+      selectedNodeKey: null
     };
   }
 },
