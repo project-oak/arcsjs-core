@@ -82,7 +82,7 @@
     if (pipeline) {
       if (!deepEqual(pipeline, state.pipeline)) {
         const outputs = {};
-        if (this.pipelineId(state.pipeline) !== this.pipelineId(pipeline)) {
+        if (state.pipeline?.$meta?.id !== pipeline.$meta.id) {
           await this.updateSelectedPipelineHistory(pipeline, service);
           assign(outputs, this.computeLayouts(pipeline));
           outputs['selectedNodeKey'] = pipeline.nodes?.[0]?.key;
@@ -108,13 +108,9 @@
       kind: 'HistoryService',
       msg: 'setSelectedPipeline',
       data: {
-        pipeline: this.pipelineId(pipeline)
+        pipeline: pipeline.$meta.id
       }
     });
-  },
-  pipelineId(pipeline) {
-    // Backward compatibility: prior to 0.4.0 pipelines were created with `name` only, without a unique id.
-    return pipeline?.$meta.id || pipeline?.$meta?.name || null;
   },
   updateItemInPipelines(pipeline, pipelines) {
     const index = this.findPipelineIndex(pipeline, pipelines);
@@ -204,8 +200,6 @@
     const id = pipeline?.$meta?.name;
     const value = pipeline?.json.replace(/\$/g, '*');
     if (id && value && publishPaths[selectedPublishKey]) {
-      // Backward compatibility for pipelines published in versions < 0.4:
-      this.unpublishPipeline(publishPaths[selectedPublishKey], pipeline.$meta.name, value);
       this.publishPipeline(publishPaths[selectedPublishKey], id, value);
       if (!pipeline?.$meta.isPublished) {
         return this.updatePipelineMeta({isPublished: true}, pipeline, pipelines);
@@ -215,8 +209,6 @@
   onDontShare({pipeline, pipelines, publishPaths}) {
     for (const publishPath of values(publishPaths)) {
       this.unpublishPipeline(publishPath, pipeline.$meta.id);
-      // Backward compatibility for pipelines published in versions < 0.4:
-      this.unpublishPipeline(publishPath, pipeline.$meta.name);
     }
     return this.updatePipelineMeta({isPublished: false}, pipeline, pipelines);
   },
@@ -274,8 +266,8 @@
   },
   computeLayouts(pipeline) {
     return {
-      nodegraphLayout: assign({id: this.pipelineId(pipeline)}, pipeline.position?.['nodegraphLayout']),
-      previewLayout: assign({id: this.pipelineId(pipeline)}, pipeline.position?.['previewLayout']),
+      nodegraphLayout: assign({id: pipeline.$meta.id}, pipeline.position?.['nodegraphLayout']),
+      previewLayout: assign({id: pipeline.$meta.id}, pipeline.position?.['previewLayout']),
     };
   },
   template: html`

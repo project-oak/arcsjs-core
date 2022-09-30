@@ -23,7 +23,9 @@ export const StoreService = async (runtime, host, request) => {
 };
 
 const getStoreValue = ({storeId}, runtime) => {
-  return runtime.stores[storeId]?.pojo;
+  if (runtime.stores[storeId]) {
+    return {storeId, value: runtime.stores[storeId]?.pojo};
+  }
 };
 
 const updateStoreValue = ({storeId, value}, runtime) => {

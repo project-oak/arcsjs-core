@@ -54,12 +54,7 @@ nodeChanged({key, connections, props, displayName}, node) {
 },
 
 pipelineChanged(pipeline, oldPipeline) {
-  return this.pipelineId(pipeline) !== this.pipelineId(oldPipeline);
-},
-
-pipelineId(pipeline) {
-  // Backward compatibility for pipelines published in versions < 0.4
-  return pipeline?.$meta?.id || pipeline?.$meta?.name;
+  return pipeline.$meta.id !== oldPipeline?.$meta?.id;
 },
 
 candidatesChanged(candidates, oldCandidates) {
@@ -158,7 +153,7 @@ async computeBindingValue(name, store, node, service) {
 
 async getBindingValue(name, store, node, service) {
   const binding = this.fullStoreId(node, name);
-  const storeValue = (await this.getStoreValue(binding, service));
+  const storeValue = (await this.getStoreValue(binding, service))?.value;
   return storeValue ?? node.props?.[name] ?? store.$value;
 },
 

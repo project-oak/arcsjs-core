@@ -18,12 +18,7 @@ async update({pipeline, nodeTypes, globalStores}, state) {
 },
 
 pipelineChanged(pipeline, oldPipeline) {
-  return this.pipelineId(pipeline) !== this.pipelineId(oldPipeline);
-},
-
-pipelineId(pipeline) {
-  // Backward compatibility for pipelines published in versions < 0.4
-  return pipeline?.$meta?.id || pipeline?.$meta?.name;
+  return pipeline.$meta.id !== oldPipeline?.$meta?.id;
 },
 
 nodesChanged(nodes, currentNodes) {
