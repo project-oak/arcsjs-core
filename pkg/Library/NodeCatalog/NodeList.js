@@ -69,9 +69,7 @@ formatNodeKey(key, index) {
 onHoverNodeType({eventlet: {key, value}, selectedNodeTypes}, state) {
   assign(state, {
     showInfoPanel: true,
-    // 34 is (approximately) the height of the toolbar
-    // TODO(mariakleiner): should use node's position!
-    infoPanelTop: value + 34
+    infoPanelTop: value
   });
   return {
     hoveredNodeType: selectedNodeTypes[key],
