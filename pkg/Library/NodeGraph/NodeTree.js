@@ -168,14 +168,11 @@ renderContainers(nodes, nodeTypesMap, nodeKey) {
   return nodes?.map(mapFn).flat().filter(n => !n.key.startsWith(nodeKey));
 },
 
-async onNodeSelect({eventlet: {key}}) { //, pipeline}, state, {service}) {
-  // const selectedNode = pipeline.nodes.find(node => node.key === key);
-  // if (selectedNode) {
-    return {selectedNodeKey: key};
-  // }
+async onNodeSelect({eventlet: {key}}) {
+  return {selectedNodeKey: key};
 },
 
-async onDrop({eventlet: {key: container, value: key}, pipeline/*, selectedNodeKey*/}, state, {service}) {
+async onDrop({eventlet: {key: container, value: key}, pipeline}, state, {service}) {
   //log('onDrop:', key, container);
   //
   // const node = pipeline.nodes.find(node => node.key === key);
@@ -190,6 +187,7 @@ async onDrop({eventlet: {key: container, value: key}, pipeline/*, selectedNodeKe
   return {selectedNodeKey: key};
 },
 
+// TODO(mariakleiner): fix this with `position` and `layout` refactoring
 updateContainerInNode(node, hostId, container) {
   // TODO (b/245770204): avoid copying objects
   // node.position = node.position || {};

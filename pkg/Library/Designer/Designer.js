@@ -106,7 +106,6 @@ render({pipeline, selectedNodeKey, nodeTypes, categories, layout}, {recipes}) {
       [];
   const rects = pipeline?.nodes?.map(
     node => idsForNode(node).map(id => ({id, position: layout?.[node.key]}))).flat();
-  // log(`>>>> ${JSON.stringify(rects)}`);
   const node = pipeline?.nodes.find(({key}) => key === selectedNodeKey);
   const nodeType = nodeTypes?.[node?.type];
   return {

@@ -85,7 +85,7 @@
         if (this.pipelineId(state.pipeline) !== this.pipelineId(pipeline)) {
           await this.updateSelectedPipelineHistory(pipeline, service);
           assign(outputs, this.computeLayouts(pipeline));
-          outputs['selectedNodeKey'] = null;
+          outputs['selectedNodeKey'] = pipeline.nodes?.[0]?.key;
         }
         state.pipeline = pipeline;
         assign(outputs, {
@@ -274,22 +274,10 @@
   },
   computeLayouts(pipeline) {
     return {
-      nodegraphLayout: assign({id: this.pipelineId(pipeline)}, pipeline.position?.['nodegraphLayout']), //this.computeLayout(pipeline, 'nodegraphLayout'),
-      previewLayout: assign({id: this.pipelineId(pipeline)}, pipeline.position?.['previewLayout']), //this.computeLayout(pipeline, 'previewLayout')
+      nodegraphLayout: assign({id: this.pipelineId(pipeline)}, pipeline.position?.['nodegraphLayout']),
+      previewLayout: assign({id: this.pipelineId(pipeline)}, pipeline.position?.['previewLayout']),
     };
   },
-  // computeLayout(pipeline, key) {
-  //   const layout = {};
-  //   // pipeline.nodes.forEach(node => {
-      
-  //   //   // if (key === 'preview') {
-  //   //   //   layout[node.key] = values(node.position?.[key])?.[0] || {};
-  //   //   // } else {
-  //   //   //   layout[node.key] = node.position?.[key] || {};
-  //   //   // }
-  //   // });
-  //   return layout;
-  // },
   template: html`
 <style>
   :host {

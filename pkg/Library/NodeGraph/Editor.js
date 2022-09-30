@@ -37,10 +37,9 @@ render(inputs, state) {
   };
 },
 
-renderGraph(inputs) { // , state) {
+renderGraph(inputs) {
   return {
     name: inputs.pipeline?.$meta?.name,
-    // localSelectedNodeKeys: state.graphLocalSelectedNodeKeys,
     graphNodes: this.renderGraphNodes(inputs),
     connectableCandidates: inputs.selectedNodeKey && this.renderConnectableCandidates(inputs)
   };
@@ -48,29 +47,21 @@ renderGraph(inputs) { // , state) {
 
 renderGraphNodes(inputs) {
   const {pipeline} = inputs;
-  return pipeline?.nodes?.map(
-    node => this.renderNode({node, ...inputs}) //, state)
-  );
+  return pipeline?.nodes?.map(node => this.renderNode({node, ...inputs}));
 },
 
 renderNode({node, categories, pipeline, hoveredNodeKey, selectedNodeKey, candidates, nodeTypes, layout}) {
   const nodeType = nodeTypes[node.type];
   const {category} = nodeType?.$meta || {category: 'n/a'};
-  const color = this.colorByCategory(category, categories);
-  const bgColor = this.bgColorByCategory(category, categories);
-  // >>>> const {x, y} = node.position?.nodegraph || {x: 0, y: 0};
-  const {x, y} = layout?.[node.key] || {x: 0, y: 0};
-  //node.position?.nodegraph || {x: node.key.length * 40 , y: node.key.length * 10};
-
   const hasUI = keys(nodeType).some(key => key.endsWith('___frame'));
   const hiddenUI = node.props?.hideUI === true;
   return {
     key: node.key,
     name: this.nodeDisplay(node),
     displayName: node.displayName,
-    position: {x, y},
-    color,
-    bgColor,
+    position: layout?.[node.key] || {x: 0, y: 0},
+    color: this.colorByCategory(category, categories),
+    bgColor: this.bgColorByCategory(category, categories),
     selected: node.key === selectedNodeKey,
     hovered: node.key === hoveredNodeKey,
     hasUI,
@@ -121,7 +112,7 @@ formatConnection(fromKey, fromStore, toKey, toStore) {
   };
 },
 
-renderConnectableCandidates({selectedNodeKey, pipeline, nodeTypes, categories}) { //, {nodeTypeMap}) {
+renderConnectableCandidates({selectedNodeKey, pipeline, nodeTypes, categories}) {
   // Store type -> [matching node types grouped by categories]
   const storeTypeToCandidates = {};
   // Go through the selected node's outputs. For each output, find the store
@@ -255,7 +246,7 @@ onNodeRemove({eventlet: {key}, pipeline, selectedNodeKey}) {
 },
 
 onNodeRenamed({eventlet: {key, value}, pipeline}) {
-  // >>> TODO START HERE STARTHERE VERIFY IT WORKS!
+  // TODO(mariakleiner): renaming doesn't work, when triggered from the menu.
   const node = pipeline.nodes.find(node => node.key === key);
   node.displayName = value.trim();
   return {pipeline: this.updateNodeInPipeline(node, pipeline)};
@@ -391,10 +382,7 @@ onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes, layout}) {
     // const name = key.split(this.catalogDelimeter)[1];
     const {svgPoint} = value;
     const newNode = this.makeNewNode(nodeTypes[key], pipeline.nodes, nodeTypes);
-    // newNode.position = {nodegraph: {x: svgPoint.x, y: svgPoint.y}};
     pipeline.nodes = [...pipeline.nodes, newNode];
-    // layout = this.setLayout(layout, pipeline, newNode, svgPoint);
-    // layout[newNode.key] = svgPoint;
     return {
       pipeline,
       selectedNodeKey: newNode.key,
@@ -403,30 +391,14 @@ onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes, layout}) {
   }
 },
 
-onNodeMoved({eventlet: {key, value}, pipeline, layout}) {
-  if (pipeline) {
-    // When a node is moved, update its nodegraph's x and y value.
-    const {x, y} = value;
-    let node = this.findNodeByKey(key, pipeline);
-    // node = {...node, position: {...node.position, nodegraph: {x, y}}};
-    // layout = this.setLayout(layout, pipeline, node, {x, y});
-    // layout[node.key] = {x, y};
-    return {
-      pipeline: this.updateNodeInPipeline(node, pipeline),
-      layout: {...layout, [node.key]: value}
-    };
-  }
-},
-
-setLayout(layout, {key: nodeKey}, {x, y}) {
-  layout[nodeKey] = {x, y};
-  return layout;
+onNodeMoved({eventlet: {key, value}, layout}) {
+  return {
+    layout: {...layout, [key]: value}
+  };
 },
 
 onNodeHovered({eventlet: {key}}) {
-  return {
-    hoveredNodeKey: key
-  };
+  return {hoveredNodeKey: key};
 },
 
 onEdgeRemove({eventlet: {key}, pipeline}) {

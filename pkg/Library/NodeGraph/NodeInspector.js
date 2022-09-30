@@ -186,7 +186,7 @@ async renderBinding(node, name, candidates, pipeline, nodeTypes, service) {
     const store = nodeTypes[node.type].$stores[name];
     const multiple = store.multiple;
     const value = selected?.map(s => this.encodeConnectionValue(s));
-    // const connectedStore = await this.constructConnectedStore(connection, selected, pipeline, nodeTypes, service);
+    const connectedValue = await this.constructConnectedValue(selected, pipeline, nodeTypes, service);
     return {
       name,
       store: {
@@ -197,7 +197,7 @@ async renderBinding(node, name, candidates, pipeline, nodeTypes, service) {
         values: froms
       },
       value,
-      // connectedStore
+      connectedStore: {$type: store.$type, $value: connectedValue}
     };
   }
 },
@@ -233,22 +233,17 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-
-// SOMEHOW USED IN SHADERTOY! WHY???
-// async constructConnectedStore(connection, selected, pipeline, nodeTypes, service) {
-//   const value = await Promise.all(selected?.map(
-//     async ({from, store}) => {
-//       const node = pipeline.nodes.find(node => node.key == from);
-//       if (node) {
-//         const nodeType = nodeTypes[node.type]; //this.findNodeType(node.name, nodeTypes);
-//         if (nodeType) {
-//           return await this.getBindingValue(store, nodeType.$stores[store], node, service);
-//         }
-//       }
-//     }
-//   ) || []);
-//   return {$type: connection.store.$type, value};
-// },
+async constructConnectedValue(selected, pipeline, nodeTypes, service) {
+  return await Promise.all(selected?.map(
+    async ({from, storeName}) => {
+      const node = pipeline.nodes.find(node => node.key == from);
+      const nodeType = nodeTypes[node?.type];
+      if (nodeType) {
+        return await this.getBindingValue(storeName, nodeType.$stores[storeName], node, service);
+      }
+    }
+  ) || []);
+},
 
 renderCandidate({from, storeName}, pipeline) {
   const node = pipeline.nodes.find(n => n.key === from);
