@@ -4,7 +4,6 @@
  * license that can be found in the LICENSE file.
  */
 ({
-// catalogDelimiter: '$$',
 
 update({selectedNodeTypes}, state) {
   state.nodeTypeList = values(selectedNodeTypes).sort(this.sortNodeTypes);

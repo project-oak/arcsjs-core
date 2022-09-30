@@ -24,7 +24,7 @@ const PipelineToolbar = {
   $kind: '$library/NodeGraph/PipelineToolbar',
   $inputs: [
     {pipeline: 'selectedPipeline'},
-    'pipelines',
+    'pipelines'
   ],
   $staticInputs: {
     publishPaths: {}

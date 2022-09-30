@@ -21,9 +21,7 @@ selectCategory(nodeTypes, category, search) {
 
 filter(nodeTypes, category, search) {
   const matchSearch = (name) => (!search || name.toLowerCase().includes(search.toLowerCase()));
-  // return nodeTypes.filter(({$meta}) => ($meta.category === category && matchSearch($meta.name)));
   const selectedNodeTypes = {};
-  // return values(nodeTypes)?.filter(({$meta}) => ($meta.category === category && matchSearch($meta.name)));
   keys(nodeTypes)?.forEach(key => {
     const nodeType = nodeTypes[key];
     if (nodeType.$meta.category === category && matchSearch(nodeType.$meta.name)) {
@@ -41,29 +39,17 @@ render(inputs, state) {
 
 groupByCategory({nodeTypes, categories, search}, state) {
   const groups = {};
-  values(nodeTypes).forEach(({$meta: {category}}) => this.requireGroup(category, groups, categories));
-  return values(groups).map(group => this.renderGroup(group, nodeTypes, search, categories,state));
-  //   group => {
-  //   const selected = group.category === state.selectedCategory;
-  //   const numSearchResults = search ? keys(this.filter(nodeTypes, group.category, search)).length : 0;
-  //   assign(group, {
-  //     selected,
-  //     colorStyle: {color: selected ? this.colorByCategory(group.category, categories) : 'inherit'},
-  //     numSearchResults,
-  //     hideSearchCount: numSearchResults === 0
-  //   });
-  // });
-  // return groups;
+  values(nodeTypes).forEach(
+    ({$meta: {category}}) => this.requireGroup(category, groups, categories)
+  );
+  return values(groups).map(
+    group => this.renderGroup(group, nodeTypes, search, categories,state)
+  );
 },
 
 requireGroup(category, groups, categories) {
-  //return this.findGroup(category, groups) 
   return groups[category] ?? this.createGroup(category, groups, categories);
 },
-
-// findGroup(category, groups) {
-//   return groups.find(g => g.category === category);
-// },
 
 createGroup(category, groups, categories) {
   const group = {
