@@ -13,10 +13,14 @@ nameDelim: ':',
 
 async update(inputs, state) {
   const {pipeline} = inputs;
-  if (this.pipelineChanged(pipeline, state.pipeline) || this.nodesChanged(pipeline.nodes, state.nodes)) {
-    state.pipeline = pipeline;
-    state.nodes = [...pipeline.nodes];
-    return {recipes: this.recipesForPipeline(inputs, state)};
+  if (pipeline) {
+    if (this.pipelineChanged(pipeline, state.pipeline) || this.nodesChanged(pipeline.nodes, state.nodes)) {
+      state.pipeline = pipeline;
+      state.nodes = [...pipeline.nodes];
+      return {recipes: this.recipesForPipeline(inputs, state)};
+    }
+  } else {
+    assign(state, {pipeline: null, nodes: []});
   }
 },
 

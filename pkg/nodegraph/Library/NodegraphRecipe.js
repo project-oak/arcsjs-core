@@ -24,7 +24,7 @@ const PipelineToolbar = {
   $kind: '$library/NodeGraph/PipelineToolbar',
   $inputs: [
     {pipeline: 'selectedPipeline'},
-    'pipelines'
+    'pipelines',
   ],
   $staticInputs: {
     publishPaths: {}
@@ -32,7 +32,9 @@ const PipelineToolbar = {
   $outputs: [
     {pipeline: 'selectedPipeline'},
     'selectedNodeKey',
-    'pipelines'
+    'pipelines',
+    'previewLayout',
+    'nodegraphLayout'
   ],
   $slots: {
     chooser: {
@@ -63,13 +65,13 @@ export const NodegraphRecipe = {
       $value: null
     },
     selectedNodeKey: {
-      $type: 'String', //'JSON'
+      $type: 'String',
     },
     candidates: {
       $type: 'JSON'
     },
     nodeTypes: {
-      $type: 'JSON', // '[JSON]',
+      $type: 'JSON',
       $value: nodeTypes
     },
     hoveredNodeKey: {
@@ -85,6 +87,12 @@ export const NodegraphRecipe = {
     categories: {
       $type: 'JSON',
       $value: categories
+    },
+    previewLayout: {
+      $type: 'JSON'
+    },
+    nodegraphLayout: {
+      $type: 'JSON'
     }
   },
   // 'a_frame': {
@@ -106,10 +114,12 @@ export const NodegraphRecipe = {
             'selectedNodeKey',
             'nodeTypes',
             'categories',
+            {layout: 'previewLayout'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNodeKey'
+            'selectedNodeKey',
+            {layout: 'previewLayout'}
           ]
         }
       },
@@ -125,11 +135,13 @@ export const NodegraphRecipe = {
             'nodeTypes',
             'hoveredNodeKey',
             'categories',
-            'candidates'
+            'candidates',
+            {layout: 'nodegraphLayout'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNodeKey'
+            'selectedNodeKey',
+            {layout: 'nodegraphLayout'}
           ]
         }
       },
@@ -181,6 +193,15 @@ export const NodegraphRecipe = {
     $staticInputs: {globalStores},
     $outputs: ['candidates']
   },
+  connectionUpdator: {
+    $kind: '$library/NodeGraph/ConnectionUpdator',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'nodeTypes',
+      'candidates',
+    ],
+    $outputs: [{pipeline: 'selectedPipeline'}]
+  },
   nodeUpdator: {
     $kind: '$library/NodeGraph/NodeUpdator',
     $inputs: [
@@ -200,5 +221,14 @@ export const NodegraphRecipe = {
       'nodeTypes'
     ],
     $outputs: ['recipes'],
+  },
+  layoutUpdator: {
+    $kind: '$library/NodeGraph/LayoutUpdator',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'previewLayout',
+      'nodegraphLayout'
+    ],
+    $outputs: [{pipeline: 'selectedPipeline'}]
   }
 };

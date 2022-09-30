@@ -26,7 +26,9 @@ export class DesignerLayout extends DragDrop {
     document.addEventListener('keydown', event => this.onKeydown(event));
   }
   update() {
-    this.updateGeometry();
+    // TODO(sjmiles): the `on-slotchange` doesn't work as expected.
+    setTimeout(() => {this.updateGeometry();}, 100);
+    // this.updateGeometry();
   }
   onKeydown(event) {
     if (!this.hasActiveInput()) {
@@ -65,7 +67,7 @@ export class DesignerLayout extends DragDrop {
   /**/
   deleteAction(target) {
     if (target) {
-      this.key = this.getTargetKey(target); // target.id;
+      this.key = this.getTargetKey(target);
       this.fire('delete');
     }
   }

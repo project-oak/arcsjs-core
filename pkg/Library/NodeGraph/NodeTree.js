@@ -69,7 +69,7 @@ updateSelectedNodeKey({pipeline, selectedNodeKey}, state) {
   // when switching pipelines, we reset some state
   const meta = pipeline?.$meta;
   if (meta?.name !== state.selectedPipelineName) {
-    state.selectedPipelineName = meta.name;
+    state.selectedPipelineName = meta?.name;
     candidate = null;
   }
   // select any first node by default

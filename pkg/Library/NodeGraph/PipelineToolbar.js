@@ -80,16 +80,19 @@
       state.selectedPublishKey = keys(publishPaths)[0];
     }
     if (pipeline) {
-      if (this.pipelineChanged(pipeline, state.pipeline)) {
+      if (!deepEqual(pipeline, state.pipeline)) {
+        const outputs = {};
         if (this.pipelineId(state.pipeline) !== this.pipelineId(pipeline)) {
           await this.updateSelectedPipelineHistory(pipeline, service);
+          assign(outputs, this.computeLayouts(pipeline));
+          outputs['selectedNodeKey'] = null;
         }
         state.pipeline = pipeline;
-        return {
+        assign(outputs, {
           pipeline,
-          pipelines: this.updateItemInPipelines(pipeline, pipelines),
-          selectedNodeKey: null
-        };
+          pipelines: this.updateItemInPipelines(pipeline, pipelines)
+        });
+        return outputs;
       }
     } else {
       state.renaming = false;
@@ -112,9 +115,6 @@
   pipelineId(pipeline) {
     // Backward compatibility: prior to 0.4.0 pipelines were created with `name` only, without a unique id.
     return pipeline?.$meta.id || pipeline?.$meta?.name || null;
-  },
-  pipelineChanged(pipeline, currentPipeline) {
-    return JSON.stringify(pipeline) !== JSON.stringify(currentPipeline);
   },
   updateItemInPipelines(pipeline, pipelines) {
     const index = this.findPipelineIndex(pipeline, pipelines);
@@ -271,7 +271,25 @@
   async onRefresh({publicPipelinesUrl}) {
     const publicPipelines = await this.fetchPublicPipelines(publicPipelinesUrl);
     return {publicPipelines};
-  },  
+  },
+  computeLayouts(pipeline) {
+    return {
+      nodegraphLayout: assign({id: this.pipelineId(pipeline)}, pipeline.position?.['nodegraphLayout']), //this.computeLayout(pipeline, 'nodegraphLayout'),
+      previewLayout: assign({id: this.pipelineId(pipeline)}, pipeline.position?.['previewLayout']), //this.computeLayout(pipeline, 'previewLayout')
+    };
+  },
+  // computeLayout(pipeline, key) {
+  //   const layout = {};
+  //   // pipeline.nodes.forEach(node => {
+      
+  //   //   // if (key === 'preview') {
+  //   //   //   layout[node.key] = values(node.position?.[key])?.[0] || {};
+  //   //   // } else {
+  //   //   //   layout[node.key] = node.position?.[key] || {};
+  //   //   // }
+  //   // });
+  //   return layout;
+  // },
   template: html`
 <style>
   :host {
