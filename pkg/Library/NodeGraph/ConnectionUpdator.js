@@ -13,19 +13,47 @@
 // automatically connect nodes.
 
 update({pipeline, nodeTypes, candidates}, state) {
-  // TODO(mariakleiner): remove connections to candidates that were removed.
-  // TODO(mariakleiner): also update connections, if candidates were changed.
-  if (pipeline && this.pipelineChanged(pipeline, state.pipeline)) {
+  if (pipeline && 
+      (this.pipelineChanged(pipeline, state.pipeline) || this.candidatesChanged(candidates, state.candidates))) {
     state.pipeline = pipeline;
-    if (this.updatePipelineConnections(pipeline, nodeTypes, candidates)) {
-      return {pipeline};
+    state.candidates = candidates;
+    let changed = false;
+    if (this.removePipelineOutdatedConnections(pipeline, nodeTypes, candidates)) {
+      changed = true;
     }
+    if (this.updatePipelineConnections(pipeline, nodeTypes, candidates)) {
+      changed = true;
+    }
+    return {pipeline};
   }
 },
 
 pipelineChanged(pipeline, oldPipeline) {
   return pipeline.id !== oldPipeline?.id || 
          pipeline.nodes?.length !== oldPipeline?.nodes?.length;
+},
+
+candidatesChanged(candidates, oldCandidates) {
+  return !deepEqual(candidates, oldCandidates);
+},
+
+removePipelineOutdatedConnections(pipeline, nodeTypes, candidates) {
+  return pipeline.nodes
+    .map(node => this.removeNodeOutdatedConnections(node, candidates[node.key]))
+    .some(changed => changed);
+},
+
+removeNodeOutdatedConnections(node, candidates) {
+  let changed = false;
+  keys(node.connections).forEach(key => {
+    const values = node.connections[key];
+    node.connections[key] = values.filter(connection => candidates[key].some(candidate => deepEqual(candidate, connection)))
+    if (node.connections[key].length === 0) {
+      delete node.connections[key];
+    }
+    changed = changed || (node.connections[key]?.length === values.length);
+  });
+  return changed;
 },
 
 updatePipelineConnections(pipeline, nodeTypes, candidates) {
