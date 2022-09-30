@@ -39,21 +39,26 @@ candidatesChanged(candidates, oldCandidates) {
 
 removePipelineOutdatedConnections(pipeline, nodeTypes, candidates) {
   return pipeline.nodes
-    .map(node => this.removeNodeOutdatedConnections(node, candidates[node.key]))
+    .map(node => {this.removeNodeOutdatedConnections(node, candidates[node.key])
+    })
     .some(changed => changed);
 },
 
 removeNodeOutdatedConnections(node, candidates) {
   let changed = false;
   keys(node.connections).forEach(key => {
-    const values = node.connections[key];
-    node.connections[key] = values.filter(connection => candidates[key].some(candidate => deepEqual(candidate, connection)))
+    const conns = node.connections[key];
+    node.connections[key] = conns.filter(conn => this.hasMatchingCandidate(conn, candidates[key]));
     if (node.connections[key].length === 0) {
       delete node.connections[key];
     }
     changed = changed || (node.connections[key]?.length === values.length);
   });
   return changed;
+},
+
+hasMatchingCandidate(connection, candidates) {
+  return candidates.some(({from, storeName}) => from === connection.from && storeName === connection.storeName);
 },
 
 updatePipelineConnections(pipeline, nodeTypes, candidates) {

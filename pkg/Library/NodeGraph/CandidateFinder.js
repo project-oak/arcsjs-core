@@ -7,8 +7,8 @@
 ({
 
 async update({pipeline, nodeTypes, globalStores}, state) {
-  if (this.pipelineChanged(pipeline, state.pipeline) ||
-      this.nodesChanged(pipeline?.nodes, state.nodes)) {
+  if (pipeline && 
+      (this.pipelineChanged(pipeline, state.pipeline) || this.nodesChanged(pipeline?.nodes, state.nodes))) {
     state.pipeline = pipeline;
     state.nodes = pipeline?.nodes;
     return {

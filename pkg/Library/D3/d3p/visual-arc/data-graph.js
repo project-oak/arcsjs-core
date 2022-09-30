@@ -185,7 +185,7 @@ export class DataGraph extends Xen.Async {
     nodes.sort((a, b) => (a?.hi ? 1 : b?.hi ? -1 : 1));
     //console.log(nodes);
     //const _links = [];
-    const _links = links;
+    const _links = links.filter(({target}) => nodes.some(({name}) => name === target));
     return {links: _links, nodes};
   }
   generateGraph(parsed) {

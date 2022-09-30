@@ -252,7 +252,7 @@ onNodeRenamed({eventlet: {key, value}, pipeline}) {
   return {pipeline: this.updateNodeInPipeline(node, pipeline)};
 },
 
-onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeTypes}, state) {
+onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeTypes, layout}) {
   // Keys for duplicated nodes.
   const newNodeKeys = [];
   // A map from original node key to its duplicated node key.
@@ -262,6 +262,7 @@ onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeT
   //
   const nodes = pipeline.nodes.filter(node => nodeKeys.includes(node.key));
   const newNodes = [];
+  const newLayout = {...layout};
   nodes.forEach(node => {
     // Duplicate the node.
     const newNode = this.duplicateNode(node, pipeline, nodeTypes);
@@ -271,6 +272,7 @@ onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeT
     newNodes.push(newNode);
     newNodeKeys.push(newNode.key);
     keyMap[node.key] = newNode.key;
+    newLayout[newNode.key] = {...layout[node.key], y: layout[node.key].y + 60};
   });
 
   // Connect duplicated nodes to duplicated nodes (instead of the original ones).
@@ -282,7 +284,8 @@ onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeT
 
   return {
     pipeline,
-    selectedNodeKey: keyMap[selectedNodeKey]
+    selectedNodeKey: keyMap[selectedNodeKey],
+    layout: newLayout
   };
 },
 
@@ -296,8 +299,6 @@ duplicateNode(node, pipeline, nodeTypes) {
   if (node.connections) {
     newNode.connections = JSON.parse(JSON.stringify(node.connections));
   }
-  // In node editor, put the duplicated node below the original node.
-  newNode.position = {...node.position, nodegraph: {...node.position.nodegraph, y: node.position.nodegraph.y + 60}};
   // In runner, put the duplicated particle below the original particle.
   if (newNode.position.preview) {
     newNode.position.preview = this.duplicatePreviewPosition(
@@ -355,10 +356,9 @@ duplicateDisplayName(displayName, pipeline) {
   return parts.join(' ');
 },
 
-onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType, svgX, svgY}}, pipeline, nodeTypes}, state) {
+onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType, svgX, svgY}}, pipeline, nodeTypes, layout}) {
   // Add the new node.
   const newNode = this.makeNewNode(nodeType, pipeline.nodes, nodeTypes);
-  newNode.position = {nodegraph: {x: svgX, y: svgY}};
   // Connect to the first store that matches toStoreType.
   // TODO(b/244191110): Type matching API to be wired here.
   const toStore = this.getInputStores(nodeType)
@@ -367,7 +367,8 @@ onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType
   pipeline.nodes = [...pipeline.nodes, newNode];
   return {
     pipeline,
-    selectedNodeKey: newNode.key
+    selectedNodeKey: newNode.key,
+    layout: {...layout, [newNode.key]: {x: svgX, y: svgY}}
   };
 },
 
@@ -377,9 +378,6 @@ onNodeSelect({eventlet: {key}}) {
 
 onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes, layout}) {
   if (pipeline) {
-    // When a node type is dropped onto node-graph-editor, create a new node,
-    // and set its svg position (nodegraph: {x, y}).
-    // const name = key.split(this.catalogDelimeter)[1];
     const {svgPoint} = value;
     const newNode = this.makeNewNode(nodeTypes[key], pipeline.nodes, nodeTypes);
     pipeline.nodes = [...pipeline.nodes, newNode];
