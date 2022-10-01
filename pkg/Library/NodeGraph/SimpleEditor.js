@@ -120,7 +120,7 @@
     return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
   },
 
-  formatNodeKey({key, index}) {
+  formatNodeKey(key, index) {
     return `${key}${index}`.replace(/ /g,'');
   },
 
