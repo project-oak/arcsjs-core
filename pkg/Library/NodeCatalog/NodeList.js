@@ -33,16 +33,18 @@ sortNodeTypes(t1, t2) {
 async onItemClick({eventlet: {key}, selectedNodeTypes, pipeline}) {
   if (pipeline) {
     // TODO(mariakleiner): nodes should be a map!
-    pipeline.nodes = [
-      ...pipeline.nodes,
-      this.makeNewNode(key, this.indexNewNode(key, pipeline.nodes), selectedNodeTypes)
-    ];
+    // pipeline.nodes = [
+    //   ...pipeline.nodes,
+    //   this.makeNewNode(key, this.indexNewNode(key, pipeline.nodes), selectedNodeTypes)
+    // ];
+    pipeline[key] = this.makeNewNode(key, pipeline, selectedNodeTypes);
     return {pipeline};
   }
 },
 
-makeNewNode(key, index, nodeTypes) {
+makeNewNode(key, pipeline, nodeTypes) {
   const name = nodeTypes[key].$meta.name;
+  const index = this.indexNewNode(key, pipeline.nodes);
   return {
     type: key,
     index,
@@ -52,7 +54,7 @@ makeNewNode(key, index, nodeTypes) {
 },
 
 indexNewNode(key, nodes) {
-  const typedNodes = nodes.filter(node => key === node.type);
+  const typedNodes = values(nodes).filter(node => key === node.type);
   return (typedNodes.pop()?.index || 0) + 1;
 },
 

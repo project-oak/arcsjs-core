@@ -24,14 +24,15 @@ pipelineChanged(pipeline, oldPipeline) {
 
 nodesChanged(nodes, currentNodes) {
   if (nodes?.length === currentNodes?.length) {
-    return !currentNodes?.every((node, index) => deepEqual(node, currentNodes[index]));
+    return keys(currentNodes).every(key => deepEqual(currentNodes[key], nodes[key]));
+    // return !currentNodes?.every((node, index) => deepEqual(node, currentNodes[index]));
   }
   return true;
 },
 
 findCandidates(pipeline, nodeTypes, globalStores) {
   const candidates = {};
-  pipeline?.nodes.forEach(node => {
+  values(pipeline?.nodes).forEach(node => {
     candidates[node.key] = this.findNodeCandidates(node, pipeline, nodeTypes, globalStores);
   });
   return candidates;
@@ -51,9 +52,9 @@ findConnectionCandidates(storeName, {$type}, node, {nodes}, nodeTypes, globalSto
   const candidates = [];
   candidates.push(this.findGlobalCandidate(storeName, globalStores));
   
-  nodes.forEach(n => {
-    if (n.key !== node.key) {
-      candidates.push(this.findCandidateInNode(n.key, $type, nodeTypes[n.type]));
+  keys(nodes).forEach(key => {
+    if (key !== node.key) {
+      candidates.push(this.findCandidateInNode(key, $type, nodeTypes[nodes[key].type]));
     }
   });
   return candidates.filter(c => c);

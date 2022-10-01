@@ -7,9 +7,9 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-  async initialize({pipelines, publishPaths}, state, {service, output}) {
+  async initialize({pipelines, publishPaths}, state, {service}) {
     const publicPipelines = await this.fetchPublicPipelines(publishPaths);
-    pipelines = await this.backwardCompatibilityPipelines(pipelines, {service, output});
+    // pipelines = await this.backwardCompatibilityPipelines(pipelines, {service, output});
     const pipeline = await this.retrieveSelectedPipeline(pipelines, publicPipelines, service);
     if (!pipeline) {
       await this.updateSelectedPipelineHistory(null, service);
@@ -47,34 +47,34 @@
   },
   async retrieveSelectedPipeline(pipelines, publicPipelines, service) {
     const pipelineId = await service({kind: 'HistoryService', msg: 'retrieveSelectedPipeline'});
-    let pipeline = this.findPipelineById(pipelineId, pipelines) ||
-                   this.findPipelineById(pipelineId, publicPipelines);
-    if (!pipeline) {
-      pipeline = await this.backwardCompatibilitySelectedPipeline(pipelineId, pipelines, publicPipelines, service);
-    }
-    return pipeline;
+    return this.findPipelineById(pipelineId, pipelines) ||
+           this.findPipelineById(pipelineId, publicPipelines);
+    // if (!pipeline) {
+    //   pipeline = await this.backwardCompatibilitySelectedPipeline(pipelineId, pipelines, publicPipelines, service);
+    // }
+    // return pipeline;
   },
-  async backwardCompatibilityPipelines(pipelines, {service, output}) {
-    // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
-    if (pipelines?.some(({$meta}) => !$meta.id)) {
-      pipelines = await Promise.all(pipelines.map(async p => {
-        p.$meta.id = p.$meta.id || await this.makeUniqueId(pipelines, service);
-        return p;
-      }));
-      await output({pipelines});
-    }
-    return pipelines;
-  },
-  async backwardCompatibilitySelectedPipeline(name, pipelines, publicPipelines, service) {
-    // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
-    // This method selects pipeline by name found in the URL param.
-    const pipeline = this.findPipelineByName(name, pipelines) ||
-                     this.findPipelineByName(name, publicPipelines);
-    if (pipeline) {
-      await this.updateSelectedPipelineHistory(pipeline, service);
-    }
-    return pipeline;
-  },
+  // async backwardCompatibilityPipelines(pipelines, {service, output}) {
+  //   // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
+  //   if (pipelines?.some(({$meta}) => !$meta.id)) {
+  //     pipelines = await Promise.all(pipelines.map(async p => {
+  //       p.$meta.id = p.$meta.id || await this.makeUniqueId(pipelines, service);
+  //       return p;
+  //     }));
+  //     await output({pipelines});
+  //   }
+  //   return pipelines;
+  // },
+  // async backwardCompatibilitySelectedPipeline(name, pipelines, publicPipelines, service) {
+  //   // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
+  //   // This method selects pipeline by name found in the URL param.
+  //   const pipeline = this.findPipelineByName(name, pipelines) ||
+  //                    this.findPipelineByName(name, publicPipelines);
+  //   if (pipeline) {
+  //     await this.updateSelectedPipelineHistory(pipeline, service);
+  //   }
+  //   return pipeline;
+  // },
   async update({pipeline, pipelines, publishPaths}, state, {service}) {
     if (publishPaths?.length > 0 && !state.selectedPublishKey) {
       state.selectedPublishKey = keys(publishPaths)[0];
@@ -108,7 +108,7 @@
       kind: 'HistoryService',
       msg: 'setSelectedPipeline',
       data: {
-        pipeline: pipeline.$meta.id
+        pipeline: pipeline?.$meta?.id
       }
     });
   },
@@ -122,7 +122,7 @@
   async addNewPipeline(pipelines, newName, service) {
     const id = await this.makeUniqueId(pipelines, service);
     const name = await this.makeNewName(newName, service);
-    const pipeline = {$meta: {name, id}, nodes: []};
+    const pipeline = {$meta: {name, id}, nodes: {}};
     return {
       pipeline,
       pipelines: [...(pipelines || []), pipeline]
@@ -163,7 +163,10 @@
         currentPipelines,
         this.makePipelineCopyName(currentPipeline.$meta?.name, currentPipelines),
         service);
-      pipeline.nodes = currentPipeline.nodes.map(node => ({...node}));
+      values(currentPipeline).forEach(node => {
+        pipeline.nodes[node.key] = {...node};
+      });
+      // pipeline.nodes = currentPipeline.nodes.map(node => ({...node}));
       return {pipeline, pipelines};
     }
   },

@@ -125,9 +125,9 @@ render({pipeline, selectedNodeKey, nodeTypes, categories, layout}, {recipes}) {
       (node && !this.isUIHidden(node) &&
         this.getParticleNamesForNode(node, pipeline, recipes)) ||
       [];
-  const rects = pipeline?.nodes?.map(
+  const rects = values(pipeline?.nodes).map(
     node => idsForNode(node).map(id => ({id, position: layout?.[node.key]}))).flat();
-  const node = pipeline?.nodes.find(({key}) => key === selectedNodeKey);
+  const node = pipeline?.nodes?.[selectedNodeKey]; //.find(({key}) => key === selectedNodeKey);
   const nodeType = nodeTypes?.[node?.type];
   return {
     selectedKeys: idsForNode(node),
@@ -142,7 +142,8 @@ isUIHidden(node) {
 
 onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
-  pipeline.nodes = pipeline.nodes.filter(n => n.key !== node.key);
+  // pipeline.nodes = pipeline.nodes.filter(n => n.key !== node.key);
+  delete pipeline.nodes[node.key];
   return {pipeline, selectedNodeKey: null};
 },
 
@@ -161,7 +162,7 @@ onNodePosition({eventlet: {key, value}, pipeline, layout}, {recipes}) {
 },
 
 findNodeByParticle(particleName, pipeline, recipes) {
-  return pipeline.nodes.find(node => {
+  return values(pipeline.nodes).find(node => {
     const names = this.getParticleNamesForNode(node, pipeline, recipes);
     return names?.find(name => name === particleName);
   });
@@ -179,10 +180,11 @@ encodeFullNodeKey({key}, {$meta}) {
 },
 
 updateNodeInPipeline(node, pipeline) {
-  const index = pipeline.nodes.findIndex(n => n.key === node.key);
+  // const index = pipeline.nodes.findIndex(n => n.key === node.key);
   // TODO (b/245770204): avoid copying objects
   // pipeline.nodes[index] = node;
-  pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
+  // pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
+  pipeline[node.key] = node;
   return pipeline;
 },
 
@@ -194,8 +196,9 @@ onDrop({eventlet: {key, value}, nodeTypes, pipeline}, state) {
   // TODO(mariakleiner): help needed! sometimes `value` contains the keys, but sometimes it doesn't...
   log(`>>>>> key=${key}; value=${JSON.stringify(value)}`);
   if (pipeline) {
-    const newNode = this.makeNewNode(value, this.indexNewNode(value, pipeline.nodes), nodeTypes);
-    pipeline.nodes = [...pipeline.nodes, newNode];
+    const newNode = this.makeNewNode(value, pipeline, nodeTypes);
+    // pipeline.nodes = [...pipeline.nodes, newNode];
+    pipeline[newNode.key] = newNode;
     return {
       pipeline,
       selectedNodeKey: newNode.key
@@ -203,8 +206,9 @@ onDrop({eventlet: {key, value}, nodeTypes, pipeline}, state) {
   }
 },
 
-makeNewNode(key, index, nodeTypes) {
+makeNewNode(key, pipeline, nodeTypes) {
   const name = nodeTypes[key].$meta.name;
+  const index = this.indexNewNode(key, pipeline.nodes);
   return {
     type: key,
     index,
@@ -214,7 +218,7 @@ makeNewNode(key, index, nodeTypes) {
 },
 
 indexNewNode(key, nodes) {
-  const typedNodes = nodes.filter(node => key === node.type);
+  const typedNodes = values(nodes).filter(node => key === node.type);
   return (typedNodes.pop()?.index || 0) + 1;
 },
 

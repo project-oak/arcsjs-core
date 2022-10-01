@@ -15,7 +15,7 @@ async update({pipeline}, state, {service}) {
         $meta: {
           name: await service({msg: 'MakeName'})
         },
-        nodes: []
+        nodes: {}
       }
     };
   }

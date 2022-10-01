@@ -18,7 +18,7 @@ update({pipeline, nodeTypes, candidates}, state) {
     state.pipeline = pipeline;
     state.candidates = candidates;
     let changed = false;
-    if (this.removePipelineOutdatedConnections(pipeline, nodeTypes, candidates)) {
+    if (this.removePipelineOutdatedConnections(pipeline, candidates)) {
       changed = true;
     }
     if (this.updatePipelineConnections(pipeline, nodeTypes, candidates)) {
@@ -37,10 +37,9 @@ candidatesChanged(candidates, oldCandidates) {
   return !deepEqual(candidates, oldCandidates);
 },
 
-removePipelineOutdatedConnections(pipeline, nodeTypes, candidates) {
-  return pipeline.nodes
-    .map(node => {this.removeNodeOutdatedConnections(node, candidates[node.key])
-    })
+removePipelineOutdatedConnections(pipeline, candidates) {
+  return values(pipeline.nodes)
+    .map(node => this.removeNodeOutdatedConnections(node, candidates[node.key]))
     .some(changed => changed);
 },
 
@@ -62,7 +61,7 @@ hasMatchingCandidate(connection, candidates) {
 },
 
 updatePipelineConnections(pipeline, nodeTypes, candidates) {
-  return pipeline.nodes
+  return values(pipeline.nodes)
     .map(node => this.updateNodeConnections(node, nodeTypes[node.type], candidates[node.key]))
     .some(changed => changed);
 },

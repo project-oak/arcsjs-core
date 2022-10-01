@@ -89,7 +89,7 @@ render({pipeline, categories, selectedNodeKey, nodeTypes}) {
 renderGraphNodes(nodes, nodeTypes, nodeKey, categories) {
   const rootContainer = this.makeContainerModel('main', 'runner');
   const graph = {name: 'Root', icon: 'settings', graphNodes: [rootContainer], isContainer: 'true'};
-  const graphNodes = nodes?.map(node => {
+  const graphNodes = values(nodes).map(node => {
     const {key, name, type} = node;
     const nodeType = nodeTypes[type];
     const categoryName = nodeType?.$meta?.category;
@@ -156,7 +156,7 @@ async onNodeSelect({eventlet: {key}}) {
 
 async onDrop({eventlet: {key: container, value: key}, pipeline, nodeTypes, layout}, state, {service}) {
   //log('onDrop:', key, container);
-  const node = pipeline.nodes.find(node => node.key === key);
+  const node = pipeline.nodes[key]; //.find(node => node.key === key);
   const nodeType = nodeTypes[node.type];
   const hostIds = this.getParticleNames(nodeType).map(particleName => this.hostId(node, particleName));
   await service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
