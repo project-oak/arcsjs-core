@@ -78,7 +78,7 @@ nodesChanged(nodes, oldNodes) {
 },
 
 layoutChanged(pipeline, layout, oldLayout) {
-  return (pipeline.$meta.id === layout.id) && !deepEqual(layout, oldLayout);
+  return (pipeline.$meta.id === layout?.id) && !deepEqual(layout, oldLayout);
 },
 
 hasSameNode(node, nodes) {

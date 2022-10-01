@@ -220,7 +220,8 @@ export const NodegraphRecipe = {
     $kind: '$library/NodeGraph/RecipeBuilder',
     $inputs: [
       {pipeline: 'selectedPipeline'},
-      'nodeTypes'
+      'nodeTypes',
+      {layout: 'previewLayout'}
     ],
     $outputs: ['recipes'],
   },
