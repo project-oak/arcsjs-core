@@ -120,8 +120,8 @@
     return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
   },
 
-  formatNodeKey({name, index}) {
-    return `${name}${index}`.replace(/ /g,'');
+  formatNodeKey({key, index}) {
+    return `${key}${index}`.replace(/ /g,'');
   },
 
   onDeleteAll({pipeline}) {
