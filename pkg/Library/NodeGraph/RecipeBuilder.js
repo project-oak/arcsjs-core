@@ -35,7 +35,7 @@ async update(inputs, state) {
 nodeTypeMap(nodeTypes, state) {
   if (!state.nodeTypeMap) {
     state.nodeTypeMap = {};
-    values(nodeTypes).forEach(t => state.nodeTypeMap[t.$meta.key] = this.flattenNodeType(t));
+    values(nodeTypes).forEach(t => state.nodeTypeMap[t.$meta.id] = this.flattenNodeType(t));
   }
   return state.nodeTypeMap;
 },

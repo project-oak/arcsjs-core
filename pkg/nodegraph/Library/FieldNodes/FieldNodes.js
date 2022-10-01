@@ -9,7 +9,7 @@
 
 export const TextField = {
   $meta: {
-    name: 'Text',
+    id: 'Text',
     category: 'Field'
   },
   $stores: {
@@ -31,7 +31,7 @@ export const TextField = {
 
 export const BooleanField = {
   $meta: {
-    name: 'Boolean',
+    id: 'Boolean',
     category: 'Field'
   },
   $stores: {
@@ -52,7 +52,8 @@ export const BooleanField = {
 
 export const TextObject = {
   $meta: {
-    name: 'StaticText',
+    id: 'StaticText',
+    displayName: 'Static Text',
     category: 'Object'
   },
   $stores: {
@@ -73,8 +74,8 @@ export const TextObject = {
 
 export const LineObject = {
   $meta: {
-    name: 'Line',
-    category: 'Object'
+    id: 'Line',
+    category: 'Object',
   },
   $stores: {
     lineStyle: {

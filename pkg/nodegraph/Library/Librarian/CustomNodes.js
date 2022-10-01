@@ -9,7 +9,7 @@
 
 export const Librarian = {
   $meta: {
-    name: 'librarian',
+    id: 'librarian',
     category: 'Custom'
   },
   $stores: {

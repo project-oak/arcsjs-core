@@ -12,14 +12,14 @@ import {NodeCatalogRecipe} from '../../../Library/NodeCatalog/NodeCatalogRecipe.
 export const NodeCatalog = {
   ...NodeCatalogRecipe,
   $meta: {
-    name: 'Node Catalog',
+    id: 'Node Catalog',
     category: 'Panels'
   }
 };
 
 export const ObjectInspector = {
   $meta: {
-    name: 'Object Inspector',
+    id: 'Object Inspector',
     category: 'Panels'
   },
   $stores: {

@@ -9,7 +9,7 @@
 
 export const Test = {
   $meta: {
-    name: 'test',
+    id: 'test',
     category: 'Test'
   },
   $stores: {
@@ -106,7 +106,7 @@ export const Test = {
 
 export const TestStrList = {
   $meta: {
-    name: 'test strings list',
+    id: 'test strings list',
     category: 'Test'
   },
   $stores: {
@@ -122,7 +122,7 @@ export const TestStrList = {
 
 export const TestObjList = {
   $meta: {
-    name: 'test objects list',
+    id: 'test objects list',
     category: 'Test'
   },
   $stores: {
@@ -138,7 +138,7 @@ export const TestObjList = {
 
 export const InspectedTest = {
   $meta: {
-    name: 'inspected test',
+    id: 'inspected test',
     category: 'Test'
   },
   $stores: {

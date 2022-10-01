@@ -6,8 +6,8 @@
 
 export const BarViewer =  {
   $meta: {
-    name: 'bar viewer',
-    category: 'Output',
+    id: 'bar viewer',
+    category: 'Output'
   },
   $stores: {
     ClassifierResults: {
@@ -26,8 +26,8 @@ export const BarViewer =  {
 
 export const JsonViewer =  {
   $meta: {
-    name: 'json viewer',
-    category: 'Output',
+    id: 'json viewer',
+    category: 'Output'
   },
   $stores: {
     ClassifierResults: {
@@ -44,7 +44,7 @@ export const JsonViewer =  {
 
 export const OutputImage = {
   $meta: {
-    name: 'image viewer',
+    id: 'image viewer',
     category: 'Output'
   },
   $stores: {

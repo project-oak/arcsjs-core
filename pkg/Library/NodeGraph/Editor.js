@@ -426,18 +426,18 @@ updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
   return pipeline;
 },
 
-makeNewNode({$meta: {key, name}}, nodes) {
-  const index = this.indexNewNode(key, nodes);
+makeNewNode({$meta: {id, displayName}}, nodes) {
+  const index = this.indexNewNode(id, nodes);
   return {
-    type: key,
+    type: id,
     index,
-    key: this.formatNodeKey(key, index),
-    name: this.displayName(name, index)
+    key: this.formatNodeKey(id, index),
+    name: this.displayName(displayName || id, index)
   };
 },
 
-indexNewNode(key, nodes) {
-  const typedNodes = values(nodes).filter(node => key === node.type);
+indexNewNode(id, nodes) {
+  const typedNodes = values(nodes).filter(node => id === node.type);
   return (typedNodes.pop()?.index || 0) + 1;
 },
 

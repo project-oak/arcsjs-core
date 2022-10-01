@@ -9,8 +9,7 @@
 
 export const Holistic = {
   $meta: {
-    description: 'Mediapipe Holistic',
-    name: 'Mediapipe Holistic',
+    id: 'Mediapipe Holistic',
     category: 'Model'
   },
   $stores: {
@@ -40,8 +39,7 @@ export const Holistic = {
 
 export const MediapipeFaceMesh = {
   $meta: {
-    description: 'Mediapipe FaceMesh',
-    name: 'Mediapipe FaceMesh',
+    id: 'Mediapipe FaceMesh',
     category: 'Model'
   },
   $stores: {
@@ -71,8 +69,7 @@ export const MediapipeFaceMesh = {
 
 export const MediapipeFaceMeshFace = {
   $meta: {
-    description: 'FaceMesh',
-    name: 'FaceMesh',
+    id: 'FaceMesh',
     category: 'Effect'
   },
   $stores: {
@@ -97,8 +94,7 @@ export const MediapipeFaceMeshFace = {
 
 export const MediapipeFaceSticker = {
   $meta: {
-    description: 'Mediapipe Face Sticker',
-    name: 'Face Sticker',
+    id: 'Face Sticker',
     category: 'Effect'
   },
   $stores: {

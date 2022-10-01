@@ -9,8 +9,8 @@
 
 export const Container = {
   $meta: {
-    name: 'Container',
-    category: 'Panels'
+    id: 'Container',
+    category: 'Panels',
   },
   $stores: {
     layout: {

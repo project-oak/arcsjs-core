@@ -9,7 +9,7 @@
 
 export const GoogleMap = {
   $meta: {
-    name: 'Google Maps',
+    id: 'Google Maps',
     category: 'Panels'
   },
   $stores: {

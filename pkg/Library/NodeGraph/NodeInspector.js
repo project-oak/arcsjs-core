@@ -28,7 +28,7 @@ async update(inputs, state, {service, output, invalidate}) {
       // calling async method without awaiting it, on purpose,
       // which creates Special Circumstances, see below
       this.monitorStores(state, nodeTypes, {service, invalidate});
-    }
+    }      
   } else {
     state.node = null;
     return {data: null, nodeType: null};

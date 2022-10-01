@@ -7,7 +7,7 @@
 
 export const FragmentShader = {
   $meta: {
-    name: 'Fragment Shader',
+    id: 'Fragment Shader',
     category: 'Effect'
   },
   $stores: {

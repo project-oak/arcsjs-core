@@ -9,7 +9,7 @@
 
 export const isPoisonous = {
   $meta: {
-    name: 'Is Poisonous',
+    id: 'Is Poisonous',
     category: 'Panels'
   },
   $stores: {
