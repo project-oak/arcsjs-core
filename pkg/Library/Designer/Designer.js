@@ -99,17 +99,17 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-render({pipeline, selectedNode, nodeTypes, categories}, {recipes}) {
+render({pipeline, selectedNodeKey, nodeTypes, categories, layout}, {recipes}) {
   const idsForNode = (node) =>
       (node && !this.isUIHidden(node) &&
         this.getParticleNamesForNode(node, pipeline, recipes)) ||
       [];
   const rects = pipeline?.nodes?.map(
-    node => idsForNode(node).map(id => ({id, position: node.position?.preview?.[id]}))).flat();
-  const nodeType =
-      nodeTypes?.find(({$meta: {name}}) => selectedNode?.name === name);
+    node => idsForNode(node).map(id => ({id, position: layout?.[node.key]}))).flat();
+  const node = pipeline?.nodes.find(({key}) => key === selectedNodeKey);
+  const nodeType = nodeTypes?.[node?.type];
   return {
-    selectedKeys: idsForNode(selectedNode),
+    selectedKeys: idsForNode(node),
     rects,
     color: this.colorByCategory(nodeType?.$meta?.category, categories),
   };
@@ -122,20 +122,19 @@ isUIHidden(node) {
 onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
   pipeline.nodes = pipeline.nodes.filter(n => n.key !== node.key);
-  return {pipeline, selectedNode: null};
+  return {pipeline, selectedNodeKey: null};
 },
 
-onNodePosition({eventlet: {key, value}, pipeline}, {recipes}) {
+onNodePosition({eventlet: {key, value}, pipeline, layout}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
   if (node) {
-    const selectedNode = {...node, position: {...node.position, preview: {...node.position?.preview, [key]: value}}};
     return {
-      selectedNode,
-      pipeline: this.updateNodeInPipeline(selectedNode, pipeline)
+      selectedNodeKey: node.key,
+      layout: {...layout, [node.key]: value}
     };
   } else {
     return {
-      selectedNode: null
+      selectedNodeKey: null
     };
   }
 },
@@ -168,6 +167,43 @@ updateNodeInPipeline(node, pipeline) {
 
 colorByCategory(category, categories) {
   return categories?.[category]?.color || 'lightblue';
+},
+
+onDrop({eventlet: {key, value}, nodeTypes, pipeline}, state) {
+  // TODO(mariakleiner): help needed! sometimes `value` contains the keys, but sometimes it doesn't...
+  log(`>>>>> key=${key}; value=${JSON.stringify(value)}`);
+  if (pipeline) {
+    const newNode = this.makeNewNode(value, this.indexNewNode(value, pipeline.nodes), nodeTypes);
+    pipeline.nodes = [...pipeline.nodes, newNode];
+    return {
+      pipeline,
+      selectedNodeKey: newNode.key
+    };
+  }
+},
+
+makeNewNode(key, index, nodeTypes) {
+  const name = nodeTypes[key].$meta.name;
+  return {
+    type: key,
+    index,
+    key: this.formatNodeKey(key, index),
+    name: this.displayName(name, index)
+  };
+},
+
+indexNewNode(key, nodes) {
+  const typedNodes = nodes.filter(node => key === node.type);
+  return (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
+},
+
+displayName(name, index) {
+  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
+  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
+},
+
+formatNodeKey(key, index) {
+  return `${key}${index}`.replace(/ /g,'');
 },
 
 template: html`

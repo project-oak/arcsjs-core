@@ -80,15 +80,19 @@
       state.selectedPublishKey = keys(publishPaths)[0];
     }
     if (pipeline) {
-      if (this.pipelineChanged(pipeline, state.pipeline)) {
-        if (this.pipelineId(state.pipeline) !== this.pipelineId(pipeline)) {
+      if (!deepEqual(pipeline, state.pipeline)) {
+        const outputs = {};
+        if (state.pipeline?.$meta?.id !== pipeline.$meta.id) {
           await this.updateSelectedPipelineHistory(pipeline, service);
+          assign(outputs, this.computeLayouts(pipeline));
+          outputs['selectedNodeKey'] = pipeline.nodes?.[0]?.key;
         }
         state.pipeline = pipeline;
-        return {
+        assign(outputs, {
           pipeline,
           pipelines: this.updateItemInPipelines(pipeline, pipelines)
-        };
+        });
+        return outputs;
       }
     } else {
       state.renaming = false;
@@ -104,16 +108,9 @@
       kind: 'HistoryService',
       msg: 'setSelectedPipeline',
       data: {
-        pipeline: this.pipelineId(pipeline)
+        pipeline: pipeline.$meta.id
       }
     });
-  },
-  pipelineId(pipeline) {
-    // Backward compatibility: prior to 0.4.0 pipelines were created with `name` only, without a unique id.
-    return pipeline?.$meta.id || pipeline?.$meta?.name || null;
-  },
-  pipelineChanged(pipeline, currentPipeline) {
-    return JSON.stringify(pipeline) !== JSON.stringify(currentPipeline);
   },
   updateItemInPipelines(pipeline, pipelines) {
     const index = this.findPipelineIndex(pipeline, pipelines);
@@ -195,15 +192,14 @@
     }
     return {
       pipelines,
-      pipeline: pipelines.length > 0 ? pipelines[0] : null
+      pipeline: pipelines.length > 0 ? pipelines[0] : null,
+      selectedNodeKey: null
     };
   },
   onShare({pipeline, pipelines, publishPaths}, {selectedPublishKey}) {
     const id = pipeline?.$meta?.name;
     const value = pipeline?.json.replace(/\$/g, '*');
     if (id && value && publishPaths[selectedPublishKey]) {
-      // Backward compatibility for pipelines published in versions < 0.4:
-      this.unpublishPipeline(publishPaths[selectedPublishKey], pipeline.$meta.name, value);
       this.publishPipeline(publishPaths[selectedPublishKey], id, value);
       if (!pipeline?.$meta.isPublished) {
         return this.updatePipelineMeta({isPublished: true}, pipeline, pipelines);
@@ -213,8 +209,6 @@
   onDontShare({pipeline, pipelines, publishPaths}) {
     for (const publishPath of values(publishPaths)) {
       this.unpublishPipeline(publishPath, pipeline.$meta.id);
-      // Backward compatibility for pipelines published in versions < 0.4:
-      this.unpublishPipeline(publishPath, pipeline.$meta.name);
     }
     return this.updatePipelineMeta({isPublished: false}, pipeline, pipelines);
   },
@@ -269,7 +263,13 @@
   async onRefresh({publicPipelinesUrl}) {
     const publicPipelines = await this.fetchPublicPipelines(publicPipelinesUrl);
     return {publicPipelines};
-  },  
+  },
+  computeLayouts(pipeline) {
+    return {
+      nodegraphLayout: assign({id: pipeline.$meta.id}, pipeline.position?.['nodegraphLayout']),
+      previewLayout: assign({id: pipeline.$meta.id}, pipeline.position?.['previewLayout']),
+    };
+  },
   template: html`
 <style>
   :host {

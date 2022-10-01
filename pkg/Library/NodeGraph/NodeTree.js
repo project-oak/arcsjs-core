@@ -13,13 +13,13 @@ async update(input, state, tools) {
   state.nodeTypesMap = mapBy(input.nodeTypes, t => t.$meta.name);
   // ...
   state.graph = await this.constructContainerGraph(input, state, tools);
-  // work on selectedNode
-  const selectCandidate = this.updateSelectedNode(input, state);
+  // work on selectedNodeKey
+  const selectCandidate = this.updateSelectedNodeKey(input, state);
   // best not to output unless we did something
   // TODO(sjmiles): this is not ergonomic, perhaps dirty-checking output can
   // prevent update waterfall with small perf cost for automation.
-  if (selectCandidate != input.selectedNode) {
-    return {selectedNode: selectCandidate};
+  if (selectCandidate != input.selectedNodeKey) {
+    return {selectedNodeKey: selectCandidate};
   }
 },
 
@@ -64,12 +64,12 @@ async constructContainerGraph({pipeline}, {nodeTypesMap}, {service}) {
   return {parsed, tree};
 },
 
-updateSelectedNode({pipeline, selectedNode}, state) {
-  let candidate = selectedNode;
+updateSelectedNodeKey({pipeline, selectedNodeKey}, state) {
+  let candidate = selectedNodeKey;
   // when switching pipelines, we reset some state
   const meta = pipeline?.$meta;
   if (meta?.name !== state.selectedPipelineName) {
-    state.selectedPipelineName = meta.name;
+    state.selectedPipelineName = meta?.name;
     candidate = null;
   }
   // select any first node by default
@@ -79,11 +79,10 @@ updateSelectedNode({pipeline, selectedNode}, state) {
   return candidate;
 },
 
-render({pipeline, categories, selectedNode}, {nodeTypesMap}) {
+render({pipeline, categories, selectedNodeKey}, {nodeTypesMap}) {
   const nodes = pipeline?.nodes;
-  const key = selectedNode?.key;
   return {
-    graphNodes: this.renderGraphNodes(nodes, nodeTypesMap, key, categories)
+    graphNodes: this.renderGraphNodes(nodes, nodeTypesMap, selectedNodeKey, categories)
   };
 },
 
@@ -169,14 +168,11 @@ renderContainers(nodes, nodeTypesMap, nodeKey) {
   return nodes?.map(mapFn).flat().filter(n => !n.key.startsWith(nodeKey));
 },
 
-async onNodeSelect({eventlet: {key}, pipeline}, state, {service}) {
-  const selectedNode = pipeline.nodes.find(node => node.key === key);
-  if (selectedNode) {
-    return {selectedNode};
-  }
+async onNodeSelect({eventlet: {key}}) {
+  return {selectedNodeKey: key};
 },
 
-async onDrop({eventlet: {key: container, value: key}, pipeline, selectedNode}, state, {service}) {
+async onDrop({eventlet: {key: container, value: key}, pipeline}, state, {service}) {
   //log('onDrop:', key, container);
   //
   // const node = pipeline.nodes.find(node => node.key === key);
@@ -188,9 +184,10 @@ async onDrop({eventlet: {key: container, value: key}, pipeline, selectedNode}, s
   const hostId = this.getHostId(node);
   await service({kind: 'ComposerService', msg: 'setContainer', data: {hostId, container}});
   this.updateContainerInNode(node, hostId, container);
-  return {selectedNode: node};
+  return {selectedNodeKey: key};
 },
 
+// TODO(mariakleiner): fix this with `position` and `layout` refactoring
 updateContainerInNode(node, hostId, container) {
   // TODO (b/245770204): avoid copying objects
   // node.position = node.position || {};

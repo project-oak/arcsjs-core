@@ -10,8 +10,8 @@
 onLabelChange({eventlet: {value}}) {
   return {label: value};
 },
-onValueChange({eventlet: {value}}) {
-  return {value: value !== 'on'};
+onValueChange({value}) {
+  return {value: !value};
 },
 template: html`
 <style>

@@ -10,7 +10,7 @@
 export const NodeCatalogRecipe = {
   $stores: {
     selectedNodeTypes: {
-      $type: '[JSON]',
+      $type: 'JSON',
       noinspect: true
     },
     nodeSearch: {

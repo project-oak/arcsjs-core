@@ -26,7 +26,9 @@ export class DesignerLayout extends DragDrop {
     document.addEventListener('keydown', event => this.onKeydown(event));
   }
   update() {
-    this.updateGeometry();
+    // TODO(sjmiles): the `on-slotchange` doesn't work as expected.
+    setTimeout(() => {this.updateGeometry();}, 100);
+    // this.updateGeometry();
   }
   onKeydown(event) {
     if (!this.hasActiveInput()) {
@@ -58,10 +60,14 @@ export class DesignerLayout extends DragDrop {
       styleOverrides
     };
   }
+  // TODO(mariakleiner): port same changes to container-layout.
+  getTargetKey(target) {
+    return target?.getAttribute('particle');
+  }
   /**/
   deleteAction(target) {
     if (target) {
-      this.key = target.id;
+      this.key = this.getTargetKey(target);
       this.fire('delete');
     }
   }
@@ -107,7 +113,7 @@ export class DesignerLayout extends DragDrop {
     this.updateOrders(this.target);
   }
   firePosition(target) {
-    this.key = target?.id;
+    this.key = this.getTargetKey(target); // target?.id;
     this.value = null;
     if (target) {
       const {l, t, w, h} = this.getRect(target);
@@ -198,8 +204,11 @@ export class DesignerLayout extends DragDrop {
     }
   }
   //
+  sanitizeId(id) {
+    return id?.replace(/[)(:]/g, '_');
+  }
   getChildById(id) {
-    return this.querySelector(`#${id}`);
+    return this.querySelector(`#${this.sanitizeId(id)}`); // (`#${id}`);
   }
   getEventTarget(e) {
     const p = e.composedPath();

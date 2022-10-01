@@ -7,18 +7,21 @@
 ({
 
 inspectorDelimiter: '$$',
+defaultInspectorDataProp: 'inspectorData',
 
-async update({node, pipeline, nodeTypes}, state, {service, output, invalidate}) {
-  if (node?.key) {
-    const nodeType = this.findNodeType(node?.name, nodeTypes);
-    if (node?.key !== state.node?.key) {
+async update(inputs, state, {service, output, invalidate}) {
+  const {selectedNodeKey, pipeline, nodeTypes, candidates} = inputs;
+  if (pipeline && selectedNodeKey) {
+    if (selectedNodeKey !== state.node?.key) {
       assign(state, {data: null, hasMonitor: false});
     }
-    if (this.pipelineChanged(pipeline, state.pipeline) || this.nodeChanged(node, state.node) || !state.hasMonitor) {
-      state.pipeline = pipeline;
-      state.node = node;
-      const data = await this.constructData(node, pipeline, nodeTypes, service);
-      await output({data, nodeType});
+    const node = pipeline.nodes.find(node => node.key === selectedNodeKey);
+    if (this.shouldConstructData(inputs, state)) {
+      await this.finagleCustomRecipes(state.recipes, service, false);
+      assign(state, {pipeline, node, candidates, recipes: []});
+      const data = await this.constructData(node, inputs, state, service);
+      await this.finagleCustomRecipes(state.recipes, service, true);
+      await output({data});
     }
     if (!state.hasMonitor) {
       state.hasMonitor = true;
@@ -32,6 +35,17 @@ async update({node, pipeline, nodeTypes}, state, {service, output, invalidate}) 
   }
 },
 
+shouldConstructData({selectedNodeKey, pipeline, candidates}, state) {
+  const node = pipeline.nodes.find(node => node.key === selectedNodeKey);
+  if (node) {
+    return this.pipelineChanged(pipeline, state.pipeline)
+        || this.nodeChanged(node, state.node)
+        || this.candidatesChanged(candidates?.[selectedNodeKey], state.candidates?.[selectedNodeKey])
+        || !state.hasMonitor;
+  }
+  return false;
+},
+
 nodeChanged({key, connections, props, displayName}, node) {
   return node?.key !== key
       || node?.displayName !== displayName
@@ -40,20 +54,21 @@ nodeChanged({key, connections, props, displayName}, node) {
 },
 
 pipelineChanged(pipeline, oldPipeline) {
-  return this.pipelineId(pipeline) !== this.pipelineId(oldPipeline);
+  return pipeline.$meta.id !== oldPipeline?.$meta?.id;
 },
 
-pipelineId(pipeline) {
-  // Backward compatibility for pipelines published in versions < 0.4
-  return pipeline?.$meta?.id || pipeline?.$meta?.name;
+candidatesChanged(candidates, oldCandidates) {
+  return deepEqual(candidates, oldCandidates);
 },
 
-formatTitle({name, index}) {
-  return this.nodeDisplay({name, index});
+async finagleCustomRecipes(recipes, service, finagle) {
+  return Promise.all(recipes?.map(
+    recipe => service({kind: 'RecipeService', msg: 'FinagleRecipe', data: {recipe, value: finagle}})
+  ) || []);
 },
 
 async monitorStores(state, nodeTypes, {service, invalidate}) {
-  const nodeType = this.findNodeType(state.node.name, nodeTypes);
+  const nodeType = nodeTypes[state.node.type];
   if (nodeType) {
     const result = await service({
       kind: 'StoreService',
@@ -80,19 +95,20 @@ getMonitoredNodeStoreIds(node, {$stores}) {
     ;
 },
 
-async constructData(node, pipeline, nodeTypes, service) {
-  const props = await this.constructProps(node, pipeline, nodeTypes, service);
+async constructData(node, inputs, state, service) {
+  const {pipeline} = inputs;
+  const props = await this.constructProps(node, inputs, state,  service);
   return  {
     key: this.encodeFullNodeKey(node, pipeline, this.inspectorDelimiter),
-    title: node.displayName || this.formatTitle(node),
+    title: this.nodeDisplay(node),
     props
   };
 },
 
-async constructProps(node, pipeline, nodeTypes, service) {
+async constructProps(node, inputs, state, service) {
   const props = [];
-  this.pushToProps(props, await this.constructStoreProps(node, pipeline, nodeTypes, service));
-  this.pushToProps(props, await this.constructConnections(node, pipeline, nodeTypes, service));
+  this.pushToProps(props, await this.constructStoreProps(node, inputs, state, service));
+  this.pushToProps(props, await this.constructConnections(node, inputs, service));
   return props;
 },
 
@@ -102,24 +118,28 @@ pushToProps(props, moreProps) {
   }
 },
 
-constructStoreProps(node, pipeline, nodeTypes, service) {
+constructStoreProps(node, inputs, state, service) {
   // construct property objects from Stores
-  const nodeType = node && this.findNodeType(node.name, nodeTypes);
+  const nodeType = node && inputs.nodeTypes[node.type];
   const stores = nodeType?.$stores;
   if (stores) {
     return Promise.all(
       entries(stores)
         .filter(([name, store]) => !store.connection)
-        .map(([name, store]) => this.computeProp(node, this.encodeFullNodeKey(node, pipeline, ''), {name, store}, service))
+        .map(([name, store]) => this.computeProp(node, {name, store}, inputs, state, service))
     );
   }
 },
 
-findNodeType(name, nodeTypes) {
-  return nodeTypes.find(({$meta}) => $meta.name === name);
+async computeProp(node, {name, store}, inputs, state, service) {
+  const {pipeline} = inputs;
+  const fullNodeKey = this.encodeFullNodeKey(node, pipeline, this.inspectorDelimiter);
+  const value = await this.computeBindingValue(name, store, node, service);
+  this.addInspectRecipe(fullNodeKey, {name, store}, inputs, state);
+  return {name, propId: this.sanitize(`${fullNodeKey}${name}`), store, value};
 },
 
-async computeProp(node, fullNodeKey, {name, store}, service) {
+async computeBindingValue(name, store, node, service) {
   let value = await this.getBindingValue(name, store, node, service);
   if (store?.$type === 'Boolean') {
     value = Boolean(value);
@@ -128,12 +148,12 @@ async computeProp(node, fullNodeKey, {name, store}, service) {
   } else if (store.$type === '[Image]') {
     value = value?.map(v => ({src: v.url}));
   }
-  return {name, propId: this.sanitize(`${fullNodeKey}${name}`), store, value};
+  return value;
 },
 
 async getBindingValue(name, store, node, service) {
   const binding = this.fullStoreId(node, name);
-  const storeValue = (await this.getStoreValue(binding, service));
+  const storeValue = (await this.getStoreValue(binding, service))?.value;
   return storeValue ?? node.props?.[name] ?? store.$value;
 },
 
@@ -145,63 +165,93 @@ getStoreValue(storeId, service) {
   return service({kind: 'StoreService', msg: 'GetStoreValue', data: {storeId}});
 },
 
-async constructConnections({connections}, pipeline, nodeTypes, service) {
-  if (connections) {
-    return Promise.all(keys(connections).map(storeName => {
-      return this.renderBinding(storeName, connections[storeName], pipeline, nodeTypes, service);
+async constructConnections(node, {pipeline, nodeTypes, candidates}, service) {
+  const matchingCandidates = (pipeline.nodes.every(({key}) => candidates?.[key]));
+  if (matchingCandidates) {
+    return Promise.all(keys(candidates[node.key]).map(storeName => {
+      return this.renderBinding(node, storeName, candidates[node.key][storeName], pipeline, nodeTypes, service);
     }));
   }
 },
 
-async renderBinding(name, connection, pipeline, nodeTypes, service) {
-  if (connection.candidates) {
-    const froms = connection.candidates.map(candidate => this.renderCandidate(candidate, pipeline)).filter(from => from);
-    const selected = connection.candidates.filter(candidate => candidate.selected);
-    const multiple = connection.store.multiple;
+async renderBinding(node, name, candidates, pipeline, nodeTypes, service) {
+  if (candidates) {
+    const froms = candidates.map(candidate => this.renderCandidate(candidate, pipeline)).filter(from => from);
+    const selected = node.connections?.[name] || [];
+    const store = nodeTypes[node.type].$stores[name];
+    const multiple = store.multiple;
     const value = selected?.map(s => this.encodeConnectionValue(s));
-    const connectedStore = await this.constructConnectedStore(connection, selected, pipeline, nodeTypes, service);
+    const connectedValue = await this.constructConnectedValue(selected, pipeline, nodeTypes, service);
     return {
       name,
       store: {
-        ...connection.store,
+        ...store,
         $type: 'Connection',
-        noinspect: connection.store.nodisplay,
+        noinspect: store.nodisplay,
         multiple,
         values: froms
       },
       value,
-      connectedStore
+      connectedStore: {$type: store.$type, $value: connectedValue}
     };
   }
 },
 
-async constructConnectedStore(connection, selected, pipeline, nodeTypes, service) {
-  const value = await Promise.all(selected?.map(
-    async ({from, store}) => {
+addInspectRecipe(nodeKey, {name, store}, {customInspectors, inspectorData}, state) {
+  const customInspector = customInspectors?.[store.$type];
+  if (customInspector) {
+    state.recipes.push(
+      this.constructInspectRecipe(customInspector, nodeKey, name, inspectorData || this.defaultInspectorDataProp)
+    );
+  }
+},
+
+constructInspectRecipe(inspector, nodeKey, storeName, inspectorData) {
+  const recipe = {
+    $meta: {...inspector.$meta},
+    $stores: {
+      [inspectorData]: {$type: 'JSON', connection: true},
+    }
+  };
+  this.getParticleNames(inspector).forEach(particleName => {
+    const particle = {...inspector[particleName]};
+    particle.$container = `Inspector#custom${this.sanitize(nodeKey)}${storeName}`;
+    particle.$inputs = particle.$outputs = [{data: inspectorData}];
+    particle.$staticInputs = {key: nodeKey, propName: storeName};
+    recipe[`${particleName}${this.inspectorDelimiter}${nodeKey}`] = particle;
+  });
+  return recipe;
+},
+
+getParticleNames(recipe) {
+  const notKeyword = name => !name.startsWith('$');
+  return recipe && keys(recipe).filter(notKeyword);
+},
+
+async constructConnectedValue(selected, pipeline, nodeTypes, service) {
+  return await Promise.all(selected?.map(
+    async ({from, storeName}) => {
       const node = pipeline.nodes.find(node => node.key == from);
-      if (node) {
-        const nodeType = this.findNodeType(node.name, nodeTypes);
-        if (nodeType) {
-          return await this.getBindingValue(store, nodeType.$stores[store], node, service);
-        }
+      const nodeType = nodeTypes[node?.type];
+      if (nodeType) {
+        return await this.getBindingValue(storeName, nodeType.$stores[storeName], node, service);
       }
     }
   ) || []);
-  return {$type: connection.store.$type, value};
 },
 
-renderCandidate({from, store}, pipeline) {
+renderCandidate({from, storeName}, pipeline) {
   const node = pipeline.nodes.find(n => n.key === from);
   if (node) {
     return {
-      key: this.encodeConnectionValue({from, store}),
-      name: `${this.nodeDisplay(node)} - ${store}`,
+      key: this.encodeConnectionValue({from, storeName}),
+      name: `${this.nodeDisplay(node)} - ${storeName}`,
     };
   }
 },
 
-encodeConnectionValue({from, store}) {
-  return `${from}${this.inspectorDelimiter}${store}`;
+encodeConnectionValue({from, storeName}) {
+  return `${from}${this.inspectorDelimiter}${storeName}`;
 },
 
 encodeFullNodeKey({key}, {$meta}, delimiter) {
@@ -212,9 +262,8 @@ sanitize(key) {
   return key.replace(/[^A-Za-z0-9]/g, '');
 },
 
-nodeDisplay({name, index}) {
-  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
-  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
+nodeDisplay(node) {
+  return node.displayName || node.name;
 }
 
 });

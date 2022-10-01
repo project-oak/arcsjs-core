@@ -10,13 +10,17 @@
 
 inspectorDelimiter: '$$',
 
-async update({node, pipeline, data}, state, {service, output}) {
-  if (data && node?.key && this.dataChanged(data, state.data)) {
-    if (state.data?.key === data?.key && data?.shouldDelete) {
-      output(this.deleteNode(node, pipeline));
-      state.data = null;
+async update({selectedNodeKey, pipeline, data}, state, {service, output}) {
+  if (data && selectedNodeKey && this.dataChanged(data, state.data)) {
+    if (state.data?.key === data?.key) {
+      if (data?.shouldDelete) {
+        output(this.deleteNode(selectedNodeKey, pipeline));
+        state.data = null;
+      } else {
+        output(this.updateValues(selectedNodeKey, pipeline, data, state, service));
+        state.data = data;
+      }
     } else {
-      output(this.updateValues(node, pipeline, data, state, service));
       state.data = data;
     }
   }
@@ -27,8 +31,9 @@ dataChanged(data, oldData) {
   return JSON.stringify(data) !== JSON.stringify(oldData);
 },
 
-updateValues(node, pipeline, data, state, service) {
+updateValues(selectedNodeKey, pipeline, data, state, service) {
   let changed = false;
+  let node = pipeline.nodes.find(({key}) => key === selectedNodeKey);
   data?.props?.forEach((prop, index) => {
     if (prop && !prop.store.noinspect) {
       const currentValue = state.data?.props?.[index]?.value;
@@ -43,11 +48,8 @@ updateValues(node, pipeline, data, state, service) {
     changed = true;
   }
   if (changed) {
-    state.node = node;
     return {
-      node,
       pipeline: this.updateNodeInPipeline(node, pipeline),
-      data: this.updateData(data, state)
     };
   }
 },
@@ -64,11 +66,6 @@ updatePropValue(prop, currentValue, node, service) {
   }
 },
 
-updateData(data, state) {
-  state.data = data;
-  return data;
-},
-
 formatPropValue({value, store: {$type}}) {
   if ($type === 'Image') {
     return {url: value};
@@ -79,32 +76,24 @@ formatPropValue({value, store: {$type}}) {
 },
 
 updateConnection(name, value, node) {
-  const decoded = value?.map(v => this.decodeConnectionValue(v));
-  const isSelected = (candidate) => decoded.some(({from, store}) => candidate.from == from && candidate.store === store);
-  const candidates = node.connections[name].candidates.map(candidate => ({
-    ...candidate,
-    selected: isSelected(candidate)
-  }));
-  return this.updateConnectionCandidates(node, name, candidates);
+  const connections = value?.map(v => this.decodeConnectionValue(v));
+  return this.updateConnectionCandidates(node, name, connections);
 },
 
-updateConnectionCandidates(node, name, candidates) {
+updateConnectionCandidates(node, name, connections) {
   return {
     ...node,
     connections: {
       ...node.connections,
-      [name]: {
-        ...node.connections[name],
-        candidates
-      }
+      [name]: connections
     }
   };
 },
 
 decodeConnectionValue(value) {
   if (value) {
-    const [from, store] = value.split(this.inspectorDelimiter);
-    return {from, store};
+    const [from, storeName] = value.split(this.inspectorDelimiter);
+    return {from, storeName};
   }
   return null;
 },
@@ -131,9 +120,9 @@ updateNodeInPipeline(node, pipeline) {
   return pipeline;
 },
 
-deleteNode({key}, pipeline) {
+deleteNode(key, pipeline) {
   pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
-  return {pipeline, node: null};
+  return {pipeline, selectedNodeKey: null};
 }
 
 });

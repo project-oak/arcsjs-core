@@ -31,7 +31,10 @@ const PipelineToolbar = {
   },
   $outputs: [
     {pipeline: 'selectedPipeline'},
-    'pipelines'
+    'selectedNodeKey',
+    'pipelines',
+    'previewLayout',
+    'nodegraphLayout'
   ],
   $slots: {
     chooser: {
@@ -61,11 +64,14 @@ export const NodegraphRecipe = {
       $type: 'JSON',
       $value: null
     },
-    selectedNode: {
+    selectedNodeKey: {
+      $type: 'String',
+    },
+    candidates: {
       $type: 'JSON'
     },
     nodeTypes: {
-      $type: '[JSON]',
+      $type: 'JSON',
       $value: nodeTypes
     },
     hoveredNodeKey: {
@@ -81,6 +87,12 @@ export const NodegraphRecipe = {
     categories: {
       $type: 'JSON',
       $value: categories
+    },
+    previewLayout: {
+      $type: 'JSON'
+    },
+    nodegraphLayout: {
+      $type: 'JSON'
     }
   },
   // 'a_frame': {
@@ -99,31 +111,37 @@ export const NodegraphRecipe = {
           $inputs: [
             'recipes',
             {pipeline: 'selectedPipeline'},
-            'selectedNode',
+            'selectedNodeKey',
             'nodeTypes',
             'categories',
+            {layout: 'previewLayout'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNode'
+            'selectedNodeKey',
+            {layout: 'previewLayout'}
           ]
         }
       },
       editor: {
         Editor: {
-          $kind: 'https://rapsai-core.web.app/0.5.1/Library/Editor',
+          // $kind: 'https://rapsai-core.web.app/0.5.1/Library/Editor',
           // $kind: 'http://localhost:9876/Library/Editor',
-          //$kind: '$library/NodeGraph/Editor',
+          // $kind: '$library/NodeGraph/SimpleEditor',
+          $kind: '$library/NodeGraph/Editor',
           $inputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNode',
+            'selectedNodeKey',
             'nodeTypes',
             'hoveredNodeKey',
-            'categories'
+            'categories',
+            'candidates',
+            {layout: 'nodegraphLayout'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNode'
+            'selectedNodeKey',
+            {layout: 'nodegraphLayout'}
           ]
         }
       },
@@ -140,13 +158,13 @@ export const NodegraphRecipe = {
           $kind: '$library/NodeGraph/NodeTree',
           $inputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNode',
+            'selectedNodeKey',
             'nodeTypes',
             'categories'
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNode'
+            'selectedNodeKey'
           ]
         }
       }
@@ -155,40 +173,62 @@ export const NodegraphRecipe = {
   nodeInspector: {
     $kind: '$library/NodeGraph/NodeInspector',
     $inputs: [
-      {node: 'selectedNode'},
+      'selectedNodeKey',
       {pipeline: 'selectedPipeline'},
+      'candidates',
       'nodeTypes'
-    ],
-    $outputs: [{data: 'inspectorData'}]
-  },
-  nodeUpdator: {
-    $kind: '$library/NodeGraph/NodeUpdator',
-    $inputs: [
-      {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'},
-      {data: 'inspectorData'}
-    ],
-    $outputs: [
-      {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'}
-    ]
-  },
-  nodesConnector: {
-    $kind: '$library/NodeGraph/NodesConnector',
-    $inputs: [
-      {pipeline: 'selectedPipeline'},
-      'selectedNode',
-      'nodeTypes'
-    ],
-    $outputs: [
-      {pipeline: 'selectedPipeline'},
-      'selectedNode',
-      'recipes'
     ],
     $staticInputs: {
       customInspectors,
       inspectorData: 'inspectorData',
-      globalStores
-    }
+    },
+    $outputs: [{data: 'inspectorData'}]
+  },
+  candidateFinder: {
+    $kind: '$library/NodeGraph/CandidateFinder',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'nodeTypes'
+    ],
+    $staticInputs: {globalStores},
+    $outputs: ['candidates']
+  },
+  connectionUpdator: {
+    $kind: '$library/NodeGraph/ConnectionUpdator',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'nodeTypes',
+      'candidates',
+    ],
+    $outputs: [{pipeline: 'selectedPipeline'}]
+  },
+  nodeUpdator: {
+    $kind: '$library/NodeGraph/NodeUpdator',
+    $inputs: [
+      'selectedNodeKey',
+      {pipeline: 'selectedPipeline'},
+      {data: 'inspectorData'}
+    ],
+    $outputs: [
+      'selectedNodeKey',
+      {pipeline: 'selectedPipeline'}
+    ]
+  },
+  recipeBuilder: {
+    $kind: '$library/NodeGraph/RecipeBuilder',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'nodeTypes'
+    ],
+    $outputs: ['recipes'],
+  },
+  layoutUpdator: {
+    $kind: '$library/NodeGraph/LayoutUpdator',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'previewLayout',
+      'nodegraphLayout'
+    ],
+    $outputs: [{pipeline: 'selectedPipeline'}]
   }
 };

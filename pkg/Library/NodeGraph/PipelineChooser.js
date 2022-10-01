@@ -14,11 +14,7 @@ async update({publicPipelines, pipelines}, state) {
 },
 filterPublicPipelines(publicPipelines, pipelines) {
   if (Array.isArray(publicPipelines)) {
-    return publicPipelines.filter(({$meta: {name, id}}) => {
-      // Prior to 0.4.0 pipelines were created with `name` only.
-      // Filtering by `name` (in addition to filtering by `id`) is done for backward compabitility.
-      return !this.findPipelineById(id, pipelines) && !this.findPipelineByName(name, pipelines);
-    });
+    return publicPipelines.filter(({$meta: {name, id}}) => !this.findPipelineById(id, pipelines));
   }
 },
 render({pipeline, pipelines}, {publicPipelines}) {
@@ -33,24 +29,18 @@ render({pipeline, pipelines}, {publicPipelines}) {
 },
 renderPipelines(pipelines, selectedPipeline) {
   return pipelines ? pipelines?.map?.(pipeline => {
-    const id = this.pipelineId(pipeline);
+    const {id} = pipeline.$meta;
     return {
       name: pipeline.$meta?.name,
       id,
       isDisabled: false,
-      isSelected: id === this.pipelineId(selectedPipeline)
+      isSelected: id === selectedPipeline?.$meta?.id
     };
   }) : [];
 },
-pipelineId(pipeline) {
-  // Backward compatibility: prior to 0.4.0 pipelines were created with `name` only, without a unique id.
-  return pipeline?.$meta.id || pipeline?.$meta?.name || null;
-},
 onSelect({eventlet: {value}, pipelines}, {publicPipelines}) {
   const pipeline = this.findPipelineById(value, pipelines)
-    || this.findPipelineById(value, publicPipelines)
-    // Backward compatibility: prior to 0.4.0 pipelines were created with `name` only.
-    || this.findPipelineByName(value, publicPipelines);
+                || this.findPipelineById(value, publicPipelines);
   log(`selected "${value}" (${pipeline?.$meta.name})`);
   return {pipeline};
 },

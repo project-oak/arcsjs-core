@@ -697,7 +697,6 @@ export class NodeGraphEditor extends Xen.Async {
       }
       this.renderNodes();
     }
-
     this.updateToolbar();
   }
 
@@ -1443,7 +1442,7 @@ export class NodeGraphEditor extends Xen.Async {
   matchTmpEdge(input) {
     return input.candidates.some(
         candidate => candidate.from === this.state.tmpEdgeFromNode.key &&
-            candidate.store === this.state.tmpEdgeFromStore);
+            candidate.storeName === this.state.tmpEdgeFromStore);
   }
 
   /** Whether the given node is the source of the tmpEdge. */
@@ -1677,6 +1676,7 @@ export class NodeGraphEditor extends Xen.Async {
         .text(d => d.category);
 
     // Node types.
+    // TODO(mariakleiner): node-graph-editor shouldn't know anything about nodeTypes, and only deal with `key`s.
     const nodeTypesSelection =
         groupsEnter.selectAll('div.node-type').data(d => d.nodeTypes);
     const nodeTypesEnter =

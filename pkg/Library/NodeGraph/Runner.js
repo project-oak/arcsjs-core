@@ -10,6 +10,7 @@
 ({
 runnerDelimiter: '$$',
 
+// TODO(mariakleiner): update to match the refactoring in Designer.
 async initialize(inputs, state) {
   state.recipes = {};
   state.stores = {};
