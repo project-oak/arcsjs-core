@@ -110,10 +110,6 @@
     };
   },
 
-  formatNodeKey({name, index}) {
-    return `${name}${index}`.replace(/ /g,'');
-  },
-
   indexNewNode(key, nodes) {
     const typedNodes = nodes.filter(node => key === node.type);
     return (typedNodes.pop()?.index || 0) + 1;
@@ -122,6 +118,10 @@
   displayName(name, index) {
     const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
     return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
+  },
+
+  formatNodeKey({name, index}) {
+    return `${name}${index}`.replace(/ /g,'');
   },
 
   onDeleteAll({pipeline}) {

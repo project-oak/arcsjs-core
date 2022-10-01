@@ -180,34 +180,6 @@ export const NodegraphRecipe = {
       'candidates',
       'nodeTypes'
     ],
-<<<<<<< HEAD
-=======
-    $outputs: [{data: 'inspectorData'}]
-  },
-  nodeUpdator: {
-    $kind: '$library/NodeGraph/NodeUpdator',
-    $inputs: [
-      {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'},
-      {data: 'inspectorData'}
-    ],
-    $outputs: [
-      {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'}
-    ]
-  },
-  nodesConnector: {
-    $kind: '$library/NodeGraph/NodesConnector',
-    $inputs: [
-      {pipeline: 'selectedPipeline'},
-      'nodeTypes',
-      {layout: 'previewLayout'}
-    ],
-    $outputs: [
-      {pipeline: 'selectedPipeline'},
-      'selectedNode',
-      'recipes'
-    ],
     $staticInputs: {
       customInspectors,
       inspectorData: 'inspectorData',
