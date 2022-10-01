@@ -109,19 +109,19 @@
       name: this.displayName(name, index)
     };
   },
-  
+
+  formatNodeKey({name, index}) {
+    return `${name}${index}`.replace(/ /g,'');
+  },
+
   indexNewNode(key, nodes) {
     const typedNodes = nodes.filter(node => key === node.type);
-    return (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
+    return (typedNodes.pop()?.index || 0) + 1;
   },
-  
+
   displayName(name, index) {
     const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
     return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
-  },
-  
-  formatNodeKey(key, index) {
-    return `${key}${index}`.replace(/ /g,'');
   },
 
   onDeleteAll({pipeline}) {

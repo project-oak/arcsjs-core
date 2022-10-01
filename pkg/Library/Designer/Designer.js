@@ -56,15 +56,29 @@ async renewRecipes(recipes, state, service) {
   for (const recipe of recipes) {
     const runningRecipe = state.recipes[recipe.$meta.name];
     if (runningRecipe) {
-      const updatedParticles = this.findParticlesWithChangedConnections(recipe, runningRecipe);
-      updatedParticles.forEach(particleId => {
-        service({kind: 'RecipeService', msg: 'UpdateConnections', data: {particleId, spec: recipe[particleId]}});
-        state.recipes[recipe.$meta.name] = recipe;
-      });
+      await this.updateConnections(recipe, runningRecipe, state, service);
+      await this.updateContainers(recipe, runningRecipe, state, service);
     } else {
       await this.startRecipe(recipe, state, service);
     }
   }
+},
+
+async updateConnections(recipe, runningRecipe, state, service) {
+  const particles = this.findParticlesWithChangedConnections(recipe, runningRecipe);
+  particles.forEach(particleId => {
+    service({kind: 'RecipeService', msg: 'UpdateConnections', data: {particleId, spec: recipe[particleId]}});
+    state.recipes[recipe.$meta.name] = recipe;
+  });  
+},
+
+async updateContainers(recipe, runningRecipe, state, service) {
+  const hostIds = this.findParticlesWithChangedContainer(recipe, runningRecipe);
+  if (hostIds.length > 0) {
+    const container = recipe[hostIds[0]].$container;
+    await service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
+    state.recipes[recipe.$meta.name] = recipe;
+  }  
 },
 
 omitConnectionStores(recipe, state) {
@@ -91,6 +105,13 @@ findParticlesWithChangedConnections(recipe, runningRecipe) {
   return particleNames.filter(particleName => {
     return JSON.stringify(recipe[particleName].$inputs)
       !== JSON.stringify(runningRecipe[particleName].$inputs);
+  });
+},
+
+findParticlesWithChangedContainer(recipe, runningRecipe) {
+  const particleNames = this.getParticleNames(recipe);
+  return particleNames.filter(particleName => {
+    return recipe[particleName].$container !== runningRecipe[particleName].$container;
   });
 },
 
@@ -194,7 +215,7 @@ makeNewNode(key, index, nodeTypes) {
 
 indexNewNode(key, nodes) {
   const typedNodes = nodes.filter(node => key === node.type);
-  return (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
+  return (typedNodes.pop()?.index || 0) + 1;
 },
 
 displayName(name, index) {

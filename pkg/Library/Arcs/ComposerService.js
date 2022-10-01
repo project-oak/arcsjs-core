@@ -17,11 +17,20 @@ export const ComposerService = {
     return arc.hosts[hostName];
   },
   setContainer(arc, _, request) {
-    const {hostId, container} = request.data;
-    const host = arc.hosts[hostId];
+    const {hostIds, container} = request.data;
+    return hostIds
+      .map(hostId => this.setHostContainer(arc.hosts[hostId], container, arc))
+      .filter(value => value);
+  },
+  rerenderHost(arc, _, request) {
+    const {hostIds} = request.data;
+    hostIds.forEach(hostId => arc.hosts[hostId].rerender());
+    return true;
+  },
+  setHostContainer(host, container, arc) {
     log(host, container);
-    if (container.startsWith(hostId)) {
-      log.error(hostId, 'cannot contain itself');
+    if (container.startsWith(host.id)) {
+      log.error(host.id, 'cannot contain itself');
     } else {
       host.meta.container = container;
       this.rerender(arc);

@@ -10,13 +10,21 @@
 
 connectorDelim: '$$',
 nameDelim: ':',
+defaultContainer: `main#runner`,
 
 async update(inputs, state) {
-  const {pipeline} = inputs;
+  const {pipeline, layout} = inputs;
   if (pipeline) {
+    let changed = false;
     if (this.pipelineChanged(pipeline, state.pipeline) || this.nodesChanged(pipeline.nodes, state.nodes)) {
-      state.pipeline = pipeline;
-      state.nodes = [...pipeline.nodes];
+      assign(state, {pipeline, nodes: [...pipeline.nodes]});
+      changed = true;
+    }
+    if (this.layoutChanged(pipeline, layout, state.layout)) {
+      assign(state, {layout});
+      changed = true;
+    }
+    if (changed) {
       return {recipes: this.recipesForPipeline(inputs, state)};
     }
   } else {
@@ -69,6 +77,10 @@ nodesChanged(nodes, oldNodes) {
   return true;
 },
 
+layoutChanged(pipeline, layout, oldLayout) {
+  return (pipeline.$meta.id === layout.id) && !deepEqual(layout, oldLayout);
+},
+
 hasSameNode(node, nodes) {
   const nodeInNodes = nodes.find(n => n.key === node.key);
   if (nodeInNodes) {
@@ -86,11 +98,11 @@ recipesForPipeline(inputs, state) {
 },
 
 recipeForNode(node, inputs, state) {
-  const {pipeline, nodeTypes} = inputs;
+  const {pipeline, nodeTypes, layout} = inputs;
   const nodeTypeMap = this.nodeTypeMap(nodeTypes, state);
   const nodeType = nodeTypeMap[node.type];
   const stores = this.buildStoreSpecs(node, nodeType, state);
-  const recipe = this.buildParticleSpecs(node, nodeType, state);
+  const recipe = this.buildParticleSpecs(node, nodeType, layout, state);
   recipe.$meta = {
     name: this.encodeFullNodeKey(node, pipeline, this.connectorDelim)
   };
@@ -98,12 +110,13 @@ recipeForNode(node, inputs, state) {
   return recipe;
 },
 
-buildParticleSpecs(node, nodeType, {storeMap}) {
+buildParticleSpecs(node, nodeType, layout, {storeMap}) {
   const specs = {};
   const names = this.getParticleNames(nodeType) || [];
   for (const particleName of names) {
+    const container = layout?.[`${node.key}:Container`] || this.defaultContainer;
     specs[this.constructParticleId(node, particleName)] =
-        this.buildParticleSpec(node, nodeType, particleName, `main#runner`, storeMap);
+        this.buildParticleSpec(node, nodeType, particleName, container, storeMap);
   }
   return specs;
 },
@@ -117,13 +130,9 @@ constructParticleId({key}, particleName) {
   return `${key}${this.nameDelim}${particleName}`;
 },
 
-buildParticleSpec(node, nodeType, particleName, defaultContainer, storeMap) {
+buildParticleSpec(node, nodeType, particleName, container, storeMap) {
   const particleSpec = nodeType[particleName];
-  const $container = this.resolveContainer(
-    node.key,
-    particleSpec.$container,
-    node.position?.preview?.[`${node.key}${particleName}:Container`] || defaultContainer
-  );
+  const $container = this.resolveContainer(node.key, particleSpec.$container, container);
   const bindings = this.resolveBindings(particleSpec, storeMap);
   const resolvedSpec = {
     $slots: {},
