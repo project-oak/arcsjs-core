@@ -444,7 +444,7 @@ makeNewNode({$meta: {key, name}}, nodes) {
 
 indexNewNode(key, nodes) {
   const typedNodes = nodes.filter(node => key === node.type);
-  return (typedNodes.length ? typedNodes[typedNodes.length - 1].index : 0) + 1;
+  return (typedNodes.pop()?.index || 0) + 1;
 },
 
 displayName(name, index) {
