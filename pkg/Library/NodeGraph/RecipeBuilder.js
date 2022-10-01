@@ -16,8 +16,8 @@ async update(inputs, state) {
   const {pipeline, layout} = inputs;
   if (pipeline) {
     let changed = false;
-    if (this.pipelineChanged(pipeline, state.pipeline) || this.nodesChanged(pipeline.nodes, state.nodes)) {
-      assign(state, {pipeline, nodes: [...pipeline.nodes]});
+    if (this.pipelineChanged(pipeline, state.pipeline)) {
+      state.pipeline = pipeline;
       changed = true;
     }
     if (this.layoutChanged(pipeline, layout, state.layout)) {
@@ -28,7 +28,7 @@ async update(inputs, state) {
       return {recipes: this.recipesForPipeline(inputs, state)};
     }
   } else {
-    assign(state, {pipeline: null, nodes: []});
+    state.pipeline = null;
   }
 },
 
@@ -67,7 +67,8 @@ flattenParticleSpec(particleId, particleSpec, $container) {
 },
 
 pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.$meta.id !== oldPipeline?.$meta?.id;
+  return pipeline.$meta.id !== oldPipeline?.$meta?.id
+      || this.nodesChanged(pipeline.nodes, oldPipeline?.nodes);
 },
 
 nodesChanged(nodes, oldNodes) {

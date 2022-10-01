@@ -7,10 +7,8 @@
 ({
 
 async update({pipeline, nodeTypes, globalStores}, state) {
-  if (pipeline && 
-      (this.pipelineChanged(pipeline, state.pipeline) || this.nodesChanged(pipeline?.nodes, state.nodes))) {
+  if (this.pipelineChanged(pipeline, state.pipeline)) {
     state.pipeline = pipeline;
-    state.nodes = pipeline?.nodes;
     return {
       candidates: this.findCandidates(pipeline, nodeTypes, globalStores)
     };
@@ -18,7 +16,10 @@ async update({pipeline, nodeTypes, globalStores}, state) {
 },
 
 pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.$meta.id !== oldPipeline?.$meta?.id;
+  if (pipeline) {
+    return pipeline.$meta.id !== oldPipeline?.$meta?.id
+            || this.nodesChanged(pipeline.nodes, oldPipeline?.nodes);
+  }  
 },
 
 nodesChanged(nodes, currentNodes) {
