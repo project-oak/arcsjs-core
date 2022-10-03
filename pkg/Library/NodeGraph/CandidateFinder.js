@@ -7,10 +7,8 @@
 ({
 
 async update({pipeline, nodeTypes, globalStores}, state) {
-  if (pipeline && 
-      (this.pipelineChanged(pipeline, state.pipeline) || this.nodesChanged(pipeline?.nodes, state.nodes))) {
+  if (pipeline && this.pipelineChanged(pipeline, state.pipeline)) {
     state.pipeline = pipeline;
-    state.nodes = pipeline?.nodes;
     return {
       candidates: this.findCandidates(pipeline, nodeTypes, globalStores)
     };
@@ -18,19 +16,13 @@ async update({pipeline, nodeTypes, globalStores}, state) {
 },
 
 pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.$meta.id !== oldPipeline?.$meta?.id;
-},
-
-nodesChanged(nodes, currentNodes) {
-  if (nodes?.length === currentNodes?.length) {
-    return !currentNodes?.every((node, index) => deepEqual(node, currentNodes[index]));
-  }
-  return true;
+  return pipeline.id !== oldPipeline?.id || 
+         keys(pipeline.nodes).length !== keys(oldPipeline?.nodes).length;
 },
 
 findCandidates(pipeline, nodeTypes, globalStores) {
   const candidates = {};
-  pipeline?.nodes.forEach(node => {
+  values(pipeline?.nodes).forEach(node => {
     candidates[node.key] = this.findNodeCandidates(node, pipeline, nodeTypes, globalStores);
   });
   return candidates;
@@ -41,18 +33,18 @@ findNodeCandidates(node, pipeline, nodeTypes, globalStores) {
   entries(nodeTypes[node.type]?.$stores).forEach(([storeName, store]) => {
     if (store.connection) {
       candidates[storeName] =
-        this.findConnectionCandidates(storeName, store, node, pipeline, nodeTypes, globalStores);
+        this.findConnectionCandidates(node.key, storeName, store, pipeline, nodeTypes, globalStores);
     }
   });
   return candidates;
 },
-findConnectionCandidates(storeName, {$type}, node, {nodes}, nodeTypes, globalStores) {
+findConnectionCandidates(nodeKey, storeName, {$type}, {nodes}, nodeTypes, globalStores) {
   const candidates = [];
   candidates.push(this.findGlobalCandidate(storeName, globalStores));
   
-  nodes.forEach(n => {
-    if (n.key !== node.key) {
-      candidates.push(this.findCandidateInNode(n.key, $type, nodeTypes[n.type]));
+  values(nodes).forEach(node => {
+    if (node.key !== nodeKey) {
+      candidates.push(this.findCandidateInNode(node.key, $type, nodeTypes[node.type]));
     }
   });
   return candidates.filter(c => c);

@@ -15,7 +15,7 @@ async update(inputs, state, {service, output, invalidate}) {
     if (selectedNodeKey !== state.node?.key) {
       assign(state, {data: null, hasMonitor: false});
     }
-    const node = pipeline.nodes.find(node => node.key === selectedNodeKey);
+    const node = pipeline.nodes[selectedNodeKey];
     if (this.shouldConstructData(inputs, state)) {
       await this.finagleCustomRecipes(state.recipes, service, false);
       assign(state, {pipeline, node, candidates, recipes: []});
@@ -36,7 +36,7 @@ async update(inputs, state, {service, output, invalidate}) {
 },
 
 shouldConstructData({selectedNodeKey, pipeline, candidates}, state) {
-  const node = pipeline.nodes.find(node => node.key === selectedNodeKey);
+  const node = pipeline.nodes[selectedNodeKey];
   if (node) {
     return this.pipelineChanged(pipeline, state.pipeline)
         || this.nodeChanged(node, state.node)
@@ -166,7 +166,7 @@ getStoreValue(storeId, service) {
 },
 
 async constructConnections(node, {pipeline, nodeTypes, candidates}, service) {
-  const matchingCandidates = (pipeline.nodes.every(({key}) => candidates?.[key]));
+  const matchingCandidates = keys(pipeline.nodes).every(key => candidates?.[key]);
   if (matchingCandidates) {
     return Promise.all(keys(candidates[node.key]).map(storeName => {
       return this.renderBinding(node, storeName, candidates[node.key][storeName], pipeline, nodeTypes, service);
@@ -231,7 +231,7 @@ getParticleNames(recipe) {
 async constructConnectedValue(selected, pipeline, nodeTypes, service) {
   return await Promise.all(selected?.map(
     async ({from, storeName}) => {
-      const node = pipeline.nodes.find(node => node.key == from);
+      const node = pipeline.nodes[from];
       const nodeType = nodeTypes[node?.type];
       if (nodeType) {
         return await this.getBindingValue(storeName, nodeType.$stores[storeName], node, service);
@@ -241,7 +241,7 @@ async constructConnectedValue(selected, pipeline, nodeTypes, service) {
 },
 
 renderCandidate({from, storeName}, pipeline) {
-  const node = pipeline.nodes.find(n => n.key === from);
+  const node = pipeline.nodes[from];
   if (node) {
     return {
       key: this.encodeConnectionValue({from, storeName}),

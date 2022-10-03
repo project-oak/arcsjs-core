@@ -136,12 +136,14 @@ export const NodegraphRecipe = {
             'hoveredNodeKey',
             'categories',
             'candidates',
-            {layout: 'nodegraphLayout'}
+            {layout: 'nodegraphLayout'},
+            {previewLayout: 'previewLayout'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
             'selectedNodeKey',
-            {layout: 'nodegraphLayout'}
+            {layout: 'nodegraphLayout'},
+            {previewLayout: 'previewLayout'}
           ]
         }
       },

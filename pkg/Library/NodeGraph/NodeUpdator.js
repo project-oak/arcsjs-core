@@ -33,7 +33,7 @@ dataChanged(data, oldData) {
 
 updateValues(selectedNodeKey, pipeline, data, state, service) {
   let changed = false;
-  let node = pipeline.nodes.find(({key}) => key === selectedNodeKey);
+  let node = pipeline.nodes[selectedNodeKey];
   data?.props?.forEach((prop, index) => {
     if (prop && !prop.store.noinspect) {
       const currentValue = state.data?.props?.[index]?.value;
@@ -48,9 +48,8 @@ updateValues(selectedNodeKey, pipeline, data, state, service) {
     changed = true;
   }
   if (changed) {
-    return {
-      pipeline: this.updateNodeInPipeline(node, pipeline),
-    };
+    pipeline.nodes[node.key] = node;
+    return {pipeline};
   }
 },
 
@@ -112,16 +111,8 @@ updateStoreValue(storeId, value, service) {
   return service({kind: 'StoreService', msg: 'UpdateStoreValue', data: {storeId, value}});
 },
 
-updateNodeInPipeline(node, pipeline) {
-  const index = pipeline.nodes.findIndex(n => n.key === node.key);
-  // TODO (b/245770204): avoid copying objects
-  // pipeline.nodes[index] = node;
-  pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
-  return pipeline;
-},
-
 deleteNode(key, pipeline) {
-  pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
+  delete pipeline.nodes[key];
   return {pipeline, selectedNodeKey: null};
 }
 

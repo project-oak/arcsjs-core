@@ -125,7 +125,8 @@ isUIHidden(node) {
 
 onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
-  pipeline.nodes = pipeline?.nodes.filter(n => n.key !== node.key);
+  // pipeline.nodes = pipeline?.nodes.filter(n => n.key !== node.key);
+  delete pipeline.nodes[node.key];
   return {pipeline, selectedNode: null};
 },
 

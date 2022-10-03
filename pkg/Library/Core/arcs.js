@@ -757,7 +757,7 @@ var Host = class extends EventEmitter {
     if (this.particle && inputs) {
       const lastInputs = this.particle.internal.inputs;
       if (this.dirtyCheck(inputs, lastInputs, this.lastOutput)) {
-        this.particle.inputs = { ...this.meta?.staticInputs, ...inputs };
+        this.particle.inputs = deepCopy({ ...this.meta?.staticInputs, ...inputs });
         this.fire("inputs-changed");
       } else {
         this.log("inputs are uninteresting, skipping update");

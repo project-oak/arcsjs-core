@@ -16,8 +16,8 @@ async update(inputs, state) {
   const {pipeline, layout} = inputs;
   if (pipeline) {
     let changed = false;
-    if (this.pipelineChanged(pipeline, state.pipeline) || this.nodesChanged(pipeline.nodes, state.nodes)) {
-      assign(state, {pipeline, nodes: [...pipeline.nodes]});
+    if (this.pipelineChanged(pipeline, state.pipeline)) {
+      state.pipeline = pipeline;
       changed = true;
     }
     if (this.layoutChanged(pipeline, layout, state.layout)) {
@@ -28,7 +28,7 @@ async update(inputs, state) {
       return {recipes: this.recipesForPipeline(inputs, state)};
     }
   } else {
-    assign(state, {pipeline: null, nodes: []});
+    state.pipeline = null;
   }
 },
 
@@ -67,12 +67,13 @@ flattenParticleSpec(particleId, particleSpec, $container) {
 },
 
 pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.$meta.id !== oldPipeline?.$meta?.id;
+  return pipeline.$meta.id !== oldPipeline?.$meta?.id
+      || this.nodesChanged(pipeline.nodes, oldPipeline?.nodes);
 },
 
 nodesChanged(nodes, oldNodes) {
-  if (nodes?.length === oldNodes?.length) {
-    return !oldNodes?.every(node => this.hasSameNode(node, nodes));
+  if (keys(nodes).length === keys(oldNodes).length) {
+    return !keys(oldNodes).every(key => deepEqual(oldNodes[key], nodes[key]));
   }
   return true;
 },
@@ -81,20 +82,9 @@ layoutChanged(pipeline, layout, oldLayout) {
   return (pipeline.$meta.id === layout?.id) && !deepEqual(layout, oldLayout);
 },
 
-hasSameNode(node, nodes) {
-  const nodeInNodes = nodes.find(n => n.key === node.key);
-  if (nodeInNodes) {
-    if (deepEqual(nodeInNodes, node)) {
-      return true;
-    }
-  }
-  //log('hasSameNode: FALSE:', nodeInNodes, node);
-  return false;
-},
-
 recipesForPipeline(inputs, state) {
   const {pipeline} = inputs;
-  return pipeline.nodes.map(node => this.recipeForNode(node, inputs, state));
+  return values(pipeline.nodes).map(node => this.recipeForNode(node, inputs, state));
 },
 
 recipeForNode(node, inputs, state) {

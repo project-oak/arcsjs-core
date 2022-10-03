@@ -12,13 +12,12 @@
 // In the future, a more sophisticated heuristics can be implemented to
 // automatically connect nodes.
 
-update({pipeline, nodeTypes, candidates}, state) {
-  if (pipeline && 
-      (this.pipelineChanged(pipeline, state.pipeline) || this.candidatesChanged(candidates, state.candidates))) {
-    state.pipeline = pipeline;
-    state.candidates = candidates;
+update(inputs, state) {
+  if (this.inputsChanged(inputs, state)) {
+    const {pipeline, nodeTypes, candidates} = inputs;
+    assign(state, {pipeline, candidates});
     let changed = false;
-    if (this.removePipelineOutdatedConnections(pipeline, nodeTypes, candidates)) {
+    if (this.removePipelineOutdatedConnections(pipeline, candidates)) {
       changed = true;
     }
     if (this.updatePipelineConnections(pipeline, nodeTypes, candidates)) {
@@ -28,19 +27,23 @@ update({pipeline, nodeTypes, candidates}, state) {
   }
 },
 
+inputsChanged({pipeline, candidates}, state) {
+  return pipeline && 
+      (this.pipelineChanged(pipeline, state.pipeline) || this.candidatesChanged(candidates, state.candidates))
+},
+
 pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.id !== oldPipeline?.id || 
-         pipeline.nodes?.length !== oldPipeline?.nodes?.length;
+  return pipeline.id !== oldPipeline?.id ||
+         keys(pipeline.nodes).length !== keys(oldPipeline?.nodes).length;
 },
 
 candidatesChanged(candidates, oldCandidates) {
   return !deepEqual(candidates, oldCandidates);
 },
 
-removePipelineOutdatedConnections(pipeline, nodeTypes, candidates) {
-  return pipeline.nodes
-    .map(node => {this.removeNodeOutdatedConnections(node, candidates[node.key])
-    })
+removePipelineOutdatedConnections(pipeline, candidates) {
+  return values(pipeline.nodes)
+    .map(node => this.removeNodeOutdatedConnections(node, candidates[node.key]))
     .some(changed => changed);
 },
 
@@ -62,7 +65,7 @@ hasMatchingCandidate(connection, candidates) {
 },
 
 updatePipelineConnections(pipeline, nodeTypes, candidates) {
-  return pipeline.nodes
+  return values(pipeline.nodes)
     .map(node => this.updateNodeConnections(node, nodeTypes[node.type], candidates[node.key]))
     .some(changed => changed);
 },

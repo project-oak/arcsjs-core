@@ -14,8 +14,8 @@
       state.selectedPipelineName = pipeline?.$meta.name;
       selectedNodeKey = null;
     }
-    if (!selectedNodeKey && pipeline?.nodes?.length) {
-      selectedNodeKey = pipeline.nodes[0].key;
+    if (!selectedNodeKey && keys(pipeline?.nodes).length) {
+      selectedNodeKey = keys(pipeline.nodes)[0].key;
     }
     return {selectedNodeKey};
   },
@@ -66,7 +66,7 @@
   },
 
   onNodeRemove({eventlet: {key}, pipeline, selectedNodeKey}) {
-    pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
+    delete pipeline.nodes[key];
     return {
       pipeline,
       selectedNodeKey: key === selectedNodeKey ? null : selectedNodeKey
@@ -92,16 +92,15 @@
 
   onDrop({eventlet: {value}, pipeline, nodeTypes}) {
     if (pipeline) {
-      pipeline.nodes = [
-        ...pipeline.nodes,
-        this.makeNewNode(value, this.indexNewNode(value, pipeline.nodes), nodeTypes)
-      ];
+      const newNode = this.makeNewNode(value, pipeline, nodeTypes);
+      pipeline.nodes[newNode.key] = this.makeNewNode(value, pipeline, nodeTypes);
       return {pipeline};
     }
   },
 
-  makeNewNode(key, index, nodeTypes) {
+  makeNewNode(key, pipeline, nodeTypes) {
     const name = nodeTypes[key].$meta.name;
+    const index = this.indexNewNode(key, pipeline.nodes);
     return {
       type: key,
       index,
@@ -111,7 +110,7 @@
   },
 
   indexNewNode(key, nodes) {
-    const typedNodes = nodes.filter(node => key === node.type);
+    const typedNodes = values(nodes).filter(node => key === node.type);
     return (typedNodes.pop()?.index || 0) + 1;
   },
 
@@ -125,7 +124,7 @@
   },
 
   onDeleteAll({pipeline}) {
-    pipeline.nodes = [];
+    pipeline.nodes = {};
     return {
       pipeline,
       selectedNodeKey: null
