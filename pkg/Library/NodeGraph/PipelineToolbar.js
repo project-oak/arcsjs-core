@@ -9,7 +9,6 @@
 ({
   async initialize({pipelines, publishPaths}, state, {service}) {
     const publicPipelines = await this.fetchPublicPipelines(publishPaths);
-    // pipelines = await this.backwardCompatibilityPipelines(pipelines, {service, output});
     const pipeline = await this.retrieveSelectedPipeline(pipelines, publicPipelines, service);
     if (!pipeline) {
       await this.updateSelectedPipelineHistory(null, service);
@@ -49,32 +48,7 @@
     const pipelineId = await service({kind: 'HistoryService', msg: 'retrieveSelectedPipeline'});
     return this.findPipelineById(pipelineId, pipelines) ||
            this.findPipelineById(pipelineId, publicPipelines);
-    // if (!pipeline) {
-    //   pipeline = await this.backwardCompatibilitySelectedPipeline(pipelineId, pipelines, publicPipelines, service);
-    // }
-    // return pipeline;
   },
-  // async backwardCompatibilityPipelines(pipelines, {service, output}) {
-  //   // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
-  //   if (pipelines?.some(({$meta}) => !$meta.id)) {
-  //     pipelines = await Promise.all(pipelines.map(async p => {
-  //       p.$meta.id = p.$meta.id || await this.makeUniqueId(pipelines, service);
-  //       return p;
-  //     }));
-  //     await output({pipelines});
-  //   }
-  //   return pipelines;
-  // },
-  // async backwardCompatibilitySelectedPipeline(name, pipelines, publicPipelines, service) {
-  //   // Prior to 0.4.0 pipelines were created with `name` only, without a unique id.
-  //   // This method selects pipeline by name found in the URL param.
-  //   const pipeline = this.findPipelineByName(name, pipelines) ||
-  //                    this.findPipelineByName(name, publicPipelines);
-  //   if (pipeline) {
-  //     await this.updateSelectedPipelineHistory(pipeline, service);
-  //   }
-  //   return pipeline;
-  // },
   async update({pipeline, pipelines, publishPaths}, state, {service}) {
     if (publishPaths?.length > 0 && !state.selectedPublishKey) {
       state.selectedPublishKey = keys(publishPaths)[0];
@@ -166,7 +140,6 @@
       values(currentPipeline).forEach(node => {
         pipeline.nodes[node.key] = {...node};
       });
-      // pipeline.nodes = currentPipeline.nodes.map(node => ({...node}));
       return {pipeline, pipelines};
     }
   },
