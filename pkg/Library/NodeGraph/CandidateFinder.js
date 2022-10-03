@@ -33,18 +33,18 @@ findNodeCandidates(node, pipeline, nodeTypes, globalStores) {
   entries(nodeTypes[node.type]?.$stores).forEach(([storeName, store]) => {
     if (store.connection) {
       candidates[storeName] =
-        this.findConnectionCandidates(storeName, store, node, pipeline, nodeTypes, globalStores);
+        this.findConnectionCandidates(node.key, storeName, store, pipeline, nodeTypes, globalStores);
     }
   });
   return candidates;
 },
-findConnectionCandidates(storeName, {$type}, node, {nodes}, nodeTypes, globalStores) {
+findConnectionCandidates(nodeKey, storeName, {$type}, {nodes}, nodeTypes, globalStores) {
   const candidates = [];
   candidates.push(this.findGlobalCandidate(storeName, globalStores));
   
-  keys(nodes).forEach(key => {
-    if (key !== node.key) {
-      candidates.push(this.findCandidateInNode(key, $type, nodeTypes[nodes[key].type]));
+  values(nodes).forEach(node => {
+    if (node.key !== nodeKey) {
+      candidates.push(this.findCandidateInNode(node.key, $type, nodeTypes[node.type]));
     }
   });
   return candidates.filter(c => c);
