@@ -15,7 +15,7 @@ async update(inputs, state, {service, output, invalidate}) {
     if (selectedNodeKey !== state.node?.key) {
       assign(state, {data: null, hasMonitor: false});
     }
-    const node = pipeline.nodes[selectedNodeKey]; //.find(node => node.key === selectedNodeKey);
+    const node = pipeline.nodes[selectedNodeKey];
     if (this.shouldConstructData(inputs, state)) {
       await this.finagleCustomRecipes(state.recipes, service, false);
       assign(state, {pipeline, node, candidates, recipes: []});
@@ -28,7 +28,7 @@ async update(inputs, state, {service, output, invalidate}) {
       // calling async method without awaiting it, on purpose,
       // which creates Special Circumstances, see below
       this.monitorStores(state, nodeTypes, {service, invalidate});
-    }
+    }      
   } else {
     state.node = null;
     return {data: null, nodeType: null};
@@ -36,7 +36,7 @@ async update(inputs, state, {service, output, invalidate}) {
 },
 
 shouldConstructData({selectedNodeKey, pipeline, candidates}, state) {
-  const node = pipeline.nodes[selectedNodeKey]; //.find(node => node.key === selectedNodeKey);
+  const node = pipeline.nodes[selectedNodeKey];
   if (node) {
     return this.pipelineChanged(pipeline, state.pipeline)
         || this.nodeChanged(node, state.node)

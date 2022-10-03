@@ -371,7 +371,7 @@ onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType
     .find(([_, store]) => store.$type === targetStoreType)[0];
   newNode.connections = {[toStore]: [{from: fromKey, storeName: fromStore}]};
   // pipeline.nodes = [...pipeline.nodes, newNode];
-  pipeline[newNode.key] = newNode;
+  pipeline.nodes[newNode.key] = newNode;
   return {
     pipeline,
     selectedNodeKey: newNode.key,

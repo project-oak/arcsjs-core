@@ -48,7 +48,7 @@ updateValues(selectedNodeKey, pipeline, data, state, service) {
     changed = true;
   }
   if (changed) {
-    pipeline[node.key] = node;
+    pipeline.nodes[node.key] = node;
     return {pipeline};
     //   pipeline: this.updateNodeInPipeline(node, pipeline),
     // };

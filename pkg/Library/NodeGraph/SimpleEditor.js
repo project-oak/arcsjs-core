@@ -97,7 +97,7 @@
       //   ...pipeline.nodes,
       //   this.makeNewNode(value, this.indexNewNode(value, pipeline.nodes), nodeTypes)
       // ];
-      pipeline[value] = this.makeNewNode(value, pipeline, nodeTypes);
+      pipeline.nodes[value] = this.makeNewNode(value, pipeline, nodeTypes);
       return {pipeline};
     }
   },

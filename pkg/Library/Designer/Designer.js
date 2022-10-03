@@ -184,7 +184,7 @@ updateNodeInPipeline(node, pipeline) {
   // TODO (b/245770204): avoid copying objects
   // pipeline.nodes[index] = node;
   // pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
-  pipeline[node.key] = node;
+  pipeline.nodes[node.key] = node;
   return pipeline;
 },
 
@@ -198,7 +198,7 @@ onDrop({eventlet: {key, value}, nodeTypes, pipeline}, state) {
   if (pipeline) {
     const newNode = this.makeNewNode(value, pipeline, nodeTypes);
     // pipeline.nodes = [...pipeline.nodes, newNode];
-    pipeline[newNode.key] = newNode;
+    pipeline.nodes[newNode.key] = newNode;
     return {
       pipeline,
       selectedNodeKey: newNode.key

@@ -37,7 +37,8 @@ async onItemClick({eventlet: {key}, selectedNodeTypes, pipeline}) {
     //   ...pipeline.nodes,
     //   this.makeNewNode(key, this.indexNewNode(key, pipeline.nodes), selectedNodeTypes)
     // ];
-    pipeline[key] = this.makeNewNode(key, pipeline, selectedNodeTypes);
+    const newNode = this.makeNewNode(key, pipeline, selectedNodeTypes);
+    pipeline.nodes[newNode.key] = newNode;
     return {pipeline};
   }
 },

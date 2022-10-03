@@ -30,7 +30,7 @@ update({pipeline, nodeTypes, candidates}, state) {
 
 pipelineChanged(pipeline, oldPipeline) {
   return pipeline.id !== oldPipeline?.id || 
-         pipeline.nodes?.length !== oldPipeline?.nodes?.length;
+         keys(pipeline.nodes).length !== keys(oldPipeline?.nodes).length;
 },
 
 candidatesChanged(candidates, oldCandidates) {

@@ -757,7 +757,7 @@ var Host = class extends EventEmitter {
     if (this.particle && inputs) {
       const lastInputs = this.particle.internal.inputs;
       if (this.dirtyCheck(inputs, lastInputs, this.lastOutput)) {
-        this.particle.inputs = { ...this.meta?.staticInputs, ...inputs };
+        this.particle.inputs = { ...this.meta?.staticInputs, ...deepCopy(inputs) };
         this.fire("inputs-changed");
       } else {
         this.log("inputs are uninteresting, skipping update");
@@ -1435,7 +1435,7 @@ var timeout2 = async (func, delayMs) => new Promise((resolve2) => setTimeout(() 
 var initVanilla = (options) => {
   try {
     log9(deepEqual);
-    const utils = { log: log9, resolve, html, makeKey, deepEqual, timeout: timeout2 };
+    const utils = { log: log9, resolve, html, makeKey, deepEqual, timeout: timeout2, deepCopy };
     const scope2 = {
       ...utils,
       ...options?.injections
@@ -1451,7 +1451,7 @@ var createParticleFactory = async (kind, options) => {
   const { Particle: Particle2 } = await Promise.resolve().then(() => (init_Particle(), Particle_exports));
   const implFactory = await requireImplFactory(kind, options);
   const log10 = createLogger(kind);
-  const injections = { log: log10, resolve, html, ...options?.injections };
+  const injections = { log: log10, resolve, html, deepCopy, ...options?.injections };
   const proto = implFactory(injections);
   const particleFactory = (host) => {
     const pipe = {
