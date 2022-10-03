@@ -33,7 +33,7 @@ inputsChanged({pipeline, candidates}, state) {
 },
 
 pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.id !== oldPipeline?.id || 
+  return pipeline.id !== oldPipeline?.id ||
          keys(pipeline.nodes).length !== keys(oldPipeline?.nodes).length;
 },
 

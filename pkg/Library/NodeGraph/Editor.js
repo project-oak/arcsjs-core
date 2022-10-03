@@ -13,7 +13,7 @@ update({pipeline, selectedNodeKey}, state) {
     state.selectedPipelineName = pipeline?.$meta.name;
     // new pipeline, choose a selectedNode if there isn't one
     if (!selectedNodeKey) {
-      return {selectedNodeKey: keys(pipeline?.nodes)?.[0]?.key};
+      return {selectedNodeKey: keys(pipeline?.nodes)?.[0]};
     }
   }
 },
@@ -412,7 +412,7 @@ onEdgeConnected({eventlet: {value}, pipeline}) {
 },
 
 updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
-  let node = pipeline.nodes[toKey];  //this.findNodeByKey(toKey, pipeline);
+  let node = pipeline.nodes[toKey];
   node = {
     ...node,
     connections: {...(node.connections || {}), [toStore]: [...(node.connections?.[toStore] || [])]}
@@ -423,15 +423,8 @@ updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
     delete node.connections[toStore];
   }
   pipeline.nodes[node.key] = node;
-  return pipeline; // this.updateNodeInPipeline(node, pipeline);
+  return pipeline;
 },
-
-// updateNodeInPipeline(node, pipeline) {
-//   // const index = pipeline.nodes.findIndex(n => n.key === node.key);
-//   // pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
-//   pipeline[node.key] = node;
-//   return pipeline;
-// },
 
 makeNewNode({$meta: {key, name}}, nodes) {
   const index = this.indexNewNode(key, nodes);

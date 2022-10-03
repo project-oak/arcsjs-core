@@ -7,7 +7,7 @@
 ({
 
 async update({pipeline, nodeTypes, globalStores}, state) {
-  if (this.pipelineChanged(pipeline, state.pipeline)) {
+  if (pipeline && this.pipelineChanged(pipeline, state.pipeline)) {
     state.pipeline = pipeline;
     return {
       candidates: this.findCandidates(pipeline, nodeTypes, globalStores)
@@ -16,17 +16,8 @@ async update({pipeline, nodeTypes, globalStores}, state) {
 },
 
 pipelineChanged(pipeline, oldPipeline) {
-  if (pipeline) {
-    return pipeline.$meta.id !== oldPipeline?.$meta?.id
-            || this.nodesChanged(pipeline.nodes, oldPipeline?.nodes);
-  }  
-},
-
-nodesChanged(nodes, currentNodes) {
-  if (keys(nodes).length === keys(currentNodes).length) {
-    return keys(currentNodes).every(key => deepEqual(currentNodes[key], nodes[key]));
-  }
-  return true;
+  return pipeline.id !== oldPipeline?.id || 
+         keys(pipeline.nodes).length !== keys(oldPipeline?.nodes).length;
 },
 
 findCandidates(pipeline, nodeTypes, globalStores) {

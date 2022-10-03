@@ -74,7 +74,6 @@ pipelineChanged(pipeline, oldPipeline) {
 nodesChanged(nodes, oldNodes) {
   if (keys(nodes).length === keys(oldNodes).length) {
     return !keys(oldNodes).every(key => deepEqual(oldNodes[key], nodes[key]));
-      //this.hasSameNode(node, nodes));
   }
   return true;
 },
@@ -82,17 +81,6 @@ nodesChanged(nodes, oldNodes) {
 layoutChanged(pipeline, layout, oldLayout) {
   return (pipeline.$meta.id === layout?.id) && !deepEqual(layout, oldLayout);
 },
-
-// hasSameNode(node, nodes) {
-//   const nodeInNodes = nodes.find(n => n.key === node.key);
-//   if (nodeInNodes) {
-//     if (deepEqual(nodeInNodes, node)) {
-//       return true;
-//     }
-//   }
-//   //log('hasSameNode: FALSE:', nodeInNodes, node);
-//   return false;
-// },
 
 recipesForPipeline(inputs, state) {
   const {pipeline} = inputs;
