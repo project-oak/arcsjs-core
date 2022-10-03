@@ -18,10 +18,6 @@ update({pipeline, selectedNodeKey}, state) {
   }
 },
 
-// findNodeByKey(key, {nodes}) {
-//   return nodes.find(node => node.key === key) ?? null;
-// },
-
 decodeBinding(value) {
   if (typeof value === 'string') {
     return {key: value, binding: ''};
@@ -97,7 +93,7 @@ renderConnections(node, pipeline) {
 
 renderStoreConnections(storeName, node, pipeline) {
   return node.connections[storeName]
-    .filter(conn => pipeline.nodes[conn.from]) //this.findNodeByKey(conn.from, pipeline))
+    .filter(conn => pipeline.nodes[conn.from])
     .map(conn => this.formatConnection(conn.from, conn.storeName, node.key, storeName))
     ;
 },
@@ -118,8 +114,8 @@ renderConnectableCandidates({selectedNodeKey, pipeline, nodeTypes, categories}) 
   // Go through the selected node's outputs. For each output, find the store
   // type, find the connectable node types for that store type, and group those
   // node types by categories.
-  const selectedNode = pipeline.nodes[selectedNodeKey]; //.find(node => node.key === selectedNodeKey);
-  const nodeType = nodeTypes[selectedNode?.type]; //name];
+  const selectedNode = pipeline.nodes[selectedNodeKey];
+  const nodeType = nodeTypes[selectedNode?.type];
   const particles = this.getParticles(nodeType);
   for (const particle of particles) {
     for (const output of particle.$outputs || []) {
@@ -238,7 +234,6 @@ getParticles(nodeType) {
 },
 
 onNodeRemove({eventlet: {key}, pipeline, selectedNodeKey}) {
-  // pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
   delete pipeline.nodes[key];
   return {
     pipeline,
@@ -248,36 +243,36 @@ onNodeRemove({eventlet: {key}, pipeline, selectedNodeKey}) {
 
 onNodeRenamed({eventlet: {key, value}, pipeline}) {
   // TODO(mariakleiner): renaming doesn't work, when triggered from the menu.
-  const node = pipeline.nodes[key]; //.find(node => node.key === key);
+  const node = pipeline.nodes[key];
   node.displayName = value.trim();
   pipeline.nodes[node.key] = node;
-  return {pipeline}; // : this.updateNodeInPipeline(node, pipeline)};
+  return {pipeline};
 },
 
-onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeTypes, layout}) {
-  // Keys for duplicated nodes.
-  const newNodeKeys = [];
+onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeTypes, layout, previewLayout}) {
   // A map from original node key to its duplicated node key.
   const keyMap = {};
 
   // Duplicate currently selected nodes.
   //
-  // const nodes = pipeline.nodes.filter(node => nodeKeys.includes(node.key));
   const newNodes = [];
   const newLayout = {...layout};
+  const newPreviewLayout = {...previewLayout};
   // nodes.forEach(node => {
   nodeKeys.forEach(key =>  {
     const node = pipeline.nodes[key];
     // Duplicate the node.
     const newNode = this.duplicateNode(node, pipeline, nodeTypes);
     // Update the pipeline with the new node.
-    // pipeline.nodes = [...pipeline.nodes, newNode];
     pipeline.nodes[newNode.key] = newNode;
     // keep the books
     newNodes.push(newNode);
-    newNodeKeys.push(newNode.key);
     keyMap[node.key] = newNode.key;
     newLayout[newNode.key] = {...layout[node.key], y: layout[node.key].y + 60};
+    const position = newPreviewLayout[node.key];
+    if (position) {
+      newPreviewLayout[newNode.key] = {...position, t: position.t + position.h + 16};
+    }
   });
 
   // Connect duplicated nodes to duplicated nodes (instead of the original ones).
@@ -290,7 +285,8 @@ onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeT
   return {
     pipeline,
     selectedNodeKey: keyMap[selectedNodeKey],
-    layout: newLayout
+    layout: newLayout,
+    previewLayout: newPreviewLayout
   };
 },
 
@@ -303,11 +299,6 @@ duplicateNode(node, pipeline, nodeTypes) {
   // Copy connections.
   if (node.connections) {
     newNode.connections = JSON.parse(JSON.stringify(node.connections));
-  }
-  // In runner, put the duplicated particle below the original particle.
-  if (newNode.position.preview) {
-    newNode.position.preview = this.duplicatePreviewPosition(
-        newNode.position.preview, node.key, newNode.key);
   }
   // Update display name if necessary.
   if (node.displayName) {

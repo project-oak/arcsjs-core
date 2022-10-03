@@ -66,7 +66,6 @@
   },
 
   onNodeRemove({eventlet: {key}, pipeline, selectedNodeKey}) {
-    // pipeline.nodes = pipeline.nodes.filter(node => node.key !== key);
     delete pipeline.nodes[key];
     return {
       pipeline,
@@ -93,11 +92,8 @@
 
   onDrop({eventlet: {value}, pipeline, nodeTypes}) {
     if (pipeline) {
-      // pipeline.nodes = [
-      //   ...pipeline.nodes,
-      //   this.makeNewNode(value, this.indexNewNode(value, pipeline.nodes), nodeTypes)
-      // ];
-      pipeline.nodes[value] = this.makeNewNode(value, pipeline, nodeTypes);
+      const newNode = this.makeNewNode(value, pipeline, nodeTypes);
+      pipeline.nodes[newNode.key] = this.makeNewNode(value, pipeline, nodeTypes);
       return {pipeline};
     }
   },
@@ -128,7 +124,7 @@
   },
 
   onDeleteAll({pipeline}) {
-    pipeline.nodes = {}; // [];
+    pipeline.nodes = {};
     return {
       pipeline,
       selectedNodeKey: null

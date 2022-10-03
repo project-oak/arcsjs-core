@@ -32,11 +32,6 @@ sortNodeTypes(t1, t2) {
 
 async onItemClick({eventlet: {key}, selectedNodeTypes, pipeline}) {
   if (pipeline) {
-    // TODO(mariakleiner): nodes should be a map!
-    // pipeline.nodes = [
-    //   ...pipeline.nodes,
-    //   this.makeNewNode(key, this.indexNewNode(key, pipeline.nodes), selectedNodeTypes)
-    // ];
     const newNode = this.makeNewNode(key, pipeline, selectedNodeTypes);
     pipeline.nodes[newNode.key] = newNode;
     return {pipeline};

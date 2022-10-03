@@ -12,11 +12,10 @@
 // In the future, a more sophisticated heuristics can be implemented to
 // automatically connect nodes.
 
-update({pipeline, nodeTypes, candidates}, state) {
-  if (pipeline && 
-      (this.pipelineChanged(pipeline, state.pipeline) || this.candidatesChanged(candidates, state.candidates))) {
-    state.pipeline = pipeline;
-    state.candidates = candidates;
+update(inputs, state) {
+  if (this.inputsChanged(inputs, state)) {
+    const {pipeline, nodeTypes, candidates} = inputs;
+    assign(state, {pipeline, candidates});
     let changed = false;
     if (this.removePipelineOutdatedConnections(pipeline, candidates)) {
       changed = true;
@@ -26,6 +25,11 @@ update({pipeline, nodeTypes, candidates}, state) {
     }
     return {pipeline};
   }
+},
+
+inputsChanged({pipeline, candidates}, state) {
+  return pipeline && 
+      (this.pipelineChanged(pipeline, state.pipeline) || this.candidatesChanged(candidates, state.candidates))
 },
 
 pipelineChanged(pipeline, oldPipeline) {

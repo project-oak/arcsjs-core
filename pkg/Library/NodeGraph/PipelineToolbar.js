@@ -85,7 +85,7 @@
         if (state.pipeline?.$meta?.id !== pipeline.$meta.id) {
           await this.updateSelectedPipelineHistory(pipeline, service);
           assign(outputs, this.computeLayouts(pipeline));
-          outputs['selectedNodeKey'] = pipeline.nodes?.[0]?.key;
+          outputs['selectedNodeKey'] = keys(pipeline.nodes)?.[0];
         }
         state.pipeline = pipeline;
         assign(outputs, {

@@ -166,9 +166,7 @@ getStoreValue(storeId, service) {
 },
 
 async constructConnections(node, {pipeline, nodeTypes, candidates}, service) {
-  const matchingCandidates = 
-    keys(pipeline.nodes).every(key => candidates?.[key]);
-    // (pipeline.nodes.every(({key}) => candidates?.[key]));
+  const matchingCandidates = keys(pipeline.nodes).every(key => candidates?.[key]);
   if (matchingCandidates) {
     return Promise.all(keys(candidates[node.key]).map(storeName => {
       return this.renderBinding(node, storeName, candidates[node.key][storeName], pipeline, nodeTypes, service);
@@ -233,7 +231,7 @@ getParticleNames(recipe) {
 async constructConnectedValue(selected, pipeline, nodeTypes, service) {
   return await Promise.all(selected?.map(
     async ({from, storeName}) => {
-      const node = pipeline.nodes[from]; //.find(node => node.key == from);
+      const node = pipeline.nodes[from];
       const nodeType = nodeTypes[node?.type];
       if (nodeType) {
         return await this.getBindingValue(storeName, nodeType.$stores[storeName], node, service);
@@ -243,7 +241,7 @@ async constructConnectedValue(selected, pipeline, nodeTypes, service) {
 },
 
 renderCandidate({from, storeName}, pipeline) {
-  const node = pipeline.nodes[from]; //.find(n => n.key === from);
+  const node = pipeline.nodes[from];
   if (node) {
     return {
       key: this.encodeConnectionValue({from, storeName}),

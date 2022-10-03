@@ -25,7 +25,6 @@ pipelineChanged(pipeline, oldPipeline) {
 nodesChanged(nodes, currentNodes) {
   if (keys(nodes).length === keys(currentNodes).length) {
     return keys(currentNodes).every(key => deepEqual(currentNodes[key], nodes[key]));
-    // return !currentNodes?.every((node, index) => deepEqual(node, currentNodes[index]));
   }
   return true;
 },

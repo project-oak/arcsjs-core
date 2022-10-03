@@ -127,7 +127,7 @@ render({pipeline, selectedNodeKey, nodeTypes, categories, layout}, {recipes}) {
       [];
   const rects = values(pipeline?.nodes).map(
     node => idsForNode(node).map(id => ({id, position: layout?.[node.key]}))).flat();
-  const node = pipeline?.nodes?.[selectedNodeKey]; //.find(({key}) => key === selectedNodeKey);
+  const node = pipeline?.nodes?.[selectedNodeKey];
   const nodeType = nodeTypes?.[node?.type];
   return {
     selectedKeys: idsForNode(node),
@@ -142,7 +142,6 @@ isUIHidden(node) {
 
 onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
-  // pipeline.nodes = pipeline.nodes.filter(n => n.key !== node.key);
   delete pipeline.nodes[node.key];
   return {pipeline, selectedNodeKey: null};
 },
@@ -179,15 +178,6 @@ encodeFullNodeKey({key}, {$meta}) {
   return [$meta?.name, key].filter(Boolean).join(this.runnerDelimiter);
 },
 
-updateNodeInPipeline(node, pipeline) {
-  // const index = pipeline.nodes.findIndex(n => n.key === node.key);
-  // TODO (b/245770204): avoid copying objects
-  // pipeline.nodes[index] = node;
-  // pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
-  pipeline.nodes[node.key] = node;
-  return pipeline;
-},
-
 colorByCategory(category, categories) {
   return categories?.[category]?.color || 'lightblue';
 },
@@ -197,7 +187,6 @@ onDrop({eventlet: {key, value}, nodeTypes, pipeline}, state) {
   log(`>>>>> key=${key}; value=${JSON.stringify(value)}`);
   if (pipeline) {
     const newNode = this.makeNewNode(value, pipeline, nodeTypes);
-    // pipeline.nodes = [...pipeline.nodes, newNode];
     pipeline.nodes[newNode.key] = newNode;
     return {
       pipeline,
