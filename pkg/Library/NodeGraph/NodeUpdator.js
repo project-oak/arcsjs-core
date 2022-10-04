@@ -103,8 +103,8 @@ updatePropInNode(name, value, node, service) {
   return node;
 },
 
-fullStoreId({key}, storeId) {
-  return `${key}:${storeId}`;
+fullStoreId({id}, storeId) {
+  return `${id}:${storeId}`;
 },
 
 updateStoreValue(storeId, value, service) {
