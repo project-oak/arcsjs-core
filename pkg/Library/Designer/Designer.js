@@ -7,8 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-
-runnerDelimiter: '$$',
+idDelimiter: '$$',
 
 async initialize(inputs, state) {
   state.recipes = {};
@@ -69,7 +68,7 @@ async updateConnections(recipe, runningRecipe, state, service) {
   particles.forEach(particleId => {
     service({kind: 'RecipeService', msg: 'UpdateConnections', data: {particleId, spec: recipe[particleId]}});
     state.recipes[recipe.$meta.name] = recipe;
-  });  
+  });
 },
 
 async updateContainers(recipe, runningRecipe, state, service) {
@@ -78,7 +77,7 @@ async updateContainers(recipe, runningRecipe, state, service) {
     const container = recipe[hostIds[0]].$container;
     await service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
     state.recipes[recipe.$meta.name] = recipe;
-  }  
+  }
 },
 
 omitConnectionStores(recipe, state) {
@@ -175,43 +174,40 @@ getParticleNamesForNode(node, pipeline, recipes) {
 },
 
 encodeFullNodeId({id}, {$meta}) {
-  return [$meta?.id, id].filter(Boolean).join(this.runnerDelimiter);
+  return [$meta?.id, id].filter(Boolean).join(this.idDelimiter);
 },
 
 colorByCategory(category, categories) {
   return categories?.[category]?.color || 'lightblue';
 },
 
-onDrop({eventlet: {key, value}, nodeTypes, pipeline}, state) {
-  // TODO(mariakleiner): help needed! sometimes `value` contains the keys, but sometimes it doesn't...
-  log(`>>>>> key=${key}; value=${JSON.stringify(value)}`);
+onDrop({eventlet: {value: typeName}, nodeTypes, pipeline}) {
   if (pipeline) {
-    const newNode = this.makeNewNode(value, pipeline, nodeTypes);
-    pipeline.nodes[newNode.id] = newNode;
-    return {
-      pipeline,
-      selectedNodeId: newNode.id
-    };
+    const nodeType = nodeTypes[typeName];
+    if (nodeType) {
+      const index = this.countNodesOfType(pipeline.nodes, typeName) + 1;
+      const id = this.formatNodeId(typeName, index);
+      pipeline.nodes[id] = this.formatNode(id, index, nodeType.$meta);
+      return {
+        pipeline,
+        selectedNodeId: id
+      };
+    }
   }
 },
 
-makeNewNode(id, pipeline, nodeTypes) {
-  const {displayName} = nodeTypes[id].$meta;
-  const index = this.indexNewNode(id, pipeline.nodes);
+formatNode(id, index, {id: type, displayName}) {
   return {
-    type: id,
-    index,
-    id: this.formatNodeId(id, index),
-    displayName: this.displayName(displayName || id, index)
+    id, index, type,
+    displayName: this.formatDisplayName(displayName || type, index)
   };
 },
 
-indexNewNode(id, nodes) {
-  const typedNodes = values(nodes).filter(node => id === node.type);
-  return (typedNodes.pop()?.index || 0) + 1;
+countNodesOfType(nodes, type) {
+  return values(nodes).filter(node => node.type === type).length;
 },
 
-displayName(name, index) {
+formatDisplayName(name, index) {
   const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
   return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
 },
@@ -226,14 +222,13 @@ template: html`
     color: var(--theme-color-fg-1);
     background-color: var(--theme-color-bg-1);
     min-height: 120px;
-    /* border-bottom: 1px solid #f7f7f7; */
   }
   designer-layout {
     height: auto !important;
   }
 </style>
 <div bar frame="chooser"></div>
-<drop-target flex row on-drop="onDrop">
+<drop-target flex row on-target-drop="onDrop">
   <designer-layout flex scrolling column frame="runner"
                     on-position="onNodePosition"
                     on-delete="onNodeDelete"

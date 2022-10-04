@@ -4,6 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
+export * from '../../Library/TensorFlow/TensorFlow.js';
 export * from '../../Library/Core/utils.min.js';
 export * from '../../Library/App/surface-imports.js';
 export * from '../../Library/Dom/container-layout.js';

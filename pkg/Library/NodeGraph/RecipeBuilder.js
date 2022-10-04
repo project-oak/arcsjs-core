@@ -9,7 +9,7 @@
 ({
 
 connectorDelim: '$$',
-nameDelim: ':',
+idDelim: ':',
 defaultContainer: `main#runner`,
 
 async update(inputs, state) {
@@ -104,7 +104,7 @@ buildParticleSpecs(node, nodeType, layout, {storeMap}) {
   const specs = {};
   const names = this.getParticleNames(nodeType) || [];
   for (const particleName of names) {
-    const container = layout?.[`${node.id}:Container`] || this.defaultContainer;
+    const container = layout?.[`${node.id}${this.idDelim}Container`] || this.defaultContainer;
     specs[this.constructParticleId(node, particleName)] =
         this.buildParticleSpec(node, nodeType, particleName, container, storeMap);
   }
@@ -117,7 +117,7 @@ getParticleNames(recipe) {
 },
 
 constructParticleId({id}, particleName) {
-  return `${id}${this.nameDelim}${particleName}`;
+  return `${id}${this.idDelim}${particleName}`;
 },
 
 buildParticleSpec(node, nodeType, particleName, container, storeMap) {
@@ -134,7 +134,7 @@ buildParticleSpec(node, nodeType, particleName, container, storeMap) {
 },
 
 resolveContainer(nodeName, containerName, defaultContainer) {
-  return containerName ? `${nodeName}${containerName}` : defaultContainer;
+  return containerName ? `${nodeName}${this.idDelim}${containerName}` : defaultContainer;
 },
 
 resolveBindings(particleSpec, storeMap) {
@@ -174,7 +174,7 @@ resolveGroup(bindings, storeMap) {
 
 constructStoreId({from, storeName}) {
   if (from) {
-    return `${from}${this.nameDelim}${storeName}`;
+    return `${from}${this.idDelim}${storeName}`;
   }
   return storeName;
 },

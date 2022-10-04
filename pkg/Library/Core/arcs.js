@@ -438,7 +438,6 @@ var Arc = class extends EventEmitter {
     if (store) {
       inputs[name] = store.pojo;
     } else {
-      this.log.warn(`computeInput: "${storeName}" (bound to "${name}") not found`);
     }
   }
   assignOutputs({ id, meta }, outputs) {

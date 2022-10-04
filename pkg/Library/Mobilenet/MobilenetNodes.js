@@ -8,7 +8,7 @@
 export const Mobilenet = {
   $meta: {
     id: 'mobilenet',
-    category: 'Model',
+    category: 'Model'
   },
   $stores: {
     Image: {
@@ -19,9 +19,9 @@ export const Mobilenet = {
     Model: {
       $type: 'HubModel',
       $value: {
-        url: './mobilenet.min.js',
+        url: '../../third_party/mobilenet/mobilenet.min.js',
         input: '3, 256, 256',
-        output: '1024',
+        output: '1024'
       }
     },
     ClassifierResults: {
@@ -33,7 +33,7 @@ export const Mobilenet = {
     $kind: '$library/Mobilenet/Classifier',
     $inputs: [
       {imageRef: 'Image'},
-      {model: 'Model'},
+      {model: 'Model'}
     ],
     $outputs: [
       {classifierResults: 'ClassifierResults'}

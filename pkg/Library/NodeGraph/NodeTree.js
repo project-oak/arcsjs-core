@@ -121,7 +121,8 @@ getHostId(node) {
 containersForNode(node, nodeType) {
   const containers = [];
   for (const particleName of this.getParticleNames(nodeType)) {
-    keys(nodeType[particleName].$slots).forEach(slotName => containers.push(
+    const slots = nodeType[particleName].$slots;
+    keys(slots).forEach(slotName => containers.push(
       this.makeContainerModel(this.hostId(node, particleName), slotName)
     ));
   }
@@ -130,7 +131,7 @@ containersForNode(node, nodeType) {
 
 getParticleNames(nodeType) {
   const notKeyword = name => !name.startsWith('$');
-  return nodeType && keys(nodeType).filter(notKeyword);
+  return keys(nodeType).filter(notKeyword);
 },
 
 makeContainerModel(hostId, slotName) {
