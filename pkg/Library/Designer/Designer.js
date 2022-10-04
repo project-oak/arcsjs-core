@@ -193,13 +193,13 @@ onDrop({eventlet: {value}, nodeTypes, pipeline}, state) {
   }
 },
 
-makeNewNode(key, pipeline, nodeTypes) {
-  const displayName = nodeTypes[key]?.$meta.displayName || key;
-  const index = this.indexNewNode(key, pipeline.nodes);
+makeNewNode(type, pipeline, nodeTypes) {
+  const displayName = nodeTypes[type]?.$meta.displayName || key;
+  const index = this.indexNewNode(type, pipeline.nodes);
   return {
-    type: key,
+    type,
     index,
-    id: this.formatNodeId(key, index),
+    id: this.formatNodeId(type, index),
     displayName: this.displayName(displayName, index)
   };
 },
