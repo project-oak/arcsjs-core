@@ -157,8 +157,8 @@ async getBindingValue(name, store, node, service) {
   return storeValue ?? node.props?.[name] ?? store.$value;
 },
 
-fullStoreId({key}, storeId) {
-  return `${key}:${storeId}`;
+fullStoreId({id}, storeId) {
+  return `${id}:${storeId}`;
 },
 
 getStoreValue(storeId, service) {
