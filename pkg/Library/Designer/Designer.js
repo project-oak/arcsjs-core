@@ -7,8 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-
-runnerDelimiter: '$$',
+idDelimiter: '$$',
 
 async initialize(inputs, state) {
   state.recipes = {};
@@ -175,41 +174,40 @@ getParticleNamesForNode(node, pipeline, recipes) {
 },
 
 encodeFullNodeId({id}, {$meta}) {
-  return [$meta?.id, id].filter(Boolean).join(this.runnerDelimiter);
+  return [$meta?.id, id].filter(Boolean).join(this.idDelimiter);
 },
 
 colorByCategory(category, categories) {
   return categories?.[category]?.color || 'lightblue';
 },
 
-onDrop({eventlet: {value}, nodeTypes, pipeline}, state) {
+onDrop({eventlet: {value: typeName}, nodeTypes, pipeline}) {
   if (pipeline) {
-    const newNode = this.makeNewNode(value, pipeline, nodeTypes);
-    pipeline.nodes[newNode.id] = newNode;
-    return {
-      pipeline,
-      selectedNodeId: newNode.id
-    };
+    const nodeType = nodeTypes[typeName];
+    if (nodeType) {
+      const index = this.countNodesOfType(pipeline.nodes, typeName) + 1;
+      const id = this.formatNodeId(typeName, index);
+      pipeline.nodes[id] = this.formatNode(id, index, nodeType.$meta);
+      return {
+        pipeline,
+        selectedNodeId: id
+      };
+    }
   }
 },
 
-makeNewNode(type, pipeline, nodeTypes) {
-  const displayName = nodeTypes[type]?.$meta.displayName || key;
-  const index = this.indexNewNode(type, pipeline.nodes);
+formatNode(id, index, {id: type, displayName}) {
   return {
-    type,
-    index,
-    id: this.formatNodeId(type, index),
-    displayName: this.displayName(displayName, index)
+    id, index, type,
+    displayName: this.formatDisplayName(displayName || type, index)
   };
 },
 
-indexNewNode(id, nodes) {
-  const typedNodes = values(nodes).filter(node => id === node.type);
-  return (typedNodes.pop()?.index || 0) + 1;
+countNodesOfType(nodes, type) {
+  return values(nodes).filter(node => node.type === type).length;
 },
 
-displayName(name, index) {
+formatDisplayName(name, index) {
   const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
   return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
 },
@@ -224,7 +222,6 @@ template: html`
     color: var(--theme-color-fg-1);
     background-color: var(--theme-color-bg-1);
     min-height: 120px;
-    /* border-bottom: 1px solid #f7f7f7; */
   }
   designer-layout {
     height: auto !important;

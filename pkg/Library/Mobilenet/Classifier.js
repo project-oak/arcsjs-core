@@ -4,6 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 ({
+
 async initialize() {
   // important so other objects know when new classifier comes online
   return {
@@ -29,7 +30,7 @@ hasChanges({imageRef, model}, state) {
 
 async perceive({imageRef, model}, service) {
   const args = {
-    kind: 'TensorFlowService', //'TfjsService',
+    kind: 'TensorFlowService',
     msg: 'toolClassify',
     data: {
       imageRef,
@@ -37,25 +38,7 @@ async perceive({imageRef, model}, service) {
       modelKind: 'mobilenet'
     }
   };
-  /////////////////
-  // HACKALERT!
-  // TODO(mariakleiner): actually run the service, instead of using hardcoded results.
-  // const classifierResults = await service(args);
-  const classifierResults = [
-    {
-      displayName: "strawberry",
-      score: 0.9991282820701599
-    },
-    {
-      displayName: "ice cream, icecream",
-      score :0.00010875583393499255
-    },
-    {
-      displayName: "thimble",
-      score: 0.00008958124089986086
-    }
-  ];
-  /////////////////
+  const classifierResults = await service(args);
   return {
     status: classifierResults ? 'complete' : 'failed',
     classifierResults
