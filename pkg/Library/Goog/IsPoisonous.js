@@ -6,13 +6,13 @@
 
 ({
 
-async update({entityInfo}, state, {output, service, invalidate}) {
-  if (state.plantName !== entityInfo?.name) {
-    state.plantName = entityInfo?.name;
-    if (entityInfo?.name) {
+async update({entityName}, state, {service, invalidate}) {
+  if (state.plantName !== entityName) {
+    state.plantName = entityName;
+    if (state.plantName) {
       state.isPoisonous = '[considering...]';
       // non-trivial asynchrony :)
-      this.updateIsPoisonous(entityInfo, state, {service, invalidate});
+      this.updateIsPoisonous(state, {service, invalidate});
     }
   }
   const response = state.response;
@@ -21,16 +21,16 @@ async update({entityInfo}, state, {output, service, invalidate}) {
     state.response = null;
     // calculate output
     const isPoisonous = this.isPoisonous(response);
-    log(entityInfo, isPoisonous);
+    log(state.plantName, isPoisonous);
     state.isPoisonous = isPoisonous;
     return {isPoisonous};
   }
 },
 
-async updateIsPoisonous(entityInfo, state, {service, invalidate}) {
+async updateIsPoisonous(state, {service, invalidate}) {
   const isPoisonousMacro = 'NvfwycdHBRpq4h13rEj2';
   const nameKey = '6f3a583b-1f7c-4e19-af80-eb9ddf374688';
-  state.response = await this.runMacro(isPoisonousMacro, {[nameKey]: entityInfo?.name}, service);
+  state.response = await this.runMacro(isPoisonousMacro, {[nameKey]: state.plantName}, service);
   invalidate();
 },
 
@@ -44,9 +44,9 @@ async runMacro(macroId, inputs, service) {
   return await service({kind: 'GoogleApisService', msg: 'runMacro', data});
 },
 
-render({entityInfo: {name}}, {isPoisonous}) {
+render({entityName}, {isPoisonous}) {
   return {
-    name,
+    name: entityName,
     isPoisonous
   };
 },

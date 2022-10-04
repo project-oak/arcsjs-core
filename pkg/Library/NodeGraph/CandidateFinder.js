@@ -44,7 +44,7 @@ findConnectionCandidates(nodeId, storeName, {$type}, {nodes}, nodeTypes, globalS
   
   values(nodes).forEach(node => {
     if (node.id !== nodeId) {
-      candidates.push(this.findCandidateInNode(node.id, $type, nodeTypes[node.type]));
+      candidates.push(...this.findCandidatesInNode(node.id, $type, nodeTypes[node.type]));
     }
   });
   return candidates.filter(c => c);
@@ -56,17 +56,19 @@ findGlobalCandidate(storeName, type, globalStores) {
   }
 },
 
-findCandidateInNode(from, type, nodeType) {
+findCandidatesInNode(from, type, nodeType) {
   const matchingType = (storeType) => {
     // TODO(b/244191110): Type matching API to be wired here.
     return storeType === type;
   };
+  const candidates = [];
   const isMatchingStore = ({$type, connection}) => matchingType($type) && !connection;
   for (const [storeName, store] of entries(nodeType?.$stores)) {
     if (isMatchingStore(store)) {
-      return {from, storeName, type: store.$type};
+      candidates.push({from, storeName, type: store.$type});
     }
   }
+  return candidates;
 }
 
 });

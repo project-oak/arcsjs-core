@@ -13,11 +13,12 @@ export const isPoisonous = {
     category: 'Panels'
   },
   $stores: {
-    entityInfo: {
-      $type: 'EntityInfo',
+    entityName: {
+      $type: 'String',
       $value: {
         name: 'Poison Ivy'
-      }
+      },
+      connection: true
     },
     isPoisonous: {
       $type: 'Boolean',
@@ -26,7 +27,7 @@ export const isPoisonous = {
   },
   isPoisonous: {
     $kind: '$library/Goog/isPoisonous',
-    $inputs: ['entityInfo'],
+    $inputs: ['entityName'],
     $outputs: ['isPoisonous']
   }
 };
