@@ -28,7 +28,7 @@ update(inputs, state) {
 },
 
 inputsChanged({pipeline, candidates}, state) {
-  return pipeline && 
+  return pipeline &&
       (this.pipelineChanged(pipeline, state.pipeline) || this.candidatesChanged(candidates, state.candidates))
 },
 
@@ -67,11 +67,12 @@ hasMatchingCandidate(connection, candidates) {
 updatePipelineConnections(pipeline, nodeTypes, candidates) {
   return values(pipeline.nodes)
     .map(node => this.updateNodeConnections(node, nodeTypes[node.type], candidates[node.id]))
-    .some(changed => changed);
+    .some(changed => changed)
+    ;
 },
 
 updateNodeConnections(node, nodeType, candidates) {
-  if (this.shouldUpdateConnections(node) && candidates) {      
+  if (this.shouldUpdateConnections(node) && candidates) {
     keys(nodeType.$stores).forEach(store => {
       node.connections ??= {};
       this.updateStoreConnection(node, store, candidates[store])

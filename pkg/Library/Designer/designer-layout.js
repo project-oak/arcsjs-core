@@ -27,8 +27,8 @@ export class DesignerLayout extends DragDrop {
   }
   update() {
     // TODO(sjmiles): the `on-slotchange` doesn't work as expected.
-    setTimeout(() => {this.updateGeometry();}, 100);
-    // this.updateGeometry();
+    //setTimeout(() => this.updateGeometry(), 100);
+    this.updateGeometry();
   }
   onKeydown(event) {
     if (!this.hasActiveInput()) {
@@ -88,15 +88,13 @@ export class DesignerLayout extends DragDrop {
   }
   position(id, position) {
     if (position == null) {
-      // Set initial position to (16, 16);
+      // set default rect
       const target = this.getChildById(id);
-      const rect = target && this.getRect(target);
-      if (rect) {
-        this.newbies = (this.newbies || 0) + 1;
-        const [m, n] = [this.newbies * 8, this.newbies * 8];
-        assign(rect, {l: 16 + m, t: 16 + n, w: 240, h: 180});
+      //const rect = target && this.getRect(target);
+      if (target) { //rect) {
+        //assign(rect, {l: 16, t: 16, w: 240, h: 180});
+        const rect = {l: 16, t: 16, w: 240, h: 180};
         this.setBoxStyle(target, rect);
-        //this.firePosition(target);
       }
     } else {
       const child = this.getChildById(id);

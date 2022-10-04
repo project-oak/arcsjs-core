@@ -69,7 +69,7 @@ async updateConnections(recipe, runningRecipe, state, service) {
   particles.forEach(particleId => {
     service({kind: 'RecipeService', msg: 'UpdateConnections', data: {particleId, spec: recipe[particleId]}});
     state.recipes[recipe.$meta.name] = recipe;
-  });  
+  });
 },
 
 async updateContainers(recipe, runningRecipe, state, service) {
@@ -78,7 +78,7 @@ async updateContainers(recipe, runningRecipe, state, service) {
     const container = recipe[hostIds[0]].$container;
     await service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
     state.recipes[recipe.$meta.name] = recipe;
-  }  
+  }
 },
 
 omitConnectionStores(recipe, state) {
@@ -182,9 +182,7 @@ colorByCategory(category, categories) {
   return categories?.[category]?.color || 'lightblue';
 },
 
-onDrop({eventlet: {key, value}, nodeTypes, pipeline}, state) {
-  // TODO(mariakleiner): help needed! sometimes `value` contains the keys, but sometimes it doesn't...
-  log(`>>>>> key=${key}; value=${JSON.stringify(value)}`);
+onDrop({eventlet: {value}, nodeTypes, pipeline}, state) {
   if (pipeline) {
     const newNode = this.makeNewNode(value, pipeline, nodeTypes);
     pipeline.nodes[newNode.id] = newNode;
@@ -195,15 +193,17 @@ onDrop({eventlet: {key, value}, nodeTypes, pipeline}, state) {
   }
 },
 
-makeNewNode(id, pipeline, nodeTypes) {
-  const {displayName} = nodeTypes[id].$meta;
-  const index = this.indexNewNode(id, pipeline.nodes);
-  return {
-    type: id,
-    index,
-    id: this.formatNodeId(id, index),
-    displayName: this.displayName(displayName || id, index)
-  };
+makeNewNode(key, pipeline, nodeTypes) {
+  if (nodeTypes[key]) {
+    const {displayName} = nodeTypes[key].$meta;
+    const index = this.indexNewNode(key, pipeline.nodes);
+    return {
+      type: key,
+      index,
+      id: this.formatNodeId(key, index),
+      displayName: this.displayName(displayName || key, index)
+    };
+  }
 },
 
 indexNewNode(id, nodes) {
@@ -233,7 +233,7 @@ template: html`
   }
 </style>
 <div bar frame="chooser"></div>
-<drop-target flex row on-drop="onDrop">
+<drop-target flex row on-target-drop="onDrop">
   <designer-layout flex scrolling column frame="runner"
                     on-position="onNodePosition"
                     on-delete="onNodeDelete"

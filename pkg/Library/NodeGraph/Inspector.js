@@ -8,7 +8,6 @@
 
 async update({data}, state, {output}) {
   if (this.dataPropsChanged(data, state)) {
-    log('refresh');
     await this.refreshRendering(state, output);
     state.data = data;
   }

@@ -104,7 +104,7 @@ buildParticleSpecs(node, nodeType, layout, {storeMap}) {
   const specs = {};
   const names = this.getParticleNames(nodeType) || [];
   for (const particleName of names) {
-    const container = layout?.[`${node.id}:Container`] || this.defaultContainer;
+    const container = layout?.[`${node.id}${nameDelim}Container`] || this.defaultContainer;
     specs[this.constructParticleId(node, particleName)] =
         this.buildParticleSpec(node, nodeType, particleName, container, storeMap);
   }
@@ -134,7 +134,7 @@ buildParticleSpec(node, nodeType, particleName, container, storeMap) {
 },
 
 resolveContainer(nodeName, containerName, defaultContainer) {
-  return containerName ? `${nodeName}${containerName}` : defaultContainer;
+  return containerName ? `${nodeName}${nameDelim}${containerName}` : defaultContainer;
 },
 
 resolveBindings(particleSpec, storeMap) {
