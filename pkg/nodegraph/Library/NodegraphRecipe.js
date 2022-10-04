@@ -150,9 +150,9 @@ export const NodegraphRecipe = {
       inspector: {
         Inspector: {
           $kind: '$library/NodeGraph/Inspector',
+          $staticInputs: {customInspectors},
           $inputs: [{data: 'inspectorData'}],
-          $outputs: [{data: 'inspectorData'}],
-          $staticInputs: {customInspectors}
+          $outputs: [{data: 'inspectorData'}]
         }
       },
       tree: {
@@ -176,16 +176,16 @@ export const NodegraphRecipe = {
   },
   nodeInspector: {
     $kind: '$library/NodeGraph/NodeInspector',
+    $staticInputs: {
+      customInspectors,
+      inspectorData: 'inspectorData',
+    },
     $inputs: [
       'selectedNodeId',
       {pipeline: 'selectedPipeline'},
       'candidates',
       'nodeTypes'
     ],
-    $staticInputs: {
-      customInspectors,
-      inspectorData: 'inspectorData',
-    },
     $outputs: [{data: 'inspectorData'}]
   },
   candidateFinder: {

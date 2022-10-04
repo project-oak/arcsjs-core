@@ -126,7 +126,8 @@ export class Arc extends EventEmitter {
     if (store) {
       inputs[name] = store.pojo;
     } else {
-      this.log.warn(`computeInput: "${storeName}" (bound to "${name}") not found`);
+      // TODO(sjmiles): is this ok or not?
+      //this.log.warn(`computeInput: "${storeName}" (bound to "${name}") not found`);
     }
   }
   // complement to `computeInputs`

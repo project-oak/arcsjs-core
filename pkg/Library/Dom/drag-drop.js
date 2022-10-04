@@ -49,7 +49,9 @@ export const DragDrop = class extends Xen.Async {
     return Math.round(o / size) * size;
   }
   static snap(rect, size) {
-    ['l', 't', 'w', 'h'].forEach(o => rect[o] = DragDrop.grid(rect[o], size));
+    if (rect) {
+      ['l', 't', 'w', 'h'].forEach(o => rect[o] = DragDrop.grid(rect[o], size));
+    }
     return rect;
   }
   doDown(e) {

@@ -24,4 +24,7 @@ try {
 
 export {app, Resources};
 
-export const canvas = await new Promise(r => setTimeout(() => r(globalThis.app?.canvas), 500));
+export const canvas = await new Promise(r => {
+  const poll = () => setTimeout(() => globalThis.app?.canvas ? r(globalThis.app.canvas) : poll(), 300);
+  poll();
+});

@@ -73,7 +73,7 @@ updatePipelineConnections(pipeline, nodeTypes, candidates) {
 
 updateNodeConnections(node, nodeType, candidates) {
   if (this.shouldUpdateConnections(node) && candidates) {
-    keys(nodeType.$stores).forEach(store => {
+    keys(nodeType?.$stores).forEach(store => {
       node.connections ??= {};
       this.updateStoreConnection(node, store, candidates[store])
     });
