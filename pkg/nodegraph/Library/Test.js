@@ -5,7 +5,7 @@ render(inputs) {
     objStrField: inputs.theObject.strField,
     objNestedNumField: inputs.theObject.nested.nestedNumField,
     objNNtrueField: inputs.theObject.nested.nestedObj.nnTrueField,
-    selectedKey: inputs.selectedNodeKey || 'N/A'
+    selectedKey: inputs.selectedNodeId || 'N/A'
   };
 },
 theStringChange({eventlet: {value}}) {

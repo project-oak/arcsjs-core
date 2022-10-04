@@ -59,7 +59,7 @@
         if (state.pipeline?.$meta?.id !== pipeline.$meta.id) {
           await this.updateSelectedPipelineHistory(pipeline, service);
           assign(outputs, this.computeLayouts(pipeline));
-          outputs['selectedNodeKey'] = keys(pipeline.nodes)?.[0];
+          outputs['selectedNodeId'] = keys(pipeline.nodes)?.[0];
         }
         state.pipeline = pipeline;
         assign(outputs, {
@@ -138,7 +138,7 @@
         this.makePipelineCopyName(currentPipeline.$meta?.name, currentPipelines),
         service);
       values(currentPipeline).forEach(node => {
-        pipeline.nodes[node.key] = {...node};
+        pipeline.nodes[node.id] = {...node};
       });
       return {pipeline, pipelines};
     }
@@ -169,7 +169,7 @@
     return {
       pipelines,
       pipeline: pipelines.length > 0 ? pipelines[0] : null,
-      selectedNodeKey: null
+      selectedNodeId: null
     };
   },
   onShare({pipeline, pipelines, publishPaths}, {selectedPublishKey}) {

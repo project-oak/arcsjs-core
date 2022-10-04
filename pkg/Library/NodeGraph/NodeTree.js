@@ -13,13 +13,13 @@ nameDelim: ':',
 
 async update(input, state, tools) {
   // state.graph = await this.constructContainerGraph(input, state, tools);
-  // work on selectedNodeKey
-  const selectCandidate = this.updateSelectedNodeKey(input, state);
+  // work on selectedNodeId
+  const selectCandidate = this.updateSelectedNodeId(input, state);
   // best not to output unless we did something
   // TODO(sjmiles): this is not ergonomic, perhaps dirty-checking output can
   // prevent update waterfall with small perf cost for automation.
-  if (selectCandidate != input.selectedNodeKey) {
-    return {selectedNodeKey: selectCandidate};
+  if (selectCandidate != input.selectedNodeId) {
+    return {selectedNodeId: selectCandidate};
   }
 },
 
@@ -64,8 +64,8 @@ async update(input, state, tools) {
 //   return {parsed, tree};
 // },
 
-updateSelectedNodeKey({pipeline, selectedNodeKey}, state) {
-  let candidate = selectedNodeKey;
+updateSelectedNodeId({pipeline, selectedNodeId}, state) {
+  let candidate = selectedNodeId;
   // when switching pipelines, we reset some state
   const meta = pipeline?.$meta;
   if (meta?.name !== state.selectedPipelineName) {
@@ -79,29 +79,29 @@ updateSelectedNodeKey({pipeline, selectedNodeKey}, state) {
   return candidate;
 },
 
-render({pipeline, categories, selectedNodeKey, nodeTypes}) {
+render({pipeline, categories, selectedNodeId, nodeTypes}) {
   const nodes = pipeline?.nodes;
   return {
-    graphNodes: this.renderGraphNodes(nodes, nodeTypes, selectedNodeKey, categories)
+    graphNodes: this.renderGraphNodes(nodes, nodeTypes, selectedNodeId, categories)
   };
 },
 
-renderGraphNodes(nodes, nodeTypes, nodeKey, categories) {
+renderGraphNodes(nodes, nodeTypes, nodeId, categories) {
   const rootContainer = this.makeContainerModel('main', 'runner');
   const graph = {name: 'Root', icon: 'settings', graphNodes: [rootContainer], isContainer: 'true'};
   const graphNodes = values(nodes).map(node => {
-    const {key, name, type} = node;
+    const {id, displayName, type} = node;
     const nodeType = nodeTypes[type];
     const categoryName = nodeType?.$meta?.category;
     const category = categories?.[categoryName] || 0;
     const containers = this.containersForNode(node, nodeType);
     return {
-      key,
-      name,
+      id,
+      displayName,
       icon: category.icon || 'settings',
       color: category.color || 'crimson',
       bgColor: category.bgColor || 'gray',
-      selected: key == nodeKey,
+      selected: id == nodeId,
       isContainer: 'false',
       graphNodes: containers
     };
@@ -142,32 +142,32 @@ makeContainerModel(hostId, slotName) {
   };
 },
 
-renderContainers(nodes, nodeTypesMap, nodeKey) {
-  // function mapping nodes to lists of containers
-  const mapFn = node => this.containersForNode(node, nodeTypesMap);
-  // nodes may have multiple containers, flatten the list, remove selected node
-  // (it cannot be it's own container)
-  return nodes?.map(mapFn).flat().filter(n => !n.key.startsWith(nodeKey));
-},
+// renderContainers(nodes, nodeTypesMap, nodeId) {
+//   // function mapping nodes to lists of containers
+//   const mapFn = node => this.containersForNode(node, nodeTypesMap);
+//   // nodes may have multiple containers, flatten the list, remove selected node
+//   // (it cannot be it's own container)
+//   return nodes?.map(mapFn).flat().filter(n => !n.id.startsWith(nodeId));
+// },
 
 async onNodeSelect({eventlet: {key}}) {
-  return {selectedNodeKey: key};
+  return {selectedNodeId: key};
 },
 
-async onDrop({eventlet: {key: container, value: key}, pipeline, nodeTypes, layout}, state, {service}) {
+async onDrop({eventlet: {key: container, value: id}, pipeline, nodeTypes, layout}, state, {service}) {
   //log('onDrop:', key, container);
-  const node = pipeline.nodes[key]; //.find(node => node.key === key);
+  const node = pipeline.nodes[id];
   const nodeType = nodeTypes[node.type];
   const hostIds = this.getParticleNames(nodeType).map(particleName => this.hostId(node, particleName));
   await service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
   return {
-    selectedNodeKey: key,
-    layout: {...layout, [`${key}:Container`]: container}
+    selectedNodeId: id,
+    layout: {...layout, [`${id}:Container`]: container}
   };
 },
 
 hostId(node, particleName) {
-  return `${node.key}${this.nameDelim}${particleName}`;
+  return `${node.id}${this.nameDelim}${particleName}`;
 },
 
 
@@ -211,17 +211,17 @@ template: html`
 <div flex scrolling repeat="node_t">{{graphNodes}}</div>
 
 <template node_t>
-  <div node selected$="{{selected}}" key="{{key}}" on-click="onNodeSelect">
+  <div node selected$="{{selected}}" key="{{id}}" on-click="onNodeSelect">
 
     <div bar>
       <!-- -->
       <icon>{{icon}}</icon>
       <!-- -->
-      <draggable-item flex row hide$="{{isContainer}}" key="{{key}}" name="{{name}}">
+      <draggable-item flex row hide$="{{isContainer}}" key="{{id}}" name="{{displayName}}">
         <span flex name>{{name}}</span>
       </draggable-item>
       <!-- -->
-      <drop-target clip row key="{{key}}" show$="{{isContainer}}" on-target-drop="onDrop">
+      <drop-target clip row key="{{id}}" show$="{{isContainer}}" on-target-drop="onDrop">
         <span flex name>{{name}}</span>
       </drop-target>
       <!-- -->

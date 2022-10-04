@@ -43,7 +43,7 @@ candidatesChanged(candidates, oldCandidates) {
 
 removePipelineOutdatedConnections(pipeline, candidates) {
   return values(pipeline.nodes)
-    .map(node => this.removeNodeOutdatedConnections(node, candidates[node.key]))
+    .map(node => this.removeNodeOutdatedConnections(node, candidates[node.id]))
     .some(changed => changed);
 },
 
@@ -66,7 +66,7 @@ hasMatchingCandidate(connection, candidates) {
 
 updatePipelineConnections(pipeline, nodeTypes, candidates) {
   return values(pipeline.nodes)
-    .map(node => this.updateNodeConnections(node, nodeTypes[node.type], candidates[node.key]))
+    .map(node => this.updateNodeConnections(node, nodeTypes[node.type], candidates[node.id]))
     .some(changed => changed);
 },
 

@@ -120,17 +120,17 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-render({pipeline, selectedNodeKey, nodeTypes, categories, layout}, {recipes}) {
-  const idsForNode = (node) =>
+render({pipeline, selectedNodeId, nodeTypes, categories, layout}, {recipes}) {
+  const particleIdsForNode = (node) =>
       (node && !this.isUIHidden(node) &&
         this.getParticleNamesForNode(node, pipeline, recipes)) ||
       [];
   const rects = values(pipeline?.nodes).map(
-    node => idsForNode(node).map(id => ({id, position: layout?.[node.key]}))).flat();
-  const node = pipeline?.nodes?.[selectedNodeKey];
+    node => particleIdsForNode(node).map(id => ({id, position: layout?.[node.id]}))).flat();
+  const node = pipeline?.nodes?.[selectedNodeId];
   const nodeType = nodeTypes?.[node?.type];
   return {
-    selectedKeys: idsForNode(node),
+    selectedKeys: particleIdsForNode(node),
     rects,
     color: this.colorByCategory(nodeType?.$meta?.category, categories),
   };
@@ -142,20 +142,20 @@ isUIHidden(node) {
 
 onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
-  delete pipeline.nodes[node.key];
-  return {pipeline, selectedNodeKey: null};
+  delete pipeline.nodes[node.id];
+  return {pipeline, selectedNodeId: null};
 },
 
 onNodePosition({eventlet: {key, value}, pipeline, layout}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
   if (node) {
     return {
-      selectedNodeKey: node.key,
-      layout: {...layout, [node.key]: value}
+      selectedNodeId: node.id,
+      layout: {...layout, [node.id]: value}
     };
   } else {
     return {
-      selectedNodeKey: null
+      selectedNodeId: null
     };
   }
 },
@@ -169,13 +169,13 @@ findNodeByParticle(particleName, pipeline, recipes) {
 
 getParticleNamesForNode(node, pipeline, recipes) {
   if (pipeline) {
-    const fullNodeKey = this.encodeFullNodeKey(node, pipeline);
-    return this.getParticleNames(recipes[fullNodeKey]);
+    const fullNodeId = this.encodeFullNodeId(node, pipeline);
+    return this.getParticleNames(recipes[fullNodeId]);
   }
 },
 
-encodeFullNodeKey({key}, {$meta}) {
-  return [$meta?.name, key].filter(Boolean).join(this.runnerDelimiter);
+encodeFullNodeId({id}, {$meta}) {
+  return [$meta?.id, id].filter(Boolean).join(this.runnerDelimiter);
 },
 
 colorByCategory(category, categories) {
@@ -187,27 +187,27 @@ onDrop({eventlet: {key, value}, nodeTypes, pipeline}, state) {
   log(`>>>>> key=${key}; value=${JSON.stringify(value)}`);
   if (pipeline) {
     const newNode = this.makeNewNode(value, pipeline, nodeTypes);
-    pipeline.nodes[newNode.key] = newNode;
+    pipeline.nodes[newNode.id] = newNode;
     return {
       pipeline,
-      selectedNodeKey: newNode.key
+      selectedNodeId: newNode.id
     };
   }
 },
 
-makeNewNode(key, pipeline, nodeTypes) {
-  const name = nodeTypes[key].$meta.name;
-  const index = this.indexNewNode(key, pipeline.nodes);
+makeNewNode(id, pipeline, nodeTypes) {
+  const {displayName} = nodeTypes[id].$meta;
+  const index = this.indexNewNode(id, pipeline.nodes);
   return {
-    type: key,
+    type: id,
     index,
-    key: this.formatNodeKey(key, index),
-    name: this.displayName(name, index)
+    id: this.formatNodeId(id, index),
+    displayName: this.displayName(displayName || id, index)
   };
 },
 
-indexNewNode(key, nodes) {
-  const typedNodes = values(nodes).filter(node => key === node.type);
+indexNewNode(id, nodes) {
+  const typedNodes = values(nodes).filter(node => id === node.type);
   return (typedNodes.pop()?.index || 0) + 1;
 },
 
@@ -216,8 +216,8 @@ displayName(name, index) {
   return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
 },
 
-formatNodeKey(key, index) {
-  return `${key}${index}`.replace(/ /g,'');
+formatNodeId(id, index) {
+  return `${id}${index}`.replace(/ /g,'');
 },
 
 template: html`

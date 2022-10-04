@@ -23,7 +23,7 @@ export const Librarian = {
       $type: 'String',
       noinspect: true,
       nodisplay: true,
-      value: 'node.key'
+      value: 'node.id'
     },  
   },
   customParticle: {

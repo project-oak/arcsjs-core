@@ -15,7 +15,7 @@ const globalStores = [
   'selectedNode',
   'selectedPipeline',
   'nodeTypes',
-  'hoveredNodeKey',
+  'hoveredNodeId',
   'categories',
   'nodeKey',
 ];
@@ -31,7 +31,7 @@ const PipelineToolbar = {
   },
   $outputs: [
     {pipeline: 'selectedPipeline'},
-    'selectedNodeKey',
+    'selectedNodeId',
     'pipelines',
     'previewLayout',
     'nodegraphLayout'
@@ -64,7 +64,7 @@ export const NodegraphRecipe = {
       $type: 'JSON',
       $value: null
     },
-    selectedNodeKey: {
+    selectedNodeId: {
       $type: 'String',
     },
     candidates: {
@@ -74,7 +74,7 @@ export const NodegraphRecipe = {
       $type: 'JSON',
       $value: nodeTypes
     },
-    hoveredNodeKey: {
+    hoveredNodeId: {
       $type: 'String'
     },
     inspectorData: {
@@ -111,14 +111,14 @@ export const NodegraphRecipe = {
           $inputs: [
             'recipes',
             {pipeline: 'selectedPipeline'},
-            'selectedNodeKey',
+            'selectedNodeId',
             'nodeTypes',
             'categories',
             {layout: 'previewLayout'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNodeKey',
+            'selectedNodeId',
             {layout: 'previewLayout'}
           ]
         }
@@ -131,9 +131,9 @@ export const NodegraphRecipe = {
           $kind: '$library/NodeGraph/Editor',
           $inputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNodeKey',
+            'selectedNodeId',
             'nodeTypes',
-            'hoveredNodeKey',
+            'hoveredNodeId',
             'categories',
             'candidates',
             {layout: 'nodegraphLayout'},
@@ -141,7 +141,7 @@ export const NodegraphRecipe = {
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNodeKey',
+            'selectedNodeId',
             {layout: 'nodegraphLayout'},
             {previewLayout: 'previewLayout'}
           ]
@@ -160,14 +160,14 @@ export const NodegraphRecipe = {
           $kind: '$library/NodeGraph/NodeTree',
           $inputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNodeKey',
+            'selectedNodeId',
             'nodeTypes',
             'categories',
             {layout: 'previewLayout'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'selectedNodeKey',
+            'selectedNodeId',
             {layout: 'previewLayout'}
           ]
         }
@@ -177,7 +177,7 @@ export const NodegraphRecipe = {
   nodeInspector: {
     $kind: '$library/NodeGraph/NodeInspector',
     $inputs: [
-      'selectedNodeKey',
+      'selectedNodeId',
       {pipeline: 'selectedPipeline'},
       'candidates',
       'nodeTypes'
@@ -209,12 +209,12 @@ export const NodegraphRecipe = {
   nodeUpdator: {
     $kind: '$library/NodeGraph/NodeUpdator',
     $inputs: [
-      'selectedNodeKey',
+      'selectedNodeId',
       {pipeline: 'selectedPipeline'},
       {data: 'inspectorData'}
     ],
     $outputs: [
-      'selectedNodeKey',
+      'selectedNodeId',
       {pipeline: 'selectedPipeline'}
     ]
   },

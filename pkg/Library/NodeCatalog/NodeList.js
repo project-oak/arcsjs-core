@@ -37,24 +37,24 @@ sortNodeTypes(t1, t2) {
 async onItemClick({eventlet: {key}, selectedNodeTypes, pipeline}) {
   if (pipeline) {
     const newNode = this.makeNewNode(key, pipeline, selectedNodeTypes);
-    pipeline.nodes[newNode.key] = newNode;
+    pipeline.nodes[newNode.id] = newNode;
     return {pipeline};
   }
 },
 
-makeNewNode(newId, pipeline, nodeTypes) {
-  const {id, displayName} = nodeTypes[newId].$meta;
+makeNewNode(id, pipeline, nodeTypes) {
+  const {displayName} = nodeTypes[id].$meta;
   const index = this.indexNewNode(id, pipeline.nodes);
   return {
     type: id,
     index,
-    key: this.formatNodeKey(id, index),
-    name: this.displayName(displayName || id, index)
+    id: this.formatNodeId(id, index),
+    displayName: this.displayName(displayName || id, index)
   };
 },
 
-indexNewNode(key, nodes) {
-  const typedNodes = values(nodes).filter(node => key === node.type);
+indexNewNode(id, nodes) {
+  const typedNodes = values(nodes).filter(node => id === node.type);
   return (typedNodes.pop()?.index || 0) + 1;
 },
 
@@ -63,8 +63,8 @@ displayName(name, index) {
   return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
 },
 
-formatNodeKey(key, index) {
-  return `${key}${index}`.replace(/ /g,'');
+formatNodeId(id, index) {
+  return `${id}${index}`.replace(/ /g,'');
 },
 
 onHoverNodeType({eventlet: {key, value}, selectedNodeTypes}, state) {
