@@ -8,12 +8,12 @@
 catalogDelimeter: '$$',
 edgeIdDelimeter: '$$',
 
-update({pipeline, selectedNodeKey}, state) {
+update({pipeline, selectedNodeId}, state) {
   if (pipeline?.$meta?.name !== state.selectedPipelineName) {
     state.selectedPipelineName = pipeline?.$meta.name;
     // new pipeline, choose a selectedNode if there isn't one
-    if (!selectedNodeKey) {
-      return {selectedNodeKey: keys(pipeline?.nodes)?.[0]};
+    if (!selectedNodeId) {
+      return {selectedNodeId: keys(pipeline?.nodes)?.[0]};
     }
   }
 },
@@ -37,7 +37,7 @@ renderGraph(inputs) {
   return {
     name: inputs.pipeline?.$meta?.name,
     graphNodes: this.renderGraphNodes(inputs),
-    connectableCandidates: inputs.selectedNodeKey && this.renderConnectableCandidates(inputs)
+    connectableCandidates: inputs.selectedNodeId && this.renderConnectableCandidates(inputs)
   };
 },
 
@@ -46,30 +46,26 @@ renderGraphNodes(inputs) {
   return values(pipeline?.nodes).map(node => this.renderNode({node, ...inputs}));
 },
 
-renderNode({node, categories, pipeline, hoveredNodeKey, selectedNodeKey, candidates, nodeTypes, layout}) {
+renderNode({node, categories, pipeline, hoveredNodeId, selectedNodeId, candidates, nodeTypes, layout}) {
   const nodeType = nodeTypes[node.type];
   const {category} = nodeType?.$meta || {category: 'n/a'};
-  const hasUI = keys(nodeType).some(key => key.endsWith('___frame'));
+  const hasUI = keys(nodeType).some(id => id.endsWith('___frame'));
   const hiddenUI = node.props?.hideUI === true;
   return {
-    key: node.key,
-    name: this.nodeDisplay(node),
+    key: node.id,
+    name: node.displayName,
     displayName: node.displayName,
-    position: layout?.[node.key] || {x: 0, y: 0},
+    position: layout?.[node.id] || {x: 0, y: 0},
     color: this.colorByCategory(category, categories),
     bgColor: this.bgColorByCategory(category, categories),
-    selected: node.key === selectedNodeKey,
-    hovered: node.key === hoveredNodeKey,
+    selected: node.id === selectedNodeId,
+    hovered: node.id === hoveredNodeId,
     hasUI,
     hiddenUI,
     inputs: this.renderInputs(node, nodeType, candidates),
     outputs: this.renderOutputs(nodeType),
     conns: this.renderConnections(node, pipeline),
   };
-},
-
-nodeDisplay(node) {
-  return node.displayName || node.name;
 },
 
 colorByCategory(category, categories) {
@@ -94,7 +90,7 @@ renderConnections(node, pipeline) {
 renderStoreConnections(storeName, node, pipeline) {
   return node.connections[storeName]
     .filter(conn => pipeline.nodes[conn.from])
-    .map(conn => this.formatConnection(conn.from, conn.storeName, node.key, storeName))
+    .map(conn => this.formatConnection(conn.from, conn.storeName, node.id, storeName))
     ;
 },
 
@@ -108,13 +104,13 @@ formatConnection(fromKey, fromStore, toKey, toStore) {
   };
 },
 
-renderConnectableCandidates({selectedNodeKey, pipeline, nodeTypes, categories}) {
+renderConnectableCandidates({selectedNodeId, pipeline, nodeTypes, categories}) {
   // Store type -> [matching node types grouped by categories]
   const storeTypeToCandidates = {};
   // Go through the selected node's outputs. For each output, find the store
   // type, find the connectable node types for that store type, and group those
   // node types by categories.
-  const selectedNode = pipeline.nodes[selectedNodeKey];
+  const selectedNode = pipeline.nodes[selectedNodeId];
   const nodeType = nodeTypes[selectedNode?.type];
   const particles = this.getParticles(nodeType);
   for (const particle of particles) {
@@ -188,7 +184,7 @@ renderInputs(node, nodeType, candidates) {
   return this.getInputStores(nodeType).map(([name, store]) => ({
     name,
     ...(node.connections?.[name] || {}),
-    candidates: candidates?.[node.key]?.[name] || [],
+    candidates: candidates?.[node.id]?.[name] || [],
     type: store.$type,
     multiple: store.multiple
   }));
@@ -233,11 +229,11 @@ getParticles(nodeType) {
   return this.getParticleNames(nodeType).map(name => nodeType[name]);
 },
 
-onNodeRemove({eventlet: {key}, pipeline, selectedNodeKey}) {
+onNodeRemove({eventlet: {key}, pipeline, selectedNodeId}) {
   delete pipeline.nodes[key];
   return {
     pipeline,
-    selectedNodeKey: (key === selectedNodeKey) ? null : selectedNodeKey
+    selectedNodeId: (key === selectedNodeId) ? null : selectedNodeId
   };
 },
 
@@ -245,13 +241,13 @@ onNodeRenamed({eventlet: {key, value}, pipeline}) {
   // TODO(mariakleiner): renaming doesn't work, when triggered from the menu.
   const node = pipeline.nodes[key];
   node.displayName = value.trim();
-  pipeline.nodes[node.key] = node;
+  pipeline.nodes[node.id] = node;
   return {pipeline};
 },
 
-onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeTypes, layout, previewLayout}) {
-  // A map from original node key to its duplicated node key.
-  const keyMap = {};
+onNodesDuplicated({eventlet: {value: nodeIds}, pipeline, selectedNodeId, nodeTypes, layout, previewLayout}) {
+  // A map from original node id to its duplicated node id.
+  const idMap = {};
 
   // Duplicate currently selected nodes.
   //
@@ -259,32 +255,32 @@ onNodesDuplicated({eventlet: {value: nodeKeys}, pipeline, selectedNodeKey, nodeT
   const newLayout = {...layout};
   const newPreviewLayout = {...previewLayout};
   // nodes.forEach(node => {
-  nodeKeys.forEach(key =>  {
-    const node = pipeline.nodes[key];
+    nodeIds.forEach(id =>  {
+    const node = pipeline.nodes[id];
     // Duplicate the node.
     const newNode = this.duplicateNode(node, pipeline, nodeTypes);
     // Update the pipeline with the new node.
-    pipeline.nodes[newNode.key] = newNode;
+    pipeline.nodes[newNode.id] = newNode;
     // keep the books
     newNodes.push(newNode);
-    keyMap[node.key] = newNode.key;
-    newLayout[newNode.key] = {...layout[node.key], y: layout[node.key].y + 60};
-    const position = newPreviewLayout[node.key];
+    idMap[node.id] = newNode.id;
+    newLayout[newNode.id] = {...layout[node.id], y: layout[node.id].y + 60};
+    const position = newPreviewLayout[node.id];
     if (position) {
-      newPreviewLayout[newNode.key] = {...position, t: position.t + position.h + 16};
+      newPreviewLayout[newNode.id] = {...position, t: position.t + position.h + 16};
     }
   });
 
   // Connect duplicated nodes to duplicated nodes (instead of the original ones).
   newNodes.forEach(({connections}) => {
     values(connections).forEach(options => {
-      options.forEach(connection => connection.from = keyMap[connection.from]);
+      options.forEach(connection => connection.from = idMap[connection.from]);
     });
   });
 
   return {
     pipeline,
-    selectedNodeKey: keyMap[selectedNodeKey],
+    selectedNodeId: idMap[selectedNodeId],
     layout: newLayout,
     previewLayout: newPreviewLayout
   };
@@ -305,17 +301,6 @@ duplicateNode(node, pipeline, nodeTypes) {
     newNode.displayName = this.duplicateDisplayName(node.displayName, pipeline);
   }
   return newNode;
-},
-
-duplicatePreviewPosition(preview, oldNodeKey, newNodeKey, offsetY = 16) {
-  const newPreview = {};
-  keys(preview).forEach(id => {
-    const newId = id.replace(oldNodeKey, newNodeKey);
-    const position = {...preview[id]};
-    position.t = position.t + position.h + offsetY;
-    newPreview[newId] = position;
-  });
-  return newPreview;
 },
 
 duplicateDisplayName(displayName, pipeline) {
@@ -362,16 +347,16 @@ onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType
     .find(([_, store]) => store.$type === targetStoreType)[0];
   newNode.connections = {[toStore]: [{from: fromKey, storeName: fromStore}]};
   // pipeline.nodes = [...pipeline.nodes, newNode];
-  pipeline.nodes[newNode.key] = newNode;
+  pipeline.nodes[newNode.id] = newNode;
   return {
     pipeline,
-    selectedNodeKey: newNode.key,
-    layout: {...layout, [newNode.key]: {x: svgX, y: svgY}}
+    selectedNodeId: newNode.id,
+    layout: {...layout, [newNode.id]: {x: svgX, y: svgY}}
   };
 },
 
 onNodeSelect({eventlet: {key}}) {
-  return {selectedNodeKey: key};
+  return {selectedNodeId: key};
 },
 
 onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes, layout}) {
@@ -379,11 +364,11 @@ onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes, layout}) {
     const {svgPoint} = value;
     const newNode = this.makeNewNode(nodeTypes[key], pipeline.nodes, nodeTypes);
     // pipeline.nodes = [...pipeline.nodes, newNode];
-    pipeline.nodes[newNode.key] = newNode;
+    pipeline.nodes[newNode.id] = newNode;
     return {
       pipeline,
-      selectedNodeKey: newNode.key,
-      layout: {...layout, [newNode.key]: svgPoint}
+      selectedNodeId: newNode.id,
+      layout: {...layout, [newNode.id]: svgPoint}
     };
   }
 },
@@ -395,7 +380,7 @@ onNodeMoved({eventlet: {key, value}, layout}) {
 },
 
 onNodeHovered({eventlet: {key}}) {
-  return {hoveredNodeKey: key};
+  return {hoveredNodeId: key};
 },
 
 onEdgeRemove({eventlet: {key}, pipeline}) {
@@ -422,22 +407,22 @@ updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
   } else {
     delete node.connections[toStore];
   }
-  pipeline.nodes[node.key] = node;
+  pipeline.nodes[node.id] = node;
   return pipeline;
 },
 
-makeNewNode({$meta: {key, name}}, nodes) {
-  const index = this.indexNewNode(key, nodes);
+makeNewNode({$meta: {id, displayName}}, nodes) {
+  const index = this.indexNewNode(id, nodes);
   return {
-    type: key,
+    type: id,
     index,
-    key: this.formatNodeKey(key, index),
-    name: this.displayName(name, index)
+    id: this.formatNodeId(id, index),
+    displayName: this.displayName(displayName || id, index)
   };
 },
 
-indexNewNode(key, nodes) {
-  const typedNodes = values(nodes).filter(node => key === node.type);
+indexNewNode(id, nodes) {
+  const typedNodes = values(nodes).filter(node => id === node.type);
   return (typedNodes.pop()?.index || 0) + 1;
 },
 
@@ -446,8 +431,8 @@ displayName(name, index) {
   return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
 },
 
-formatNodeKey(key, index) {
-  return `${key}${index}`.replace(/ /g,'');
+formatNodeId(id, index) {
+  return `${id}${index}`.replace(/ /g,'');
 },
 
 template: html`

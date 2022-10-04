@@ -9,7 +9,7 @@
 
 export const Poem = {
   $meta: {
-    name: 'Poem',
+    id: 'Poem',
     category: 'Panels'
   },
   poem: {

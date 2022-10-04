@@ -10,12 +10,12 @@ inspectorDelimiter: '$$',
 defaultInspectorDataProp: 'inspectorData',
 
 async update(inputs, state, {service, output, invalidate}) {
-  const {selectedNodeKey, pipeline, nodeTypes, candidates} = inputs;
-  if (pipeline && selectedNodeKey) {
-    if (selectedNodeKey !== state.node?.key) {
+  const {selectedNodeId, pipeline, nodeTypes, candidates} = inputs;
+  if (pipeline && selectedNodeId) {
+    if (selectedNodeId !== state.node?.key) {
       assign(state, {data: null, hasMonitor: false});
     }
-    const node = pipeline.nodes[selectedNodeKey];
+    const node = pipeline.nodes[selectedNodeId];
     if (this.shouldConstructData(inputs, state)) {
       await this.finagleCustomRecipes(state.recipes, service, false);
       assign(state, {pipeline, node, candidates, recipes: []});
@@ -35,12 +35,12 @@ async update(inputs, state, {service, output, invalidate}) {
   }
 },
 
-shouldConstructData({selectedNodeKey, pipeline, candidates}, state) {
-  const node = pipeline.nodes[selectedNodeKey];
+shouldConstructData({selectedNodeId, pipeline, candidates}, state) {
+  const node = pipeline.nodes[selectedNodeId];
   if (node) {
     return this.pipelineChanged(pipeline, state.pipeline)
         || this.nodeChanged(node, state.node)
-        || this.candidatesChanged(candidates?.[selectedNodeKey], state.candidates?.[selectedNodeKey])
+        || this.candidatesChanged(candidates?.[selectedNodeId], state.candidates?.[selectedNodeId])
         || !state.hasMonitor;
   }
   return false;
@@ -76,7 +76,7 @@ async monitorStores(state, nodeTypes, {service, invalidate}) {
       data: {storeIds: this.getMonitoredNodeStoreIds(state.node, nodeType)}
     });
     if (result) {
-      //log(`${storeId} has changed affecting node ${state.node.key}`);
+      //log(`${storeId} has changed affecting node ${state.node.id}`);
       // this method is untethered from return stack because of
       // Special Circumstances created above, so we provoke
       // a change manually
@@ -99,8 +99,8 @@ async constructData(node, inputs, state, service) {
   const {pipeline} = inputs;
   const props = await this.constructProps(node, inputs, state,  service);
   return  {
-    key: this.encodeFullNodeKey(node, pipeline, this.inspectorDelimiter),
-    title: this.nodeDisplay(node),
+    key: this.encodeFullNodeId(node, pipeline, this.inspectorDelimiter),
+    title: node.displayName,
     props
   };
 },
@@ -133,10 +133,10 @@ constructStoreProps(node, inputs, state, service) {
 
 async computeProp(node, {name, store}, inputs, state, service) {
   const {pipeline} = inputs;
-  const fullNodeKey = this.encodeFullNodeKey(node, pipeline, this.inspectorDelimiter);
+  const fullNodeId = this.encodeFullNodeId(node, pipeline, this.inspectorDelimiter);
   const value = await this.computeBindingValue(name, store, node, service);
-  this.addInspectRecipe(fullNodeKey, {name, store}, inputs, state);
-  return {name, propId: this.sanitize(`${fullNodeKey}${name}`), store, value};
+  this.addInspectRecipe(fullNodeId, {name, store}, inputs, state);
+  return {name, propId: this.sanitize(`${fullNodeId}${name}`), store, value};
 },
 
 async computeBindingValue(name, store, node, service) {
@@ -166,10 +166,10 @@ getStoreValue(storeId, service) {
 },
 
 async constructConnections(node, {pipeline, nodeTypes, candidates}, service) {
-  const matchingCandidates = keys(pipeline.nodes).every(key => candidates?.[key]);
+  const matchingCandidates = keys(pipeline.nodes).every(id => candidates?.[id]);
   if (matchingCandidates) {
-    return Promise.all(keys(candidates[node.key]).map(storeName => {
-      return this.renderBinding(node, storeName, candidates[node.key][storeName], pipeline, nodeTypes, service);
+    return Promise.all(keys(candidates[node.id]).map(storeName => {
+      return this.renderBinding(node, storeName, candidates[node.id][storeName], pipeline, nodeTypes, service);
     }));
   }
 },
@@ -245,7 +245,7 @@ renderCandidate({from, storeName}, pipeline) {
   if (node) {
     return {
       key: this.encodeConnectionValue({from, storeName}),
-      name: `${this.nodeDisplay(node)} - ${storeName}`,
+      name: `${node.displayName} - ${storeName}`,
     };
   }
 },
@@ -254,16 +254,12 @@ encodeConnectionValue({from, storeName}) {
   return `${from}${this.inspectorDelimiter}${storeName}`;
 },
 
-encodeFullNodeKey({key}, {$meta}, delimiter) {
-  return [$meta?.name, key].filter(Boolean).join(delimiter);
+encodeFullNodeId({id}, {$meta}, delimiter) {
+  return [$meta.id, id].filter(Boolean).join(delimiter);
 },
 
 sanitize(key) {
   return key.replace(/[^A-Za-z0-9]/g, '');
-},
-
-nodeDisplay(node) {
-  return node.displayName || node.name;
 }
 
 });

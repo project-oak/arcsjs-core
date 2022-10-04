@@ -9,34 +9,34 @@
  ({
   catalogDelimiter: '$$',
 
-  update({pipeline, selectedNodeKey}, state) {
+  update({pipeline, selectedNodeId}, state) {
     if (pipeline?.$meta?.name !== state.selectedPipelineName) {
       state.selectedPipelineName = pipeline?.$meta.name;
-      selectedNodeKey = null;
+      selectedNodeId = null;
     }
-    if (!selectedNodeKey && keys(pipeline?.nodes).length) {
-      selectedNodeKey = keys(pipeline.nodes)[0].key;
+    if (!selectedNodeId && keys(pipeline?.nodes).length) {
+      selectedNodeId = keys(pipeline.nodes)[0];
     }
-    return {selectedNodeKey};
+    return {selectedNodeId};
   },
 
-  render({pipeline, nodeTypes, categories, selectedNodeKey}) {
+  render({pipeline, nodeTypes, categories, selectedNodeId}) {
     return {
-      graphNodes: this.renderGraphNodes(pipeline?.nodes, selectedNodeKey, nodeTypes, categories),
+      graphNodes: this.renderGraphNodes(pipeline?.nodes, selectedNodeId, nodeTypes, categories),
     };
   },
 
-  renderGraphNodes(nodes, selectedNodeKey, nodeTypes, categories) {
+  renderGraphNodes(nodes, selectedNodeId, nodeTypes, categories) {
     const graph = {name: 'pipeline', children: []};
     const graphNodes = nodes?.map(node => {
       const nodeType = nodeTypes[node.type];
       const category = nodeType?.$meta?.category;
       return {
-        key: node.key,
-        name: this.nodeDisplay(node),
+        key: node.id,
+        name: node.displayName,
         color: this.colorByCategory(category, categories),
         bgColor: this.bgColorByCategory(category, categories),
-        strokeWidth: node.key == selectedNodeKey ? 3 : 1,
+        strokeWidth: node.id == selectedNodeId ? 3 : 1,
         conn: this.renderConnections(node),
         children: []
       };
@@ -46,10 +46,6 @@
       parent.children.push(gn);
     });
     return graph;
-  },
-
-  nodeDisplay(node) {
-    return node.displayName || node.name;
   },
 
   colorByCategory(category, categories) {
@@ -65,11 +61,11 @@
     return connections?.[0]?.from;
   },
 
-  onNodeRemove({eventlet: {key}, pipeline, selectedNodeKey}) {
+  onNodeRemove({eventlet: {key}, pipeline, selectedNodeId}) {
     delete pipeline.nodes[key];
     return {
       pipeline,
-      selectedNodeKey: key === selectedNodeKey ? null : selectedNodeKey
+      selectedNodeId: key === selectedNodeId ? null : selectedNodeId
     };
   },
 
@@ -87,30 +83,30 @@
   },
 
   onNodeSelect({eventlet: {key}}) {
-    return {selectedNodeKey: key};
+    return {selectedNodeId: key};
   },
 
   onDrop({eventlet: {value}, pipeline, nodeTypes}) {
     if (pipeline) {
       const newNode = this.makeNewNode(value, pipeline, nodeTypes);
-      pipeline.nodes[newNode.key] = this.makeNewNode(value, pipeline, nodeTypes);
+      pipeline.nodes[newNode.id] = this.makeNewNode(value, pipeline, nodeTypes);
       return {pipeline};
     }
   },
 
-  makeNewNode(key, pipeline, nodeTypes) {
-    const name = nodeTypes[key].$meta.name;
-    const index = this.indexNewNode(key, pipeline.nodes);
+  makeNewNode(id, pipeline, nodeTypes) {
+    const {displayName} = nodeTypes[id].$meta;
+    const index = this.indexNewNode(id, pipeline.nodes);
     return {
-      type: key,
+      type: id,
       index,
-      key: this.formatNodeKey(key, index),
-      name: this.displayName(name, index)
+      id: this.formatNodeId(id, index),
+      displayName: this.displayName(displayName || id, index)
     };
   },
 
-  indexNewNode(key, nodes) {
-    const typedNodes = values(nodes).filter(node => key === node.type);
+  indexNewNode(id, nodes) {
+    const typedNodes = values(nodes).filter(node => id === node.type);
     return (typedNodes.pop()?.index || 0) + 1;
   },
 
@@ -119,15 +115,15 @@
     return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
   },
 
-  formatNodeKey(key, index) {
-    return `${key}${index}`.replace(/ /g,'');
+  formatNodeId(id, index) {
+    return `${id}${index}`.replace(/ /g,'');
   },
 
   onDeleteAll({pipeline}) {
     pipeline.nodes = {};
     return {
       pipeline,
-      selectedNodeKey: null
+      selectedNodeId: null
     };
   },
 

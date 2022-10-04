@@ -58,13 +58,16 @@ const nodeTypesList = [
 
 nodeTypesList.forEach(nodeType => {
   let {category, name} = nodeType.$meta;
-  let key =  nodeType.$meta.key;
-  if (!key) {
-    key = `${category}:${name}`;
+  let id =  nodeType.$meta.id;
+  if (id) {
+    if (nodeTypes[id]) {
+      console.warn(`Skipping non unique NodeType id='${id}'`);
+    }
+    nodeTypes[id] = nodeType;
+  } else {
     console.warn(`Missing 'key' for NodeType '${name}' (category='${category}')`);
-    nodeType.$meta.key = key;
   }
-  nodeTypes[key] = nodeType;
+  
 });
 
 const icons = ['coffee', 'shower', 'chair', 'flatware', 'light', 'casino', 'escalator', 'umbrella', 'theater_comedy', 'diamond'];

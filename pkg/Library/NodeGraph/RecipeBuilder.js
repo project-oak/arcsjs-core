@@ -35,7 +35,7 @@ async update(inputs, state) {
 nodeTypeMap(nodeTypes, state) {
   if (!state.nodeTypeMap) {
     state.nodeTypeMap = {};
-    values(nodeTypes).forEach(t => state.nodeTypeMap[t.$meta.key] = this.flattenNodeType(t));
+    values(nodeTypes).forEach(t => state.nodeTypeMap[t.$meta.id] = this.flattenNodeType(t));
   }
   return state.nodeTypeMap;
 },
@@ -94,7 +94,7 @@ recipeForNode(node, inputs, state) {
   const stores = this.buildStoreSpecs(node, nodeType, state);
   const recipe = this.buildParticleSpecs(node, nodeType, layout, state);
   recipe.$meta = {
-    name: this.encodeFullNodeKey(node, pipeline, this.connectorDelim)
+    name: this.encodeFullNodeId(node, pipeline, this.connectorDelim)
   };
   recipe.$stores = stores;
   return recipe;
@@ -104,7 +104,7 @@ buildParticleSpecs(node, nodeType, layout, {storeMap}) {
   const specs = {};
   const names = this.getParticleNames(nodeType) || [];
   for (const particleName of names) {
-    const container = layout?.[`${node.key}:Container`] || this.defaultContainer;
+    const container = layout?.[`${node.id}:Container`] || this.defaultContainer;
     specs[this.constructParticleId(node, particleName)] =
         this.buildParticleSpec(node, nodeType, particleName, container, storeMap);
   }
@@ -116,13 +116,13 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-constructParticleId({key}, particleName) {
-  return `${key}${this.nameDelim}${particleName}`;
+constructParticleId({id}, particleName) {
+  return `${id}${this.nameDelim}${particleName}`;
 },
 
 buildParticleSpec(node, nodeType, particleName, container, storeMap) {
   const particleSpec = nodeType[particleName];
-  const $container = this.resolveContainer(node.key, particleSpec.$container, container);
+  const $container = this.resolveContainer(node.id, particleSpec.$container, container);
   const bindings = this.resolveBindings(particleSpec, storeMap);
   const resolvedSpec = {
     $slots: {},
@@ -157,7 +157,7 @@ buildStoreSpecs(node, nodeType, state) {
         state.storeMap[name] = storeId;
       });
     } else {
-      const storeId = this.constructStoreId({from: node.key, storeName: name});
+      const storeId = this.constructStoreId({from: node.id, storeName: name});
       specs[storeId] = this.buildStoreSpec(store, node.props?.[name], node);
       state.storeMap[name] = storeId;
     }
@@ -200,14 +200,14 @@ formatStoreValue(store, value, node) {
     return value;
   }
   // TODO(mariakleiner): Revisit how to express special default values supported by NodesConnector.
-  if (store.value === `node.key`) {
-    return node.key;
+  if (store.value === `node.id`) {
+    return node.id;
   }
   return store.$value;
 },
 
-encodeFullNodeKey({key}, {$meta}, delimiter) {
-  return [$meta?.name, key].filter(Boolean).join(delimiter);
+encodeFullNodeId({id}, {$meta}, delimiter) {
+  return [$meta.id, id].filter(Boolean).join(delimiter);
 }
 
 });

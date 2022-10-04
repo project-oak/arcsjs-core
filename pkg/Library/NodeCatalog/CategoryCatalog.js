@@ -22,10 +22,10 @@ selectCategory(nodeTypes, category, search) {
 filter(nodeTypes, category, search) {
   const matchSearch = (name) => (!search || name.toLowerCase().includes(search.toLowerCase()));
   const selectedNodeTypes = {};
-  keys(nodeTypes)?.forEach(key => {
-    const nodeType = nodeTypes[key];
-    if (nodeType.$meta.category === category && matchSearch(nodeType.$meta.name)) {
-      selectedNodeTypes[key] = nodeType;
+  keys(nodeTypes)?.forEach(id => {
+    const nodeType = nodeTypes[id];
+    if (nodeType.$meta.category === category && matchSearch(nodeType.$meta.displayName || nodeType.$meta.id)) {
+      selectedNodeTypes[id] = nodeType;
     }
   });
   return selectedNodeTypes;

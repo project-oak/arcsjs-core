@@ -1,7 +1,7 @@
 
 export const Image = {
   $meta: {
-    name: 'Image',
+    id: 'Image',
     category: 'Media'
   },
   $stores: {

@@ -7,7 +7,7 @@
 
 export const ThreejsEditorNode = {
   $meta: {
-    name: 'Threejs Editor',
+    id: 'Threejs Editor',
     category: 'Effect'
   },
   threejsEditor: {

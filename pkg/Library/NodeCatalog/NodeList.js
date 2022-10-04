@@ -22,35 +22,39 @@ renderNodeTypes(nodeTypeList) {
   return nodeTypeList.map(this.renderNodeType.bind(this));
 },
 
-renderNodeType({$meta: {name, key}}) {
-  return {name, key};
+renderNodeType({$meta: {id, displayName}}) {
+  return {
+    id,
+    displayName: displayName || id
+  };
 },
 
 sortNodeTypes(t1, t2) {
-  return t1.$meta.name.toLowerCase().localeCompare(t2.$meta.name.toLowerCase());
+  const displayName = ({$meta: {id, displayName}}) => displayName || id;
+  return displayName(t1).toLowerCase().localeCompare(displayName(t2).toLowerCase());
 },
 
 async onItemClick({eventlet: {key}, selectedNodeTypes, pipeline}) {
   if (pipeline) {
     const newNode = this.makeNewNode(key, pipeline, selectedNodeTypes);
-    pipeline.nodes[newNode.key] = newNode;
+    pipeline.nodes[newNode.id] = newNode;
     return {pipeline};
   }
 },
 
-makeNewNode(key, pipeline, nodeTypes) {
-  const name = nodeTypes[key].$meta.name;
-  const index = this.indexNewNode(key, pipeline.nodes);
+makeNewNode(id, pipeline, nodeTypes) {
+  const {displayName} = nodeTypes[id].$meta;
+  const index = this.indexNewNode(id, pipeline.nodes);
   return {
-    type: key,
+    type: id,
     index,
-    key: this.formatNodeKey(key, index),
-    name: this.displayName(name, index)
+    id: this.formatNodeId(id, index),
+    displayName: this.displayName(displayName || id, index)
   };
 },
 
-indexNewNode(key, nodes) {
-  const typedNodes = values(nodes).filter(node => key === node.type);
+indexNewNode(id, nodes) {
+  const typedNodes = values(nodes).filter(node => id === node.type);
   return (typedNodes.pop()?.index || 0) + 1;
 },
 
@@ -59,8 +63,8 @@ displayName(name, index) {
   return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
 },
 
-formatNodeKey(key, index) {
-  return `${key}${index}`.replace(/ /g,'');
+formatNodeId(id, index) {
+  return `${id}${index}`.replace(/ /g,'');
 },
 
 onHoverNodeType({eventlet: {key, value}, selectedNodeTypes}, state) {
@@ -168,7 +172,7 @@ template: html`
 </div>
 
 <template nodetype_t>
-  <draggable-item key="{{key}}" name="{{name}}"
+  <draggable-item key="{{id}}" name="{{displayName}}"
     on-enter="onHoverNodeType" on-leave="onMouseOutNodeType"
     on-item-clicked="onItemClick"></draggable-item>
 </template>

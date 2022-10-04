@@ -23,7 +23,7 @@ pipelineChanged(pipeline, oldPipeline) {
 findCandidates(pipeline, nodeTypes, globalStores) {
   const candidates = {};
   values(pipeline?.nodes).forEach(node => {
-    candidates[node.key] = this.findNodeCandidates(node, pipeline, nodeTypes, globalStores);
+    candidates[node.id] = this.findNodeCandidates(node, pipeline, nodeTypes, globalStores);
   });
   return candidates;
 },
@@ -33,18 +33,18 @@ findNodeCandidates(node, pipeline, nodeTypes, globalStores) {
   entries(nodeTypes[node.type]?.$stores).forEach(([storeName, store]) => {
     if (store.connection) {
       candidates[storeName] =
-        this.findConnectionCandidates(node.key, storeName, store, pipeline, nodeTypes, globalStores);
+        this.findConnectionCandidates(node.id, storeName, store, pipeline, nodeTypes, globalStores);
     }
   });
   return candidates;
 },
-findConnectionCandidates(nodeKey, storeName, {$type}, {nodes}, nodeTypes, globalStores) {
+findConnectionCandidates(nodeId, storeName, {$type}, {nodes}, nodeTypes, globalStores) {
   const candidates = [];
   candidates.push(this.findGlobalCandidate(storeName, globalStores));
   
   values(nodes).forEach(node => {
-    if (node.key !== nodeKey) {
-      candidates.push(this.findCandidateInNode(node.key, $type, nodeTypes[node.type]));
+    if (node.id !== nodeId) {
+      candidates.push(this.findCandidateInNode(node.id, $type, nodeTypes[node.type]));
     }
   });
   return candidates.filter(c => c);

@@ -7,7 +7,7 @@
 
 export const Mobilenet = {
   $meta: {
-    name: 'mobilenet',
+    id: 'mobilenet',
     category: 'Model',
   },
   $stores: {
