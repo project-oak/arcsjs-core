@@ -19,7 +19,7 @@ export const Librarian = {
       // noinspect: true
       //
     },
-    nodeKey: {
+    nodeId: {
       $type: 'String',
       noinspect: true,
       nodisplay: true,
@@ -28,7 +28,7 @@ export const Librarian = {
   },
   customParticle: {
     $kind: '$app/Library/Librarian/CustomParticle',
-    $inputs: ['particle', 'nodeKey'],
+    $inputs: ['particle', 'nodeId'],
     $outputs: ['particle']
   }
 };

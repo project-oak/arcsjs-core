@@ -197,16 +197,16 @@ async renderBinding(node, name, candidates, pipeline, nodeTypes, service) {
   }
 },
 
-addInspectRecipe(nodeKey, {name, store}, {customInspectors, inspectorData}, state) {
+addInspectRecipe(nodeId, {name, store}, {customInspectors, inspectorData}, state) {
   const customInspector = customInspectors?.[store.$type];
   if (customInspector) {
     state.recipes.push(
-      this.constructInspectRecipe(customInspector, nodeKey, name, inspectorData || this.defaultInspectorDataProp)
+      this.constructInspectRecipe(customInspector, nodeId, name, inspectorData || this.defaultInspectorDataProp)
     );
   }
 },
 
-constructInspectRecipe(inspector, nodeKey, storeName, inspectorData) {
+constructInspectRecipe(inspector, nodeId, storeName, inspectorData) {
   const recipe = {
     $meta: {...inspector.$meta},
     $stores: {
@@ -215,10 +215,10 @@ constructInspectRecipe(inspector, nodeKey, storeName, inspectorData) {
   };
   this.getParticleNames(inspector).forEach(particleName => {
     const particle = {...inspector[particleName]};
-    particle.$container = `Inspector#custom${this.sanitize(nodeKey)}${storeName}`;
+    particle.$container = `Inspector#custom${this.sanitize(nodeId)}${storeName}`;
     particle.$inputs = particle.$outputs = [{data: inspectorData}];
-    particle.$staticInputs = {key: nodeKey, propName: storeName};
-    recipe[`${particleName}${this.inspectorDelimiter}${nodeKey}`] = particle;
+    particle.$staticInputs = {key: nodeId, propName: storeName};
+    recipe[`${particleName}${this.inspectorDelimiter}${nodeId}`] = particle;
   });
   return recipe;
 },

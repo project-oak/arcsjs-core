@@ -13,5 +13,11 @@ export const customInspectors = {
     inspect: {
       $kind: '$app/Library/Inspectors/MyTestObjectInspect',
     }
+  },
+  '[Particle]': {
+    $meta: {},
+    $inspect: {
+      $kind: '$library/Noop'
+    }
   }
 };

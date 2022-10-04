@@ -199,8 +199,8 @@ formatStoreValue(store, value, node) {
   if (value !== undefined) {
     return value;
   }
-  // TODO(mariakleiner): Revisit how to express special default values supported by NodesConnector.
-  if (store.value === `node.id`) {
+  // TODO(mariakleiner): Revisit how to express special default values supported by RecipeBuilder.
+  if (store.value === 'node.id') {
     return node.id;
   }
   return store.$value;
