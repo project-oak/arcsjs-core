@@ -10,10 +10,10 @@
 initialize({}, state) {
   state.particle = {code: '', html: ''};
 },
-async update({particle, nodeKey}, state, tools) {
-  if (nodeKey && particle && !deepEqual(particle, state.particle)) {
+async update({particle, nodeId}, state, tools) {
+  if (nodeId && particle && !deepEqual(particle, state.particle)) {
     await this.destroyParticle(state, tools);
-    await this.addParticle(nodeKey, particle, state, tools);
+    await this.addParticle(nodeId, particle, state, tools);
     state.particle = particle;
   }
 },
@@ -28,13 +28,13 @@ async destroyParticle({particleName: name}, {service}) {
     return service({msg: 'destroyParticle', data: {name}});
   }
 },
-async addParticle(nodeKey, particle, state, {service}) {
+async addParticle(nodeId, particle, state, {service}) {
   const name = await service({msg: 'makeName'});
   const code = this.packageParticleSource(particle);
   const meta = {
     ...this.getMeta(particle),
     kind: name,
-    container: `${nodeKey}customParticle#canvas`
+    container: `${nodeId}_customParticle#canvas`
   };
   state.particleName = name;
   return service({msg: 'addParticle', data: {name, meta, code}});
