@@ -87,7 +87,7 @@ const template = Xen.Template.html`
 <container object$="{{isobject}}">
   <left title="{{name}}" on-click="_onExpandClick">
     <span expand expanded$="{{hideexpand}}" object$="{{isobject}}" on-click="_onExpandClick"></span>
-    <span>{{name}}</span>&nbsp;<span json unsafe-html="{{json}}"></span>
+    <span>{{name}}</span>&nbsp;<span json Xunsafe-html="{{json}}">{{json}}</span>
   </left>
   <right>
     <div check hidden="{{notbool}}" title="{{name}}"><input type="checkbox" checked="{{value}}" on-click="_onCheckInput"></div>

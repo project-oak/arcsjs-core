@@ -8,9 +8,10 @@
  */
 import {Paths, Runtime, Arc, Decorator, Chef, logFactory, utils} from '../../core.js';
 import {MessageBus} from './MessageBus.js';
-import {RecipeService} from '../../Arcs/RecipeService.js';
-import {StoreService} from '../../Arcs/StoreService.js';
-import {ComposerService} from '../../Arcs/ComposerService.js';
+import {RecipeService} from '../RecipeService.js';
+import {StoreService} from '../StoreService.js';
+import {ComposerService} from '../ComposerService.js';
+import /*{JSONataService} from*/ '../JSONataService.js';
 
 // n.b. lives in Worker context
 

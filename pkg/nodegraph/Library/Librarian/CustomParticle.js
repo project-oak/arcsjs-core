@@ -63,14 +63,14 @@ template: html`
 <style>
   :host {
     font-size: 0.75em;
+    /*
     flex: none !important;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border-radius: 5px;
     border: 1px solid gray;
-    /* padding: 2px; */
-    margin: 4px;
+    */
     width: 320px;
     height: 240px;
     --mdc-icon-button-size: 24px;
@@ -88,6 +88,7 @@ template: html`
     padding: 0 0 2px 6px;
   }
 </style>
+
 <mxc-tab-pages flex tabs="Preview, Html, Js, Meta">
   <div flex frame="canvas"></div>
   <code-mirror flex text="{{html}}" key="html" on-code-blur="onChanged"></code-mirror>

@@ -52,7 +52,7 @@ render({entityName}, {isPoisonous}) {
 },
 
 template: html`
-<div>
+<div flex row centering>
   "<span>{{name}}</span>" is poisonous/venomous: <span>{{isPoisonous}}</span>
 </div>
 `

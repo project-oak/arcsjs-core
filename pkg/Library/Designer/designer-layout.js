@@ -23,12 +23,18 @@ export class DesignerLayout extends DragDrop {
   }
   _didMount() {
     this.boxer = this._dom.$('[boxer]');
+    this.observer = new MutationObserver(e => {
+      log(e);
+    });
+    //const container = this._dom.$('[container]');
+    this.observer.observe(this, {childList: true});
+    // TODO(sjmiles): derp
     document.addEventListener('keydown', event => this.onKeydown(event));
   }
   update() {
     // TODO(sjmiles): the `on-slotchange` doesn't work as expected.
-    //setTimeout(() => this.updateGeometry(), 100);
-    this.updateGeometry();
+    setTimeout(() => this.updateGeometry(), 50);
+    //this.updateGeometry();
   }
   onKeydown(event) {
     if (!this.hasActiveInput()) {
@@ -72,6 +78,7 @@ export class DesignerLayout extends DragDrop {
     }
   }
   onSlotChange() {
+    log('slot change');
     this.updateGeometry();
   }
   updateGeometry() {
@@ -167,13 +174,17 @@ export class DesignerLayout extends DragDrop {
     // }
   }
   doMove(dx, dy) {
-    // grid-snap
-    const snap = rect => DragDrop.snap(rect, 16);
-    // perform drag operation
-    const dragRect = this.doDrag(snap(this.rect), dx, dy, this.dragKind, this.dragFrom);
-    // install output rectangle
-    this.setBoxStyle(this.target, snap(dragRect));
-    requestAnimationFrame(() => this.setBoxStyle(this.boxer, this.getRect(this.target)));
+    if (this.rect && this.target) {
+      // grid-snap
+      const snap = rect => DragDrop.snap(rect, 16);
+      // perform drag operation
+      const dragRect = this.doDrag(this.rect, dx, dy, this.dragKind, this.dragFrom);
+      //const dragRect = this.doDrag(snap(this.rect), dx, dy, this.dragKind, this.dragFrom);
+      // install output rectangle
+      this.setBoxStyle(this.target, snap(dragRect));
+      // let the boxer adapt to the target end state
+      requestAnimationFrame(() => this.setBoxStyle(this.boxer, this.getRect(this.target)));
+    }
   }
   doDrag({l, t, w, h}, dx, dy, dragKind, dragFrom) {
     if (dragKind === 'move') {
