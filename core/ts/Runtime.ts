@@ -225,8 +225,8 @@ export class Runtime extends EventEmitter {
   protected async marshalParticleFactory(kind: string): Promise<ParticleFactory> {
     return particleFactoryCache[kind] ?? this.lateBindParticle(kind);
   }
-  protected lateBindParticle(kind: string): Promise<unknown> {
-    return Runtime.registerParticleFactory(kind, Runtime?.particleIndustry(kind, Runtime.particleOptions));
+  protected lateBindParticle(kind: string, code?: string): Promise<unknown> {
+    return Runtime.registerParticleFactory(kind, Runtime?.particleIndustry(kind, {...Runtime.particleOptions, code}));
   }
   protected static registerParticleFactory(kind, factoryPromise: Promise<unknown>) {
     return particleFactoryCache[kind] = factoryPromise;

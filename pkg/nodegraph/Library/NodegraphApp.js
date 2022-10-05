@@ -44,6 +44,8 @@ export const NodegraphApp = class extends App {
         return this.addParticle(runtime, host, data);
       case 'destroyParticle':
         return this.destroyParticle(runtime, host, data);
+      case 'updateParticle':
+        return this.updateParticle(runtime, host, data);
     }
   }
   async addParticle(runtime, host, {name, meta, code}) {
@@ -52,6 +54,10 @@ export const NodegraphApp = class extends App {
   }
   async destroyParticle(runtime, host, {name}) {
     this.arcs.destroyParticle(name, 'user');
+    return true;
+  }
+  async updateParticle(runtime, host, {kind, code}) {
+    this.arcs.updateParticle(kind, code, 'user');
     return true;
   }
 };

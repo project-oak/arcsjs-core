@@ -56,6 +56,8 @@ renderNode({node, categories, pipeline, hoveredNodeId, selectedNodeId, candidate
     name: node.displayName,
     displayName: node.displayName,
     position: layout?.[node.id] || {x: 0, y: 0},
+    // TODO(mariakleiner): node-graph-editor doesn't get updated, if nodeType (and hence color)
+    // for a customNode was loaded after the node was rendered
     color: this.colorByCategory(category, categories),
     bgColor: this.bgColorByCategory(category, categories),
     selected: node.id === selectedNodeId,

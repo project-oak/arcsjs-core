@@ -68,7 +68,7 @@ export const NodegraphRecipe = {
     candidates: {
       $type: 'JSON'
     },
-    nodeTypes: {
+    builtinNodeTypes: {
       $type: 'JSON',
       $value: nodeTypes
     },
@@ -91,7 +91,11 @@ export const NodegraphRecipe = {
     },
     nodegraphLayout: {
       $type: 'JSON'
-    }
+    },
+    nodeTypes: {
+      $type: 'JSON',
+      $value: nodeTypes
+    },
   },
   // 'a_frame': {
   //   $kind: '$library/AFrame/Scene.js'
@@ -104,7 +108,7 @@ export const NodegraphRecipe = {
         PipelineToolbar
       },
       preview: {
-        runner: {
+        designer: {
           $kind: '$library/Designer/Designer',
           $inputs: [
             'recipes',
@@ -245,5 +249,10 @@ export const NodegraphRecipe = {
       'nodegraphLayout'
     ],
     $outputs: [{pipeline: 'selectedPipeline'}]
+  },
+  combiner: {
+    $kind: '$library/NodeGraph/NodeTypesCombiner',
+    $inputs: ['builtinNodeTypes', 'selectedPipeline'],
+    $outputs: [{results: 'nodeTypes'}]
   }
 };

@@ -13,7 +13,7 @@ idDelim: ':',
 defaultContainer: `main#runner`,
 
 async update(inputs, state) {
-  const {pipeline, layout} = inputs;
+  const {pipeline, nodeTypes, layout} = inputs;
   if (pipeline) {
     let changed = false;
     if (this.pipelineChanged(pipeline, state.pipeline)) {
@@ -24,6 +24,10 @@ async update(inputs, state) {
       assign(state, {layout});
       changed = true;
     }
+    if (this.nodeTypesChanged(nodeTypes, state.nodeTypes)) {
+      assign(state, {nodeTypes});
+      changed = true;
+    }
     if (changed) {
       return {recipes: this.recipesForPipeline(inputs, state)};
     }
@@ -32,11 +36,21 @@ async update(inputs, state) {
   }
 },
 
+nodeTypesChanged(nodeTypes, oldNodeTypes) {
+  return keys(nodeTypes).length !== keys(oldNodeTypes).length
+    || !entries(nodeTypes).every(([id, nodeType]) => !nodeType.$meta.custom || deepEqual(nodeType, oldNodeTypes[id]));
+
+},
+
 nodeTypeMap(nodeTypes, state) {
   if (!state.nodeTypeMap) {
     state.nodeTypeMap = {};
-    values(nodeTypes).forEach(t => state.nodeTypeMap[t.$meta.id] = this.flattenNodeType(t));
   }
+  values(nodeTypes).forEach(t => {
+    if (!state.nodeTypeMap[t.$meta.id] || t.$meta.custom) {
+      state.nodeTypeMap[t.$meta.id] = this.flattenNodeType(t);
+    }
+  });
   return state.nodeTypeMap;
 },
 
@@ -84,20 +98,26 @@ layoutChanged(pipeline, layout, oldLayout) {
 
 recipesForPipeline(inputs, state) {
   const {pipeline} = inputs;
-  return values(pipeline.nodes).map(node => this.recipeForNode(node, inputs, state));
+  return values(pipeline.nodes)
+    .map(node => this.recipeForNode(node, inputs, state))
+    .filter(recipe => recipe)
+    ;
 },
 
 recipeForNode(node, inputs, state) {
   const {pipeline, nodeTypes, layout} = inputs;
   const nodeTypeMap = this.nodeTypeMap(nodeTypes, state);
   const nodeType = nodeTypeMap[node.type];
-  const stores = this.buildStoreSpecs(node, nodeType, state);
-  const recipe = this.buildParticleSpecs(node, nodeType, layout, state);
-  recipe.$meta = {
-    name: this.encodeFullNodeId(node, pipeline, this.connectorDelim)
-  };
-  recipe.$stores = stores;
-  return recipe;
+  if (nodeType) {
+    const stores = this.buildStoreSpecs(node, nodeType, state);
+    const recipe = this.buildParticleSpecs(node, nodeType, layout, state);
+    recipe.$meta = {
+      name: this.encodeFullNodeId(node, pipeline, this.connectorDelim),
+      custom: nodeType.$meta.custom
+    };
+    recipe.$stores = stores;
+    return recipe;
+  }
 },
 
 buildParticleSpecs(node, nodeType, layout, {storeMap}) {
@@ -148,7 +168,7 @@ resolveBindings(particleSpec, storeMap) {
 buildStoreSpecs(node, nodeType, state) {
   const specs = {};
   state.storeMap = {};
-  entries(nodeType.$stores).forEach(([name, store]) => {
+  entries(nodeType?.$stores).forEach(([name, store]) => {
     state.storeMap[name] = [];
     if (store.connection) {
       const connections = node.connections?.[name];

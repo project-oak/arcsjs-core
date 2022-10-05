@@ -1089,8 +1089,8 @@ var _Runtime = class extends EventEmitter {
   async marshalParticleFactory(kind) {
     return particleFactoryCache[kind] ?? this.lateBindParticle(kind);
   }
-  lateBindParticle(kind) {
-    return _Runtime.registerParticleFactory(kind, _Runtime?.particleIndustry(kind, _Runtime.particleOptions));
+  lateBindParticle(kind, code) {
+    return _Runtime.registerParticleFactory(kind, _Runtime?.particleIndustry(kind, { ..._Runtime.particleOptions, code }));
   }
   static registerParticleFactory(kind, factoryPromise) {
     return particleFactoryCache[kind] = factoryPromise;

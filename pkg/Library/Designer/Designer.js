@@ -54,11 +54,14 @@ async removeStores({$stores}, state, service) {
 async renewRecipes(recipes, state, service) {
   for (const recipe of recipes) {
     const runningRecipe = state.recipes[recipe.$meta.name];
-    if (runningRecipe) {
+    if (!runningRecipe || runningRecipe.$meta.custom) {
+      if (runningRecipe && !deepEqual(runningRecipe, recipe)) {
+        await this.stopRecipe(recipe, state, service);
+      }
+      await this.startRecipe(recipe, state, service);
+    } else {
       await this.updateConnections(recipe, runningRecipe, state, service);
       await this.updateContainers(recipe, runningRecipe, state, service);
-    } else {
-      await this.startRecipe(recipe, state, service);
     }
   }
 },
