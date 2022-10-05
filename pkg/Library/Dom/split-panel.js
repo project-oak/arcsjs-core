@@ -96,13 +96,21 @@ export class SplitPanel extends DragDrop {
   update({divider, vertical}, state) {
     divider = isNaN(Number(divider)) ? null : Number(divider);
     // attributes are "" for true, null for false
-    state.vertical = (vertical != null);
+    vertical = (vertical != null);
     if (!state.divider) {
+      // which direction are we splitting
       const ord = vertical ? 'offsetWidth' : 'offsetHeight';
-      //const node = this._dom.$('[endside]');
-      const d = divider || /*node[ord] ||*/ Math.floor(this[ord]/2);
-      // divider at half (divider should be normalized float?)
+      // the total length in that direction
+      const ordValue = this[ord];
+      // 'divider' < 0 means to measure from the other end
+      if (divider < 0) {
+        divider = Math.max(16, ordValue + divider);
+      }
+      // use divider, or have the length for the split-point
+      const d = divider || Math.floor(ordValue/2);
+      // cache clamped divider (should be normalized float?)
       state.divider = Math.max(d, 16);
+      state.vertical = vertical;
     }
   }
   render({}, {vertical, divider, dragging}) {
