@@ -16,7 +16,7 @@ import {JSONataService} from '../../JSONata/JSONataService.js';
 // n.b. lives in Worker context
 
 // aliases
-const {values, keys} = Object;
+const {values} = Object;
 
 // log
 const log = logFactory(logFactory.flags.worker, 'worker', 'darkgreen');

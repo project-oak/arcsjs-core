@@ -11,7 +11,6 @@ import {app, canvas, Resources} from './lobby.js';
 // build a return stream off of this canvas
 const returnStream = canvas.captureStream(30);
 const id = Resources.allocate(returnStream);
-
 // tell webRTC this is our returnStream
 app.arcs.set('user', 'returnStream', id);
 
@@ -19,41 +18,22 @@ app.arcs.set('user', 'returnStream', id);
 const streams = [];
 // playback infrastructure
 const videos = [];
-// audio stream
-let audio = null;
-
-for (let i=1; i<=4; i++) {
-  // make an invisible playback element so we can access frames
-  const video = Object.assign(document.createElement('video'), {
-    autoplay: true, playsinline: true, muted: true,
-    style: 'width: 128px; height: 128px; position: absolute; visibility: hidden;'
-  });
-  document.body.appendChild(video);
-  // memoize
-  videos[i] = video;
-}
-
-globalThis.unmute = () => {
-  if (videos[1]) {
-    videos[1].muted = false;
-  }
-};
 
 // what to do when stream info is updated
 const onStream = (key, info) => {
   // find a video playback element for this stream
   let video = videos[key];
   // make it if id doesn't exist
-  // if (!video) {
-  //   // make an invisible playback element so we can access frames
-  //   video = Object.assign(document.createElement('video'), {
-  //     autoplay: true, playsinline: true, muted: true,
-  //     style: 'width: 128px; height: 128px; position: absolute; visibility: hidden;'
-  //   });
-  //   document.body.appendChild(video);
-  //   // memoize
-  //   videos[key] = video;
-  // }
+  if (!video) {
+    // make an invisible playback element so we can access frames
+    video = Object.assign(document.createElement('video'), {
+      autoplay: true, playsinline: true, muted: true,
+      style: 'width: 128px; height: 128px; position: absolute; visibility: hidden;'
+    });
+    document.body.appendChild(video);
+    // memoize
+    videos[key] = video;
+  }
   // map our stream key to the resource info
   streams[key] = info;
   // get the realStream from Resources
@@ -61,14 +41,6 @@ const onStream = (key, info) => {
   // if it's new, attach it to the video object
   if (realStream !== video.srcObject) {
     video.srcObject = realStream;
-    //
-    if (key == 1 && !audio) {
-      audio = realStream.getAudioTracks()[0];
-      if (audio) {
-        returnStream.addTrack(audio.clone());
-        console.log('audiod-it');
-      }
-    }
   }
 };
 
