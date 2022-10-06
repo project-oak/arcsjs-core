@@ -25,7 +25,7 @@ export const Mobilenet = {
       }
     },
     ClassifierResults: {
-      $type: '[ClassifierResults]',
+      $type: 'Pojo',
       noinspect: true
     }
   },

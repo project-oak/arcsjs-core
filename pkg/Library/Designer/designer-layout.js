@@ -23,18 +23,11 @@ export class DesignerLayout extends DragDrop {
   }
   _didMount() {
     this.boxer = this._dom.$('[boxer]');
-    this.observer = new MutationObserver(e => {
-      log(e);
-    });
-    //const container = this._dom.$('[container]');
-    this.observer.observe(this, {childList: true});
-    // TODO(sjmiles): derp
+    // TODO(sjmiles): need simple 'focus' somewhere, put keydown there, perhaps on `this`
     document.addEventListener('keydown', event => this.onKeydown(event));
   }
   update() {
-    // TODO(sjmiles): the `on-slotchange` doesn't work as expected.
-    setTimeout(() => this.updateGeometry(), 50);
-    //this.updateGeometry();
+    this.updateGeometry();
   }
   onKeydown(event) {
     if (!this.hasActiveInput()) {
@@ -78,7 +71,7 @@ export class DesignerLayout extends DragDrop {
     }
   }
   onSlotChange() {
-    log('slot change');
+    console.log('slot change');
     this.updateGeometry();
   }
   updateGeometry() {
@@ -97,9 +90,7 @@ export class DesignerLayout extends DragDrop {
     if (position == null) {
       // set default rect
       const target = this.getChildById(id);
-      //const rect = target && this.getRect(target);
-      if (target) { //rect) {
-        //assign(rect, {l: 16, t: 16, w: 240, h: 180});
+      if (target) {
         const rect = {l: 16, t: 16, w: 240, h: 180};
         this.setBoxStyle(target, rect);
       }

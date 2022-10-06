@@ -11,7 +11,7 @@ import {MessageBus} from './MessageBus.js';
 import {RecipeService} from '../RecipeService.js';
 import {StoreService} from '../StoreService.js';
 import {ComposerService} from '../ComposerService.js';
-import /*{JSONataService} from*/ '../JSONataService.js';
+import {JSONataService} from '../../JSONata/JSONataService.js';
 
 // n.b. lives in Worker context
 
@@ -85,6 +85,9 @@ const handleRequest = async(arc, host, request) => {
     // (ability to re-target the Render output of a Host)
     // so this is work-in-progress
     return ComposerService[request?.msg]?.(arc, host, request);
+  }
+  if (request?.kind === 'JSONataService') {
+    return JSONataService[request?.msg]?.(arc, host, request);
   }
   return serviceRequest(request);
 };
