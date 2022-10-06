@@ -98,7 +98,6 @@ template: html`
     height: 100%;
     flex-shrink: 0;
     overflow-y: auto;
-    padding: 0 12px;
   }
   [category] {
     width: 72px;
