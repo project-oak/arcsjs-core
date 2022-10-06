@@ -41,7 +41,7 @@ export class ContainerLayout extends DragDrop {
       || ['INPUT', 'SELECT', 'TEXTAREA'].includes(active?.tagName)
       ;
   }
-  getActiveElement(activeElement) {
+  getActiveElement({activeElement}) {
     return activeElement?.shadowRoot ? this.getActiveElement(activeElement.shadowRoot) : activeElement;
   }
   render({color}) {
@@ -86,9 +86,11 @@ export class ContainerLayout extends DragDrop {
       // Set initial position to (16, 16);
       const target = this.getChildById(id);
       if (target) {
-        const rect = {l: 16, t: 16, w: 240, h: 180};
-        this.setBoxStyle(target, rect);
-        // this.firePosition(target);
+        if (!this.getRect(target)) {
+          const rect = {l: 16, t: 16, w: 240, h: 180};
+          this.setBoxStyle(target, rect);
+          // this.firePosition(target);
+        }
       }
     } else {
       const child = this.getChildById(id);
