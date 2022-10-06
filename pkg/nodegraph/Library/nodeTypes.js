@@ -20,6 +20,7 @@ import * as displayNodes from '../../Library/Display/DisplayNodes.js';
 import * as shaderNodes from '../../Library/Shader/ShaderNodes.js';
 // import {SceneNode} from '../../Library/AFrame/SceneNode.js';
 import {ThreejsEditorNode} from '../../Library/Threejs/ThreejsEditorNode.js';
+import {JSONataNode} from '../../Library/JSONata/JSONataNode.js';
 
 const fieldNodes = Object.values(baseFieldNodes).map(node => {
   const newNode = {...node};
@@ -48,11 +49,12 @@ const nodeTypesList = [
   ...values(shaderNodes),
   //SceneNode,
   ThreejsEditorNode,
-  ...values(customNodes)
+  ...values(customNodes),
   // ...values(locationNodes),
   // ...values(homescreen),
   // ...values(speech),
   // ...values(translator)
+  JSONataNode
 ];
 
 
@@ -67,7 +69,7 @@ nodeTypesList.forEach(nodeType => {
   } else {
     console.warn(`Missing 'key' for NodeType '${name}' (category='${category}')`);
   }
-  
+
 });
 
 const icons = ['coffee', 'shower', 'chair', 'flatware', 'light', 'casino', 'escalator', 'umbrella', 'theater_comedy', 'diamond'];

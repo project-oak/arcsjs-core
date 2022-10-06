@@ -8,9 +8,10 @@
  */
 import {Paths, Runtime, Arc, Decorator, Chef, logFactory, utils} from '../../core.js';
 import {MessageBus} from './MessageBus.js';
-import {RecipeService} from '../../Arcs/RecipeService.js';
-import {StoreService} from '../../Arcs/StoreService.js';
-import {ComposerService} from '../../Arcs/ComposerService.js';
+import {RecipeService} from '../RecipeService.js';
+import {StoreService} from '../StoreService.js';
+import {ComposerService} from '../ComposerService.js';
+import {JSONataService} from '../../JSONata/JSONataService.js';
 
 // n.b. lives in Worker context
 
@@ -84,6 +85,9 @@ const handleRequest = async(arc, host, request) => {
     // (ability to re-target the Render output of a Host)
     // so this is work-in-progress
     return ComposerService[request?.msg]?.(arc, host, request);
+  }
+  if (request?.kind === 'JSONataService') {
+    return JSONataService[request?.msg]?.(arc, host, request);
   }
   return serviceRequest(request);
 };

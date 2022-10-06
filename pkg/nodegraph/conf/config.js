@@ -1,5 +1,5 @@
 globalThis.config = {
-  aeon: 'nodegraph/0.4.0',
+  aeon: 'nodegraph/0.4.3',
   meta: 'nodegraph',
   //theme: 'dark',
   logFlags: {

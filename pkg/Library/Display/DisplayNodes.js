@@ -4,25 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-export const BarViewer =  {
-  $meta: {
-    id: 'bar viewer',
-    category: 'Output'
-  },
-  $stores: {
-    ClassifierResults: {
-      $type: '[ClassifierResults]',
-      connection: true,
-      noinspect: true,
-    },
-  },
-  jsonDisplay: {
-    $kind: '$library/Display/BarDisplay',
-    $inputs: [
-      {classifierResults: 'ClassifierResults'}
-    ]
-  }
-};
+export * from './BarDisplayNode.js';
 
 export const JsonViewer =  {
   $meta: {
