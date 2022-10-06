@@ -72,39 +72,43 @@ updatePipelineConnections(pipeline, nodeTypes, candidates) {
 },
 
 updateNodeConnections(node, nodeType, candidates) {
-  // STARTHERE START HERE!!!
-  // TODO: refactor nicely
-  // TODO: NodeTypepanel in inspector doesn't work
-  const isNewNode = !node.connections;
-  let changed = false;
-  const used = [];
-  keys(nodeType?.$stores).forEach(store => {
-    node.connections ??= {};
-    changed |= this.updateOnlyChoiceStoreConnection(node, store, candidates[store], used);
-    changed |= this.updateNoDisplayStoreConnection(node, store, candidates[store], used);
-  });
-  return (isNewNode && keys(node.connections).length > 0) || changed;
+  if (candidates) {
+    let changed = this.initializeConnections(node, nodeType, candidates);
+    changed |= this.updateNoDisplayConnections(node, nodeType, candidates);
+    return changed;
+  }
 },
 
-shouldUpdateConnections(node) {
-  return !node.connections;
+initializeConnections(node, nodeType, candidates) {
+  if (!node.connections) {
+    const used = [];
+    keys(nodeType?.$stores).forEach(store => {
+      node.connections ??= {};
+      this.initializeStoreConnection(store, node, candidates[store], used);
+    });
+    return true;
+  }
+  return false;
 },
 
-updateOnlyChoiceStoreConnection(node, store, candidates, used) {
+initializeStoreConnection(store, node, storeCandidates, used) {
   const isUsed = (candidate) => used.find(({from, storeName}) => candidate.from === from && candidate.storeName === storeName);
-  const unusedCandidates = candidates?.filter(candidate => !isUsed(candidate));
+  const unusedCandidates = storeCandidates?.filter(candidate => !isUsed(candidate));
   if (unusedCandidates?.length === 1) {
     node.connections[store] = [unusedCandidates?.[0]];
     used.push(unusedCandidates?.[0]);
-    return true;
   }
 },
 
-updateNoDisplayStoreConnection(node, store, candidates) {
-  if (node.nodedisplay) {
-    node.connections[store] = [...candidates];
-  }
+updateNoDisplayConnections(node, nodeType, candidates) {
+  return keys(nodeType?.$stores)
+    .map(store => {
+      if (candidates[store] && nodeType.$stores[store].nodisplay) {
+        node.connections[store] = [...candidates[store]];
+        return true;
+      }
+    })
+    .some(changed => changed);
 }
-
 
 });
