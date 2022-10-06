@@ -40,8 +40,7 @@ findNodeCandidates(node, pipeline, nodeTypes, globalStores) {
 },
 findConnectionCandidates(nodeId, storeName, {$type}, {nodes}, nodeTypes, globalStores) {
   const candidates = [];
-  candidates.push(this.findGlobalCandidate(storeName, globalStores));
-  
+  candidates.push(this.findGlobalCandidate(storeName, $type, globalStores));
   values(nodes).forEach(node => {
     if (node.id !== nodeId) {
       candidates.push(...this.findCandidatesInNode(node.id, $type, nodeTypes[node.type]));
@@ -62,13 +61,41 @@ findCandidatesInNode(from, type, nodeType) {
     return storeType === type;
   };
   const candidates = [];
-  const isMatchingStore = ({$type, connection}) => matchingType($type) && !connection;
+  const isCandidate = (storeName, {$type, connection}) => matchingType($type) && !connection && this.storeHasOutput(storeName, nodeType);
   for (const [storeName, store] of entries(nodeType?.$stores)) {
-    if (isMatchingStore(store)) {
+    if (isCandidate(storeName, store)) {
       candidates.push({from, storeName, type: store.$type});
     }
   }
   return candidates;
+},
+
+storeHasOutput(storeName, nodeType) {
+  return this.getParticleNames(nodeType).some(
+      name => this.hasMatchingStore(nodeType[name].$outputs, storeName));
+},
+
+getParticleNames(nodeType) {
+  const notKeyword = name => !name.startsWith('$');
+  return keys(nodeType).filter(notKeyword);
+},
+
+hasMatchingStore(bindings, storeName) {
+  return bindings?.some(binding => this.isMatchingStore(storeName, binding));
+},
+
+isMatchingStore(storeName, connection) {
+  const {key, binding} = this.decodeBinding(connection);
+  return (binding || key) == storeName;
+},
+
+decodeBinding(value) {
+  if (typeof value === 'string') {
+    return {key: value, binding: ''};
+  } else {
+    const [key, binding] = entries(value)[0];
+    return {key, binding};
+  }
 }
 
 });

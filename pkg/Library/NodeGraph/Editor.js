@@ -11,7 +11,7 @@ edgeIdDelimeter: '$$',
 update({pipeline, selectedNodeId}, state) {
   if (pipeline?.$meta?.name !== state.selectedPipelineName) {
     state.selectedPipelineName = pipeline?.$meta.name;
-    // new pipeline, choose a selectedNode if there isn't one
+    // new pipeline, choose a selectedNodeId if there isn't one
     if (!selectedNodeId) {
       return {selectedNodeId: keys(pipeline?.nodes)?.[0]};
     }
@@ -211,7 +211,7 @@ isOutput(nodeType, storeName) {
 },
 
 hasMatchingStore(bindings, storeName) {
-  return bindings?.some(binding => this.isMatchingStore(storeName, binding))
+  return bindings?.some(binding => this.isMatchingStore(storeName, binding));
 },
 
 isMatchingStore(storeName, connection) {
@@ -328,7 +328,6 @@ duplicateDisplayName(displayName, pipeline) {
     } else {
       newParts[newParts.length - 1] = c;
     }
-    // TODO(???)
     if (!values(pipeline.nodes).find(n => n.displayName === newParts.join(' '))) {
       parts = newParts;
       break;

@@ -12,7 +12,7 @@ defaultInspectorDataProp: 'inspectorData',
 async update(inputs, state, {service, output, invalidate}) {
   const {selectedNodeId, pipeline, nodeTypes, candidates} = inputs;
   if (pipeline && selectedNodeId) {
-    if (selectedNodeId !== state.node?.key) {
+    if (selectedNodeId !== state.node?.id) {
       assign(state, {data: null, hasMonitor: false});
     }
     const node = pipeline.nodes[selectedNodeId];
@@ -58,7 +58,7 @@ pipelineChanged(pipeline, oldPipeline) {
 },
 
 candidatesChanged(candidates, oldCandidates) {
-  return deepEqual(candidates, oldCandidates);
+  return !deepEqual(candidates, oldCandidates);
 },
 
 async finagleCustomRecipes(recipes, service, finagle) {

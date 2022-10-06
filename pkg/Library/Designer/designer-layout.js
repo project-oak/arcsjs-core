@@ -59,7 +59,6 @@ export class DesignerLayout extends DragDrop {
       styleOverrides
     };
   }
-  // TODO(mariakleiner): port same changes to container-layout.
   getTargetKey(target) {
     return target?.getAttribute('particle');
   }
@@ -109,7 +108,7 @@ export class DesignerLayout extends DragDrop {
     this.updateOrders(this.target);
   }
   firePosition(target) {
-    this.key = this.getTargetKey(target); // target?.id;
+    this.key = this.getTargetKey(target);
     this.value = null;
     if (target) {
       const {l, t, w, h} = this.getRect(target);

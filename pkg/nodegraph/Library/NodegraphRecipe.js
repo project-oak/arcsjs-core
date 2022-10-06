@@ -17,7 +17,7 @@ const globalStores = [
   'nodeTypes',
   'hoveredNodeId',
   'categories',
-  'nodeKey',
+  'nodeId',
 ];
 
 const PipelineToolbar = {
@@ -65,7 +65,7 @@ export const NodegraphRecipe = {
       $value: null
     },
     selectedNodeId: {
-      $type: 'String',
+      $type: 'String'
     },
     candidates: {
       $type: 'JSON'
@@ -225,7 +225,7 @@ export const NodegraphRecipe = {
       'nodeTypes',
       {layout: 'previewLayout'}
     ],
-    $outputs: ['recipes'],
+    $outputs: ['recipes']
   },
   layoutUpdator: {
     $kind: '$library/NodeGraph/LayoutUpdator',

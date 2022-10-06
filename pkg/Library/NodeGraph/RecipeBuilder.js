@@ -153,7 +153,7 @@ buildStoreSpecs(node, nodeType, state) {
       const connections = node.connections?.[name];
       connections?.forEach(connection => {
         const storeId = this.constructStoreId(connection);
-        specs[storeId] = {$type: store.$type};
+        specs[storeId] = {$type: store.$type, connection: true};
         state.storeMap[name] = storeId;
       });
     } else {
