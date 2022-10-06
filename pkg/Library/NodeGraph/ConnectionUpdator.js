@@ -72,28 +72,39 @@ updatePipelineConnections(pipeline, nodeTypes, candidates) {
 },
 
 updateNodeConnections(node, nodeType, candidates) {
-  if (this.shouldUpdateConnections(node) && candidates) {
-    const used = [];
-    keys(nodeType?.$stores).forEach(store => {
-      node.connections ??= {};
-      this.updateStoreConnection(node, store, candidates[store], used);
-    });
-    return true;
-  }
-  return false;
+  // STARTHERE START HERE!!!
+  // TODO: refactor nicely
+  // TODO: NodeTypepanel in inspector doesn't work
+  const isNewNode = !node.connections;
+  let changed = false;
+  const used = [];
+  keys(nodeType?.$stores).forEach(store => {
+    node.connections ??= {};
+    changed |= this.updateOnlyChoiceStoreConnection(node, store, candidates[store], used);
+    changed |= this.updateNoDisplayStoreConnection(node, store, candidates[store], used);
+  });
+  return (isNewNode && keys(node.connections).length > 0) || changed;
 },
 
 shouldUpdateConnections(node) {
   return !node.connections;
 },
 
-updateStoreConnection(node, store, candidates, used) {
+updateOnlyChoiceStoreConnection(node, store, candidates, used) {
   const isUsed = (candidate) => used.find(({from, storeName}) => candidate.from === from && candidate.storeName === storeName);
   const unusedCandidates = candidates?.filter(candidate => !isUsed(candidate));
-  if (node.nodedisplay || unusedCandidates?.length === 1) {
+  if (unusedCandidates?.length === 1) {
     node.connections[store] = [unusedCandidates?.[0]];
     used.push(unusedCandidates?.[0]);
+    return true;
+  }
+},
+
+updateNoDisplayStoreConnection(node, store, candidates) {
+  if (node.nodedisplay) {
+    node.connections[store] = [...candidates];
   }
 }
+
 
 });
