@@ -10,7 +10,6 @@
 ({
 runnerDelimiter: '$$',
 
-// TODO(mariakleiner): update to match the refactoring in Designer.
 async initialize(inputs, state) {
   state.recipes = {};
   state.stores = {};
@@ -57,14 +56,28 @@ async renewRecipes(recipes, state, service) {
   for (const recipe of recipes) {
     const runningRecipe = state.recipes[recipe.$meta.name];
     if (runningRecipe) {
-      const updatedParticles = this.findParticlesWithChangedConnections(recipe, runningRecipe);
-      updatedParticles.forEach(particleId => {
-        service({kind: 'RecipeService', msg: 'UpdateConnections', data: {particleId, spec: recipe[particleId]}});
-        state.recipes[recipe.$meta.name] = recipe;
-      });
+      await this.updateConnections(recipe, runningRecipe, state, service);
+      await this.updateContainers(recipe, runningRecipe, state, service);
     } else {
       await this.startRecipe(recipe, state, service);
     }
+  }
+},
+
+async updateConnections(recipe, runningRecipe, state, service) {
+  const particles = this.findParticlesWithChangedConnections(recipe, runningRecipe);
+  particles.forEach(particleId => {
+    service({kind: 'RecipeService', msg: 'UpdateConnections', data: {particleId, spec: recipe[particleId]}});
+    state.recipes[recipe.$meta.name] = recipe;
+  });
+},
+
+async updateContainers(recipe, runningRecipe, state, service) {
+  const hostIds = this.findParticlesWithChangedContainer(recipe, runningRecipe);
+  if (hostIds.length > 0) {
+    const container = recipe[hostIds[0]].$container;
+    await service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
+    state.recipes[recipe.$meta.name] = recipe;
   }
 },
 
@@ -95,25 +108,29 @@ findParticlesWithChangedConnections(recipe, runningRecipe) {
   });
 },
 
+findParticlesWithChangedContainer(recipe, runningRecipe) {
+  const particleNames = this.getParticleNames(recipe);
+  return particleNames.filter(particleName => {
+    return recipe[particleName].$container !== runningRecipe[particleName].$container;
+  });
+},
+
 getParticleNames(recipe) {
   const notKeyword = name => !name.startsWith('$');
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-render({pipeline, selectedNode, nodeTypes, categories}, {recipes}) {
-  const idsForNode = (node) =>
+render({pipeline, selectedNodeId, nodeTypes, categories, layout}, {recipes}) {
+  const particleIdsForNode = (node) =>
       (node && !this.isUIHidden(node) &&
         this.getParticleNamesForNode(node, pipeline, recipes)) ||
       [];
-  const rects = pipeline?.nodes?.map(
-    node => idsForNode(node).map(
-      id => ({id, position: node.position?.preview?.[id]})
-    )
-  ).flat();
-  const nodeType =
-      nodeTypes?.find(({$meta: {name}}) => selectedNode?.name === name);
+  const rects = values(pipeline?.nodes).map(
+    node => particleIdsForNode(node).map(id => ({id, position: layout?.[node.id]}))).flat();
+  const node = pipeline?.nodes?.[selectedNodeId];
+  const nodeType = nodeTypes?.[node?.type];
   return {
-    selectedKeys: idsForNode(selectedNode),
+    selectedKeys: particleIdsForNode(node),
     rects,
     color: this.colorByCategory(nodeType?.$meta?.category, categories),
   };
@@ -125,28 +142,26 @@ isUIHidden(node) {
 
 onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
-  // pipeline.nodes = pipeline?.nodes.filter(n => n.key !== node.key);
-  delete pipeline.nodes[node.key];
-  return {pipeline, selectedNode: null};
+  delete pipeline.nodes[node.id];
+  return {pipeline, selectedNodeId: null};
 },
 
-onNodePosition({eventlet: {key, value}, pipeline}, {recipes}) {
+onNodePosition({eventlet: {key, value}, pipeline, layout}, {recipes}) {
   const node = this.findNodeByParticle(key, pipeline, recipes);
   if (node) {
-    const selectedNode = {...node, position: {...node.position, preview: {...node.position?.preview, [key]: value}}};
     return {
-      selectedNode,
-      pipeline: this.updateNodeInPipeline(selectedNode, pipeline)
+      selectedNodeId: node.id,
+      layout: {...layout, [node.id]: value}
     };
   } else {
     return {
-      selectedNode: null
+      selectedNodeId: null
     };
   }
 },
 
 findNodeByParticle(particleName, pipeline, recipes) {
-  return pipeline?.nodes?.find(node => {
+  return values(pipeline?.nodes).find(node => {
     const names = this.getParticleNamesForNode(node, pipeline, recipes);
     return names?.find(name => name === particleName);
   });
@@ -154,21 +169,13 @@ findNodeByParticle(particleName, pipeline, recipes) {
 
 getParticleNamesForNode(node, pipeline, recipes) {
   if (pipeline) {
-    const fullNodeKey = this.encodeFullNodeKey(node, pipeline);
-    return this.getParticleNames(recipes[fullNodeKey]);
+    const fullNodeId = this.encodeFullNodeId(node, pipeline);
+    return this.getParticleNames(recipes[fullNodeId]);
   }
 },
 
-encodeFullNodeKey({key}, {$meta}) {
-  return [$meta?.name, key].filter(Boolean).join(this.runnerDelimiter);
-},
-
-updateNodeInPipeline(node, pipeline) {
-  const index = pipeline?.nodes?.findIndex(n => n.key === node.key);
-  // TODO (b/245770204): avoid copying objects
-  pipeline.nodes[index] = node;
-  //pipeline.nodes = assign([], pipeline.nodes, {[index]: node});
-  return pipeline;
+encodeFullNodeId({id}, {$meta}) {
+  return [$meta?.id, id].filter(Boolean).join(this.runnerDelimiter);
 },
 
 colorByCategory(category, categories) {

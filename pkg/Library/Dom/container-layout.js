@@ -9,61 +9,40 @@
 import {Xen} from './Xen/xen-async.js';
 import {DragDrop} from './drag-drop.js';
 import {IconsCss} from './Material/material-icon-font/icons.css.js';
-import {deepEqual} from '../Core/utils.min.js';
-
 const {assign} = Object;
 
 export class ContainerLayout extends DragDrop {
   static get observedAttributes() {
     return [
-      'selected', 'rects',
+      'selected',
+      'rects',
       // The color of the boxer.
       'color'
     ];
   }
   _didMount() {
     this.boxer = this._dom.$('[boxer]');
-    this.setupKeyboardShortcut();
+    document.addEventListener('keydown', event => this.onKeydown(event));
   }
-  setupKeyboardShortcut() {
-    document.addEventListener('keydown', (event) => {
-      // Don't trigger if any input elements have the focus.
-      const activeEle = this.getActiveElement(document);
-      const isInputElement = activeEle.tagName === 'INPUT' ||
-          activeEle.tagName === 'SELECT' || activeEle.tagName === 'TEXTAREA' ||
-          activeEle.contentEditable === 'true';
-      if (isInputElement) {
-        return;
-      }
-
+  update() {
+    this.updateGeometry();
+  }
+  onKeydown(event) {
+    if (!this.hasActiveInput()) {
       // Delete the selected node or edge when pressing the "backspace" or "delete" key .
       if (event.key === 'Backspace' || event.key === 'Delete') {
-        if (this.target) {
-          this.key = this.target.id;
-          this.fire('delete');
-        }
+        this.deleteAction(this.target);
       }
-    });
-  }
-  getActiveElement(root) {
-    const activeEl = root.activeElement;
-    if (!activeEl) {
-      return null;
-    }
-    if (activeEl.shadowRoot) {
-      return this.getActiveElement(activeEl.shadowRoot);
-    } else {
-      return activeEl;
     }
   }
-  update({selected, rects}, state) {
-    if (!deepEqual(selected, state.selected) || !deepEqual(rects, state.rects)) {
-      state.rects = rects;
-      this.selected = selected;
-      setTimeout(() => {
-        this.updateSelectionAndPositions(selected, rects);
-      }, 100);
-    }
+  hasActiveInput() {
+    const active = this.getActiveElement(document);
+    return active?.contentEditable
+      || ['INPUT', 'SELECT', 'TEXTAREA'].includes(active?.tagName)
+      ;
+  }
+  getActiveElement(activeElement) {
+    return activeElement?.shadowRoot ? this.getActiveElement(activeElement.shadowRoot) : activeElement;
   }
   render({color}) {
     const styleOverrides = `
@@ -78,10 +57,25 @@ export class ContainerLayout extends DragDrop {
       styleOverrides
     };
   }
+  getTargetKey(target) {
+    return target?.getAttribute('particle');
+  }
+  deleteAction(target) {
+    if (target) {
+      this.key = this.getTargetKey(target);
+      this.fire('delete');
+    }
+  }
+  onSlotChange() {
+    this.updateGeometry();
+  }
+  updateGeometry() {
+    this.updateSelectionAndPositions(this.selected, this.rects);
+  }
   updateSelectionAndPositions(selected, rects) {
     rects?.forEach(({id, position}) => this.position(id, position));
     this.select(null);
-    selected.forEach(id => {
+    selected?.forEach(id => {
       if (this.getChildById(id)) {
         this.select(id);
       }
@@ -91,12 +85,10 @@ export class ContainerLayout extends DragDrop {
     if (position == null) {
       // Set initial position to (16, 16);
       const target = this.getChildById(id);
-      const rect = target && this.getRect(target);
-      if (rect) {
-        rect.t = 16;
-        rect.l = 16;
+      if (target) {
+        const rect = {l: 16, t: 16, w: 240, h: 180};
         this.setBoxStyle(target, rect);
-        this.firePosition(target);
+        // this.firePosition(target);
       }
     } else {
       const child = this.getChildById(id);
@@ -113,7 +105,7 @@ export class ContainerLayout extends DragDrop {
     this.updateOrders(this.target);
   }
   firePosition(target) {
-    this.key = target?.id;
+    this.key = this.getTargetKey(target);
     this.value = null;
     if (target) {
       const {l, t, w, h} = this.getRect(target);
@@ -203,8 +195,11 @@ export class ContainerLayout extends DragDrop {
     }
   }
   //
+  sanitizeId(id) {
+    return id?.replace(/[)(:]/g, '_');
+  }
   getChildById(id) {
-    return this.querySelector(`#${id}`);
+    return this.querySelector(`#${this.sanitizeId(id)}`);
   }
   getEventTarget(e) {
     const p = e.composedPath();
@@ -329,7 +324,7 @@ export class ContainerLayout extends DragDrop {
 </style>
 <style>${'{{styleOverrides}}'}</style>
 <div container on-pointerdown="onContainerDown">
-  <slot on-pointerdown="onDown" on-pointerup="onUp"></slot>
+  <slot on-pointerdown="onDown" on-pointerup="onUp" on-slotchange="onSlotChange"></slot>
 </div>
 <div boxer on-pointerdown="onDown">
   <div top edge></div>

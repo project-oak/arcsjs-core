@@ -73,9 +73,10 @@ updatePipelineConnections(pipeline, nodeTypes, candidates) {
 
 updateNodeConnections(node, nodeType, candidates) {
   if (this.shouldUpdateConnections(node) && candidates) {
+    const used = [];
     keys(nodeType?.$stores).forEach(store => {
       node.connections ??= {};
-      this.updateStoreConnection(node, store, candidates[store])
+      this.updateStoreConnection(node, store, candidates[store], used);
     });
     return true;
   }
@@ -86,10 +87,12 @@ shouldUpdateConnections(node) {
   return !node.connections;
 },
 
-updateStoreConnection(node, store, candidates) {
-  if (candidates?.length === 1) {
-    node.connections[store] = [...candidates];
-    return true;
+updateStoreConnection(node, store, candidates, used) {
+  const isUsed = (candidate) => used.find(({from, storeName}) => candidate.from === from && candidate.storeName === storeName);
+  const unusedCandidates = candidates?.filter(candidate => !isUsed(candidate));
+  if (node.nodedisplay || unusedCandidates?.length === 1) {
+    node.connections[store] = [unusedCandidates?.[0]];
+    used.push(unusedCandidates?.[0]);
   }
 }
 
