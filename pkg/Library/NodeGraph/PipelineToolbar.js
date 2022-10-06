@@ -56,10 +56,14 @@
     if (pipeline) {
       if (!deepEqual(pipeline, state.pipeline)) {
         const outputs = {};
-        if (state.pipeline?.$meta?.id !== pipeline.$meta.id) {
+        const isDifferentPipeline = state.pipeline?.$meta?.id !== pipeline.$meta.id;
+        if (isDifferentPipeline) {
           await this.updateSelectedPipelineHistory(pipeline, service);
-          assign(outputs, this.computeLayouts(pipeline));
           outputs['selectedNodeId'] = keys(pipeline.nodes)?.[0];
+        }
+        const isDifferentNodes = keys(pipeline.nodes).length !== keys(state.pipeline?.nodes).length;
+        if (isDifferentPipeline || isDifferentNodes) {
+          assign(outputs, this.computeLayouts(pipeline));
         }
         state.pipeline = pipeline;
         assign(outputs, {
@@ -242,9 +246,18 @@
   },
   computeLayouts(pipeline) {
     return {
-      nodegraphLayout: assign({id: pipeline.$meta.id}, pipeline.position?.['nodegraphLayout']),
-      previewLayout: assign({id: pipeline.$meta.id}, pipeline.position?.['previewLayout']),
+      nodegraphLayout: this.computeLayout(pipeline, pipeline.position?.['nodegraphLayout']),
+      previewLayout: this.computeLayout(pipeline, pipeline.position?.['previewLayout']),
     };
+  },
+  computeLayout({$meta: {id}, nodes}, positions) {
+    const layout = {id};
+    entries(positions).forEach(([id, position]) => {
+      if (nodes[id]) {
+        layout[id] = position;
+      }
+    });
+    return layout;
   },
   template: html`
 <style>
