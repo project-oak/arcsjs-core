@@ -73,9 +73,9 @@ updatePipelineConnections(pipeline, nodeTypes, candidates) {
 
 updateNodeConnections(node, nodeType, candidates) {
   if (candidates) {
-    let changed = this.initializeConnections(node, nodeType, candidates);
-    changed |= this.updateNoDisplayConnections(node, nodeType, candidates);
-    return changed;
+    const initChanged = this.initializeConnections(node, nodeType, candidates);
+    const nodisplayChanged = this.updateNoDisplayConnections(node, nodeType, candidates);
+    return initChanged || nodisplayChanged;
   }
 },
 
