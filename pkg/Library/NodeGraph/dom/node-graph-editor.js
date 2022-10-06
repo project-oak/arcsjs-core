@@ -1713,7 +1713,7 @@ export class NodeGraphEditor extends Xen.Async {
             });
     nodeTypesEnter.append('div')
         .classed('node-type-label', true)
-        .text(d => d.$meta.name);
+        .text(({$meta: {displayName, id}}) => displayName || id);
   }
 
   hideCandidateChooserDialog() {

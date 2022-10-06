@@ -72,28 +72,43 @@ updatePipelineConnections(pipeline, nodeTypes, candidates) {
 },
 
 updateNodeConnections(node, nodeType, candidates) {
-  if (this.shouldUpdateConnections(node) && candidates) {
+  if (candidates) {
+    const initChanged = this.initializeConnections(node, nodeType, candidates);
+    const nodisplayChanged = this.updateNoDisplayConnections(node, nodeType, candidates);
+    return initChanged || nodisplayChanged;
+  }
+},
+
+initializeConnections(node, nodeType, candidates) {
+  if (!node.connections) {
     const used = [];
     keys(nodeType?.$stores).forEach(store => {
       node.connections ??= {};
-      this.updateStoreConnection(node, store, candidates[store], used);
+      this.initializeStoreConnection(store, node, candidates[store], used);
     });
     return true;
   }
   return false;
 },
 
-shouldUpdateConnections(node) {
-  return !node.connections;
-},
-
-updateStoreConnection(node, store, candidates, used) {
+initializeStoreConnection(store, node, storeCandidates, used) {
   const isUsed = (candidate) => used.find(({from, storeName}) => candidate.from === from && candidate.storeName === storeName);
-  const unusedCandidates = candidates?.filter(candidate => !isUsed(candidate));
-  if (node.nodedisplay || unusedCandidates?.length === 1) {
+  const unusedCandidates = storeCandidates?.filter(candidate => !isUsed(candidate));
+  if (unusedCandidates?.length === 1) {
     node.connections[store] = [unusedCandidates?.[0]];
     used.push(unusedCandidates?.[0]);
   }
+},
+
+updateNoDisplayConnections(node, nodeType, candidates) {
+  return keys(nodeType?.$stores)
+    .map(store => {
+      if (candidates[store] && nodeType.$stores[store].nodisplay) {
+        node.connections[store] = [...candidates[store]];
+        return true;
+      }
+    })
+    .some(changed => changed);
 }
 
 });
