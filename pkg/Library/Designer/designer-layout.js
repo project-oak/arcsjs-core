@@ -23,11 +23,10 @@ export class DesignerLayout extends DragDrop {
   }
   _didMount() {
     this.boxer = this._dom.$('[boxer]');
+    // TODO(sjmiles): need simple 'focus' somewhere, put keydown there, perhaps on `this`
     document.addEventListener('keydown', event => this.onKeydown(event));
   }
   update() {
-    // TODO(sjmiles): the `on-slotchange` doesn't work as expected.
-    //setTimeout(() => this.updateGeometry(), 100);
     this.updateGeometry();
   }
   onKeydown(event) {
@@ -72,6 +71,7 @@ export class DesignerLayout extends DragDrop {
     }
   }
   onSlotChange() {
+    console.log('slot change');
     this.updateGeometry();
   }
   updateGeometry() {
@@ -90,9 +90,7 @@ export class DesignerLayout extends DragDrop {
     if (position == null) {
       // set default rect
       const target = this.getChildById(id);
-      //const rect = target && this.getRect(target);
-      if (target) { //rect) {
-        //assign(rect, {l: 16, t: 16, w: 240, h: 180});
+      if (target) {
         const rect = {l: 16, t: 16, w: 240, h: 180};
         this.setBoxStyle(target, rect);
       }
@@ -167,13 +165,17 @@ export class DesignerLayout extends DragDrop {
     // }
   }
   doMove(dx, dy) {
-    // grid-snap
-    const snap = rect => DragDrop.snap(rect, 16);
-    // perform drag operation
-    const dragRect = this.doDrag(snap(this.rect), dx, dy, this.dragKind, this.dragFrom);
-    // install output rectangle
-    this.setBoxStyle(this.target, snap(dragRect));
-    requestAnimationFrame(() => this.setBoxStyle(this.boxer, this.getRect(this.target)));
+    if (this.rect && this.target) {
+      // grid-snap
+      const snap = rect => DragDrop.snap(rect, 16);
+      // perform drag operation
+      const dragRect = this.doDrag(this.rect, dx, dy, this.dragKind, this.dragFrom);
+      //const dragRect = this.doDrag(snap(this.rect), dx, dy, this.dragKind, this.dragFrom);
+      // install output rectangle
+      this.setBoxStyle(this.target, snap(dragRect));
+      // let the boxer adapt to the target end state
+      requestAnimationFrame(() => this.setBoxStyle(this.boxer, this.getRect(this.target)));
+    }
   }
   doDrag({l, t, w, h}, dx, dy, dragKind, dragFrom) {
     if (dragKind === 'move') {

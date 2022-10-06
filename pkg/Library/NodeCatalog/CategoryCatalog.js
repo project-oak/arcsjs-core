@@ -3,7 +3,6 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-
 ({
 initialize({nodeTypes}, state) {
   state.selectedCategory = values(nodeTypes)?.[0]?.$meta?.category;
@@ -99,6 +98,7 @@ template: html`
     height: 100%;
     flex-shrink: 0;
     overflow-y: auto;
+    padding: 0 12px;
   }
   [category] {
     width: 72px;
@@ -146,14 +146,10 @@ template: html`
 </div>
 
 <template category_t>
-  <div category
-       key="{{category}}"
-       selected$="{{selected}}"
-       on-click="onClickCategory">
+  <div category key="{{category}}" selected$="{{selected}}" on-click="onClickCategory">
     <icon xen:style="{{colorStyle}}">{{icon}}</icon>
     <div category-name>{{category}}</div>
-    <div search-count-container
-         hide$="{{hideSearchCount}}">{{numSearchResults}}</div>
+    <div search-count-container hide$="{{hideSearchCount}}">{{numSearchResults}}</div>
   </div>
 </template>
 

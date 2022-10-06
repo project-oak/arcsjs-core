@@ -75,8 +75,8 @@ template: html`
     <div left collapsed$="{{leftCollapsed}}" column section>
       <div flex frame="catalog"></div>
     </div>
-    <!-- center -->
-    <split-panel vertical flex section row>
+    <split-panel vertical flex section row divider="240">
+      <!-- center -->
       <div slot="left" flex column>
         <!-- top -->
         <div nav toolbar>
@@ -90,13 +90,14 @@ template: html`
           <div flex column frame="editor" slot="bottom"></div>
         </split-panel>
       </div>
-    <!-- right -->
-    <div slot="right" right flex column collapsed$="{{rightCollapsed}}" section>
-      <split-panel flex column>
+      <!-- right -->
+      <div slot="right" flex column Xright Xcollapsed$="{{rightCollapsed}}" Xsection>
+        <split-panel flex column>
         <div flex column frame="inspector" slot="top"></div>
         <div flex column frame="tree" slot="bottom"></div>
-      </split-panel>
-    </div>
+        </split-panel>
+      </div>
+    </split-panel>
   </div>
   <!-- page 2 -->
   <div flex column frame="pipelines"></div>

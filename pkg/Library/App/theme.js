@@ -20,7 +20,7 @@ const monoTheme = [
 ];
 
 const darkTheme = [
-  "#585858", "#d9d9d9", "#6c6c6d", "#3a3a3a", "darkorchid",
+  "#585858", "#d9d9d9", "#6c6c6d", "#3a3a3a", "#533b5f",
   "#d9d9d9", "#585858", "#63f469", "#fdfdfd", "violet"
 ];
 

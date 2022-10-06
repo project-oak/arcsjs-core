@@ -23,7 +23,7 @@ async update(inputs, state, {service, output, invalidate}) {
       await this.finagleCustomRecipes(state.recipes, service, true);
       await output({data});
     }
-    if (!state.hasMonitor) {
+    if (!state.hasMonitor && state.node) {
       state.hasMonitor = true;
       // calling async method without awaiting it, on purpose,
       // which creates Special Circumstances, see below
