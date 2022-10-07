@@ -1,4 +1,9 @@
+// extract an absolute url to the folder 2 above here (counting the filename, aka '/')
+import {Paths} from '../../Library/Core/utils.min.js';
+const url = Paths.getAbsoluteHereUrl(import.meta, 3);
+
 globalThis.config = {
+  arcsPath: url,
   aeon: 'nodegraph/0.4.3',
   meta: 'nodegraph',
   //theme: 'dark',

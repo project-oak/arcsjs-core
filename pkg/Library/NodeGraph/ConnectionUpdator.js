@@ -16,12 +16,14 @@ update(inputs, state) {
   if (this.inputsChanged(inputs, state)) {
     const {pipeline, nodeTypes, candidates} = inputs;
     assign(state, {pipeline, candidates});
-    let changed = false;
-    if (this.removePipelineOutdatedConnections(pipeline, candidates)) {
-      changed = true;
-    }
-    if (this.updatePipelineConnections(pipeline, nodeTypes, candidates)) {
-      changed = true;
+    if (candidates) {
+      //let changed = false;
+      if (this.removePipelineOutdatedConnections(pipeline, candidates)) {
+        //changed = true;
+      }
+      if (this.updatePipelineConnections(pipeline, nodeTypes, candidates)) {
+        //changed = true;
+      }
     }
     return {pipeline};
   }

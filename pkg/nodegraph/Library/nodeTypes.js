@@ -7,20 +7,25 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import * as nodeGraphNodes from './Nodes/NodeGraphNodes.js';
-import * as testNodes from './Nodes/TestNodes.js';
-import * as miscNodes from './Nodes/MiscNodes.js';
-import * as baseFieldNodes from './FieldNodes/FieldNodes.js';
-import * as candyNodes from './Nodes/CandyNodes.js';
+// arcs library
 import * as customNodes from '../Library/Librarian/CustomNodes.js';
 import * as mediapipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
 import * as newMediaNodes from '../../Library/NewMedia/Nodes/Nodes.js';
 import * as mobilenetNodes from '../../Library/Mobilenet/MobilenetNodes.js';
 import * as displayNodes from '../../Library/Display/DisplayNodes.js';
 import * as shaderNodes from '../../Library/Shader/ShaderNodes.js';
-// import {SceneNode} from '../../Library/AFrame/SceneNode.js';
 import {ThreejsEditorNode} from '../../Library/Threejs/ThreejsEditorNode.js';
 import {JSONataNode} from '../../Library/JSONata/JSONataNode.js';
+// nodegraph library
+import * as nodeGraphNodes from './Nodes/NodeGraphNodes.js';
+import * as testNodes from './Nodes/TestNodes.js';
+import * as miscNodes from './Nodes/MiscNodes.js';
+import * as baseFieldNodes from './FieldNodes/FieldNodes.js';
+import * as candyNodes from './Nodes/CandyNodes.js';
+// rapsai library
+import {RapsaiImagesNode} from './RapsaiNodes/RapsaiImagesNode.js';
+// backburner
+// import {SceneNode} from '../../Library/AFrame/SceneNode.js';
 
 const fieldNodes = Object.values(baseFieldNodes).map(node => {
   const newNode = {...node};
@@ -38,6 +43,7 @@ export const nodeTypes = {};
 
 const nodeTypesList = [
   ...values(newMediaNodes),
+  RapsaiImagesNode,
   ...values(mediapipeNodes),
   ...values(nodeGraphNodes),
   ...fieldNodes,
@@ -57,7 +63,6 @@ const nodeTypesList = [
   JSONataNode
 ];
 
-
 nodeTypesList.forEach(nodeType => {
   let {category, name} = nodeType.$meta;
   let id =  nodeType.$meta.id;
@@ -69,7 +74,6 @@ nodeTypesList.forEach(nodeType => {
   } else {
     console.warn(`Missing 'key' for NodeType '${name}' (category='${category}')`);
   }
-
 });
 
 const icons = ['coffee', 'shower', 'chair', 'flatware', 'light', 'casino', 'escalator', 'umbrella', 'theater_comedy', 'diamond'];
@@ -82,6 +86,3 @@ export const categories = {};
     bgColor: `${colors[i % (colors.length - 1)]}33`,
   };
 });
-
-// globalThis.nodeTypes = nodeTypes;
-//builderNodes.NodeCatalog.$stores.nodeTypes.$value = nodeTypes;

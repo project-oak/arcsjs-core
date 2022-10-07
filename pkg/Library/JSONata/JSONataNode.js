@@ -22,10 +22,10 @@
     },
     result: {
       $type: 'String',
-      //noinspect: true
+      noinspect: true
     }
   },
-  holistic: {
+  JSONata: {
     $kind: 'JSONata/JSONata',
     $inputs: ['json', 'expression'],
     $outputs: ['result']

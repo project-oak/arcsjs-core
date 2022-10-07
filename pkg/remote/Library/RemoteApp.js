@@ -62,6 +62,7 @@ export const RemoteApp = class extends App {
     log('onstream', meta);
     const id = meta?.id || makeName();
     Resources.set(id, stream);
+    console.warn(id, stream.getAudioTracks());
     this.arcs.set('user', 'remoteStream', id);
   }
   createTvParticle(name, container, stream) {

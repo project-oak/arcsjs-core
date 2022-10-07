@@ -70,7 +70,7 @@ export class DesignerLayout extends DragDrop {
     }
   }
   onSlotChange() {
-    console.log('slot change');
+    //console.log('slot change');
     this.updateGeometry();
   }
   updateGeometry() {
