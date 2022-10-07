@@ -58,7 +58,6 @@
         const outputs = {};
         if (state.pipeline?.$meta?.id !== pipeline.$meta.id) {
           await this.updateSelectedPipelineHistory(pipeline, service);
-          assign(outputs, this.computeLayouts(pipeline));
           outputs['selectedNodeId'] = keys(pipeline.nodes)?.[0];
         }
         state.pipeline = pipeline;
@@ -239,12 +238,6 @@
   async onRefresh({publicPipelinesUrl}) {
     const publicPipelines = await this.fetchPublicPipelines(publicPipelinesUrl);
     return {publicPipelines};
-  },
-  computeLayouts(pipeline) {
-    return {
-      nodegraphLayout: assign({id: pipeline.$meta.id}, pipeline.position?.['nodegraphLayout']),
-      previewLayout: assign({id: pipeline.$meta.id}, pipeline.position?.['previewLayout']),
-    };
   },
   template: html`
 <style>

@@ -32,9 +32,7 @@ const PipelineToolbar = {
   $outputs: [
     {pipeline: 'selectedPipeline'},
     'selectedNodeId',
-    'pipelines',
-    'previewLayout',
-    'nodegraphLayout'
+    'pipelines'
   ],
   $slots: {
     chooser: {
@@ -226,6 +224,14 @@ export const NodegraphRecipe = {
       {layout: 'previewLayout'}
     ],
     $outputs: ['recipes']
+  },
+  layoutInitializer: {
+    $kind: '$library/NodeGraph/LayoutInitializer',
+    $inputs: [{pipeline: 'selectedPipeline'}],
+    $outputs: [
+      'previewLayout',
+      'nodegraphLayout'
+    ]
   },
   layoutUpdator: {
     $kind: '$library/NodeGraph/LayoutUpdator',
