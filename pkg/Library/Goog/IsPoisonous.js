@@ -45,22 +45,30 @@ async runMacro(macroId, inputs, service) {
 },
 
 render({entityName}, {isPoisonous}) {
-  const text = isPoisonous === null
+  const q = `Is "${entityName}" poisonous?`;
+  const a = isPoisonous === null
     ? '[considering...]'
     : isPoisonous
-    ? ` may indeed be poisonous (or venomous), be advised.`
-    : ` is likely to be safe.`
+    ? `may indeed be poisonous (or venomous), be advised.`
+    : `might be safe, but I can make mistakes!`
     ;
   return {
-    //brain: resolve('$library/Goog/assets/brain.png'),
-    text,
-    name: `"${entityName}" `,
+    noEntity: !entityName,
+    brain: resolve('$library/Goog/assets/brain.png'),
+    entityName,
+    query: q,
+    name: isPoisonous === null ? '' : 'It ', //`"${entityName}" `,
+    text : a,
     isPoisonous
   };
 },
 
 template: html`
 <style>
+  img {
+    margin-right: 8px;
+    font-size: 0.8em;
+  }
   [result] {
     color: darkgreen;
     font-weight: bold;
@@ -68,13 +76,28 @@ template: html`
   [poison-y] {
     color: crimson;
   }
+  [row] [row] {
+    padding: 4px;
+  }
 </style>
 <div flex row centering>
+
   <img src="{{brain}}">
-  <div>
-    <span>{{name}}</span><span result poison-y$="{{isPoisonous}}">{{text}}</span>
+
+  <div hidden="{{noEntity}}" flex center column>
+
+    <div row>
+      <span>Is "</span>
+      <b>{{entityName}}</b>
+      <span>" poisonous?</span>
+    </div>
+
+    <div row>
+      <span>{{name}}</span>&nbsp;
+      <span result poison-y$="{{isPoisonous}}">{{text}}</span>
+    </div>
+
   </div>
-  <!-- is poisonous (or venomous):&nbsp;<span>{{isPoisonous}}</span> -->
 </div>
 `
 
