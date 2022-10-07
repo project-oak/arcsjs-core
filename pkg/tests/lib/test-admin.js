@@ -20,6 +20,10 @@ class TestAdmin extends Xen.Async {
     };
   }
   async onTestOptionClick(e) {
+    // Reset result ui.
+    this.state.result = undefined;
+    this.invalidate();
+
     const {currentTarget: {key}} = e;
     const test = this.props.alltests?.[key];
     if (test) {
