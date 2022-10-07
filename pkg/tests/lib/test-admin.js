@@ -21,8 +21,7 @@ class TestAdmin extends Xen.Async {
   }
   async onTestOptionClick(e) {
     // Reset result.
-    this.state.result = undefined;
-    this.invalidate();
+    this.mergeState({result: null});
 
     const {currentTarget: {key}} = e;
     const test = this.props.alltests?.[key];
