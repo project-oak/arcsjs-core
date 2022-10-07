@@ -9,8 +9,9 @@
 
 ({
 update({pipeline}, state) {
-  const outputs = {};
-  if (this.pipelineChanged(pipeline, state.pipeline)) {
+  const outputs = {};  
+  if (this.shouldRecomputeLayout(pipeline, state.pipeline)) {
+    state.pipeline = pipeline;
     keys(pipeline.position).forEach(key => {
       assign(outputs, {[key]: this.computeLayout(pipeline, pipeline.position[key])});
     });
@@ -18,9 +19,15 @@ update({pipeline}, state) {
   return outputs;
 },
 
-pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.$meta.id !== oldPipeline?.$meta?.id
-    || keys(pipeline.nodes).length !== keys(oldPipeline?.nodes).length;
+shouldRecomputeLayout(pipeline, oldPipeline) {
+  // Pipeline changed.
+  if (pipeline.$meta.id !== oldPipeline?.$meta?.id) {
+    return true;
+  }
+  // A node was removed.
+  if (keys(oldPipeline.nodes).some(key => !pipeline.nodes[key])) {
+    return true;
+  }
 },
 
 computeLayout({$meta: {id}, nodes}, positions) {
