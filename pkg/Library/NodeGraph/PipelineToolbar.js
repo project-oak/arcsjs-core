@@ -56,14 +56,9 @@
     if (pipeline) {
       if (!deepEqual(pipeline, state.pipeline)) {
         const outputs = {};
-        const isDifferentPipeline = state.pipeline?.$meta?.id !== pipeline.$meta.id;
-        if (isDifferentPipeline) {
+        if (state.pipeline?.$meta?.id !== pipeline.$meta.id) {
           await this.updateSelectedPipelineHistory(pipeline, service);
           outputs['selectedNodeId'] = keys(pipeline.nodes)?.[0];
-        }
-        const isDifferentNodes = keys(pipeline.nodes).length !== keys(state.pipeline?.nodes).length;
-        if (isDifferentPipeline || isDifferentNodes) {
-          assign(outputs, this.computeLayouts(pipeline));
         }
         state.pipeline = pipeline;
         assign(outputs, {
@@ -243,21 +238,6 @@
   async onRefresh({publicPipelinesUrl}) {
     const publicPipelines = await this.fetchPublicPipelines(publicPipelinesUrl);
     return {publicPipelines};
-  },
-  computeLayouts(pipeline) {
-    return {
-      nodegraphLayout: this.computeLayout(pipeline, pipeline.position?.['nodegraphLayout']),
-      previewLayout: this.computeLayout(pipeline, pipeline.position?.['previewLayout']),
-    };
-  },
-  computeLayout({$meta: {id}, nodes}, positions) {
-    const layout = {id};
-    entries(positions).forEach(([id, position]) => {
-      if (nodes[id]) {
-        layout[id] = position;
-      }
-    });
-    return layout;
   },
   template: html`
 <style>
