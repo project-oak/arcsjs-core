@@ -20,7 +20,7 @@ class TestAdmin extends Xen.Async {
     };
   }
   async onTestOptionClick(e) {
-    // Reset result ui.
+    // Reset result.
     this.state.result = undefined;
     this.invalidate();
 
