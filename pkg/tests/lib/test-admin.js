@@ -20,6 +20,9 @@ class TestAdmin extends Xen.Async {
     };
   }
   async onTestOptionClick(e) {
+    // Reset result.
+    this.mergeState({result: null});
+
     const {currentTarget: {key}} = e;
     const test = this.props.alltests?.[key];
     if (test) {
