@@ -67,7 +67,7 @@ render({entityName}, {isPoisonous}) {
 template: html`
 <style>
   img {
-    margin-right: 8px;
+    margin: 0 8px;
     font-size: 0.8em;
   }
   [result] {
