@@ -135,7 +135,9 @@ async computeProp(node, {name, store}, inputs, state, service) {
   const {pipeline} = inputs;
   const fullNodeId = this.encodeFullNodeId(node, pipeline, this.inspectorDelimiter);
   const value = await this.computeBindingValue(name, store, node, service);
-  this.addInspectRecipe(fullNodeId, {name, store}, inputs, state);
+  if (!store.noinspect) {
+    this.addInspectRecipe(fullNodeId, {name, store}, inputs, state);
+  }
   return {name, propId: this.sanitize(`${fullNodeId}${name}`), store, value};
 },
 

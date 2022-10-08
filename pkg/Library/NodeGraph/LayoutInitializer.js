@@ -8,12 +8,12 @@
  */
 
 ({
-update({pipeline}, state) {
-  const outputs = {};  
-  if (this.shouldRecomputeLayout(pipeline, state.pipeline)) {
+update({pipeline, ...inputs}, state) {
+  const outputs = {};
+  if (pipeline && this.shouldRecomputeLayout(pipeline, state.pipeline)) {
     state.pipeline = pipeline;
-    keys(pipeline.position).forEach(key => {
-      assign(outputs, {[key]: this.computeLayout(pipeline, pipeline.position[key])});
+    keys(inputs).forEach(key => {
+      assign(outputs, {[key]: this.computeLayout(pipeline, pipeline.position?.[key])});
     });
   }
   return outputs;
