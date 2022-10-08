@@ -90,7 +90,7 @@ template: html`
 </style>
 
 <mxc-tab-pages flex tabs="Preview, Html, Js, Meta">
-  <div flex frame="canvas"></div>
+  <div flex row frame="canvas"></div>
   <code-mirror flex text="{{html}}" key="html" on-code-blur="onChanged"></code-mirror>
   <code-mirror flex text="{{code}}" key="code" on-code-blur="onChanged"></code-mirror>
   <code-mirror flex text="{{meta}}" key="meta" on-code-blur="onChanged"></code-mirror>
