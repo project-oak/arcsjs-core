@@ -227,7 +227,11 @@ export const NodegraphRecipe = {
   },
   layoutInitializer: {
     $kind: '$library/NodeGraph/LayoutInitializer',
-    $inputs: [{pipeline: 'selectedPipeline'}],
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'previewLayout',
+      'nodegraphLayout'
+    ],
     $outputs: [
       'previewLayout',
       'nodegraphLayout'
