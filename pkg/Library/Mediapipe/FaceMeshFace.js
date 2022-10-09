@@ -7,13 +7,13 @@
 ({
 async initialize(_, state, {service}) {
   state.target = await service({kind: 'MediaService', msg: 'allocateCanvas', data: {width: 640, height: 480}});
+  state.renderFace = (data, target) => service({kind: 'FaceMeshService', msg: 'renderFace', data: {data, target}});
 },
 shouldUpdate({data}) {
   return Boolean(data);
 },
 async update({data}, state, {service}) {
-  const kind = 'MediapipeService';
-  await service({kind, msg: 'renderFace', data: {data: data.results, target: state.target}});
+  await state.renderFace(data.results, state.target);
   state.outputImage = {
     canvas: state.target,
     version: Math.random()

@@ -6,7 +6,7 @@
  */
 ({
 async update({image}, state, {service}) {
-  const results = await service({kind: 'MediapipeService', msg: 'faceMesh', data: {image}});
+  const results = await service({kind: 'FaceMeshService', msg: 'classify', data: {image}});
   return {data: results};
 }
 });

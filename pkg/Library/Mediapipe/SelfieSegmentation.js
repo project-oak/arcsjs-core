@@ -9,7 +9,7 @@ async initialize(inputs, state, {service}) {
   state.target = await service({kind: 'MediaService', msg: 'allocateCanvas', data: {width: 640, height: 480}});
 },
 async update({image}, state, {service}) {
-  const mask = await service({kind: 'MediapipeService', msg: 'selfieSegmentation', data: {image, target: state.target}});
+  const mask = await service({kind: 'SelfieSegmentationService', msg: 'classify', data: {image, target: state.target}});
   state.mask = mask;
   return {mask};
 },
