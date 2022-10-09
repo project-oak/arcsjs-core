@@ -4,23 +4,40 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-
+import {Paths} from '../core.js';
 import {Resources} from '../App/Resources.js';
 import {loadImage} from '../Media/ImageLoader.js';
-//
-import '../../third_party/mediapipe/holistic/holistic.js';
-const {Holistic} = globalThis;
-
-import '../../third_party/mediapipe/face_mesh/face_mesh.js';
-const {FaceMesh} = globalThis;
-
 import '../../third_party/mediapipe/drawing_utils.js';
 const {drawLandmarks, drawConnectors, lerp} = globalThis;
 
-const local = import.meta.url.split('/').slice(0, -1).join('/');
+// TODO(sjmiles): make separate services
 
+let Holistic;
+const requireHolistic = async () => {
+  if (!Holistic) {
+    await import('../../third_party/mediapipe/holistic/holistic.js');
+    Holistic = globalThis.Holisitc;
+  }
+};
+
+let FaceMesh;
+const requireFaceMesh = async () => {
+  if (!FaceMesh) {
+    await import('../../third_party/mediapipe/face_mesh/face_mesh.js');
+    FaceMesh = globalThis.FaceMesh;
+  }
+};
+
+let SelfieSegmentation;
+const requireSelfieSegmentation = async () => {
+  if (!SelfieSegmentation) {
+    await import('../../third_party/mediapipe/selfie_segmentation/selfie_segmentation.js');
+    SelfieSegmentation = globalThis.SelfieSegmentation;
+  }
+};
 const mpHolistic = globalThis;
 
+const local = import.meta.url.split('/').slice(0, -1).join('/');
 const masque = await loadImage(`assets/masquerade.png`);
 const scalar = 25;
 
@@ -41,6 +58,42 @@ export const MediapipeService = {
     }
     return results;
   },
+  async selfieSegmentation({image, target}) {
+    const [realImage, realTarget]= [Resources.get(image?.canvas), Resources.get(target)];
+    let mask = {};
+    if (realTarget && realImage) {
+      const {width, height} = realImage;
+      if (width && height) {
+        const results = await Mediapipe.selfieSegmentation(realImage, realTarget);
+        const bitmap = results?.results?.segmentationMask;
+        if (bitmap) {
+          realTarget.width = width;
+          realTarget.height = height;
+          const ctx = realTarget.getContext('2d');
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(bitmap, 0, 0, width, height);
+          mask = {canvas: target, stream: image?.stream, version: Math.random()};
+          // Only overwrite existing pixels.
+          ctx.globalCompositeOperation = 'source-in';
+          ctx.fillStyle = '#00FF00';
+          ctx.fillRect(0, 0, width, height);
+        }
+      }
+    }
+    return mask;
+  },
+  //
+  async faceMesh({image}) {
+    await requireFaceMesh();
+    const realCanvas = Resources.get(image?.canvas);
+    let results = {};
+    if (realCanvas) {
+      results = await Mediapipe.faceMesh(realCanvas);
+      results.image = {canvas: results?.canvas, stream: image?.stream, version: Math.random()};
+    }
+    return results;
+  },
+  //
   async clear({target}) {
     const realTarget = Resources.get(target);
     if (realTarget) {
@@ -79,7 +132,22 @@ export const MediapipeService = {
 };
 
 export const Mediapipe = {
-  getFaceMesh() {
+  async getSelfieSegmentation() {
+    await requireSelfieSegmentation();
+    const locateFile = file => `${local}/../../third_party/mediapipe/selfie_segmentation/${file}`;
+    const selfieSegmentation = new SelfieSegmentation({locateFile});
+    selfieSegmentation.setOptions({
+      modelSelection: 1 // 0=default, 1=landscape
+    });
+    Mediapipe.getSelfieSegmentation = () => selfieSegmentation;
+    return selfieSegmentation;
+  },
+  async selfieSegmentation(image) {
+    return this.classify(await Mediapipe.getSelfieSegmentation(), image);
+  },
+
+  async getFaceMesh() {
+    await requireFaceMesh();
     const locateFile = file => `${local}/../../third_party/mediapipe/face_mesh/${file}`;
     const facemesh = new FaceMesh({locateFile});
     facemesh.setOptions({
@@ -94,7 +162,12 @@ export const Mediapipe = {
     Mediapipe.getFaceMesh = () => facemesh;
     return facemesh;
   },
-  getHolistic() {
+  async faceMesh(image) {
+    return this.classify(await Mediapipe.getFaceMesh(), image);
+  },
+  //
+  async getHolistic() {
+    await requireHolistic();
     const locateFile = file => `${local}/../../third_party/mediapipe/holistic/${file}`;
     const holistic = new Holistic({locateFile});
     holistic.setOptions({
@@ -110,11 +183,9 @@ export const Mediapipe = {
     return holistic;
   },
   async holistic(image) {
-    return this.classify(Mediapipe.getHolistic(), image);
+    return this.classify(await Mediapipe.getHolistic(), image);
   },
-  async faceMesh(image) {
-    return this.classify(Mediapipe.getFaceMesh(), image);
-  },
+  //
   async classify(classifier, testImage) {
     if (Mediapipe.busy) {
       return {};
@@ -136,6 +207,7 @@ export const Mediapipe = {
       results: {...results, width: testImage.width, height: testImage.height}
     };
   },
+  //
   renderHands(ctx, {rightHandLandmarks, leftHandLandmarks}) {
     const radius = data => lerp(data.from.z, -0.15, .1, 10, 1);
     drawLandmarks(ctx, rightHandLandmarks, {

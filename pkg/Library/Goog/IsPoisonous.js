@@ -3,9 +3,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-
 ({
-
 async update({entityName}, state, {service, invalidate}) {
   if (state.plantName !== entityName) {
     state.plantName = entityName;
@@ -30,7 +28,10 @@ async update({entityName}, state, {service, invalidate}) {
 async updateIsPoisonous(state, {service, invalidate}) {
   const isPoisonousMacro = 'NvfwycdHBRpq4h13rEj2';
   const nameKey = '6f3a583b-1f7c-4e19-af80-eb9ddf374688';
-  state.response = await this.runMacro(isPoisonousMacro, {[nameKey]: state.plantName}, service);
+  state.response = await this.runMacro(isPoisonousMacro, {
+    [nameKey]: state.plantName
+  },
+  service);
   invalidate();
 },
 
@@ -66,7 +67,7 @@ render({entityName}, {isPoisonous}) {
 template: html`
 <style>
   img {
-    margin-right: 8px;
+    margin: 0 8px;
     font-size: 0.8em;
   }
   [result] {
@@ -100,5 +101,4 @@ template: html`
   </div>
 </div>
 `
-
 });
