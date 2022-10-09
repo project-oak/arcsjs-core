@@ -21,9 +21,6 @@ const requireCocoSsdModel = async () => {
   return CocoSsdModel;
 };
 
-//const local = import.meta.url.split('/').slice(0, -1).join('/');
-//const locateFile = file => `${local}/../../third_party/mediapipe/selfie_segmentation/${file}`;
-
 export const CocoSsdService = {
   async classify({image}) {
     // get our input canvas objects
