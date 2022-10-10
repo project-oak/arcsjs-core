@@ -4,56 +4,36 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Paths} from '../core.js';
 import {Resources} from '../App/Resources.js';
 import {loadImage} from '../Media/ImageLoader.js';
+import {MediapipeClassifier} from './MediapipeClassifier.js';
 import '../../third_party/mediapipe/drawing_utils.js';
+
 const {drawLandmarks, drawConnectors, lerp} = globalThis;
+const mpHolistic = globalThis;
 
-// TODO(sjmiles): make separate services
+// late-bind dependencies to reduce so we pay-for-usage
 
-let Holistic;
-const requireHolistic = async () => {
-  if (!Holistic) {
-    await import('../../third_party/mediapipe/holistic/holistic.js');
-    Holistic = globalThis.Holisitc;
-  }
-};
+const local = import.meta.url.split('/').slice(0, -1).join('/');
+const locateFile = file => `${local}/../../third_party/mediapipe/face_mesh/${file}`;
 
 let FaceMesh;
 const requireFaceMesh = async () => {
   if (!FaceMesh) {
-    await import('../../third_party/mediapipe/face_mesh/face_mesh.js');
+    await MediapipeClassifier.import('../../third_party/mediapipe/face_mesh/face_mesh.js');
     FaceMesh = globalThis.FaceMesh;
   }
 };
 
-let SelfieSegmentation;
-const requireSelfieSegmentation = async () => {
-  if (!SelfieSegmentation) {
-    await import('../../third_party/mediapipe/selfie_segmentation/selfie_segmentation.js');
-    SelfieSegmentation = globalThis.SelfieSegmentation;
-  }
-};
-const mpHolistic = globalThis;
-
-const local = import.meta.url.split('/').slice(0, -1).join('/');
 const masque = await loadImage(`assets/masquerade.png`);
 const scalar = 25;
 
-// const masque = await loadImage(`assets/fawkes.png`);
-// const scalar = 30;
-
-export const MediapipeService = {
-  async holistic({image}) {
-    const realCanvas = Resources.get(image?.canvas);
-    return realCanvas ? Mediapipe.holistic(realCanvas) : {};
-  },
-  async faceMesh({image}) {
+export const FaceMeshService = {
+  async classify({image, target}) {
     const realCanvas = Resources.get(image?.canvas);
     let results = {};
     if (realCanvas) {
-      results = await Mediapipe.faceMesh(realCanvas);
+      results = await FaceMeshModel.faceMesh(realCanvas);
       results.image = {canvas: results?.canvas, stream: image?.stream, version: Math.random()};
     }
     return results;
@@ -109,7 +89,7 @@ export const MediapipeService = {
     if (faceLandmarks && realTarget && width && height) {
       Object.assign(realTarget, {width, height});
       const ctx = realTarget.getContext('2d');
-      Mediapipe.renderSticker(ctx, {faceLandmarks}, realSticker, index);
+      FaceMeshModel.renderSticker(ctx, {faceLandmarks}, realSticker, index);
     }
   },
   async renderFace({data, target}) {
@@ -119,36 +99,25 @@ export const MediapipeService = {
     if (faceLandmarks && realTarget && width && height) {
       Object.assign(realTarget, {width, height});
       const ctx = realTarget.getContext('2d');
-      Mediapipe.renderFace(ctx, {faceLandmarks});
+      FaceMeshModel.renderFace(ctx, {faceLandmarks});
     }
   },
   async renderHands({data, target}) {
     const realTarget = Resources.get(target);
     if (data && realTarget) {
       const ctx = realTarget.getContext('2d');
-      Mediapipe.renderHands(ctx, data);
+      FaceMeshModel.renderHands(ctx, data);
     }
   }
 };
 
-export const Mediapipe = {
-  async getSelfieSegmentation() {
-    await requireSelfieSegmentation();
-    const locateFile = file => `${local}/../../third_party/mediapipe/selfie_segmentation/${file}`;
-    const selfieSegmentation = new SelfieSegmentation({locateFile});
-    selfieSegmentation.setOptions({
-      modelSelection: 1 // 0=default, 1=landscape
-    });
-    Mediapipe.getSelfieSegmentation = () => selfieSegmentation;
-    return selfieSegmentation;
+export const FaceMeshModel = {
+  ...MediapipeClassifier,
+  async faceMesh(image) {
+    return this.classify(await this.getFaceMesh(), image);
   },
-  async selfieSegmentation(image) {
-    return this.classify(await Mediapipe.getSelfieSegmentation(), image);
-  },
-
   async getFaceMesh() {
     await requireFaceMesh();
-    const locateFile = file => `${local}/../../third_party/mediapipe/face_mesh/${file}`;
     const facemesh = new FaceMesh({locateFile});
     facemesh.setOptions({
       modelComplexity: 1, // 0, 1, 2
@@ -159,55 +128,9 @@ export const Mediapipe = {
       minDetectionConfidence: 0.5, // human detection thresholds
       minTrackingConfidence: 0.5
     });
-    Mediapipe.getFaceMesh = () => facemesh;
+    this.getFaceMesh = () => facemesh;
     return facemesh;
   },
-  async faceMesh(image) {
-    return this.classify(await Mediapipe.getFaceMesh(), image);
-  },
-  //
-  async getHolistic() {
-    await requireHolistic();
-    const locateFile = file => `${local}/../../third_party/mediapipe/holistic/${file}`;
-    const holistic = new Holistic({locateFile});
-    holistic.setOptions({
-      modelComplexity: 1, // 0, 1, 2
-      smoothLandmarks: true, // reduce jitter in landmarks
-      //enableSegmentation: true, // also produce segment mask
-      //smoothSegmentation: true, // reduce jitter in segment mask
-      //refineFaceLandmarks: true, // more detail in mouth and iris
-      minDetectionConfidence: 0.5, // human detection thresholds
-      minTrackingConfidence: 0.5
-    });
-    Mediapipe.getHolistic = () => holistic;
-    return holistic;
-  },
-  async holistic(image) {
-    return this.classify(await Mediapipe.getHolistic(), image);
-  },
-  //
-  async classify(classifier, testImage) {
-    if (Mediapipe.busy) {
-      return {};
-    }
-    // TODO(sjmiles): probably want some timeout protection to keep
-    // this from becoming stuck true in case of error
-    Mediapipe.busy = true;
-    const promise = new Promise(resolve => {
-      classifier.onResults(results => {
-        resolve(results);
-        Mediapipe.busy = false;
-      });
-      classifier.send({image: testImage});
-    });
-    //
-    const fullResults = await promise;
-    const {canvas, image, ...results} = fullResults;
-    return {
-      results: {...results, width: testImage.width, height: testImage.height}
-    };
-  },
-  //
   renderHands(ctx, {rightHandLandmarks, leftHandLandmarks}) {
     const radius = data => lerp(data.from.z, -0.15, .1, 10, 1);
     drawLandmarks(ctx, rightHandLandmarks, {

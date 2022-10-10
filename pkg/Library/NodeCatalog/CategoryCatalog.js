@@ -100,7 +100,7 @@ template: html`
     overflow-y: auto;
   }
   [category] {
-    width: 72px;
+    width: 96px;
     height: 72px;
     display: flex;
     flex-direction: column;
@@ -119,7 +119,7 @@ template: html`
     font-size: 14px;
     font-weight: 500;
     text-transform: capitalize;
-    padding: 4px 0;
+    padding: 4px 6px;
   }
   icon {
     font-size: 19px;

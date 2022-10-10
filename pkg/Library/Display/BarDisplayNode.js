@@ -6,7 +6,7 @@
 
  export const BarDisplayNode =  {
   $meta: {
-    id: 'BarDisplay',
+    id: 'BarDisplayNode',
     displayName: 'Bar Display',
     category: 'Output'
   },

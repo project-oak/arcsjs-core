@@ -8,25 +8,25 @@ export * from './BarDisplayNode.js';
 
 export const JsonViewer =  {
   $meta: {
-    id: 'json viewer',
+    id: 'JsonViewer',
     category: 'Output'
   },
   $stores: {
-    ClassifierResults: {
-      $type: '[ClassifierResults]',
+    json: {
+      $type: 'Pojo',
       connection: true,
       noinspect: true
     },
   },
   jsonDisplay: {
     $kind: '$library/Display/JsonViewer',
-    $inputs: [{classifierResults: 'ClassifierResults'}]
+    $inputs: [{classifierResults: 'json'}]
   }
 };
 
 export const OutputImage = {
   $meta: {
-    id: 'image viewer',
+    id: 'OutputImage',
     category: 'Output'
   },
   $stores: {

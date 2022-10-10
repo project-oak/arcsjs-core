@@ -7,7 +7,7 @@
 ({
 async initialize({index}, state, {service}) {
   state.target = await service({kind: 'MediaService', msg: 'allocateCanvas', data: {width: 640, height: 480}});
-  state.media = (msg, data) => service({kind: 'MediapipeService', msg, data});
+  state.faceMesh = (msg, data) => service({kind: 'FaceMeshService', msg, data});
 },
 shouldUpdate({data}) {
   return Boolean(data);
@@ -16,11 +16,11 @@ async update(inputs, state) {
   state.outputImage = await this.updateTarget(inputs, state);
   return {outputImage: state.outputImage};
 },
-async updateTarget({index, data: {results}, sticker}, {media, target}) {
+async updateTarget({index, data: {results}, sticker}, {faceMesh, target}) {
   sticker = sticker?.canvas;
   // TODO(sjmiles): use one 'media' call not two
-  await media('clear', {target});
-  await media('renderSticker', {data: results, target, sticker, index});
+  await faceMesh('clear', {target});
+  await faceMesh('renderSticker', {data: results, target, sticker, index});
   return {canvas: target, version: Math.random()};
 },
 render({data}, {outputImage}) {
