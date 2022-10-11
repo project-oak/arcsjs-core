@@ -1,6 +1,7 @@
 export const SelfieSegmentation = {
   $meta: {
-    displayName: 'SelfieSegmentation',
+    id: 'SelfieSegmentation',
+    displayName: 'Selfie Segmentation',
     description: 'Mediapipe SelfieSegmentation',
     category: 'Mediapipe',
     module: `# Detects face and corresponding landmarks.

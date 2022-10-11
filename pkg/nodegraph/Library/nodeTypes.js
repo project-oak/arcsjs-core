@@ -9,13 +9,16 @@
 
 // arcs library
 import * as customNodes from '../Library/Librarian/CustomNodes.js';
-import * as mediapipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
+//import * as mediapipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
 import * as newMediaNodes from '../../Library/NewMedia/Nodes/Nodes.js';
 import * as mobilenetNodes from '../../Library/Mobilenet/MobilenetNodes.js';
 import * as displayNodes from '../../Library/Display/DisplayNodes.js';
 import * as shaderNodes from '../../Library/Shader/ShaderNodes.js';
 import {ThreejsEditorNode} from '../../Library/Threejs/ThreejsEditorNode.js';
 import {JSONataNode} from '../../Library/JSONata/JSONataNode.js';
+import * as mediaPipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
+import * as tensorFlowNodes from '../../Library/TensorFlow/CocoSsdNode.js';
+
 // nodegraph library
 import * as nodeGraphNodes from './Nodes/NodeGraphNodes.js';
 import * as testNodes from './Nodes/TestNodes.js';
@@ -43,8 +46,10 @@ export const nodeTypes = {};
 
 const nodeTypesList = [
   ...values(newMediaNodes),
+  ...values(mediaPipeNodes),
+  ...values(tensorFlowNodes),
   RapsaiImagesNode,
-  ...values(mediapipeNodes),
+  //...values(mediapipeNodes),
   ...values(nodeGraphNodes),
   ...fieldNodes,
   ...values(miscNodes),

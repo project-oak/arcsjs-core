@@ -1,6 +1,7 @@
 export const FaceMesh = {
   $meta: {
-    displayName: 'FaceMesh',
+    id: 'FaceMesh',
+    displayName: 'Face Mesh',
     description: 'Mediapipe FaceMesh',
     category: 'Mediapipe',
     module: `# Detects face and corresponding landmarks.

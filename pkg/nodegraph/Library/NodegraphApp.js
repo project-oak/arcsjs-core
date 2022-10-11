@@ -11,7 +11,6 @@ import {LocalStoragePersistor} from '../../Library/LocalStorage/LocalStoragePers
 import {HistoryService} from '../../Library/App/HistoryService.js';
 import {MediaService} from '../../Library/NewMedia/MediaService.js';
 import {GoogleApisService} from '../../Library/Goog/GoogleApisService.js';
-// import {MediapipeService} from '../../Library/Mediapipe/MediapipeService.js';
 import {FaceMeshService} from '../../Library/Mediapipe/FaceMeshService.js';
 import {ThreejsService} from '../../Library/Threejs/ThreejsService.js';
 import {TensorFlowService} from '../../Library/TensorFlow/TensorFlowService.js';
@@ -29,7 +28,8 @@ export const NodegraphApp = class extends App {
     this.services = {
       HistoryService,
       MediaService,
-      ThreejsService, ShaderService, FaceMeshService,// MediapipeService,
+      ThreejsService, ShaderService,
+      FaceMeshService,
       TensorFlowService,
       GoogleApisService
     };

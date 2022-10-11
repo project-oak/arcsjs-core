@@ -1,6 +1,6 @@
 export const FaceMeshSticker = {
   $meta: {
-    //id: 'Mediapipe Face Sticker',
+    id: 'FaceMeshSticker',
     displayName: 'Face Sticker',
     description: 'Mediapipe Face Sticker',
     category: 'Mediapipe'
