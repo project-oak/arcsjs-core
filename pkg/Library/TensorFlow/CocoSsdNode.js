@@ -1,5 +1,6 @@
 export const CocoSsdNode = {
   $meta: {
+    id: 'CocoSsdNode',
     displayName: 'CocoSsd',
     description: 'TensorFlow CocoSsd',
     category: 'TensorFlow',

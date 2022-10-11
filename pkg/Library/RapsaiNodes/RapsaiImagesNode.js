@@ -16,7 +16,10 @@ export const RapsaiImagesNode = {
       $value: [
         'https://storage.googleapis.com/tfweb/testpics/pose1.jpg',
         'https://storage.googleapis.com/tfweb/testpics/dog.jpeg',
-        'https://storage.googleapis.com/tfweb/testpics/strawberry2.jpeg'
+        'https://storage.googleapis.com/tfweb/testpics/strawberry2.jpeg',
+        "https://arcsjs.web.app/assets/kitten.jpeg",
+        "https://arcsjs.web.app/assets/corgi.jpeg",
+        "https://arcsjs.web.app/assets/black-widow.jpeg",
       ]
     },
     selectedUrl: {

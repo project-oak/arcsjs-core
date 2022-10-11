@@ -1,6 +1,6 @@
 export const FaceMeshFace = {
   $meta: {
-    //id: 'Mediapipe Face',
+    id: 'FaceMeshFace',
     displayName: 'Face Display',
     description: 'Face Display',
     category: 'Mediapipe'
