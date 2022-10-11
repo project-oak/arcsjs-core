@@ -9,7 +9,6 @@
 
 // arcs library
 import * as customNodes from '../Library/Librarian/CustomNodes.js';
-//import * as mediapipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
 import * as newMediaNodes from '../../Library/NewMedia/Nodes/Nodes.js';
 import * as mobilenetNodes from '../../Library/Mobilenet/MobilenetNodes.js';
 import * as displayNodes from '../../Library/Display/DisplayNodes.js';
@@ -49,7 +48,6 @@ const nodeTypesList = [
   ...values(mediaPipeNodes),
   ...values(tensorFlowNodes),
   RapsaiImagesNode,
-  //...values(mediapipeNodes),
   ...values(nodeGraphNodes),
   ...fieldNodes,
   ...values(miscNodes),
