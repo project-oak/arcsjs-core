@@ -160,6 +160,7 @@ var init_Particle = __esm({
         return this.pipe?.service?.(request);
       }
       invalidateInputs() {
+        this.internal.$propChanged = true;
         this.invalidate();
       }
       invalidate() {
@@ -185,6 +186,7 @@ var init_Particle = __esm({
             log8.error(e);
           }
           this.internal.validator = null;
+          this.internal.$propChanged = false;
         }
       }
       validateInputs() {
