@@ -8,7 +8,8 @@ export * from './BarDisplayNode.js';
 
 export const JsonViewer =  {
   $meta: {
-    id: 'JsonViewer',
+    id: 'JsonViewerNode',
+    displayName: 'Json Viewer',
     category: 'Output'
   },
   $stores: {
@@ -26,7 +27,8 @@ export const JsonViewer =  {
 
 export const OutputImage = {
   $meta: {
-    id: 'OutputImage',
+    id: 'OutputImageNode',
+    displayName: 'Output Image',
     category: 'Output'
   },
   $stores: {

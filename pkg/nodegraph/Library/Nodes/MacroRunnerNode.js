@@ -24,7 +24,7 @@
       connection: true
     },
     results: {
-      $type: '[ClassifierResults]',
+      $type: 'Pojo',
       noinspect: true
     }
   },
