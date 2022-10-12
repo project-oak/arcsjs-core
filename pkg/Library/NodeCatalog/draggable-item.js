@@ -105,9 +105,8 @@ export class DraggableItem extends Xen.Async {
     // Get the distance between the item element and the top of the main
     // app container. This value will be used to position the popup panel that
     // shows the info the hovered item.
-    const offsetTop = this.host.host.offsetTop;
-    const scrollTop = this.host.host.parentElement.parentElement.scrollTop;
-    this.value = offsetTop - scrollTop;
+    const {top, left, width} = this.host.host.getBoundingClientRect();
+    this.value = {top, left: left + width};
     this.fire('enter');
   }
 
