@@ -9,12 +9,15 @@ update({selectedNodeTypes}, state) {
   state.nodeTypeList = values(selectedNodeTypes).sort(this.sortNodeTypes);
 },
 
-render({}, {nodeTypeList, showInfoPanel, infoPanelTop}) {
+render({}, {nodeTypeList, showInfoPanel, infoPanelPos}) {
   return {
     nodeTypes: this.renderNodeTypes(nodeTypeList),
     hideNoMatchedNodesLabel: nodeTypeList.length !== 0,
     showInfoPanel: String(Boolean(showInfoPanel)),
-    infoPanelContainerStyle: {top: `${infoPanelTop}px`}
+    infoPanelContainerStyle: {
+      top: `${infoPanelPos?.top || 0}px`,
+      left: `${infoPanelPos?.left || 0}px`
+    }
   };
 },
 
@@ -70,7 +73,7 @@ formatNodeId(id, index) {
 onHoverNodeType({eventlet: {key, value}, selectedNodeTypes}, state) {
   assign(state, {
     showInfoPanel: true,
-    infoPanelTop: value
+    infoPanelPos: value
   });
   return {
     hoveredNodeType: selectedNodeTypes[key],
@@ -149,7 +152,6 @@ template: html`
     position: fixed;
     background: white;
     z-index: 1000;
-    left: 250px;
     padding: 12px;
     box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 2px 6px 2px rgba(60, 64, 67, 0.15);
     border-radius: 8px;
