@@ -24,8 +24,14 @@ export class ContainerLayout extends DragDrop {
     this.boxer = this._dom.$('[boxer]');
     document.addEventListener('keydown', event => this.onKeydown(event));
   }
-  update() {
-    this.updateGeometry();
+  update(inputs, state) {
+    // De-dedup inputs to get rid of UI flashes (caused by rects being rendered
+    // in old positions right after being moved to a new position).
+    const inputsJson = JSON.stringify(inputs);
+    if (state.inputsJson !== inputsJson) {
+      state.inputsJson = inputsJson;
+      this.updateGeometry();
+    }
   }
   onKeydown(event) {
     if (!this.hasActiveInput()) {
@@ -86,11 +92,13 @@ export class ContainerLayout extends DragDrop {
       // Set initial position to (16, 16);
       const target = this.getChildById(id);
       if (target) {
-        if (!this.getRect(target)) {
-          const rect = {l: 16, t: 16, w: 240, h: 180};
-          this.setBoxStyle(target, rect);
-          // this.firePosition(target);
+        const rect = this.getRect(target);
+        if (rect.l === 0 && rect.t === 0) {
+          rect.l = 16;
+          rect.t = 16;
         }
+        this.setBoxStyle(target, rect);
+        this.firePosition(target);
       }
     } else {
       const child = this.getChildById(id);
