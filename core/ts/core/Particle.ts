@@ -260,6 +260,7 @@ export class Particle {
     return this.pipe?.service?.(request);
   }
   invalidateInputs() {
+    this.internal.$propChanged = true;
     this.invalidate();
   }
   // validate after the next microtask
@@ -296,6 +297,7 @@ export class Particle {
       }
       // nullify validator _after_ methods so state changes don't reschedule validation
       this.internal.validator = null;
+      this.internal.$propChanged = false;
     }
   }
   validateInputs() {
@@ -354,11 +356,9 @@ export class Particle {
     this.pipe?.output?.(data, this.maybeRender());
   }
   maybeRender() {
-    //this.log('maybeRender');
     if (this.template) {
       const {inputs, state} = this.internal;
       if (this.impl?.shouldRender?.(inputs, state) !== false) {
-        //this.log('render');
         if (this.implements('render')) {
           return this.impl.render(inputs, state);
         } else {
@@ -374,7 +374,7 @@ export class Particle {
       await this.asyncMethod(onhandler.bind(this.impl), {eventlet: data});
       this.internal.inputs.eventlet = null;
     } else {
-      //console.log(`[${this.id}] event handler [${handler}] not found`);
+      //this.log(`event handler [${handler}] not found`);
     }
   }
   async asyncMethod(asyncMethod, injections?) {
