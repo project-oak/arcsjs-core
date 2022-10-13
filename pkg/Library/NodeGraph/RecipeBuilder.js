@@ -149,17 +149,17 @@ buildStoreSpecs(node, nodeType, state) {
   const specs = {};
   state.storeMap = {};
   entries(nodeType.$stores).forEach(([name, store]) => {
+    state.storeMap[name] = [];
     if (store.connection) {
       const connections = node.connections?.[name];
       connections?.forEach(connection => {
         const storeId = this.constructStoreId(connection);
-        specs[storeId] = {$type: store.$type, connection: true};
-        state.storeMap[name] = storeId;
+        state.storeMap[name].push(storeId);
       });
     } else {
       const storeId = this.constructStoreId({from: node.id, storeName: name});
       specs[storeId] = this.buildStoreSpec(store, node.props?.[name], node);
-      state.storeMap[name] = storeId;
+      state.storeMap[name].push(storeId);
     }
   });
   return specs;
@@ -168,7 +168,8 @@ buildStoreSpecs(node, nodeType, state) {
 resolveGroup(bindings, storeMap) {
   return bindings?.map(coded => {
     const {key, binding} = this.decodeBinding(coded);
-    return {[key]: storeMap[binding || key]};
+    return storeMap[binding || key].map(
+        (store, index) => ({[`${key}${index === 0 ? '' : index}`]: store}));
   }).flat();
 },
 
