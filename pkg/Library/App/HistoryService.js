@@ -10,12 +10,21 @@
 import {Params} from './Params.js';
 
 export const HistoryService = {
-  retrieveSelectedPipeline() {
+  retrieveSelectedPipeline({keepParam}) {
     const pipeline = Params.getParam('pipeline');
-    Params.replaceUrlParam('pipeline', null);
+    if (!keepParam) {
+      Params.replaceUrlParam('pipeline', null);
+    }
     return pipeline;
   },
   setSelectedPipeline({pipeline}) {
     Params.setUrlParam('pipeline', pipeline);
+  },
+  generateAndCopyRunnerUrlForPipeline({pipeline}) {
+    const url = new URL(document.URL);
+    const runnerUrl =
+        `${url.origin}${url.pathname.replace('studio', 'runner')}?pipeline=${
+            pipeline.$meta.id}`;
+    navigator.clipboard.writeText(runnerUrl);
   }
 };

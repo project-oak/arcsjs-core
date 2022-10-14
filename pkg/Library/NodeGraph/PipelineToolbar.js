@@ -121,6 +121,7 @@
       showChooser: String(!renaming),
       showDeleteIcon: String(isOwned),
       showRefreshIcon,
+      showCopyPipelineUrlIcon: String(!isOwned),
       publishKeys,
       showPublish: String(isOwned && publishKeys.length > 0),
       showUnpublish: String(Boolean(pipeline?.$meta?.isPublished) && isOwned),
@@ -232,6 +233,13 @@
   findPipelineByName(name, pipelines) {
     return pipelines?.find(({$meta}) => $meta.name === name);
   },
+  async onCopyPipelineUrlClicked({pipeline}, state, {service}) {
+    await service({
+      kind: 'HistoryService',
+      msg: 'generateAndCopyRunnerUrlForPipeline',
+      data: {pipeline}
+    });
+  },
   onPublishPathChanged({eventlet: {value}}, state) {
     state.selectedPublishKey = value;
   },
@@ -273,6 +281,7 @@
   <mwc-icon-button title="Delete Pipeline" on-click="onDelete" icon="delete" display$="{{showDeleteIcon}}"></mwc-icon-button>
   <input rename type="text" value="{{name}}" display$="{{showRenameInput}}" autofocus on-change="onRename" on-blur="onRenameBlur">
   <mwc-icon-button title="Rename Pipeline" on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
+  <mwc-icon-button title="Copy Pipeline Url" on-click="onCopyPipelineUrlClicked" display$="{{showCopyPipelineUrlIcon}}" icon="link"></mwc-icon-button>
   <div column separator></div>
   <select title="Publish Target" display$="{{showPublish}}" on-change="onPublishPathChanged" repeat="option_t">{{publishKeys}}</select>
   <mwc-icon-button title="Publish Pipeline" on-click="onShare" icon="public" display$="{{showPublish}}"></mwc-icon-button>
