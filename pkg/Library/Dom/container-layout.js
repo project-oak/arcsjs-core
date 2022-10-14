@@ -126,10 +126,10 @@ export class ContainerLayout extends DragDrop {
   updateOrders(target) {
     const particleDivs = this.querySelectorAll('[particle]');
     particleDivs.forEach(div => {
-      if (!this.rects?.find(rect => rect.id === div.id)) {
+      if (!this.rects?.find(rect => rect.id === div.getAttribute('particle'))) {
         div.style.zIndex = 98;
       } else {
-        div.style.zIndex = (div === target ? 100 : 99);
+        div.style.zIndex = (div === target ? 101 : 100);
       }
     });
   }
@@ -231,7 +231,8 @@ export class ContainerLayout extends DragDrop {
   setBoxStyle(elt, {l, t, w, h}) {
     [l, t, w, h] = [l, t, w, h].map(Math.round);
     assign(elt.style, {
-      transform: `translate(${l}px, ${t}px)`,
+      left: `${l}px`,
+      top: `${t}px`,
       width: `${!(w>0) ? 0 : w}px`,
       height: `${!(h>0) ? 0 : h}px`
     });
@@ -271,7 +272,7 @@ export class ContainerLayout extends DragDrop {
     position: absolute;
     background-color: transparent;
     box-sizing: border-box;
-    transform: translate(-1000px, 0);
+    left: -1000px;
     z-index: 100;
   }
   [corner] {
