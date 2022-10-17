@@ -32,8 +32,9 @@ update(inputs, state) {
 },
 
 inputsChanged({pipeline, candidates}, state) {
+  // TODO(mariakleiner): for custom nodes, recompute connections, if nodeType changed.
   return pipeline &&
-      (this.pipelineChanged(pipeline, state.pipeline) || this.candidatesChanged(candidates, state.candidates))
+      (this.pipelineChanged(pipeline, state.pipeline) || this.candidatesChanged(candidates, state.candidates));
 },
 
 pipelineChanged(pipeline, oldPipeline) {
@@ -55,11 +56,14 @@ removeNodeOutdatedConnections(node, candidates) {
   let changed = false;
   keys(node.connections).forEach(key => {
     const conns = node.connections[key];
-    node.connections[key] = conns.filter(conn => this.hasMatchingCandidate(conn, candidates[key]));
-    if (node.connections[key].length === 0) {
-      delete node.connections[key];
+    const connCandidates = candidates[key];
+    if (connCandidates) {
+      node.connections[key] = conns.filter(conn => this.hasMatchingCandidate(conn, connCandidates));
+      if (node.connections[key].length === 0) {
+        delete node.connections[key];
+      }
+      changed = changed || (node.connections[key]?.length === values.length);
     }
-    changed = changed || (node.connections[key]?.length === values.length);
   });
   return changed;
 },

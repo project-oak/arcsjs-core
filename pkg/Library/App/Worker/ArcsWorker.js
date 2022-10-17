@@ -12,6 +12,7 @@ import {RecipeService} from '../RecipeService.js';
 import {StoreService} from '../StoreService.js';
 import {ComposerService} from '../ComposerService.js';
 import {JSONataService} from '../../JSONata/JSONataService.js';
+import {deepCopy} from '../../Core/utils.min.js';
 
 // n.b. lives in Worker context
 
@@ -164,6 +165,20 @@ const handlers = {
     // connect arc to runtime
     return user.addArc(realArc);
   },
+  
+  updateParticle: async ({particle, code, arc}) => {
+    await user.lateBindParticle(particle, code);
+    // Update corresponding hosts.
+    const realArc = getArc(arc);
+    const hosts = Object.values(realArc.hosts).filter(({meta}) => meta?.kind === particle);
+    for (const host of hosts) {
+      const inputsCopy = deepCopy(host.particle.internal.inputs);
+      await user.marshalParticle(host, host.meta);
+      host.particle.inputs = inputsCopy;
+    }
+    return true;
+  },
+
   createParticle: async ({name, arc, meta, code}) => {
     const realArc = getArc(arc);
     if (realArc) {

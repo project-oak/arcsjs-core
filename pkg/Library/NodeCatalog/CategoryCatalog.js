@@ -21,7 +21,7 @@ selectCategory(nodeTypes, category, search) {
 filter(nodeTypes, category, search) {
   const matchSearch = (name) => (!search || name.toLowerCase().includes(search.toLowerCase()));
   const selectedNodeTypes = {};
-  keys(nodeTypes)?.forEach(id => {
+  keys(nodeTypes).forEach(id => {
     const nodeType = nodeTypes[id];
     if (nodeType.$meta.category === category && matchSearch(nodeType.$meta.displayName || nodeType.$meta.id)) {
       selectedNodeTypes[id] = nodeType;

@@ -13,22 +13,27 @@ export const Librarian = {
     category: 'Custom'
   },
   $stores: {
-    particle: {
-      $type: '[Particle]',
-      // TODO(mariakleiner): if not inspected, changing in Designer/Runner doesn't affect the pipeline!
-      // noinspect: true
-      //
-    },
     nodeId: {
       $type: 'String',
       noinspect: true,
       nodisplay: true,
       value: 'node.id'
-    },  
+    },
+    selectedPipeline: {
+      $type: 'JSON',
+      connection: true,
+      noinspect: true,
+      nodisplay: true
+    },
   },
   customParticle: {
     $kind: '$app/Library/Librarian/CustomParticle',
-    $inputs: ['particle', 'nodeId'],
-    $outputs: ['particle']
+    $inputs: [
+      'nodeId',
+      {'pipeline': 'selectedPipeline'}
+    ],
+    $outputs: [
+      {'pipeline': 'selectedPipeline'}
+    ]
   }
 };

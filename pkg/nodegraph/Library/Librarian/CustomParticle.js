@@ -7,70 +7,53 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-initialize({}, state) {
-  state.particle = {code: '', html: ''};
-},
-async update({particle, nodeId}, state, tools) {
-  if (nodeId && particle && !deepEqual(particle, state.particle)) {
-    await this.destroyParticle(state, tools);
-    await this.addParticle(nodeId, particle, state, tools);
-    state.particle = particle;
-  }
-},
-onChanged({eventlet: {key, value}, particle}) {
-  return {particle: {...particle, [key]: value}};
-},
-render({}, state) {
-  return state.particle;
-},
-async destroyParticle({particleName: name}, {service}) {
-  if (name) {
-    return service({msg: 'destroyParticle', data: {name}});
-  }
-},
-async addParticle(nodeId, particle, state, {service}) {
-  const name = await service({msg: 'makeName'});
-  const code = this.packageParticleSource(particle);
-  const meta = {
-    ...this.getMeta(particle),
-    kind: name,
-    container: `${nodeId}_customParticle#canvas`
-  };
-  state.particleName = name;
-  return service({msg: 'addParticle', data: {name, meta, code}});
-},
-getMeta(props) {
-  try {
-    const userMeta = JSON.parse(`{${props.meta}}`);
-    return (typeof userMeta === 'object') ? {...userMeta} : null;
-  } catch(x) {
-    // warn user somehow
-  }
-  return null;
+
+async onCodeChanged({eventlet: {key, value}, pipeline, nodeId}) {
+  const custom = this.requireCustom(pipeline, nodeId);
+  custom[key] = value;
+  return {pipeline};
 },
 
-packageParticleSource(props) {
-  if (props) {
-    const {code, html} = props;
-    return `({
-      ${code ? `${code},` : ''}
-      ${html ? `template: html\`${html}\`` : ''}
-    });`;
+onSpecChanged({eventlet: {value}, pipeline, nodeId}) {
+  const custom = this.requireCustom(pipeline, nodeId);
+  try {
+    const spec = JSON.parse(value);
+    if (spec.$meta) {
+      assign(spec.$meta, {id: nodeId, category: 'Custom', custom: true});
+    }
+    custom.spec = spec;
+  } catch (e) {
+    log(`Failed parsing spec with error ${e}`);
   }
+  return {pipeline};
+},
+
+requireCustom(pipeline, nodeId) {
+  pipeline.custom ??= {};
+  pipeline.custom[nodeId] ??= {};
+  return pipeline.custom[nodeId];
+},
+
+async onUpdate() {},
+
+render({pipeline, nodeId}) {
+  if (pipeline?.custom?.[nodeId]) {
+    return this.renderCustom(pipeline.custom[nodeId]);
+  }
+},
+
+renderCustom({html, js, spec}) {
+  return {
+    html,
+    js,
+    specStr: JSON.stringify(spec, null, 2)
+  };
 },
 
 template: html`
 <style>
   :host {
     font-size: 0.75em;
-    /*
-    flex: none !important;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border-radius: 5px;
-    border: 1px solid gray;
-    */
     width: 320px;
     height: 240px;
     --mdc-icon-button-size: 24px;
@@ -87,13 +70,21 @@ template: html`
     background: #edaf22;
     padding: 0 0 2px 6px;
   }
+  [full] {
+    height: 100%;
+  }
 </style>
 
-<mxc-tab-pages flex tabs="Preview, Html, Js, Meta">
-  <div flex row frame="canvas"></div>
-  <code-mirror flex text="{{html}}" key="html" on-code-blur="onChanged"></code-mirror>
-  <code-mirror flex text="{{code}}" key="code" on-code-blur="onChanged"></code-mirror>
-  <code-mirror flex text="{{meta}}" key="meta" on-code-blur="onChanged"></code-mirror>
-</mxc-tab-pages>
+<div full>
+  <div bar>
+    <div flex></div>
+    <mwc-button raised on-click="onUpdate">Update</mwc-button>
+  </div>
+  <mxc-tab-pages flex full tabs="Html, Js, Meta">
+    <code-mirror flex text="{{html}}" key="html" on-code-blur="onCodeChanged"></code-mirror>
+    <code-mirror flex text="{{js}}" key="js" on-code-blur="onCodeChanged"></code-mirror>
+    <code-mirror flex text="{{specStr}}" on-code-blur="onSpecChanged"></code-mirror>
+  </mxc-tab-pages>
+</div>
 `
 });
