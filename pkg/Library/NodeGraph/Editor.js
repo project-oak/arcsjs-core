@@ -404,7 +404,14 @@ updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
   if (isSelected) {
     node.connections[toStore].push({from: fromKey, storeName: fromStore});
   } else {
-    delete node.connections[toStore];
+    if (node.connections[toStore].length <= 1) {
+      delete node.connections[toStore];
+    } else {
+      const index = node.connections[toStore].findIndex(conn => conn.from === fromKey);
+      if (index >= 0) {
+        node.connections[toStore].splice(index, 1);
+      }
+    }
   }
   pipeline.nodes[node.id] = node;
   return pipeline;
