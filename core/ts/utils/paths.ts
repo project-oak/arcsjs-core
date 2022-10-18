@@ -7,8 +7,6 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import { deepUndefinedToNull } from "./object";
-
 export const PathMapper = class {
   map: Record<string, unknown>;
   constructor(root: string) {
