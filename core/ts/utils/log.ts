@@ -11,7 +11,10 @@ import {logKinds, errKinds, LoggerFunction, AllLoggerFunctions, DebugLoggers, Er
 
 const {fromEntries} = Object;
 
-const _logFactory = (enable: boolean, preamble: string, bg: string, color: string, kind: keyof AllLoggerFunctions = 'log'): LoggerFunction => {
+const _logFactory = (enable: boolean|string, preamble: string, bg: string, color: string, kind: keyof AllLoggerFunctions = 'log'): LoggerFunction => {
+  if (typeof enable === 'string') {
+    enable = logFactory.flags[enable];
+  }
   if (!enable) {
     return () => {};
   }

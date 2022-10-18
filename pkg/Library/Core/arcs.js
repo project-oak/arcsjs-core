@@ -1,9 +1,5 @@
 var __defProp = Object.defineProperty;
-var __getOwnPropNames = Object.getOwnPropertyNames;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-};
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
@@ -12,280 +8,6 @@ var __publicField = (obj, key2, value) => {
   __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
   return value;
 };
-
-// js/core/Particle.js
-var Particle_exports = {};
-__export(Particle_exports, {
-  Particle: () => Particle,
-  ParticleApi: () => ParticleApi
-});
-var create4, assign2, keys5, values4, entries5, defineProperty, setPrototypeOf, scope, log8, timeout, nob2, storePrototype, ParticleApi, privateProperty, Particle;
-var init_Particle = __esm({
-  "js/core/Particle.js"() {
-    ({ create: create4, assign: assign2, keys: keys5, values: values4, entries: entries5, defineProperty, setPrototypeOf } = Object);
-    scope = globalThis["scope"] ?? {};
-    ({ log: log8, timeout } = scope);
-    nob2 = () => create4(null);
-    storePrototype = new class {
-      get empty() {
-        return this.length === 0;
-      }
-      get data() {
-        return this;
-      }
-      get pojo() {
-        return this.data;
-      }
-      get json() {
-        return JSON.stringify(this.pojo);
-      }
-      get pretty() {
-        return JSON.stringify(this.pojo, null, "  ");
-      }
-      get keys() {
-        return keys5(this.data);
-      }
-      get length() {
-        return keys5(this.data).length;
-      }
-      get values() {
-        return values4(this.data);
-      }
-      get entries() {
-        return entries5(this.data);
-      }
-      set(key2, value) {
-        this.data[key2] = value;
-      }
-      setByIndex(index, value) {
-        this.data[this.keys[index]] = value;
-      }
-      add(...values6) {
-        values6.forEach((value) => this.data[scope.makeKey()] = value);
-      }
-      push(...values6) {
-        this.add(...values6);
-      }
-      remove(value) {
-        entries5(this.data).find(([key2, entry]) => {
-          if (entry === value) {
-            delete this.data[key2];
-            return true;
-          }
-        });
-      }
-      has(key2) {
-        return this.data[key2] !== void 0;
-      }
-      get(key2) {
-        return this.getByKey(key2);
-      }
-      getByKey(key2) {
-        return this.data[key2];
-      }
-      getByIndex(index) {
-        return this.data[this.keys[index]];
-      }
-      delete(key2) {
-        delete this.data[key2];
-      }
-      deleteByIndex(index) {
-        delete this.data[this.keys[index]];
-      }
-      assign(dictionary) {
-        assign2(this.data, dictionary);
-      }
-      map(mapFunc) {
-        return this.values.map(mapFunc);
-      }
-      toString() {
-        return this.pretty;
-      }
-    }();
-    ParticleApi = class {
-      get template() {
-        return null;
-      }
-      shouldUpdate(inputs, state) {
-        return true;
-      }
-      async update(inputs, state, tools) {
-        return null;
-      }
-      shouldRender(inputs, state) {
-        return true;
-      }
-      render(inputs, state) {
-        return null;
-      }
-    };
-    privateProperty = (initialValue) => {
-      let value = initialValue;
-      return { get: () => value, set: (v) => value = v };
-    };
-    Particle = class {
-      pipe;
-      impl;
-      internal;
-      constructor(proto, pipe, beStateful) {
-        this.pipe = pipe;
-        this.impl = create4(proto);
-        defineProperty(this, "internal", privateProperty(nob2()));
-        this.internal.$busy = 0;
-        this.internal.beStateful = true;
-        this.internal.state = nob2();
-      }
-      get log() {
-        return this.pipe?.log || log8;
-      }
-      get template() {
-        return this.impl?.template;
-      }
-      get config() {
-        return {
-          template: this.template
-        };
-      }
-      set inputs(inputs) {
-        this.internal.inputs = inputs;
-        this.invalidateInputs();
-      }
-      get inputs() {
-        return this.internal.inputs;
-      }
-      get state() {
-        return this.internal.state;
-      }
-      async service(request) {
-        return this.pipe?.service?.(request);
-      }
-      invalidateInputs() {
-        this.internal.$propChanged = true;
-        this.invalidate();
-      }
-      invalidate() {
-        if (!this.internal.validator) {
-          this.internal.validator = timeout(this.validate.bind(this), 1);
-        }
-      }
-      async(fn) {
-        return Promise.resolve().then(fn.bind(this));
-      }
-      async validate() {
-        if (this.internal.validator) {
-          try {
-            this.internal.$validateAfterBusy = this.internal.$busy;
-            if (!this.internal.$busy) {
-              if (!this.internal.beStateful) {
-                this.internal.state = nob2();
-              }
-              this.internal.inputs = this.validateInputs();
-              await this.maybeUpdate();
-            }
-          } catch (e) {
-            log8.error(e);
-          }
-          this.internal.validator = null;
-          this.internal.$propChanged = false;
-        }
-      }
-      validateInputs() {
-        const inputs = assign2(nob2(), this.inputs);
-        entries5(inputs).forEach(([key2, value]) => {
-          if (value && typeof value === "object") {
-            if (!Array.isArray(value)) {
-              value = setPrototypeOf({ ...value }, storePrototype);
-            }
-            inputs[key2] = value;
-          }
-        });
-        return inputs;
-      }
-      implements(methodName) {
-        return typeof this.impl?.[methodName] === "function";
-      }
-      async maybeUpdate() {
-        if (await this.checkInit()) {
-          if (!this.canUpdate()) {
-            this.outputData(null);
-          }
-          if (await this.shouldUpdate(this.inputs, this.state)) {
-            this.update();
-          }
-        }
-      }
-      async checkInit() {
-        if (!this.internal.initialized) {
-          this.internal.initialized = true;
-          if (this.implements("initialize")) {
-            await this.asyncMethod(this.impl.initialize);
-          }
-        }
-        return true;
-      }
-      canUpdate() {
-        return this.implements("update");
-      }
-      async shouldUpdate(inputs, state) {
-        return !this.impl?.shouldUpdate || await this.impl.shouldUpdate(inputs, state) !== false;
-      }
-      update() {
-        this.asyncMethod(this.impl?.update);
-      }
-      outputData(data) {
-        this.pipe?.output?.(data, this.maybeRender());
-      }
-      maybeRender() {
-        if (this.template) {
-          const { inputs, state } = this.internal;
-          if (this.impl?.shouldRender?.(inputs, state) !== false) {
-            if (this.implements("render")) {
-              return this.impl.render(inputs, state);
-            } else {
-              return { ...inputs, ...state };
-            }
-          }
-        }
-      }
-      async handleEvent({ handler, data }) {
-        const onhandler = this.impl?.[handler];
-        if (onhandler) {
-          this.internal.inputs.eventlet = data;
-          await this.asyncMethod(onhandler.bind(this.impl), { eventlet: data });
-          this.internal.inputs.eventlet = null;
-        } else {
-        }
-      }
-      async asyncMethod(asyncMethod, injections) {
-        if (asyncMethod) {
-          const { inputs, state } = this.internal;
-          const stdlib = {
-            service: async (request) => this.service(request),
-            invalidate: () => this.invalidate(),
-            output: async (data) => this.outputData(data)
-          };
-          const task = asyncMethod.bind(this.impl, inputs, state, { ...stdlib, ...injections });
-          this.outputData(await this.try(task));
-          if (!this.internal.$busy && this.internal.$validateAfterBusy) {
-            this.invalidate();
-          }
-        }
-      }
-      async try(asyncFunc) {
-        this.internal.$busy++;
-        try {
-          return await asyncFunc();
-        } catch (e) {
-          log8.error(e);
-        } finally {
-          this.internal.$busy--;
-        }
-      }
-    };
-    scope.harden(globalThis);
-    scope.harden(Particle);
-  }
-});
 
 // js/core/EventEmitter.js
 var EventEmitter = class {
@@ -323,6 +45,9 @@ var errKinds = ["warn", "error"];
 // js/utils/log.js
 var { fromEntries } = Object;
 var _logFactory = (enable, preamble, bg, color, kind = "log") => {
+  if (typeof enable === "string") {
+    enable = logFactory.flags[enable];
+  }
   if (!enable) {
     return () => {
     };
@@ -337,9 +62,9 @@ var logFactory = (enable, preamble, bg = "", color = "") => {
   const debugLoggers = fromEntries(logKinds.map((kind) => [kind, _logFactory(enable, preamble, bg, color, kind)]));
   const errorLoggers = fromEntries(errKinds.map((kind) => [kind, _logFactory(true, preamble, bg, color, kind)]));
   const loggers = { ...debugLoggers, ...errorLoggers };
-  const log10 = loggers.log;
-  Object.assign(log10, loggers);
-  return log10;
+  const log8 = loggers.log;
+  Object.assign(log8, loggers);
+  return log8;
 };
 logFactory.flags = globalThis.config?.logFlags || {};
 
@@ -701,6 +426,7 @@ var Host = class extends EventEmitter {
   }
   onevent(eventlet) {
     this.arc?.onevent(eventlet);
+    this.fire("eventlet", eventlet);
   }
   installParticle(particle, meta) {
     if (this.particle) {
@@ -735,6 +461,7 @@ var Host = class extends EventEmitter {
     if (outputModel) {
       this.lastOutput = outputModel;
       this.arc?.assignOutputs(this, outputModel);
+      this.fire("output", outputModel);
     }
     if (this.template) {
       Decorator.maybeDecorateModel(renderModel, this.particle);
@@ -751,6 +478,7 @@ var Host = class extends EventEmitter {
     const { id, container, template } = this;
     const content = { model, template };
     const packet = { id, container, content };
+    this.fire("render", packet);
     this.arc?.render(packet);
     this.lastPacket = packet;
   }
@@ -969,9 +697,9 @@ var _Runtime = class extends EventEmitter {
   async bootstrapParticle(arc, id, meta) {
     const host = new Host(id);
     await this.marshalParticle(host, meta);
-    const promise = arc.addHost(host);
+    await arc.addHost(host);
     log2("bootstrapped particle", id);
-    return promise;
+    return host;
   }
   addSurface(id, surface) {
     this.surfaces[id] = surface;
@@ -995,7 +723,7 @@ var _Runtime = class extends EventEmitter {
   }
   async marshalParticle(host, particleMeta) {
     const particle = await this.createParticle(host, particleMeta.kind);
-    host.installParticle(particle, particleMeta);
+    return host.installParticle(particle, particleMeta);
   }
   async installParticle(arc, particleMeta, name) {
     this.log("installParticle", name, particleMeta, arc.id);
@@ -1008,8 +736,24 @@ var _Runtime = class extends EventEmitter {
     }
     const host = new Host(name);
     await this.marshalParticle(host, particleMeta);
-    arc.addHost(host);
+    await arc.addHost(host);
     return host;
+  }
+  async addParticle(arc, host, particleMeta, name) {
+    this.log("addParticle", arc.id, name, particleMeta, arc.id);
+    await this.marshalParticle(host, particleMeta);
+    await arc.addHost(host);
+    return host;
+  }
+  idFromName(name, list) {
+    let id = name || makeId();
+    if (list[id]) {
+      let n = 1;
+      for (; list[`${id}-${n}`]; n++)
+        ;
+      id = `${id}-${n}`;
+    }
+    return id;
   }
   addStore(storeId, store) {
     if (store.marshal) {
@@ -1081,7 +825,7 @@ var _Runtime = class extends EventEmitter {
   async createParticle(host, kind) {
     try {
       const factory = await this.marshalParticleFactory(kind);
-      return factory(host);
+      return factory?.(host);
     } catch (x) {
       log2.error(`createParticle(${kind}):`, x);
     }
@@ -1090,9 +834,16 @@ var _Runtime = class extends EventEmitter {
     return particleFactoryCache[kind] ?? this.lateBindParticle(kind);
   }
   lateBindParticle(kind, code) {
-    return _Runtime.registerParticleFactory(kind, _Runtime?.particleIndustry(kind, { ..._Runtime.particleOptions, code }));
+    const { particleOptions, particleIndustry, registerFactoryPromise } = _Runtime;
+    if (!particleIndustry) {
+      throw `no ParticleIndustry to create '${kind}'`;
+    } else {
+      const factoryPromise = particleIndustry(kind, { ...particleOptions, code });
+      registerFactoryPromise(kind, factoryPromise);
+      return factoryPromise;
+    }
   }
-  static registerParticleFactory(kind, factoryPromise) {
+  static registerFactoryPromise(kind, factoryPromise) {
     return particleFactoryCache[kind] = factoryPromise;
   }
   requireStore(meta) {
@@ -1240,7 +991,7 @@ var StoreCook = class {
       runtime.addStore(meta.name, store);
       if (store.shouldPersist()) {
         const cached = await store.restore();
-        value = cached === void 0 ? value : cached;
+        value = cached == null ? value : cached;
       }
     }
     if (value !== void 0) {
@@ -1332,6 +1083,16 @@ var Chef = class {
   }
 };
 
+// js/isolation/code.js
+var code_exports = {};
+__export(code_exports, {
+  fetchParticleCode: () => fetchParticleCode,
+  maybeFetchParticleCode: () => maybeFetchParticleCode,
+  pathForKind: () => pathForKind,
+  requireParticleBaseCode: () => requireParticleBaseCode,
+  requireParticleImplCode: () => requireParticleImplCode
+});
+
 // js/utils/paths.js
 var PathMapper = class {
   map;
@@ -1343,6 +1104,13 @@ var PathMapper = class {
     Object.assign(this.map, mappings || {});
   }
   resolve(path) {
+    let last;
+    do {
+      path = this._resolve(last = path);
+    } while (last !== path);
+    return path;
+  }
+  _resolve(path) {
     const bits = path.split("/");
     const top = bits.shift();
     const prefix = this.map[top] || top;
@@ -1379,19 +1147,8 @@ var Paths = globalThis["Paths"] = new PathMapper(root);
 Paths.add(globalThis.config?.paths);
 
 // js/isolation/code.js
-var log7 = logFactory(logFactory.flags.code, "code", "gold");
-var defaultParticleBasePath = "$arcs/js/core/Particle.js";
-var requireParticleBaseCode = async (sourcePath) => {
-  if (!requireParticleBaseCode.source) {
-    const path = Paths.resolve(sourcePath || defaultParticleBasePath);
-    log7("particle base code path: ", path);
-    const response = await fetch(path);
-    const moduleText = await response.text() + "\n//# sourceURL=" + path + "\n";
-    requireParticleBaseCode.source = moduleText.replace(/export /g, "");
-  }
-  return requireParticleBaseCode.source;
-};
-requireParticleBaseCode.source = null;
+var log7 = logFactory(logFactory.flags.code, "code", "gold", "#333");
+var defaultParticleBasePath = "$arcs/core/Particle.js";
 var requireParticleImplCode = async (kind, options) => {
   const code = options?.code || await fetchParticleCode(kind);
   return code.slice(code.indexOf("({"));
@@ -1406,7 +1163,11 @@ var maybeFetchParticleCode = async (kind) => {
   const path = pathForKind(kind);
   try {
     const response = await fetch(path);
-    return await response.text();
+    if (response.ok) {
+      return await response.text();
+    } else {
+      throw "";
+    }
   } catch (x) {
     log7.error(`could not locate implementation for particle "${kind}" [${path}]`);
   }
@@ -1423,132 +1184,17 @@ var pathForKind = (kind) => {
   }
   return "404";
 };
-
-// js/isolation/vanilla.js
-var log9 = logFactory(logFactory.flags.isolation, "vanilla", "goldenrod");
-var harden = (object) => object;
-globalThis.harden = harden;
-globalThis.scope = {
-  harden
-};
-var makeKey = () => `i${Math.floor((1 + Math.random() * 9) * 1e14)}`;
-var timeout2 = async (func, delayMs) => new Promise((resolve2) => setTimeout(() => resolve2(func()), delayMs));
-var initVanilla = (options) => {
-  try {
-    log9(deepEqual);
-    const utils = { log: log9, resolve, html, makeKey, deepEqual, timeout: timeout2 };
-    const scope2 = {
-      ...utils,
-      ...options?.injections
-    };
-    Object.assign(globalThis.scope, scope2);
-    Object.assign(globalThis, scope2);
-  } finally {
+var requireParticleBaseCode = async (sourcePath) => {
+  if (!requireParticleBaseCode.source) {
+    const path = Paths.resolve(sourcePath || defaultParticleBasePath);
+    log7("particle base code path: ", path);
+    const response = await fetch(path);
+    const moduleText = await response.text() + "\n//# sourceURL=" + path + "\n";
+    requireParticleBaseCode.source = moduleText.replace(/export /g, "");
   }
+  return requireParticleBaseCode.source;
 };
-var resolve = Paths.resolve.bind(Paths);
-var html = (strings, ...values6) => `${strings[0]}${values6.map((v, i) => `${v}${strings[i + 1]}`).join("")}`.trim();
-var createParticleFactory = async (kind, options) => {
-  const { Particle: Particle2 } = await Promise.resolve().then(() => (init_Particle(), Particle_exports));
-  const implFactory = await requireImplFactory(kind, options);
-  const log10 = createLogger(kind);
-  const injections = { log: log10, resolve, html, ...options?.injections };
-  const proto = implFactory(injections);
-  const particleFactory = (host) => {
-    const pipe = {
-      log: log10,
-      output: host.output.bind(host),
-      service: host.service.bind(host)
-    };
-    return new Particle2(proto, pipe, true);
-  };
-  return particleFactory;
-};
-var requireImplFactory = async (kind, options) => {
-  const implCode = await requireParticleImplCode(kind, options);
-  let factory = (0, eval)(implCode);
-  if (typeof factory === "object") {
-    factory = repackageImplFactory(factory, kind);
-    log9("repackaged factory:\n", factory);
-  }
-  return globalThis.harden(factory);
-};
-var { assign: assign3, keys: keys6, entries: entries6, values: values5, create: create5 } = Object;
-globalThis.SafeObject = {
-  create: create5,
-  assign: assign3,
-  keys(o) {
-    return o ? keys6(o) : [];
-  },
-  values(o) {
-    return o ? values5(o) : [];
-  },
-  entries(o) {
-    return o ? entries6(o) : [];
-  },
-  mapBy(a, keyGetter) {
-    return a ? values5(a).reduce((map, item) => (map[keyGetter(item)] = item, map), {}) : {};
-  }
-};
-var repackageImplFactory = (factory, kind) => {
-  const { constNames, rewriteConsts, funcNames, rewriteFuncs } = collectDecls(factory);
-  const proto = `{${[...constNames, ...funcNames]}}`;
-  const moduleRewrite = `
-({log, ...utils}) => {
-// protect utils
-globalThis.harden(utils);
-// these are just handy
-const {assign, keys, entries, values, create, mapBy} = globalThis.SafeObject;
-// declarations
-${[...rewriteConsts, ...rewriteFuncs].join("\n\n")}
-// hardened Object (map) of declarations,
-// suitable to be a prototype
-return globalThis.harden(${proto});
-// name the file for debuggers
-//# sourceURL=sandbox/${pathForKind(kind).split("/").pop()}
-};
-  `;
-  log9("rewritten:\n\n", moduleRewrite);
-  return (0, eval)(moduleRewrite);
-};
-var collectDecls = (factory) => {
-  const props = Object.entries(factory);
-  const isFunc = ([n, p]) => typeof p === "function";
-  const isForbidden = ([n, p]) => n == "harden" || n == "globalThis";
-  const funcs = props.filter((item) => isFunc(item) && !isForbidden(item));
-  const rewriteFuncs = funcs.map(([n, f]) => {
-    const code = f?.toString?.() ?? "";
-    const async2 = code.includes("async");
-    const body = code.replace("async ", "").replace("function ", "");
-    return `${async2 ? "async" : ""} function ${body};`;
-  });
-  const funcNames = funcs.map(([n]) => n);
-  const consts = props.filter((item) => !isFunc(item) && !isForbidden(item));
-  const rewriteConsts = consts.map(([n, p]) => {
-    return `const ${n} = \`${p}\`;`;
-  });
-  const constNames = consts.map(([n]) => n);
-  return {
-    constNames,
-    rewriteConsts,
-    funcNames,
-    rewriteFuncs
-  };
-};
-var createLogger = (kind) => {
-  const _log = logFactory(logFactory.flags.particles, kind, "#002266");
-  return (msg, ...args) => {
-    const stack = msg?.stack?.split("\n")?.slice(1, 2) || new Error().stack?.split("\n").slice(2, 3);
-    const where = stack.map((entry) => entry.replace(/\([^()]*?\)/, "").replace(/ \([^()]*?\)/, "").replace("<anonymous>, <anonymous>", "").replace("Object.", "").replace("eval at :", "").replace(/\(|\)/g, "").replace(/\[[^\]]*?\] /, "").replace(/at (.*) (\d)/, 'at "$1" $2')).reverse().join("\n").trim();
-    if (msg?.message) {
-      _log.error(msg.message, ...args, `(${where})`);
-    } else {
-      _log(msg, ...args, `(${where})`);
-    }
-  };
-};
-Runtime.particleIndustry = createParticleFactory;
-Runtime.securityLockdown = initVanilla;
+requireParticleBaseCode.source = null;
 
 // js/utils/utils.js
 var utils_exports = {};
@@ -1643,7 +1289,6 @@ export {
   Chef,
   DataStore,
   Decorator,
-  EventEmitter,
   Host,
   Parser,
   ParticleCook,
@@ -1651,13 +1296,8 @@ export {
   Runtime,
   Store,
   StoreCook,
-  fetchParticleCode,
-  initVanilla,
+  code_exports as code,
   logFactory2 as logFactory,
-  maybeFetchParticleCode,
-  pathForKind,
-  requireParticleBaseCode,
-  requireParticleImplCode,
   utils_exports as utils
 };
 /**

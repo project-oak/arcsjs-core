@@ -1,3 +1,6 @@
+import './dom.js';
+import './Xen/xen-async.js';
+import './multi-select.js';
 import './modal-view.js';
 import './fancy-image.js';
 import './multi-select.js';

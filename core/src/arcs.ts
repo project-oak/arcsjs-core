@@ -8,7 +8,7 @@
  */
 
 export * from '../js/Runtime.js';
-export * from '../js/core/EventEmitter.js';
+//export * from '../js/core/EventEmitter.js';
 export * from '../js/core/Store.js';
 export * from '../js/core/Arc.js';
 export * from '../js/core/Host.js';
@@ -17,8 +17,7 @@ export * from '../js/recipe/Chef.js';
 export * from '../js/recipe/ParticleCook.js';
 export * from '../js/recipe/StoreCook.js';
 export * from '../js/recipe/RecipeParser.js';
-export * from '../js/isolation/code.js';
-export * from '../js/isolation/vanilla.js';
+export * as code from '../js/isolation/code.js';
 
 import * as utils from '../js/utils/utils.js';
 const {logFactory, Paths} = utils;

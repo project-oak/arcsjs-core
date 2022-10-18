@@ -3,10 +3,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {logFactory} from '../core.js';
-
-const {config} = globalThis;
-const aeonPath = `/${config.aeon}`;
+import {logFactory} from '../Core/core.js';
 
 const log = logFactory(logFactory.flags.storage, 'storage', 'limegreen');
 const len = serial => !serial?.length ? 'n/a' : `${(serial.length/1024).toFixed(2)}Kb`;
@@ -16,7 +13,7 @@ export const Persistor = class {
     this.uid = uid;
   }
   get path() {
-    return `${this.uid}${aeonPath}`;
+    return `${this.uid}/${globalThis.config?.aeon || 'missing'}`;
   }
   getKey(id) {
     return `${this.path}/${id}`;

@@ -7,12 +7,6 @@
 import {Xen} from '../../Xen/xen-async.js';
 
 const template = Xen.Template.html`
-<!-- <style>
-  :host {
-    display: flex;
-  }
-</style>
-<slot></slot> -->
 `;
 
 export class PageGroup extends Xen.Async {

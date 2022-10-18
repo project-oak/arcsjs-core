@@ -17,7 +17,7 @@ const log = logFactory(logFactory.flags.isolation, 'vanilla', 'goldenrod');
 
 const harden = object => object;
 
-globalThis.harden = harden;
+//globalThis.harden = harden;
 globalThis.scope = {
   harden
 };
@@ -46,7 +46,7 @@ export const initVanilla = (options?) => {
 const resolve = Paths.resolve.bind(Paths);
 const html = (strings, ...values) => `${strings[0]}${values.map((v, i) => `${v}${strings[i + 1]}`).join('')}`.trim();
 
-const createParticleFactory = async (kind, options?) => {
+export const createParticleFactory = async (kind, options?) => {
   // ensure our canonical Particle class exists in the isolation chamber
   const {Particle} = await import('../core/Particle.js');
   //const Particle = await requireParticle();
@@ -79,7 +79,7 @@ const requireImplFactory = async (kind, options) => {
     factory = repackageImplFactory(factory, kind);
     log('repackaged factory:\n', factory);
   }
-  return globalThis.harden(factory);
+  return globalThis.harden?.(factory) ?? factory;
 };
 
 const {assign, keys, entries, values, create} = Object;

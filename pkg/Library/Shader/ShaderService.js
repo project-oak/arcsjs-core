@@ -3,7 +3,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {logFactory} from '../core.js';
+import {logFactory} from '../Core/core.js';
 import {uniformsFactory, fragmentShader} from './shader-tools.js';
 import {THREE} from '../Threejs/threejs-import.js';
 import {Resources} from '../App/Resources.js';

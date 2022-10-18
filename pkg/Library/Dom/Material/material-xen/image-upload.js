@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 import {Xen} from '../../Xen/xen-async.js';
-import {logFactory} from '../../../core.js';
+import {logFactory} from '../../../Core/core.js';
 
 const template = Xen.Template.html`
   <style>

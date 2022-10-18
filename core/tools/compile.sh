@@ -9,4 +9,6 @@
 #npm install --prefer-offline
 echo ':: npx tsc'
 npx tsc --build
+rm ../pkg/Library/Core/core/Particle.js
+cp ../core/js/core/Particle.js ../pkg/Library/Core/core/Particle.js
 echo ':: done.'

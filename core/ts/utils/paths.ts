@@ -7,6 +7,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
+import { deepUndefinedToNull } from "./object";
+
 export const PathMapper = class {
   map: Record<string, unknown>;
   constructor(root: string) {
@@ -17,6 +19,13 @@ export const PathMapper = class {
     Object.assign(this.map, mappings || {});
   }
   resolve(path) {
+    let last;
+    do {
+      path = this._resolve(last = path)
+    } while (last !== path);
+    return path;
+  }
+  _resolve(path) {
     const bits = path.split('/');
     const top = bits.shift();
     const prefix = this.map[top] || top;

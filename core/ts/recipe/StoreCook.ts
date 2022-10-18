@@ -59,7 +59,7 @@ export class StoreCook {
       runtime.addStore(meta.name, store);
       if (store.shouldPersist()) {
         const cached = await store.restore();
-        value = cached === undefined ? value : cached;
+        value = (cached == null) ? value : cached;
       }
     }
     if (value !== undefined) {

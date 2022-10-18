@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {utils} from '../core.js';
+import {utils} from '../Core/core.js';
 
 const resources = {};
 
