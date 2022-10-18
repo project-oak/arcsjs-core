@@ -8,7 +8,7 @@
  */
 
 export * from '../js/Runtime.js';
-//export * from '../js/core/EventEmitter.js';
+export * from '../js/core/EventEmitter.js';
 export * from '../js/core/Store.js';
 export * from '../js/core/Arc.js';
 export * from '../js/core/Host.js';
