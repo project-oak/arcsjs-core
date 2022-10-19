@@ -24,8 +24,6 @@ import * as testNodes from './Nodes/TestNodes.js';
 import * as miscNodes from './Nodes/MiscNodes.js';
 import * as baseFieldNodes from './FieldNodes/FieldNodes.js';
 import * as candyNodes from './Nodes/CandyNodes.js';
-// rapsai library
-import {RapsaiImagesNode} from './RapsaiNodes/RapsaiImagesNode.js';
 // backburner
 // import {SceneNode} from '../../Library/AFrame/SceneNode.js';
 

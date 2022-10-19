@@ -127,7 +127,6 @@ export const NodegraphRecipe = {
       },
       editor: {
         Editor: {
-          // $kind: 'https://rapsai-core.web.app/0.5.1/Library/Editor',
           // $kind: 'http://localhost:9876/Library/Editor',
           // $kind: '$library/NodeGraph/SimpleEditor',
           $kind: '$library/NodeGraph/Editor',

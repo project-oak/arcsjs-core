@@ -20,17 +20,10 @@ export * from '../../Library/Threejs/threejs-editor.js';
 // extract an absolute url to the folder 2 above here (counting the filename, aka 'nodegraph/')
 import {Paths} from '../../Library/Core/utils.min.js';
 const url = Paths.getAbsoluteHereUrl(import.meta, 2);
-//const url = globalThis.config.arcsPath;
-
-// remote libraries
-//const rapsai = `http://localhost:9876`;
-const rapsai = `https://rapsai-core.web.app/0.5.1`;
-await import(`${rapsai}/Library/input-image.js`);
 
 // calculate important paths
 export const paths = {
   $app: url,
-  $rapsai: rapsai,
   $config: `${url}/conf/config.js`,
   $library: `${url}/../Library`
 };
