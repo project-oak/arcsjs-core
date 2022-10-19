@@ -72,18 +72,19 @@ export class Runtime extends EventEmitter {
   serviceFactory(service) {
     return async (host, request) => service.handle(this, host, request);
   }
+  // TODO(sjmiles): duplication vis a vis `installParticle`
+  // used by? ... [ParticleCook.js]
   async bootstrapParticle(arc, id, meta: ParticleMeta) {
     // make a host
     const host = new Host(id);
     // make a particle
     await this.marshalParticle(host, meta);
     // add `host` to `arc`
-    const promise = arc.addHost(host);
+    await arc.addHost(host);
     // report
     log('bootstrapped particle', id);
     //log(host);
-    // we'll call you when it's ready
-    return promise;
+    return host;
   }
   // no-op surface mapping
   addSurface(id, surface) {
@@ -110,9 +111,11 @@ export class Runtime extends EventEmitter {
   // create a particle inside of host
   async marshalParticle(host, particleMeta: ParticleMeta) {
     const particle = await this.createParticle(host, particleMeta.kind);
-    host.installParticle(particle, particleMeta);
+    return host.installParticle(particle, particleMeta);
   }
   // create a host, install a particle, add host to arc
+  // TODO(sjmiles): duplication vis a vis `bootstrapParticle`
+  // used by? ... [ArcsWorker.js]
   async installParticle(arc, particleMeta: ParticleMeta, name?) {
     this.log('installParticle', name, particleMeta, arc.id);
     // provide a default name
@@ -126,8 +129,41 @@ export class Runtime extends EventEmitter {
     // build the structure
     const host = new Host(name);
     await this.marshalParticle(host, particleMeta);
-    arc.addHost(host);
+    await arc.addHost(host);
     return host;
+  }
+  // TODO(sjmiles): third version to rule them all; bring your own host
+  async addParticle(arc, host: Host, particleMeta: ParticleMeta, name?) {
+    this.log('addParticle', arc.id, name, particleMeta, arc.id);
+    await this.marshalParticle(host, particleMeta);
+    await arc.addHost(host);
+    return host;
+    // this.log('addParticle', name, particleMeta, arc.id);
+    // // provide a default name
+    // name = name || makeId();
+    // // deduplicate name
+    // if (arc.hosts[name]) {
+    //   let n = 1;
+    //   for (; (arc.hosts[`${name}-${n}`]); n++);
+    //   name = `${name}-${n}`;
+    // }
+    // // build the structure
+    // const host = new Host(name);
+    // await this.marshalParticle(host, particleMeta);
+    // await arc.addHost(host);
+    // return host;
+  }
+  idFromName(name, list) {
+    // provide a default name
+    let id = name || makeId();
+    // deduplicate name
+    if (list[id]) {
+      let n = 1;
+      for (; (list[`${id}-${n}`]); n++);
+      id = `${id}-${n}`;
+    }
+    // return unique id
+    return id;
   }
   // map a store by a Runtime-specific storeId
   // Stores have no intrinsic id
@@ -217,7 +253,7 @@ export class Runtime extends EventEmitter {
   protected async createParticle(host, kind): Promise<unknown> {
     try {
       const factory = await this.marshalParticleFactory(kind);
-      return factory(host);
+      return factory?.(host);
     } catch(x) {
       log.error(`createParticle(${kind}):`, x);
     }
@@ -226,9 +262,16 @@ export class Runtime extends EventEmitter {
     return particleFactoryCache[kind] ?? this.lateBindParticle(kind);
   }
   protected lateBindParticle(kind: string, code?: string): Promise<unknown> {
-    return Runtime.registerParticleFactory(kind, Runtime?.particleIndustry(kind, {...Runtime.particleOptions, code}));
+    const {particleOptions, particleIndustry, registerFactoryPromise} = Runtime;
+    if (!particleIndustry) {
+      throw `no ParticleIndustry to create '${kind}'`;
+    } else {
+      const factoryPromise = particleIndustry(kind, {...particleOptions, code});
+      registerFactoryPromise(kind, factoryPromise);
+      return factoryPromise;
+    }
   }
-  protected static registerParticleFactory(kind, factoryPromise: Promise<unknown>) {
+  protected static registerFactoryPromise(kind, factoryPromise: Promise<unknown>) {
     return particleFactoryCache[kind] = factoryPromise;
   }
   requireStore(meta: StoreMeta): Store|undefined {

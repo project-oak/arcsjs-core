@@ -17,6 +17,13 @@ export const PathMapper = class {
     Object.assign(this.map, mappings || {});
   }
   resolve(path) {
+    let last;
+    do {
+      path = this._resolve(last = path)
+    } while (last !== path);
+    return path;
+  }
+  _resolve(path) {
     const bits = path.split('/');
     const top = bits.shift();
     const prefix = this.map[top] || top;

@@ -3,7 +3,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Chef, ParticleCook, Parser} from '../core.js';
+import {Chef, ParticleCook, Parser} from '../Core/core.js';
 
 export const RecipeService = async (runtime, host, request) => {
   switch (request.msg) {

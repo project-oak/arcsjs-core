@@ -80,6 +80,7 @@ export class CodeMirrorElement extends Xen.Async {
   }
   onMirrorChanges() {
     if (!this.squelch) {
+      this.fire('input');
       this.fire('changes');
     }
   }

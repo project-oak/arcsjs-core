@@ -6,13 +6,14 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Paths, Runtime, Arc, Decorator, Chef, logFactory, utils} from '../../core.js';
+import {Paths, Runtime, Arc, Decorator, Chef, logFactory, utils} from '../../Core/core.js';
 import {MessageBus} from './MessageBus.js';
 import {RecipeService} from '../RecipeService.js';
 import {StoreService} from '../StoreService.js';
 import {ComposerService} from '../ComposerService.js';
 import {JSONataService} from '../../JSONata/JSONataService.js';
 import {deepCopy} from '../../Core/utils.min.js';
+import '../../Isolation/vanilla.js';
 
 // n.b. lives in Worker context
 
@@ -165,7 +166,7 @@ const handlers = {
     // connect arc to runtime
     return user.addArc(realArc);
   },
-  
+
   updateParticle: async ({particle, code, arc}) => {
     await user.lateBindParticle(particle, code);
     // Update corresponding hosts.

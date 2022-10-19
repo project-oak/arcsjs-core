@@ -6,7 +6,7 @@
  */
 export const RapsaiImagesNode = {
   $meta: {
-    id: 'RapsaiImages',
+    id: 'RapsaiImagesNode',
     displayName: 'Rapsai Images',
     category: 'Rapsai'
   },

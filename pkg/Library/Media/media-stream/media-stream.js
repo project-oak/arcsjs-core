@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 import {Xen} from '../../Dom/Xen/xen-async.js';
-import {logFactory} from '../../core.js';
+import {logFactory} from '../../Core/core.js';
 import {Resources} from '../../App/Resources.js';
 
 const sharedStreams = {};

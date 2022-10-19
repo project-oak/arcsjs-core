@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {Paths, Runtime, logFactory} from '../../arcsjs-core.js';
+import {Paths, Runtime, logFactory} from '../../Core/core.js';
 import {requireParticleBaseCode, requireParticleImplCode, pathForKind} from '../../arcsjs-core.js';
 
 import '../../third_party/ses/ses.umd.min.js';

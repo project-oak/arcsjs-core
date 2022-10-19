@@ -10,8 +10,27 @@
  * PSA: code in this file is subject to isolation restrictions, including runtime processing.
  * Particle module interfaces with 3p code, and is often loaded into isolation contexts.
 **/
-const { create, assign, keys, values, entries, defineProperty, setPrototypeOf } = Object;
-const scope = globalThis['scope'] ?? {};
+const { defineProperty, setPrototypeOf } = Object;
+const { create, assign, keys, values, entries, mapBy } = (() => {
+    const { assign, keys, entries, values, create } = Object;
+    return {
+        create,
+        assign,
+        keys(o) {
+            return o ? keys(o) : [];
+        },
+        values(o) {
+            return o ? values(o) : [];
+        },
+        entries(o) {
+            return o ? entries(o) : [];
+        },
+        mapBy(a, keyGetter) {
+            return a ? values(a).reduce((map, item) => (map[keyGetter(item)] = item, map), {}) : {};
+        }
+    };
+})();
+const scope = globalThis['scope'] ?? globalThis;
 const { log, timeout } = scope;
 const nob = () => create(null);
 // yay lambda, he gets a semi-colon ... named classes not so much
@@ -250,6 +269,7 @@ export class Particle {
         return this.pipe?.service?.(request);
     }
     invalidateInputs() {
+        this.internal.$propChanged = true;
         this.invalidate();
     }
     // validate after the next microtask
@@ -287,6 +307,7 @@ export class Particle {
             }
             // nullify validator _after_ methods so state changes don't reschedule validation
             this.internal.validator = null;
+            this.internal.$propChanged = false;
         }
     }
     validateInputs() {
@@ -345,11 +366,9 @@ export class Particle {
         this.pipe?.output?.(data, this.maybeRender());
     }
     maybeRender() {
-        //this.log('maybeRender');
         if (this.template) {
             const { inputs, state } = this.internal;
             if (this.impl?.shouldRender?.(inputs, state) !== false) {
-                //this.log('render');
                 if (this.implements('render')) {
                     return this.impl.render(inputs, state);
                 }
@@ -367,7 +386,7 @@ export class Particle {
             this.internal.inputs.eventlet = null;
         }
         else {
-            //console.log(`[${this.id}] event handler [${handler}] not found`);
+            //this.log(`event handler [${handler}] not found`);
         }
     }
     async asyncMethod(asyncMethod, injections) {
@@ -398,8 +417,8 @@ export class Particle {
         }
     }
 }
-scope.harden(globalThis);
-scope.harden(Particle);
+scope.harden?.(globalThis);
+scope.harden?.(Particle);
 // log('Any leaked values? Must pass three tests:');
 // try { globalThis['sneaky'] = 42; } catch(x) { log('sneaky test: pass'); }
 // try { Particle['foo'] = 42; } catch(x) { log('Particle.foo test: pass'); }

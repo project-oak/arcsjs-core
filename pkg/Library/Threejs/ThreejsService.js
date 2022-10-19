@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-import {logFactory} from '../core.js';
+import {logFactory} from '../Core/core.js';
 import {Resources} from '../App/Resources.js';
 import {loadImage} from '../Media/ImageLoader.js';
 import {THREE} from '../../third_party/threejs/threejs-import.js';

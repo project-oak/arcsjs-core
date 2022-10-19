@@ -53,6 +53,7 @@ export class Host extends EventEmitter {
   }
   onevent(eventlet) {
     this.arc?.onevent(eventlet);
+    this.fire('eventlet', eventlet);
   }
   // Particle and ParticleMeta are separate, host specifically integrates these on behalf of Particle
   installParticle(particle: Particle, meta?: ParticleMeta) {
@@ -88,6 +89,7 @@ export class Host extends EventEmitter {
     if (outputModel) {
       this.lastOutput = outputModel;
       this.arc?.assignOutputs(this, outputModel);
+      this.fire('output', outputModel);
     }
     if (this.template) {
       Decorator.maybeDecorateModel(renderModel, this.particle);
@@ -106,8 +108,10 @@ export class Host extends EventEmitter {
     const {id, container, template} = this;
     const content = {model, template};
     const packet = {id, container, content};
+    this.fire('render', packet);
     this.arc?.render(packet);
     this.lastPacket = packet;
+
   }
   set inputs(inputs) {
     if (this.particle && inputs) {

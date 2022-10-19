@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-import {Parser} from '../../../core.js';
+import {Parser} from '../../../Core/core.js';
 import {Xen} from '../../../Dom/Xen/xen-async.js';
 import {renderForceGraph, renderTreeGraph} from './d3-render.js';
 //import {TfjsRecipe} from '../../../../../tfjs/Library/TfjsRecipe.js';
