@@ -439,6 +439,4 @@ export class TensorFlowService  {
     Resources.set(tensorId, tensor);
     return tensorId;
   }
-  // TODO(jingjin): move rapsai specific functions to another service hosted in
-  // rapsai-core.
 }
