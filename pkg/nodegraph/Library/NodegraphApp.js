@@ -28,7 +28,8 @@ export const NodegraphApp = class extends App {
     this.services = {
       HistoryService,
       MediaService,
-      ThreejsService, ShaderService,
+      ThreejsService,
+      ShaderService,
       FaceMeshService,
       TensorFlowService,
       GoogleApisService
@@ -36,7 +37,6 @@ export const NodegraphApp = class extends App {
     this.userAssembly = [NodegraphRecipe];
     log('Welcome!');
   }
-
   // application service
   async onservice(runtime, host, {msg, data}) {
     switch (msg) {

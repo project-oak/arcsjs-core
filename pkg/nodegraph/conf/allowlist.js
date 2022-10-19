@@ -3,6 +3,8 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
+ import 'https://arcsjs.web.app/lib/corsFix.js';
+
 export * from '../../Library/TensorFlow/TensorFlow.js';
 export * from '../../Library/Core/utils.min.js';
 export * from '../../Library/App/surface-imports.js';
