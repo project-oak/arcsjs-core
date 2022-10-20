@@ -57,7 +57,7 @@ template: html`
 <!-- TODO(jingjin): Show drop down for suggestions -->
 <div search-container>
   <icon search>search</icon>
-  <input placeholder="Search nodes" on-input="onTextChanged" value="{{search}}"/>
+  <input placeholder="Search" on-input="onTextChanged" value="{{search}}"/>
   <icon clear hide$="{{hideClearSearchButton}}" on-click="onClearClick">
     close
   </icon>

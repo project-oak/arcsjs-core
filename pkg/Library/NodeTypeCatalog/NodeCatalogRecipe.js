@@ -9,10 +9,6 @@
 
 export const NodeCatalogRecipe = {
   $stores: {
-    selectedNodeTypes: {
-      $type: 'JSON',
-      noinspect: true
-    },
     nodeSearch: {
       $type: 'String',
     },
@@ -26,28 +22,23 @@ export const NodeCatalogRecipe = {
     }
   },
   NodeCatalog: {
-    $kind:'$library/NodeCatalog/NodeCatalog',
+    $kind:'$library/NodeTypeCatalog/NodeCatalog',
     $slots: {
       nodeSearch: {
         SearchBar: {
-          $kind: '$library/NodeCatalog/SearchBar',
+          $kind: '$library/NodeTypeCatalog/SearchBar',
           $inputs: [{'search': 'nodeSearch'}],
           $outputs: [{'search': 'nodeSearch'}]
         }
       },
-      categories: {
-        CategoryCatalog: {
-          $kind: '$library/NodeCatalog/CategoryCatalog',
-          $inputs: ['nodeTypes', 'categories', {'search': 'nodeSearch'}],
-          $outputs: ['selectedNodeTypes']
-        }
-      },
       nodetypes: {
         NodeList: {
-          $kind: '$library/NodeCatalog/NodeList',
+          $kind: '$library/NodeTypeCatalog/NodeList',
           $inputs: [
-            'selectedNodeTypes',
-            {pipeline: 'selectedPipeline'}
+            'nodeTypes',
+            'categories',
+            {pipeline: 'selectedPipeline'},
+            {'search': 'nodeSearch'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
@@ -56,8 +47,11 @@ export const NodeCatalogRecipe = {
           $slots: {
             typeInfo: {
               infoPanel: {
-                $kind: '$library/NodeCatalog/NodeTypeInfoPanel',
-                $inputs: [{nodeType: 'hoveredNodeType'}]
+                $kind: '$library/NodeTypeCatalog/NodeTypeInfoPanel',
+                $inputs: [
+                  {nodeType: 'hoveredNodeType'},
+                  'categories'
+                ]
               }
             }
           }

@@ -9,7 +9,7 @@
 
 import {nodeTypes, categories} from './nodeTypes.js';
 import {customInspectors} from './customInspectors.js';
-import {NodeCatalogRecipe} from '../../Library/NewCatalog/NodeCatalogRecipe.js';
+import {NodeCatalogRecipe} from '../../Library/NodeTypeCatalog/NodeCatalogRecipe.js';
 
 const globalStores = [
   'selectedNode',

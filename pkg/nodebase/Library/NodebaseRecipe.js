@@ -9,7 +9,7 @@
 
 import {nodeTypes} from './nodeTypes.js';
 import {PipelinesToolbar} from './PipelinesToolbar.js';
-import {NodeCatalogParticles, NodeCatalogStores} from '../../Library/NodeCatalog/NodeCatalogSpecs.js';
+import {NodeCatalogParticles, NodeCatalogStores} from '../../Library/NodeTypeCatalog/NodeCatalogSpecs.js';
 import {DeviceUxRecipe} from '../../Library/Media/DeviceUxRecipe.js';
 
 export const NodebaseRecipe = {

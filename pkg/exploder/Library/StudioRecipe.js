@@ -8,7 +8,7 @@
  */
 
 import {nodeTypes} from './nodeTypes.js';
-import {NodeCatalogRecipe} from '../../Library/NodeCatalog/NodeCatalogRecipe.js';
+import {NodeCatalogRecipe} from '../../Library/NodeTypeCatalog/NodeCatalogRecipe.js';
 
 const catalog = {
   ...NodeCatalogRecipe,

@@ -5,17 +5,61 @@
  */
 ({
 
-update({nodeTypes, search}, state) {
-  const matchSearch = (name) => (!search || name.toLowerCase().includes(search.toLowerCase()));
-  state.nodeTypeList = values(nodeTypes)
-      .sort(this.sortNodeTypes)
-      .filter(({$meta}) => matchSearch($meta.displayName || $meta.id));
+update(inputs, state) {
+  state.groups = this.groupByCategory(inputs);
 },
 
-render({}, {nodeTypeList, showInfoPanel, infoPanelPos}) {
+groupByCategory({nodeTypes, search, categories}) {
+  const matchSearch = (name) => (!search || name.toLowerCase().includes(search.toLowerCase()));
+  const groups = {};
+  values(nodeTypes).forEach(({$meta: {id, category, displayName}}) => {
+    if (matchSearch(displayName || id)) {
+      const group = this.requireGroup(category, groups, categories);
+      group.nodeTypes.push({
+        id,
+        displayName: displayName || id
+      });
+    }
+  });
+  values(groups).forEach(group => group.nodeTypes = group.nodeTypes.sort(this.sortNodeTypes));
+  return values(groups);
+},
+
+requireGroup(category, groups, categories) {
+  return groups[category] ?? this.createGroup(category, groups, categories);
+},
+
+createGroup(category, groups, categories) {
+  const group = {
+    category,
+    style: this.categoryStyle(category, categories),
+    nodeTypes: []
+  };
+  groups[category] = group;
+  return group;
+},
+
+categoryStyle(category, categories) {
+  const color = this.colorByCategory(category, categories);
+  const backgroundColor = this.bgColorByCategory(category, categories);
   return {
-    nodeTypes: this.renderNodeTypes(nodeTypeList),
-    hideNoMatchedNodesLabel: nodeTypeList.length !== 0,
+    backgroundColor,
+    borderTop: `1px solid ${color}` 
+  };
+},
+
+colorByCategory(category, categories) {
+  return categories?.[category]?.color || 'crimson';
+},
+
+bgColorByCategory(category, categories) {
+  return categories?.[category]?.bgColor || 'lightgrey';
+},
+
+render({}, {groups, showInfoPanel, infoPanelPos}) {
+  return {
+    groups,
+    hideNoMatchedNodesLabel: groups.length !== 0,
     showInfoPanel: String(Boolean(showInfoPanel)),
     infoPanelContainerStyle: {
       top: `${infoPanelPos?.top || 0}px`,
@@ -24,20 +68,8 @@ render({}, {nodeTypeList, showInfoPanel, infoPanelPos}) {
   };
 },
 
-renderNodeTypes(nodeTypeList) {
-  return nodeTypeList.map(this.renderNodeType.bind(this));
-},
-
-renderNodeType({$meta: {id, displayName}}) {
-  return {
-    id,
-    displayName: displayName || id
-  };
-},
-
-sortNodeTypes(t1, t2) {
-  const displayName = ({$meta: {id, displayName}}) => displayName || id;
-  return displayName(t1).toLowerCase().localeCompare(displayName(t2).toLowerCase());
+sortNodeTypes({displayName}, {displayName: otherDisplayName}) {
+  return displayName.toLowerCase().localeCompare(otherDisplayName.toLowerCase());
 },
 
 async onItemClick({eventlet: {key}, nodeTypes, pipeline}) {
@@ -155,24 +187,35 @@ template: html`
     position: fixed;
     background: white;
     z-index: 1000;
-    padding: 12px;
     box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 2px 6px 2px rgba(60, 64, 67, 0.15);
     border-radius: 8px;
+    min-width: 200px;
     max-width: 320px;
   }
   nodetype-info-panel {
     display: none;
   }
+  [category] {
+    padding-left: 10px;
+    /* border-top: 1px solid var(--nodelist-container-fg); */
+  }
 </style>
 
 <div nodetypes-container>
-  <div repeat="nodetype_t">{{nodeTypes}}</div>
+  <div repeat="group_t">{{groups}}</div>
   <div no-matched-nodes hide$="{{hideNoMatchedNodesLabel}}">No matched nodes</div>
 </div>
 
 <div info-panel-container xen:style="{{infoPanelContainerStyle}}" display$="{{showInfoPanel}}">
   <div frame="typeInfo"></div>
 </div>
+
+<template group_t>
+  <div>
+    <div category xen:style="{{style}}">{{category}}</div>
+    <div repeat="nodetype_t">{{nodeTypes}}</div>
+  </div>
+</template>
 
 <template nodetype_t>
   <draggable-item key="{{id}}" name="{{displayName}}"
