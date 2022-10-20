@@ -28,7 +28,7 @@ template: html`
   }
   [search-container] {
     position: relative;
-    background-color: var(--theme-color-bg-0);
+    background-color: var(--theme-color-bg-2);
     color: var(--theme-color-fg-0);
     display: flex;
     align-items: center;
@@ -38,7 +38,7 @@ template: html`
   [search-container] input {
     width: 100%;
     height: 40px;
-    border-radius: 20px;
+    border-radius: 5px;
     border: none;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
     padding: 0 40px 0 40px;
@@ -57,7 +57,7 @@ template: html`
 <!-- TODO(jingjin): Show drop down for suggestions -->
 <div search-container>
   <icon search>search</icon>
-  <input placeholder="Search nodes" on-input="onTextChanged" value="{{search}}"/>
+  <input placeholder="Search" on-input="onTextChanged" value="{{search}}"/>
   <icon clear hide$="{{hideClearSearchButton}}" on-click="onClearClick">
     close
   </icon>

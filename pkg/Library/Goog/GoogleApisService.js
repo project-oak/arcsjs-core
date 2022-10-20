@@ -4,7 +4,8 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import * as urls from 'https://arcsjs.web.app/lib/apiUrls.js';
+// import * as urls from 'https://arcsjs.web.app/lib/apiUrls.js';
+const urls = {};
 
 export class GoogleApisService {
   static async fetch(url) {

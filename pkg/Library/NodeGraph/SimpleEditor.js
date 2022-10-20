@@ -6,182 +6,182 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
- ({
-  catalogDelimiter: '$$',
+({
+catalogDelimiter: '$$',
 
-  update({pipeline, selectedNodeId}, state) {
-    if (pipeline?.$meta?.name !== state.selectedPipelineName) {
-      state.selectedPipelineName = pipeline?.$meta.name;
-      selectedNodeId = null;
-    }
-    if (!selectedNodeId && keys(pipeline?.nodes).length) {
-      selectedNodeId = keys(pipeline.nodes)[0];
-    }
-    return {selectedNodeId};
-  },
+update({pipeline, selectedNodeId}, state) {
+  if (pipeline?.$meta?.name !== state.selectedPipelineName) {
+    state.selectedPipelineName = pipeline?.$meta.name;
+    selectedNodeId = null;
+  }
+  if (!selectedNodeId && keys(pipeline?.nodes).length) {
+    selectedNodeId = keys(pipeline.nodes)[0];
+  }
+  return {selectedNodeId};
+},
 
-  render({pipeline, nodeTypes, categories, selectedNodeId}) {
+render({pipeline, nodeTypes, categories, selectedNodeId}) {
+  return {
+    graphNodes: this.renderGraphNodes(pipeline?.nodes, selectedNodeId, nodeTypes, categories),
+  };
+},
+
+renderGraphNodes(nodes, selectedNodeId, nodeTypes, categories) {
+  const graph = {name: 'pipeline', children: []};
+  const graphNodes = values(nodes).map(node => {
+    const nodeType = nodeTypes[node.type];
+    const category = nodeType?.$meta?.category;
     return {
-      graphNodes: this.renderGraphNodes(pipeline?.nodes, selectedNodeId, nodeTypes, categories),
+      key: node.id,
+      name: node.displayName,
+      color: this.colorByCategory(category, categories),
+      bgColor: this.bgColorByCategory(category, categories),
+      strokeWidth: node.id == selectedNodeId ? 3 : 1,
+      conn: this.renderConnections(node),
+      children: []
     };
-  },
-
-  renderGraphNodes(nodes, selectedNodeId, nodeTypes, categories) {
-    const graph = {name: 'pipeline', children: []};
-    const graphNodes = nodes?.map(node => {
-      const nodeType = nodeTypes[node.type];
-      const category = nodeType?.$meta?.category;
-      return {
-        key: node.id,
-        name: node.displayName,
-        color: this.colorByCategory(category, categories),
-        bgColor: this.bgColorByCategory(category, categories),
-        strokeWidth: node.id == selectedNodeId ? 3 : 1,
-        conn: this.renderConnections(node),
-        children: []
-      };
-    });
-    graphNodes?.forEach(gn => {
-      const parent = (gn.conn && graphNodes.find(p => p.key === gn.conn)) || graph;
-      parent.children.push(gn);
-    });
-    return graph;
-  },
-
-  colorByCategory(category, categories) {
-    return categories?.[category]?.color || 'crimson';
-  },
-
-  bgColorByCategory(category, categories) {
-    return categories?.[category]?.bgColor || 'lightgrey';
-  },
-
-  renderConnections(node) {
-    const connections = values(node.connections)?.[0];
-    return connections?.[0]?.from;
-  },
-
-  onNodeRemove({eventlet: {key}, pipeline, selectedNodeId}) {
-    delete pipeline.nodes[key];
-    return {
-      pipeline,
-      selectedNodeId: key === selectedNodeId ? null : selectedNodeId
-    };
-  },
-
-  updateConnectionCandidates(node, name, candidates) {
-    return {
-      ...node,
-      connections: {
-        ...node.connections,
-        [name]: {
-          ...node.connections[name],
-          candidates
-        }
-      }
-    };
-  },
-
-  onNodeSelect({eventlet: {key}}) {
-    return {selectedNodeId: key};
-  },
-
-  onDrop({eventlet: {value}, pipeline, nodeTypes}) {
-    if (pipeline) {
-      const newNode = this.makeNewNode(value, pipeline, nodeTypes);
-      pipeline.nodes[newNode.id] = this.makeNewNode(value, pipeline, nodeTypes);
-      return {pipeline};
-    }
-  },
-
-  makeNewNode(id, pipeline, nodeTypes) {
-    const {displayName} = nodeTypes[id].$meta;
-    const index = this.indexNewNode(id, pipeline.nodes);
-    return {
-      type: id,
-      index,
-      id: this.formatNodeId(id, index),
-      displayName: this.displayName(displayName || id, index)
-    };
-  },
-
-  indexNewNode(id, nodes) {
-    const typedNodes = values(nodes).filter(node => id === node.type);
-    return (typedNodes.pop()?.index || 0) + 1;
-  },
-
-  displayName(name, index) {
-    const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
-    return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
-  },
-
-  formatNodeId(id, index) {
-    return `${id}${index}`.replace(/ /g,'');
-  },
-
-  onDeleteAll({pipeline}) {
-    pipeline.nodes = {};
-    return {
-      pipeline,
-      selectedNodeId: null
-    };
-  },
-
-  template: html`
-  <style>
-    :host {
-      color: black;
-      background-color: var(--theme-color-bg-1);
-      display: block;
-      height: 100%;
-      font-size: 12px;
-      --edge-border: 1px solid #555;
-      --mdc-icon-size: 18px;
-      --mdc-icon-button-size: 26px;
-    }
-    mwc-icon-button {
-      color: #555;
-    }
-    [node] {
-      border: var(--edge-border);
-      background: #fdfdfd;
-      cursor: pointer;
-      margin: 14px 20px;
-      min-width: 100px;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    [node][selected] {
-      margin: 12px 18px;
-      border-width: 3px;
-    }
-    [category="input"] {
-      background-color: #e9f2e4;
-      border-color: green;
-    }
-    [category="model"] {
-      background-color: #fbe5c2;
-      border-color: orange;
-    }
-    [category="effect"] {
-      background-color: #e7d2fc;
-      border-color: purple;
-    }
-    [category="output"] {
-      background-color: #c8d8f5;
-      border-color: blue;
-    }
-    [category="misc"] {
-      background-color: lightgrey;
-      border-color: grey;
-    }
-  </style>
-  <!-- <div toolbar>
-    <span flex></span>
-    <mwc-icon-button on-click="onDeleteAll" icon="delete_forever"></mwc-icon-button>
-  </div> -->
-  <drop-target flex grid scrolling on-target-drop="onDrop">
-    <node-graph nodes="{{graphNodes}}" on-select="onNodeSelect" on-delete="onNodeRemove"></node-graph>
-  </drop-target>
-  `
   });
+  graphNodes?.forEach(gn => {
+    const parent = (gn.conn && graphNodes.find(p => p.key === gn.conn)) || graph;
+    parent.children.push(gn);
+  });
+  return graph;
+},
+
+colorByCategory(category, categories) {
+  return categories?.[category]?.color || 'crimson';
+},
+
+bgColorByCategory(category, categories) {
+  return categories?.[category]?.bgColor || 'lightgrey';
+},
+
+renderConnections(node) {
+  const connections = values(node.connections)?.[0];
+  return connections?.[0]?.from;
+},
+
+onNodeRemove({eventlet: {key}, pipeline, selectedNodeId}) {
+  delete pipeline.nodes[key];
+  return {
+    pipeline,
+    selectedNodeId: key === selectedNodeId ? null : selectedNodeId
+  };
+},
+
+updateConnectionCandidates(node, name, candidates) {
+  return {
+    ...node,
+    connections: {
+      ...node.connections,
+      [name]: {
+        ...node.connections[name],
+        candidates
+      }
+    }
+  };
+},
+
+onNodeSelect({eventlet: {key}}) {
+  return {selectedNodeId: key};
+},
+
+onDrop({eventlet: {value}, pipeline, nodeTypes}) {
+  if (pipeline) {
+    const newNode = this.makeNewNode(value, pipeline, nodeTypes);
+    pipeline.nodes[newNode.id] = this.makeNewNode(value, pipeline, nodeTypes);
+    return {pipeline};
+  }
+},
+
+makeNewNode(id, pipeline, nodeTypes) {
+  const {displayName} = nodeTypes[id].$meta;
+  const index = this.indexNewNode(id, pipeline.nodes);
+  return {
+    type: id,
+    index,
+    id: this.formatNodeId(id, index),
+    displayName: this.displayName(displayName || id, index)
+  };
+},
+
+indexNewNode(id, nodes) {
+  const typedNodes = values(nodes).filter(node => id === node.type);
+  return (typedNodes.pop()?.index || 0) + 1;
+},
+
+displayName(name, index) {
+  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
+  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
+},
+
+formatNodeId(id, index) {
+  return `${id}${index}`.replace(/ /g,'');
+},
+
+onDeleteAll({pipeline}) {
+  pipeline.nodes = {};
+  return {
+    pipeline,
+    selectedNodeId: null
+  };
+},
+
+template: html`
+<style>
+  :host {
+    color: black;
+    background-color: var(--theme-color-bg-1);
+    display: block;
+    height: 100%;
+    font-size: 12px;
+    --edge-border: 1px solid #555;
+    --mdc-icon-size: 18px;
+    --mdc-icon-button-size: 26px;
+  }
+  mwc-icon-button {
+    color: #555;
+  }
+  [node] {
+    border: var(--edge-border);
+    background: #fdfdfd;
+    cursor: pointer;
+    margin: 14px 20px;
+    min-width: 100px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  [node][selected] {
+    margin: 12px 18px;
+    border-width: 3px;
+  }
+  [category="input"] {
+    background-color: #e9f2e4;
+    border-color: green;
+  }
+  [category="model"] {
+    background-color: #fbe5c2;
+    border-color: orange;
+  }
+  [category="effect"] {
+    background-color: #e7d2fc;
+    border-color: purple;
+  }
+  [category="output"] {
+    background-color: #c8d8f5;
+    border-color: blue;
+  }
+  [category="misc"] {
+    background-color: lightgrey;
+    border-color: grey;
+  }
+</style>
+<!-- <div toolbar>
+  <span flex></span>
+  <mwc-icon-button on-click="onDeleteAll" icon="delete_forever"></mwc-icon-button>
+</div> -->
+<drop-target flex grid scrolling on-target-drop="onDrop">
+  <node-graph nodes="{{graphNodes}}" on-select="onNodeSelect" on-delete="onNodeRemove"></node-graph>
+</drop-target>
+`
+});

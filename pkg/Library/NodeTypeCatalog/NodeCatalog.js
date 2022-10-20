@@ -22,7 +22,7 @@ template: html`
 
 <div frame="nodeSearch"></div>
 <div container>
-  <div frame="categories"></div>
+  <!-- <div frame="categories"></div> -->
   <div frame="nodetypes"></div>
 </div>
 `

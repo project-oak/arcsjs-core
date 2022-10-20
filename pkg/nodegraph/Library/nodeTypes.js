@@ -45,7 +45,6 @@ const nodeTypesList = [
   ...values(newMediaNodes),
   ...values(mediaPipeNodes),
   ...values(tensorFlowNodes),
-  RapsaiImagesNode,
   ...values(nodeGraphNodes),
   ...fieldNodes,
   ...values(miscNodes),
