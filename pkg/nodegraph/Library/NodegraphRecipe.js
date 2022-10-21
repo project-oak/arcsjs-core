@@ -252,6 +252,6 @@ export const NodegraphRecipe = {
   combiner: {
     $kind: '$library/NodeGraph/NodeTypesCombiner',
     $inputs: ['builtinNodeTypes', 'selectedPipeline'],
-    $outputs: [{results: 'nodeTypes'}]
+    $outputs: [{results: 'nodeTypes'}, 'selectedPipeline']
   }
 };
