@@ -20,31 +20,50 @@ export class NodeGraph extends Xen.Async {
   }
   _didMount() {
     this.canvas = this.querySelector('canvas');
+    this.rects = {};
   }
   onNodeClick(event) {
     //event.stopPropagation();
     this.key = event.currentTarget.key;
     this.fire('node-selected');
   }
-  geom(i) {
-    const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
-    const p = i => ({
-      x: (i%cols)*(width+margin) + ox,
-      y: Math.floor(i/cols)*(height+margin) + margin*(i%2) + oy
-    });
-    const o = p(i);
-    const [w, h, w2, h2] = [width, height, width/2, height/2];
-    return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
-    //return {x: o.x - width/2, y: o.y - height/2, width, height};
+  onUpdateBox({currentTarget: {value: rect}}) {
+    this.rects[this.key] = rect;
+    this.invalidate();
+  }
+  geom(key, i) {
+    if (this.rects[key]) {
+      const {l, t, w, h} = this.rects[key];
+      const [w2, h2] = [w/2, h/2];
+      return {x: l+w2, y: t+h2, l, t, r: l+w, b: t+h, w, h, w2, h2};
+    } else {
+      const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
+      const p = i => ({
+        x: (i%cols)*(width+margin) + ox,
+        y: Math.floor(i/cols)*(height+margin) + margin*(i%2) + oy
+      });
+      const o = p(i);
+      const [w, h, w2, h2] = [width, height, width/2, height/2];
+      return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
+    }
   }
   render({graph}, {x, y}) {
     const getEdgePath = ({x:startX, y:startY}, {x:endX, y:endY}) => {
-      return [
-        startX, startY,
-        startX + (endX - startX) / 2, startY,
-        endX - (endX - startX) / 2, endY,
-        endX, endY
-      ];
+      // if (startX < endX) {
+        return [
+          startX, startY,
+          startX + (endX - startX) / 2, startY,
+          endX - (endX - startX) / 2, endY,
+          endX, endY
+        ];
+      // } else {
+      //   return [
+      //     startX, startY - 50,
+      //     startX + (endX - startX) / 2, startY,
+      //     endX - (endX - startX) / 2, endY,
+      //     endX, endY + 50
+      //   ];
+      // }
     };
     const ctx = this.canvas?.getContext('2d');
     if (ctx) {
@@ -65,9 +84,9 @@ export class NodeGraph extends Xen.Async {
         ctx.fill();
       };
       //const p = i => ({x: (i%cols)*width + margin + ox, y: Math.floor(i/cols)*height + margin + (margin*8)*(i%2) + oy});
-      const radius = 16;
+      //const radius = 16;
       graph?.graphNodes.map((n, i) => {
-        const g0 = this.geom(i);
+        const g0 = this.geom(n.key, i);
         ctx.strokeStyle = ['red', 'green', 'blue'][i%3];
         // this.roundedRect(ctx, g0.l, g0.t, g0.w, g0.h, radius);
         // ctx.fillStyle = n.bgColor;
@@ -75,7 +94,7 @@ export class NodeGraph extends Xen.Async {
         // ctx.strokeStyle = n.color;
         // ctx.stroke();
         //
-        const g1 = this.geom(i+1)
+        const g1 = this.geom(null, i+1)
         const p0 = {x: g0.r, y: g0.y};
         const p1 = {x: g1.l, y: g1.y};
         const path = getEdgePath(p0, p1);
@@ -98,7 +117,7 @@ export class NodeGraph extends Xen.Async {
     //console.log(graph);
     return {
       nodes: graph?.graphNodes.map((n, i) => {
-        const g = this.geom(i);
+        const g = this.geom(n.key, i);
         return {
           ...n,
           style: {
@@ -172,7 +191,11 @@ const template = Xen.Template.html`
   }
   /**/
   [layer0] {
-    position: relative;
+    position: absolute;
+    inset: 0;
+  }
+  [layer0] > * {
+    position: absolute;
     inset: 0;
   }
   [layer1] {
@@ -181,28 +204,22 @@ const template = Xen.Template.html`
   }
 </style>
 
-<div layer0 repeat="node_t">{{nodes}}</div>
+<div layer0>
+  <designer-layout
+    on-update-box="onUpdateBox"
+    Xon-position="onNodePosition"
+    on-delete="onNodeDelete"
+    repeat="node_t"
+  >{{nodes}}</designer-layout>
+</div>
+
+<!-- <div layer0 repeat="node_t">{{nodes}}</div> -->
 <canvas layer1 width="2000" height="800"></canvas>
 
 <template node_t>
   <div node key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-click="onNodeClick"><span>{{displayName}}</span></div>
 </template>
 
-<!-- <svg width="200" height="250" version="1.1" xmlns="http://www.w3.org/2000/svg">
-  <g repeat="node_t">
-    <rect x="10" y="10" width="30" height="30" stroke="black" fill="transparent" stroke-width="5"/>
-  </g>
-</svg> -->
-
-<!-- <template node_t>
-  <rect x="10" y="10" width="30" height="30" stroke="black" fill="transparent" stroke-width="5"/>
-</template>
-
-<template node_t2>
-  <g node key="{{key}}" selected$="{{selected}}" center row xen:style="{{style}}" on-click="onNodeClick">
-    <rect x="10" y="10" width="30" height="30" stroke="black" fill="transparent" stroke-width="5"/>
-  </g>
-</template> -->
 `;
 
 customElements.define('node-graph', NodeGraph);
