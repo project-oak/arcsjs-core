@@ -27,7 +27,7 @@
 
 chrome.action.onClicked.addListener(async () => {
   const url = chrome.runtime.getURL("hello.html");
-  const tab = await chrome.tabs.create({ url });
+  //const tab = await chrome.tabs.create({ url });
   //chrome.tabs.sendMessage(tab.id, 'hello', {});
 });
 
