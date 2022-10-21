@@ -174,6 +174,8 @@ export class DesignerLayout extends DragDrop {
       this.setBoxStyle(this.target, snap(dragRect));
       // let the boxer adapt to the target end state
       requestAnimationFrame(() => this.setBoxStyle(this.boxer, this.getRect(this.target)));
+      this.value = dragRect;
+      this.fire('update-box');
     }
   }
   doDrag({l, t, w, h}, dx, dy, dragKind, dragFrom) {
