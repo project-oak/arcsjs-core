@@ -54,46 +54,46 @@ export const NodegraphRecipe = {
   },
   $stores: {
     pipelines: {
-      $type: '[JSON]',
+      $type: '[Pojo]',
       $tags: ['persisted'],
       $value: []
     },
     selectedPipeline: {
-      $type: 'JSON',
+      $type: 'Pojo',
       $value: null
     },
     selectedNodeId: {
       $type: 'String'
     },
     candidates: {
-      $type: 'JSON'
+      $type: 'Pojo'
     },
     builtinNodeTypes: {
-      $type: 'JSON',
+      $type: 'Pojo',
       $value: nodeTypes
     },
     hoveredNodeId: {
       $type: 'String'
     },
     inspectorData: {
-      $type: 'JSON'
+      $type: 'Pojo'
     },
     recipes: {
-      $type: '[JSON]',
+      $type: '[Pojo]',
       $value: []
     },
     categories: {
-      $type: 'JSON',
+      $type: 'Pojo',
       $value: categories
     },
     previewLayout: {
-      $type: 'JSON'
+      $type: 'Pojo'
     },
     nodegraphLayout: {
-      $type: 'JSON'
+      $type: 'Pojo'
     },
     nodeTypes: {
-      $type: 'JSON',
+      $type: 'Pojo',
       $value: nodeTypes
     },
   },
@@ -101,7 +101,7 @@ export const NodegraphRecipe = {
   //   $kind: '$library/AFrame/Scene.js'
   // },
   main: {
-    $kind: '$app/Library/Nodegraph',
+    $kind: '$nodegraph/Nodegraph',
     $slots: {
       catalog: NodeCatalogRecipe,
       toolbar: {

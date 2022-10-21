@@ -6,8 +6,6 @@
  */
 import {Resources} from '../../App/Resources.js';
 
-// TODO(sjmiles): make separate services
-
 let Holistic;
 const requireHolistic = async () => {
   if (!Holistic) {
@@ -16,14 +14,7 @@ const requireHolistic = async () => {
   }
 };
 
-//const mpHolistic = globalThis;
-
 const local = import.meta.url.split('/').slice(0, -1).join('/');
-//const masque = await loadImage(`assets/masquerade.png`);
-//const scalar = 25;
-
-// const masque = await loadImage(`assets/fawkes.png`);
-// const scalar = 30;
 
 export const MediapipeService = {
   async holistic({image}) {

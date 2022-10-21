@@ -117,18 +117,30 @@ const requireImplFactory = async (kind, implCode) => {
     proto = particleCompartment.evaluate(implCode);
   }
   catch (x) {
-    log.error('failed to evaluate:', implCode);
+    log.error('failed to evaluate:', x);
+    log.groupCollapsed('code:');
+    log(implCode);
+    log.groupEnd();
     throw x;
   }
+  // second stage turbine blade
   // if it's an object
   if (typeof proto === 'object') {
     // repackage the code to eliminate closures
     const module = packager.packageProtoFactory(proto, kind);
-    const factory = particleCompartment.evaluate(module);
-    log.groupCollapsed(`repackaged factory for [${kind}]`);
-    log(factory);
-    log.groupEnd();
-    return globalThis.harden(factory);
+    try {
+      const factory = particleCompartment.evaluate(module);
+      log.groupCollapsed(`repackaged factory for [${kind}]`);
+      log(factory);
+      log.groupEnd();
+      return globalThis.harden(factory);
+    } catch (x) {
+      log.error('failed to evaluate:', x);
+      log.groupCollapsed('module:');
+      log(module);
+      log.groupEnd();
+      throw x;
+    }
   }
 };
 

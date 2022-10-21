@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-export const GoogleMap = {
+export const GoogleMapNode = {
   $meta: {
     id: 'Google Maps',
     category: 'Panels'
@@ -30,4 +30,3 @@ export const GoogleMap = {
     $inputs: ['geolocation']
   }
 };
-

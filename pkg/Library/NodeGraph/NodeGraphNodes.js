@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-import {NodeCatalogRecipe} from '../../../Library/NodeTypeCatalog/NodeCatalogRecipe.js';
+import {NodeCatalogRecipe} from '../NodeTypeCatalog/NodeCatalogRecipe.js';
 
 export const NodeCatalog = {
   ...NodeCatalogRecipe,

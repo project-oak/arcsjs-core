@@ -3,21 +3,14 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-
 import {Xen} from '../../Dom/Xen/xen-async.js';
-import {d3} from './d3-import.js';
-
-const template = Xen.Template.html`
-<style>
-  svg {
-    height: 95%;
-  }
-</style>
-`;
 
 export class NodeGraph extends Xen.Async {
   static get observedAttributes() {
-    return ['nodes'];
+    return ['graph', 'nodes'];
+  }
+  get host() {
+    return this;
   }
   get template() {
     return template;
@@ -25,221 +18,191 @@ export class NodeGraph extends Xen.Async {
   get container() {
     return this._dom.root;
   }
-  update({nodes}, state) {
-    state.svg = nodes && renderNodeGraph(nodes, this.onSelectClick.bind(this), this.onDeleteClick.bind(this));
+  _didMount() {
+    this.canvas = this.querySelector('canvas');
   }
-  render({}, {svg}) {
-    const old = this.host.querySelector('svg');
-    old?.remove();
-    if (svg) {
-      this.host.appendChild(svg);
+  onNodeClick(event) {
+    //event.stopPropagation();
+    this.key = event.currentTarget.key;
+    this.fire('node-selected');
+  }
+  geom(i) {
+    const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
+    const p = i => ({
+      x: (i%cols)*(width+margin) + ox,
+      y: Math.floor(i/cols)*(height+margin) + margin*(i%2) + oy
+    });
+    const o = p(i);
+    const [w, h, w2, h2] = [width, height, width/2, height/2];
+    return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
+    //return {x: o.x - width/2, y: o.y - height/2, width, height};
+  }
+  render({graph}, {x, y}) {
+    const getEdgePath = ({x:startX, y:startY}, {x:endX, y:endY}) => {
+      return [
+        startX, startY,
+        startX + (endX - startX) / 2, startY,
+        endX - (endX - startX) / 2, endY,
+        endX, endY
+      ];
+    };
+    const ctx = this.canvas?.getContext('2d');
+    if (ctx) {
+      // this.canvas.width = this.canvas.offsetWidth;
+      // this.canvas.height = this.canvas.offsetHeight;
+      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      let scale = 1; //this.canvas.width / 2500;
+      const curve = path => {
+        path = path.map(v => v*scale);
+        ctx.beginPath();
+        ctx.moveTo(path[0], path[1]);
+        ctx.bezierCurveTo(path[2], path[3], path[4], path[5], path[6], path[7]);
+        ctx.stroke();
+      };
+      const circle = (c, r) => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, r, 0, Math.PI*2);
+        ctx.fill();
+      };
+      //const p = i => ({x: (i%cols)*width + margin + ox, y: Math.floor(i/cols)*height + margin + (margin*8)*(i%2) + oy});
+      const radius = 16;
+      graph?.graphNodes.map((n, i) => {
+        const g0 = this.geom(i);
+        ctx.strokeStyle = ['red', 'green', 'blue'][i%3];
+        // this.roundedRect(ctx, g0.l, g0.t, g0.w, g0.h, radius);
+        // ctx.fillStyle = n.bgColor;
+        // ctx.fill();
+        // ctx.strokeStyle = n.color;
+        // ctx.stroke();
+        //
+        const g1 = this.geom(i+1)
+        const p0 = {x: g0.r, y: g0.y};
+        const p1 = {x: g1.l, y: g1.y};
+        const path = getEdgePath(p0, p1);
+        //
+        ctx.strokeStyle = 'violet';
+        curve(path);
+        ctx.fillStyle = 'violet';
+        ctx.strokeStyle = 'purple';
+        circle(p0, 4);
+        ctx.stroke();
+        circle(p1, 4);
+        ctx.stroke();
+        ctx.fillStyle = n.color;
+        ctx.font = '14px sans-serif';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        ctx.fillText(n.displayName, g0.x + g0.width/2, p0.y, g0.width - 16);
+      });
     }
+    //console.log(graph);
+    return {
+      nodes: graph?.graphNodes.map((n, i) => {
+        const g = this.geom(i);
+        return {
+          ...n,
+          style: {
+            borderColor: n.selected ? n.color : n.bgColor,
+            color: n.color,
+            background: n.bgColor,
+            transform: `translate(${g.l}px, ${g.t}px)`,
+          }
+        };
+      })
+    };
   }
-  onSelectClick(event,  {data: {key}}) {
-    this.key = key;
-    this.fire('select');
-    event.stopPropagation();
-  }
-  onDeleteClick(event, {data: {key}}) {
-    this.key = key;
-    this.fire('delete');
-    event.stopPropagation();
+  roundedRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.lineJoin = "round";
+    ctx.moveTo(x, y + radius);
+    ctx.arcTo(x, y + height, x + radius, y + height, radius);
+    ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
+    ctx.arcTo(x + width, y, x + width - radius, y, radius);
+    ctx.arcTo(x, y, x, y + radius, radius);
   }
 }
+
+const template = Xen.Template.html`
+<style>
+  :host {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  [node] {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    /**/
+    position: absolute;
+    /*
+    top: 10px;
+    left: 10px;
+    */
+    width: 140px;
+    height: 60px;
+    /**/
+    border-radius: 32px;
+    border: 3px solid violet;
+    background: purple;
+    padding: 4px 11px;
+    /* color: white; */
+    font-size: 13px;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  [node] > span {
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  [node][selected] {
+    border-radius: 50px;
+    background: #e0e0e0;
+    box-shadow:  23px 23px 46px #bebebe, -23px -23px 46px #ffffff;
+  }
+  [node]:not([selected]) {
+    /* border-color: silver !important; */
+    border-radius: 50px;
+    background: #e0e0e0;
+    box-shadow:  9px 9px 18px #cecece, -9px -9px 18px #f2f2f2;
+  }
+  /**/
+  [layer0] {
+    position: relative;
+    inset: 0;
+  }
+  [layer1] {
+    position: absolute;
+    pointer-events: none;
+  }
+</style>
+
+<div layer0 repeat="node_t">{{nodes}}</div>
+<canvas layer1 width="2000" height="800"></canvas>
+
+<template node_t>
+  <div node key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-click="onNodeClick"><span>{{displayName}}</span></div>
+</template>
+
+<!-- <svg width="200" height="250" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <g repeat="node_t">
+    <rect x="10" y="10" width="30" height="30" stroke="black" fill="transparent" stroke-width="5"/>
+  </g>
+</svg> -->
+
+<!-- <template node_t>
+  <rect x="10" y="10" width="30" height="30" stroke="black" fill="transparent" stroke-width="5"/>
+</template>
+
+<template node_t2>
+  <g node key="{{key}}" selected$="{{selected}}" center row xen:style="{{style}}" on-click="onNodeClick">
+    <rect x="10" y="10" width="30" height="30" stroke="black" fill="transparent" stroke-width="5"/>
+  </g>
+</template> -->
+`;
+
 customElements.define('node-graph', NodeGraph);
-
-export const renderNodeGraph = (nodes, selectHandler, deleteHandler) => {
-  const svg = Tree(nodes, {
-    padding: 0,
-    label: d => d.name,
-    selectHandler,
-    deleteHandler
-  });
-  return svg;
-};
-
-// Copyright 2021 Observable, Inc.
-// Released under the ISC license.
-// https://observablehq.com/@d3/tree
-
-const Tree = (data, { // data is either tabular (array of objects) or hierarchy (nested objects)
-  path, // as an alternative to id and parentId, returns an array identifier, imputing internal nodes
-  id = Array.isArray(data) ? d => d.id : null, // if tabular data, given a d in data, returns a unique identifier (string)
-  parentId = Array.isArray(data) ? d => d.parentId : null, // if tabular data, given a node d, returns its parent’s identifier
-  children, // if hierarchical data, given a d in data, returns its children
-  tree = d3.tree, // layout algorithm (typically d3.tree or d3.cluster)
-  sort, // how to sort nodes prior to layout (e.g., (a, b) => d3.descending(a.height, b.height))
-  label, // given a node d, returns the display name
-  title, // given a node d, returns its hover text
-  link, // given a node d, its link (if any)
-  linkTarget = "_blank", // the target attribute for links (if any)
-  width, // outer width, in pixels
-  height, // outer height, in pixels
-  r = 3, // radius of nodes
-  padding = 1, // horizontal padding for first and last column
-  fill = "#999", // fill for nodes
-  fillOpacity, // fill opacity for nodes
-  stroke = "#555", // stroke for links
-  strokeWidth = 1.5, // stroke width for links
-  strokeOpacity = 0.4, // stroke opacity for links
-  strokeLinejoin, // stroke line join for links
-  strokeLinecap, // stroke line cap for links
-  halo = "#fff", // color of label halo
-  haloWidth = 0, // padding around the labels
-  selectHandler,
-  deleteHandler
-} = {}) => {
-  // If id and parentId options are specified, or the path option, use d3.stratify
-  // to convert tabular data to a hierarchy; otherwise we assume that the data is
-  // specified as an object {children} with nested objects (a.k.a. the “flare.json”
-  // format), and use d3.hierarchy.
-  const root = path != null ? d3.stratify().path(path)(data)
-      : id != null || parentId != null ? d3.stratify().id(id).parentId(parentId)(data)
-      : d3.hierarchy(data, children);
-  //
-  // Compute labels and titles.
-  const descendants = root.descendants();
-  const L = label == null ? null : descendants.map(d => label(d.data, d));
-  //
-  // Sort the nodes.
-  if (sort != null) root.sort(sort);
-  //
-  const nodeWidth = 164;
-  const nodeHeight = 48;
-  const nodeMarginY = 32;
-  const nodeMarginX = 64;
-  //
-  // Compute the layout.
-  const dx = nodeWidth + nodeMarginX;
-  const dy = nodeHeight + nodeMarginY;
-  // works out some sizing stuff?
-  tree().nodeSize([dy, dx])(root);
-  //
-  // Center the tree.
-  let y0 = Infinity;
-  let y1 = -y0;
-  root.each(d => {
-    // d is rotated 90 degrees
-    if (d.x > y1) y1 = d.x;
-    if (d.x < y0) y0 = d.x;
-  });
-  const cy = nodeHeight / 2;
-  y0 -= cy;
-  y1 += cy;
-  //
-  // Compute sizes.
-  if (height === undefined) height = y1 - y0;
-  width = dx * root.height;
-  //
-  const [markerBoxWidth, markerBoxHeight] = [6, 6];
-  const [markerCx, markerCy] = [markerBoxWidth / 2, markerBoxHeight / 2];
-  const arrowPoints = [[0, 0], [0, markerBoxWidth], [markerBoxWidth, markerCy]];
-  //
-  // output svg
-  const svg = d3.create("svg");
-  svg
-    .attr("viewBox", [dx - 16, y0, width, height])
-    .attr("width", width)
-    .attr("height", height)
-    .attr("font-size", 14)
-    ;
-  // marker defs
-  const defs = svg.append('defs');
-  defs.append('marker')
-    .attr('id', 'arrow')
-    .attr('viewBox', [0, 0, markerBoxWidth, markerBoxHeight])
-    .attr('refX', markerCx)
-    .attr('refY', markerCy)
-    .attr('markerWidth', markerBoxWidth)
-    .attr('markerHeight', markerBoxHeight)
-    .attr('orient', 'auto-start-reverse')
-    .append('path')
-      .attr('d', d3.line()(arrowPoints))
-      .attr('stroke', 'black')
-    ;
-  defs.append('marker')
-    .attr('id', 'dot')
-    .attr('viewBox', [0, 0, markerBoxWidth, markerBoxHeight])
-    .attr('refX', markerCx)
-    .attr('refY', markerCy)
-    .attr('markerWidth', markerBoxWidth)
-    .attr('markerHeight', markerBoxHeight)
-    .attr('orient', 'auto-start-reverse')
-    .append('circle')
-      //.attr('stroke', 'green')
-      //.attr('stroke-width', 2)
-      .attr('fill', '#333')
-      //.attr('fill', 'red')
-      .attr('cx', markerCx)
-      .attr('cy', markerCy)
-      .attr('r', markerCy)
-    ;
-  // grouped details
-  const node = svg.append("g")
-    .selectAll("a")
-    .data(root.descendants())
-    .join("a")
-      .on("click", (event, d) => selectHandler(event, d))
-      .attr("display", d => d.depth === 0 ? 'none' : '')
-      .attr("link:href", link == null ? null : d => link(d.data, d))
-      .attr("target", link == null ? null : linkTarget)
-      .attr("transform", d => `translate(${d.y},${d.x})`)
-      .attr("cursor", "pointer")
-      ;
-  node.append("rect")
-    .attr("stroke", d => d.data.color || "silver")
-    .attr("stroke-width", d => d.data.strokeWidth || strokeWidth)
-    .attr("fill", d => d.data.bgColor || "#F0F0FF")
-    .attr("width", nodeWidth)
-    .attr("height", nodeHeight)
-    .attr("y", -nodeHeight/2)
-    .attr("rx", 8)
-    .attr("ry", 8)
-    ;
-  node.append("text")
-    .on("click", (event, d) => deleteHandler(event, d))
-    .attr("dx", `${nodeWidth - 8}px`)
-    .attr("dy", `0.5em`)
-    .attr("text-anchor", "end")
-    .attr("font-family", "Material Icons")
-    .attr("font-size", 18)
-    .attr("cursor", "pointer")
-    .text("delete")
-    ;
-  if (title) {
-    node.append("title").text(d => title(d.data, d));
-  }
-  if (L) {
-    node.append("text")
-      .attr("dx", "0.64em")
-      .attr("dy", "0.32em")
-      .text((d, i) => L[i])
-      .call(text => text.clone(true))
-        .attr("fill", "none")
-        .attr("stroke", halo)
-        .attr("stroke-width", haloWidth)
-      ;
-  }
-  // connectors
-  svg.append("g")
-      .attr("fill", "none")
-      .attr("stroke", stroke)
-      .attr("stroke-opacity", strokeOpacity)
-      .attr("stroke-linecap", strokeLinecap)
-      .attr("stroke-linejoin", strokeLinejoin)
-      .attr("stroke-width", strokeWidth)
-    .selectAll("path")
-      .data(root.links())
-      .join("path")
-        .attr("display", d => d.source.depth === 0 ? 'none' : null)
-        .attr("d", d3.linkHorizontal()
-          .source(({source: {x, y}}) => ({x: x, y: y + nodeWidth}))
-          .target(({target: {x, y}}) => ({x: x, y: y - markerBoxWidth}))
-          .x(d => d.y)
-          .y(d => d.x)
-        )
-        .attr('marker-start', 'url(#dot)')
-        .attr('marker-end', 'url(#arrow)')
-        ;
-  return svg.node();
-};

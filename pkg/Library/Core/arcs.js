@@ -770,13 +770,13 @@ var _Runtime = class extends EventEmitter {
   async persistStore(storeId, store) {
     if (store.shouldPersist()) {
       this.log(`persistStore "${storeId}"`);
-      return this.persistor.persist?.(storeId, store);
+      return this.persistor?.persist?.(storeId, store);
     }
   }
   async restoreStore(storeId, store) {
     if (store.shouldPersist()) {
       this.log(`restoreStore "${storeId}"`);
-      return this.persistor.restore?.(storeId);
+      return this.persistor?.restore?.(storeId);
     }
   }
   storeChanged(storeId, store) {
@@ -1289,6 +1289,7 @@ export {
   Chef,
   DataStore,
   Decorator,
+  EventEmitter,
   Host,
   Parser,
   ParticleCook,

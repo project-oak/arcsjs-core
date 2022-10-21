@@ -12,8 +12,10 @@ import {HistoryService} from '../../Library/App/HistoryService.js';
 import {MediaService} from '../../Library/NewMedia/MediaService.js';
 import {GoogleApisService} from '../../Library/Goog/GoogleApisService.js';
 import {FaceMeshService} from '../../Library/Mediapipe/FaceMeshService.js';
+import {SelfieSegmentationService} from '../../Library/Mediapipe/SelfieSegmentationService.js';
 import {ThreejsService} from '../../Library/Threejs/ThreejsService.js';
 import {TensorFlowService} from '../../Library/TensorFlow/TensorFlowService.js';
+import {CocoSsdService} from '../../Library/TensorFlow/CocoSsdService.js';
 import {ShaderService} from '../../Library/Shader/ShaderService.js';
 import {NodegraphRecipe} from './NodegraphRecipe.js';
 import {logFactory} from '../../Library/Core/utils.min.js';
@@ -31,7 +33,9 @@ export const NodegraphApp = class extends App {
       ThreejsService,
       ShaderService,
       FaceMeshService,
+      SelfieSegmentationService,
       TensorFlowService,
+      CocoSsdService,
       GoogleApisService
     };
     this.userAssembly = [NodegraphRecipe];

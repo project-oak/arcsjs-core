@@ -25,7 +25,7 @@ const requireFaceMesh = async () => {
   }
 };
 
-const masque = await loadImage(`assets/masquerade.png`);
+const masque = null; //await loadImage(`assets/masquerade.png`);
 const scalar = 25;
 
 export const FaceMeshService = {

@@ -12,23 +12,20 @@ const template = Xen.Template.html`
     position: relative;
     cursor: grab;
     padding: 9px 0 9px 30px;
-    /* color: var(--theme-color-fg-4); */
     user-select: none;
   }
-
   [container][draggable="true"]:hover {
     background: var(--theme-color-bg-4);
   }
-
   [container][draggable="true"]:hover icon {
     display: flex;
     align-items: center;
   }
-
   icon {
     display: none;
     font-family: "Material Icons";
     font-style: normal;
+    font-feature-settings: "liga";
     -webkit-font-feature-settings: "liga";
     -webkit-font-smoothing: antialiased;
     cursor: pointer;
@@ -43,7 +40,6 @@ const template = Xen.Template.html`
     left: 9px;
     position: absolute;
   }
-
   [label] {
     font-size: 12px;
     font-weight: normal;

@@ -166,7 +166,6 @@ const handlers = {
     // connect arc to runtime
     return user.addArc(realArc);
   },
-
   updateParticle: async ({particle, code, arc}) => {
     await user.lateBindParticle(particle, code);
     // Update corresponding hosts.

@@ -188,8 +188,8 @@ buildStoreSpecs(node, nodeType, state) {
 resolveGroup(bindings, storeMap) {
   return bindings?.map(coded => {
     const {key, binding} = this.decodeBinding(coded);
-    return storeMap[binding || key].map(
-        (store, index) => ({[`${key}${index === 0 ? '' : index}`]: store}));
+    const task = (store, index) => ({[`${key}${index === 0 ? '' : index}`]: store});
+    return storeMap[binding || key]?.map(task);
   }).flat();
 },
 

@@ -235,6 +235,7 @@ export class Particle {
     constructor(proto, pipe, beStateful) {
         this.pipe = pipe;
         this.impl = create(proto);
+        globalThis.harden?.(this.impl);
         defineProperty(this, 'internal', privateProperty(nob()));
         this.internal.$busy = 0;
         //if (beStateful) {
