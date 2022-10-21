@@ -44,7 +44,7 @@ categoryStyle(category, categories) {
   const backgroundColor = this.bgColorByCategory(category, categories);
   return {
     backgroundColor,
-    borderTop: `1px solid ${color}` 
+    borderTop: `1px solid ${color}`
   };
 },
 
@@ -196,7 +196,8 @@ template: html`
     display: none;
   }
   [category] {
-    padding-left: 10px;
+    font-size: 0.8em;
+    padding: 8px 12px;
     /* border-top: 1px solid var(--nodelist-container-fg); */
   }
 </style>

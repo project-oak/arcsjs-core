@@ -24,7 +24,7 @@ shouldRecomputeLayout(pipeline, oldPipeline) {
     // Pipeline changed.
     return (pipeline.$meta.id !== oldPipeline?.$meta?.id)
       // A node was removed.
-      || (keys(oldPipeline.nodes).some(key => !pipeline.nodes[key]))
+      || (keys(oldPipeline?.nodes).some(key => !pipeline.nodes[key]))
       ;
   }
 },

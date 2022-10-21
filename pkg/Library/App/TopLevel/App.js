@@ -12,9 +12,7 @@ import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
 import {themeRules} from '../theme.js';
 //import {loadCss} from '../../Dom/dom.js';
 
-// n.b. lives in 'top' context
-
-const log = logFactory(true, 'App', 'darkorange');
+const log = logFactory(true, 'App', '#CC7722');
 
 export const App = class {
   static get Arcs() {
@@ -23,6 +21,9 @@ export const App = class {
   constructor(paths, root) {
     this.paths = paths;
     this.root = root;
+    Arcs.render = (packet) => {
+    log('render', packet);
+    };
     log(JSON.stringify(paths, null, '  '));
   }
   get arcs() {
@@ -38,7 +39,7 @@ export const App = class {
     //await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     // TODO(sjmiles): pick a syntax
     const assembly = [DevToolsRecipe, ...(this.userAssembly ?? this.recipes ?? [])];
-    await Arcs.addAssembly(assembly, 'user');
+    await Arcs.addAssembly('user', assembly);
   }
   async service({request}) {
     // if we are specific

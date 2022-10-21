@@ -13,12 +13,18 @@ export const NodeCatalogRecipe = {
       $type: 'String',
     },
     hoveredNodeType: {
-      $type: 'JSON',
+      $type: 'Pojo',
       noinspect: true
     },
+    nodeTypes: {
+      $type: 'Pojo'
+    },
     categories: {
-      $type: 'JSON',
+      $type: 'Pojo',
       noinspect: true
+    },
+    selectedPipeline: {
+      $type: 'Pojo'
     }
   },
   NodeCatalog: {

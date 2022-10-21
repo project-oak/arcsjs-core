@@ -56,7 +56,7 @@ renderNode({node, categories, pipeline, hoveredNodeId, selectedNodeId, candidate
     name: node.displayName,
     displayName: node.displayName,
     position: layout?.[node.id] || {x: 0, y: 0},
-    // TODO(mariakleiner): node-graph-editor doesn't get updated, if nodeType (and hence color)
+    // TODO(mariakleiner): node-graph doesn't get updated, if nodeType (and hence color)
     // for a customNode was loaded after the node was rendered
     color: this.colorByCategory(category, categories),
     bgColor: this.bgColorByCategory(category, categories),
@@ -451,6 +451,7 @@ template: html`
   mwc-icon-button {
     color: #555;
   }
+  /*
   [node] {
     border: var(--edge-border);
     background: #fdfdfd;
@@ -464,6 +465,7 @@ template: html`
     margin: 12px 18px;
     border-width: 3px;
   }
+  */
   [category="input"] {
     background-color: #e9f2e4;
     border-color: green;
@@ -486,7 +488,7 @@ template: html`
   }
 </style>
 <div flex grid scrolling>
-  <node-graph-editor
+  <node-graph flex
       graph="{{graph}}"
       on-nodetype-dropped="onNodeTypeDropped"
       on-node-moved="onNodeMoved"
@@ -498,7 +500,7 @@ template: html`
       on-add-candidate="onAddCandidate"
       on-edge-deleted="onEdgeRemove"
       on-edge-connected="onEdgeConnected">
-  </node-graph-editor>
+  </node-graph>
 </div>
 `
 });

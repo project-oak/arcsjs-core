@@ -15,16 +15,18 @@ import * as displayNodes from '../../Library/Display/DisplayNodes.js';
 import * as shaderNodes from '../../Library/Shader/ShaderNodes.js';
 import {ThreejsEditorNode} from '../../Library/Threejs/ThreejsEditorNode.js';
 import {JSONataNode} from '../../Library/JSONata/JSONataNode.js';
-import * as mediaPipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
-import * as tensorFlowNodes from '../../Library/TensorFlow/CocoSsdNode.js';
-
-// nodegraph library
-import * as nodeGraphNodes from './Nodes/NodeGraphNodes.js';
-import * as testNodes from './Nodes/TestNodes.js';
-import * as miscNodes from './Nodes/MiscNodes.js';
-import * as baseFieldNodes from './FieldNodes/FieldNodes.js';
-import * as candyNodes from './Nodes/CandyNodes.js';
+import * as mediapipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
+import {CocoSsdNode} from '../../Library/TensorFlow/CocoSsdNode.js';
+import {GoogleMapNode} from '../../Library/Goog/GoogleMapNode.js';
+import {MacroRunnerNode} from '../../Library/Goog/MacroRunnerNode.js';
+import * as baseFieldNodes from '../../Library/Fields/FieldNodes.js';
+import * as nodeGraphNodes from '../../Library/NodeGraph/NodeGraphNodes.js';
+import * as testNodes from './TestNodes.js';
+import * as ContainerNodes from './ContainerNodes.js';
 // backburner
+//import {PoemNode} from './PoemNode.js';
+//import {isPoisonousNode} from './isPoisonousNode.js';
+//import * as candyNodes from './Nodes/CandyNodes.js';
 // import {SceneNode} from '../../Library/AFrame/SceneNode.js';
 
 const fieldNodes = Object.values(baseFieldNodes).map(node => {
@@ -43,13 +45,15 @@ export const nodeTypes = {};
 
 const nodeTypesList = [
   ...values(newMediaNodes),
-  ...values(mediaPipeNodes),
-  ...values(tensorFlowNodes),
+  ...values(mediapipeNodes),
+  CocoSsdNode,
   ...values(nodeGraphNodes),
   ...fieldNodes,
-  ...values(miscNodes),
+  ...values(ContainerNodes),
+  GoogleMapNode,
+  MacroRunnerNode,
   ...values(testNodes),
-  ...values(candyNodes),
+  //...values(candyNodes),
   ...values(mobilenetNodes),
   ...values(displayNodes),
   ...values(shaderNodes),

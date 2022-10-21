@@ -13,6 +13,7 @@
 **/
 
 const {defineProperty, setPrototypeOf} = Object;
+
 const {create, assign, keys, values, entries, mapBy} = (() => {
   const {assign, keys, entries, values, create} = Object;
   return {
@@ -247,6 +248,7 @@ export class Particle {
   constructor(proto, pipe, beStateful) {
     this.pipe = pipe;
     this.impl = create(proto);
+    globalThis.harden?.(this.impl);
     defineProperty(this, 'internal', privateProperty(nob()));
     this.internal.$busy = 0;
     //if (beStateful) {

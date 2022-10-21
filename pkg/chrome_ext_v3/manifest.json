@@ -10,15 +10,22 @@
     },
     "default_title": "Open Tools"
   },
+  "content_security_policy": {
+    "sandbox": "sandbox allow-scripts; worker-src blob:;"
+  },
   "sandbox": {
     "pages": [
       "deploy/librarian/index.html",
-      "viewer.html"
+      "viewer.html",
+      "hello.html"
     ]
   },
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
-  "permissions": ["scripting"]
+  "permissions": [
+    "scripting",
+    "activeTab"
+  ]
 }

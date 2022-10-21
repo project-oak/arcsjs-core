@@ -196,13 +196,13 @@ export class Runtime extends EventEmitter {
   protected async persistStore(storeId, store) {
     if (store.shouldPersist()) {
       this.log(`persistStore "${storeId}"`);
-      return this.persistor.persist?.(storeId, store);
+      return this.persistor?.persist?.(storeId, store);
     }
   }
   protected async restoreStore(storeId, store) {
     if (store.shouldPersist()) {
       this.log(`restoreStore "${storeId}"`);
-      return this.persistor.restore?.(storeId);
+      return this.persistor?.restore?.(storeId);
     }
   }
   protected storeChanged(storeId, store) {

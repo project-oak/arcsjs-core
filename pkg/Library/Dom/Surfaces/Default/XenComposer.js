@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import {Composer} from './Composer.js';
-import {Template} from '../../Xen/xen-template.js';
+import {Xen} from '../../Xen/xen-async.js';
 import {IconsCss} from '../../Material/material-icon-font/icons.css.js';
 import {XenCss} from '../../Material/material-xen/xen.css.js';
 import {dom} from '../../dom.js';
@@ -48,7 +48,7 @@ export class XenComposer extends Composer {
     container.setAttribute('particle', id);
     // TODO(sjmiles): a_ hack is for a_frame elements that cannot live in ShadowDOM
     const root = (!id.toLowerCase().startsWith('a_') && this.useShadowRoot) ? container.attachShadow({mode: `open`}) : container;
-    const slot = Template
+    const slot = Xen.Template
       .stamp(template)
       .appendTo(root)
       .events(this.mapEvent.bind(this, id))

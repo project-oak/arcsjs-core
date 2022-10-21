@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import {MessageBus} from './MessageBus.js';
-import {XenComposer as Composer} from '../../Dom/Surfaces/Default/XenComposer.js';
+// import {XenComposer as Composer} from '../../Dom/Surfaces/Default/XenComposer.js';
 import {logFactory} from '../../Core/utils.min.js';
 
 // n.b. lives in 'top' context
@@ -17,21 +17,24 @@ const log = logFactory(logFactory.flags.arcs, 'Arcs', 'goldenrod', '#333');
 // socket will be our MessageBus
 let socket;
 
-// monostate
-const watchers = {};
-const getters = {};
+// // monostate
+// const watchers = {};
+// const getters = {};
 const arcs = {};
 
 arcs.blargTheWorker = async ({paths}) => {
-  const code = [
-    `import '${paths.$config}';`,
-    `import '${paths.$library}/App/Worker/ArcsWorker.js';`
-  ];
-  const text = code.join('\n');
-  const blob = new Blob([text], {type: 'application/javascript'});
-  const oUrl = URL.createObjectURL(blob);
-  const worker = new Worker(oUrl, {type: 'module', name: 'arcsjs'});
-  setTimeout(() => URL.revokeObjectURL(oUrl), 5000);
+  const url = './worker.js';
+  const worker = new Worker(url, {type: 'module', name: 'arcsjs'});
+  // const code = [
+  //   `import '${paths.$config}';`,
+  //   `import '${paths.$library}/App/Worker/ArcsWorker.js';`
+  // ];
+  // const text = code.join('\n');
+  // const blob = new Blob([text], {type: 'application/javascript'});
+  // const oUrl = URL.createObjectURL(blob);
+  // const worker = new Worker(oUrl, {type: 'module', name: 'arcsjs'});
+  // setTimeout(() => URL.revokeObjectURL(oUrl), 5000);
+
   log.groupCollapsed('Worker launched (blarg!)');
   log.log(text);
   log.groupEnd();
@@ -41,24 +44,23 @@ arcs.blargTheWorker = async ({paths}) => {
 // composer handles render packets
 
 let composer;
-
 const renderPacket = packet =>  {
   composer?.render(packet);
 };
 
-arcs.setComposerRoot = root => {
-  if (root) {
-    // make a composer suitable for rendering on our document
-    composer = new Composer(root, true);
-    // channel local events into vibrations
-    composer.onevent = (pid, eventlet) => {
-      socket.sendVibration({kind: 'handleEvent', pid, eventlet});
-    };
-    socket.sendVibration({kind: 'rerender'});
-  }
-};
+// arcs.setComposerRoot = root => {
+//   if (root) {
+//     // make a composer suitable for rendering on our document
+//     composer = new Composer(root, true);
+//     // channel local events into vibrations
+//     composer.onevent = (pid, eventlet) => {
+//       socket.sendVibration({kind: 'handleEvent', pid, eventlet});
+//     };
+//     socket.sendVibration({kind: 'rerender'});
+//   }
+// };
 
-// n.b. vibrational paths are worker-relative
+// // n.b. vibrational paths are worker-relative
 
 const receiveVibrations = msg => {
   if (msg.type === 'render') {
@@ -86,7 +88,7 @@ const handleServiceCall = async msg => {
 // public API
 
 arcs.init = async ({root, paths, onservice, injections}) => {
-  log.log(paths, injections);
+  log.log({paths, injections});
   // worker path is document relative
   const worker = await arcs.blargTheWorker({paths});
   // bus to worker
