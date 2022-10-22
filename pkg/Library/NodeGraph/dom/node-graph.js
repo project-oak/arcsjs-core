@@ -22,7 +22,7 @@ export class NodeGraph extends Xen.Async {
     this.canvas = this.querySelector('canvas');
     this.rects = {};
   }
-  onNodeClick(event) {
+  onNodeSelect(event) {
     //event.stopPropagation();
     this.key = event.currentTarget.key;
     this.fire('node-selected');
@@ -70,14 +70,6 @@ export class NodeGraph extends Xen.Async {
       // this.canvas.width = this.canvas.offsetWidth;
       // this.canvas.height = this.canvas.offsetHeight;
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      let scale = 1; //this.canvas.width / 2500;
-      const curve = path => {
-        path = path.map(v => v*scale);
-        ctx.beginPath();
-        ctx.moveTo(path[0], path[1]);
-        ctx.bezierCurveTo(path[2], path[3], path[4], path[5], path[6], path[7]);
-        ctx.stroke();
-      };
       const circle = (c, r) => {
         ctx.beginPath();
         ctx.arc(c.x, c.y, r, 0, Math.PI*2);
@@ -100,18 +92,18 @@ export class NodeGraph extends Xen.Async {
         const path = getEdgePath(p0, p1);
         //
         ctx.strokeStyle = 'violet';
-        curve(path);
+        this.curve(ctx, path);
         ctx.fillStyle = 'violet';
         ctx.strokeStyle = 'purple';
         circle(p0, 4);
         ctx.stroke();
         circle(p1, 4);
         ctx.stroke();
-        ctx.fillStyle = n.color;
-        ctx.font = '14px sans-serif';
-        ctx.textBaseline = 'middle';
-        ctx.textAlign = 'center';
-        ctx.fillText(n.displayName, g0.x + g0.width/2, p0.y, g0.width - 16);
+        // ctx.fillStyle = 'silver'; //n.color;
+        // ctx.font = '14px sans-serif';
+        // ctx.textBaseline = 'middle';
+        // ctx.textAlign = 'center';
+        // ctx.fillText(n.displayName, g0.x + g0.width/2, p0.y, g0.width - 16);
       });
     }
     //console.log(graph);
@@ -122,7 +114,7 @@ export class NodeGraph extends Xen.Async {
           ...n,
           style: {
             borderColor: n.selected ? n.color : n.bgColor,
-            color: n.color,
+            color: n.selected ? 'white' : 'gray',
             background: n.bgColor,
             transform: `translate(${g.l}px, ${g.t}px)`,
           }
@@ -130,16 +122,37 @@ export class NodeGraph extends Xen.Async {
       })
     };
   }
-  roundedRect(ctx, x, y, width, height, radius) {
-    ctx.beginPath();
-    ctx.lineWidth = 2;
-    ctx.lineJoin = "round";
-    ctx.moveTo(x, y + radius);
-    ctx.arcTo(x, y + height, x + radius, y + height, radius);
-    ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
-    ctx.arcTo(x + width, y, x + width - radius, y, radius);
-    ctx.arcTo(x, y, x, y + radius, radius);
-  }
+  // roundedRect(ctx, x, y, width, height, radius) {
+  //   ctx.beginPath();
+  //   ctx.lineWidth = 2;
+  //   ctx.lineJoin = "round";
+  //   ctx.moveTo(x, y + radius);
+  //   ctx.arcTo(x, y + height, x + radius, y + height, radius);
+  //   ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
+  //   ctx.arcTo(x + width, y, x + width - radius, y, radius);
+  //   ctx.arcTo(x, y, x, y + radius, radius);
+  // }
+  curve(ctx, path) {
+    //path = path.map(v => v*scale);
+    // ctx.beginPath();
+    // ctx.moveTo(path[0], path[1]);
+    // ctx.bezierCurveTo(path[2], path[3], path[4], path[5], path[6], path[7]);
+    // ctx.stroke();
+    const ir = r => Math.round(Math.random() * r);
+    //const highlight = [ir(255), ir(255), ir(255)];
+    const highlight = [255, 0, 255];
+
+    for (let i=5; i>=0; i--) {
+      ctx.beginPath();
+      // draw each line, the last line in each is always white
+      ctx.lineWidth = (i+1)*4-3;
+      ctx.strokeStyle = !i ? '#fff' : `rgba(${highlight[0]},${highlight[1]},${highlight[2]},${0.1-0.01*i})`;
+      ctx.moveTo(path[0], path[1]);
+      ctx.bezierCurveTo(path[2], path[3], path[4], path[5], path[6], path[7]);
+      ctx.stroke();
+      ctx.closePath();
+    }
+  };
 }
 
 const template = Xen.Template.html`
@@ -181,13 +194,13 @@ const template = Xen.Template.html`
   [node][selected] {
     border-radius: 50px;
     background: #e0e0e0;
-    box-shadow:  23px 23px 46px #bebebe, -23px -23px 46px #ffffff;
+    box-shadow:  23px 23px 46px #bebebe88, -23px -23px 46px #ffffff88;
   }
   [node]:not([selected]) {
     /* border-color: silver !important; */
     border-radius: 50px;
     background: #e0e0e0;
-    box-shadow:  9px 9px 18px #cecece, -9px -9px 18px #f2f2f2;
+    box-shadow:  9px 9px 18px #cecece88, -9px -9px 18px #f2f2f288;
   }
   /**/
   [layer0] {
@@ -197,6 +210,7 @@ const template = Xen.Template.html`
   [layer0] > * {
     position: absolute;
     inset: 0;
+    background: black;
   }
   [layer1] {
     position: absolute;
@@ -217,7 +231,7 @@ const template = Xen.Template.html`
 <canvas layer1 width="2000" height="800"></canvas>
 
 <template node_t>
-  <div node key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-click="onNodeClick"><span>{{displayName}}</span></div>
+  <div node key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-mousedown="onNodeSelect"><span>{{displayName}}</span></div>
 </template>
 
 `;

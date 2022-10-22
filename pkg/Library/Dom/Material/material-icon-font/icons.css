@@ -4,6 +4,59 @@
  * license that can be found in the LICENSE file.
  */
 
+ /**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+
+:host {
+  --mdc-icon-font: "Material Symbols Outlined"
+}
+
+icon {
+  font-family: "Material Symbols Outlined";
+  font-size: 24px;
+  font-style: normal;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  /* partial FOUC prevention */
+  width: 24px;
+  height: 24px;
+  overflow: hidden;;
+}
+
+/* fallback */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v61/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHCIJIZrDCvHOejbd5zrDAt.woff2) format('woff2');
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
 /* @font-face {
   font-family: 'Material Icons';
   font-style: normal;
@@ -11,6 +64,15 @@
   src: url(https://fonts.gstatic.com/s/materialicons/v87/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2) format('woff2');
 } */
 
+
+/* @font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/materialicons/v87/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2) format('woff2');
+} */
+
+/*
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;
@@ -24,7 +86,6 @@
 }
 
 @font-face {
-  /* latin */
   font-family: 'Roboto Mono';
   src: url('robotomono-variablefont_wght-webfont.woff2') format('woff2'),
       url('robotomono-variablefont_wght-webfont.woff') format('woff')
@@ -43,8 +104,8 @@ icon {
   cursor: pointer;
   user-select: none;
   flex-shrink: 0;
-  /* partial FOUC prevention */
   width: 24px;
   height: 24px;
   overflow: hidden;;
 }
+*/

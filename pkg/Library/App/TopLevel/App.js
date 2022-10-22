@@ -22,7 +22,7 @@ export const App = class {
     this.paths = paths;
     this.root = root;
     Arcs.render = (packet) => {
-    log('render', packet);
+      log('render', packet);
     };
     log(JSON.stringify(paths, null, '  '));
   }
@@ -36,12 +36,13 @@ export const App = class {
       onservice: this.service.bind(this),
       injections: {themeRules, ...this.injections}
     });
+    this.arcs.user.persistor = this.persistor;
     //await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     // TODO(sjmiles): pick a syntax
     const assembly = [DevToolsRecipe, ...(this.userAssembly ?? this.recipes ?? [])];
     await Arcs.addAssembly('user', assembly);
   }
-  async service({request}) {
+  async service(request) {
     // if we are specific
     if (request?.kind) {
       // find that kind of service
@@ -55,7 +56,7 @@ export const App = class {
       return this.dispatchServiceRequest(service, request);
     }
     // otherwise it's an App request
-    return this.appService({request});
+    return this.appService(request);
   }
   async dispatchServiceRequest(service, request) {
     try {
@@ -69,7 +70,7 @@ export const App = class {
       log.warn(e.toString());
     }
   }
-  async appService({request}) {
+  async appService(request) {
     // magic special services
     switch (request?.msg) {
       case 'makeName':
@@ -78,6 +79,8 @@ export const App = class {
       case 'makeId':
       case 'MakeId':
         return makeId(3, 4);
+      case 'request-context':
+        return ({runtime: this.arcs.user});
     }
     switch (request?.type) {
       case 'persist':

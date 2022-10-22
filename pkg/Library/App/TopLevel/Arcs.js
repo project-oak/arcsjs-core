@@ -28,7 +28,7 @@ export const Arcs = {
   addPaths(paths) {
     Paths.add(paths);
   },
-  setInjections({injections}) {
+  setInjections(injections) {
     const o = Runtime.particleOptions || 0;
     const i = o.injections || 0;
     Runtime.particleOptions = {
@@ -64,6 +64,28 @@ export const Arcs = {
     // connect arc to runtime
     return this.user.addArc(realArc);
   },
+  get(arcKey, storeKey) {
+    const realArc = this.getArc(arcKey);
+    const store = realArc?.stores[storeKey];
+    return store?.data;
+  },
+  async set(arcKey, storeKey, data) {
+    const realArc = this.getArc(arcKey);
+    if (!realArc) {
+      log(`setStoreData: "${arcKey}" is not an Arc.`);
+    }
+    const store = realArc?.stores[storeKey];
+    if (!store) {
+      log(`setStoreData: "${storeKey}" is not a store.`);
+    }
+    if (store) {
+      store.data = data;
+      log(`setStoreData: set data into "${arcKey}:${storeKey}"`, data);
+    }
+  },
+  watch({arcKey, storeKey, remove}){
+    //watching[storeKey] = (remove !== true);
+  },
   render(packet) {
     try {
       //this.fire('render', packet);
@@ -73,8 +95,9 @@ export const Arcs = {
       log.error(packet);
     }
   },
-  serviceHandler() {
-    //
+  serviceHandler(realArc, host, request) {
+    log(request);
+    return this.onservice(/*realArc, host,*/ request);
   },
   rerender() {
     Object.values(this.user.arcs).forEach(arc => arc.rerender());

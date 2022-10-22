@@ -5,20 +5,9 @@
  * license that can be found in the LICENSE file.
  */
 import './app/config.js';
-import {quickStart/*, Paths*/} from './app/arcs.js';
+import {quickStart} from './app/arcs.js';
 import {ExtensionApp} from './app/ExtensionApp.js';
 
 await quickStart(ExtensionApp, import.meta.url, {
-  $nodegraph: '$app/deploy/nodegraph/Library',
-  //$library: '$app/../deploy/Library',
-  //$pathMacro: '$otherMacro/path'
+  $nodegraph: '$app/deploy/nodegraph/Library'
 });
-
-//quickStart(ExtensionApp);
-
-// try {
-//   const app = new ExtensionApp(Paths.map);
-//   await app.spinup();
-// } catch(x) {
-//   console.error(x);
-// }

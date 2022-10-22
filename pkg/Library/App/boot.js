@@ -15,7 +15,6 @@ export const quickStart = (App, url, extraPaths) => {
 export const configurePaths = (Paths, metaUrl, extraPaths) => {
   // remove parameters from import-meta url
   const url = metaUrl.split('?').shift();
-  console.warn(url);
   // get the absolute path of `url`, minus the filename (remove `1`)
   // TODO(sjmiles): the default is good, but when you have to adjust
   // it can be a hassle to get the url right from the calling side.

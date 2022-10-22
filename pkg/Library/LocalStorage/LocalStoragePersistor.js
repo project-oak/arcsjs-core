@@ -18,8 +18,9 @@ export const Persistor = class {
   getKey(id) {
     return `${this.path}/${id}`;
   }
-  async persist(id, data) {
+  async persist(id, store) {
     let serial;
+    const data = store?.data;
     if (id && data) {
       const key = this.getKey(id);
       try {
@@ -28,9 +29,8 @@ export const Persistor = class {
         log.warn(x);
       }
       if (serial) {
-        this.upload(key, serial);
         log(`[${key}]\nPERSIST [${len(serial)}]`);
-        localStorage.setItem(key, serial);
+        this.upload(key, serial);
       }
     }
   }
