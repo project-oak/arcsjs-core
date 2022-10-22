@@ -37,6 +37,7 @@ renderGraph(inputs) {
   return {
     name: inputs.pipeline?.$meta?.name,
     graphNodes: this.renderGraphNodes(inputs),
+    graphEdges: this.renderGraphEdges(inputs),
     connectableCandidates: inputs.selectedNodeId && this.renderConnectableCandidates(inputs)
   };
 },
@@ -68,6 +69,20 @@ renderNode({node, categories, pipeline, hoveredNodeId, selectedNodeId, candidate
     outputs: this.renderOutputs(nodeType),
     conns: this.renderConnections(node, pipeline),
   };
+},
+
+renderGraphEdges(inputs) {
+  const {pipeline, categories} = inputs;
+  const edges = [];
+  values(pipeline?.nodes).forEach(node => {
+    const froms = values(node.connections).map(values => values.map(({from}) => from)).flat();
+    froms.forEach(from => edges.push({
+      from,
+      to: node.id,
+      color: this.colorByCategory('todo', categories)
+    }));
+  });
+  return edges;
 },
 
 colorByCategory(category, categories) {
@@ -360,16 +375,17 @@ onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes, layout}) {
+onNodeTypeDropped({eventlet: {/*key,*/ value}, pipeline, nodeTypes, layout}) {
   if (pipeline) {
-    const {svgPoint} = value;
+    // const {svgPoint} = value;
+    const key = value;
     const newNode = this.makeNewNode(nodeTypes[key], pipeline.nodes, nodeTypes);
     // pipeline.nodes = [...pipeline.nodes, newNode];
     pipeline.nodes[newNode.id] = newNode;
     return {
       pipeline,
-      selectedNodeId: newNode.id,
-      layout: {...layout, [newNode.id]: svgPoint}
+      selectedNodeId: newNode.id
+      // layout: {...layout, [newNode.id]: svgPoint}
     };
   }
 },
@@ -487,10 +503,11 @@ template: html`
     border-color: grey;
   }
 </style>
-<div flex grid scrolling>
+<!-- <div flex grid scrolling> -->
+<drop-target flex grid scrolling on-target-drop="onNodeTypeDropped">
   <node-graph flex
       graph="{{graph}}"
-      on-nodetype-dropped="onNodeTypeDropped"
+      on-nodetype-dropped="xonNodeTypeDropped"
       on-node-moved="onNodeMoved"
       on-node-hovered="onNodeHovered"
       on-node-selected="onNodeSelect"
@@ -501,6 +518,7 @@ template: html`
       on-edge-deleted="onEdgeRemove"
       on-edge-connected="onEdgeConnected">
   </node-graph>
-</div>
+</drop-target>
+<!-- </div> -->
 `
 });

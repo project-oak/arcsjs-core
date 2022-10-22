@@ -18,6 +18,15 @@ export class NodeGraph extends Xen.Async {
   get container() {
     return this._dom.root;
   }
+  // TODO(mariakleiner): initialize node positions
+  // update({graph}) {
+  //   graph?.graphNodes.forEach(node => {
+  //     const w = 140;
+  //     const h = 60;
+  //     const [w2, h2] = [w/2, h/2];
+  //     this.rects[node.key] = {h, w, l: node.position.x-w2, y: node.position.y-h2};
+  //   });
+  // }
   _didMount() {
     this.canvas = this.querySelector('canvas');
     this.rects = {};
@@ -26,6 +35,20 @@ export class NodeGraph extends Xen.Async {
     //event.stopPropagation();
     this.key = event.currentTarget.key;
     this.fire('node-selected');
+  }
+  onMouseDown(event) {
+    //event.stopPropagation();
+    this.key = event.currentTarget.key;
+    this.fire('node-selected');
+  }
+  onMouseUp(event) {
+    this.key = event.currentTarget.key;
+    this.value = {x: event.clientX, y: event.clientY};
+    this.fire('node-moved');
+  }
+  onDrop(event) {
+    debugger;
+    console.log('hello');
   }
   onUpdateBox({currentTarget: {value: rect}}) {
     this.rects[this.key] = rect;
@@ -85,8 +108,10 @@ export class NodeGraph extends Xen.Async {
       };
       //const p = i => ({x: (i%cols)*width + margin + ox, y: Math.floor(i/cols)*height + margin + (margin*8)*(i%2) + oy});
       //const radius = 16;
-      graph?.graphNodes.map((n, i) => {
-        const g0 = this.geom(n.key, i);
+      // graph?.graphNodes.map((n, i) => {
+      graph?.graphEdges.map((edge, i) => {
+        const i0 = graph.graphNodes.findIndex(({key}) => key === edge.from);
+        const g0 = this.geom(edge.from, i0); //i); //n.key, i);
         ctx.strokeStyle = ['red', 'green', 'blue'][i%3];
         // this.roundedRect(ctx, g0.l, g0.t, g0.w, g0.h, radius);
         // ctx.fillStyle = n.bgColor;
@@ -94,7 +119,8 @@ export class NodeGraph extends Xen.Async {
         // ctx.strokeStyle = n.color;
         // ctx.stroke();
         //
-        const g1 = this.geom(null, i+1)
+        const i1 = graph.graphNodes.findIndex(({key}) => key === edge.to);
+        const g1 = this.geom(edge.to, i1); //i+1);//graph.graphNodes[i+1]?.key, i+1);
         const p0 = {x: g0.r, y: g0.y};
         const p1 = {x: g1.l, y: g1.y};
         const path = getEdgePath(p0, p1);
@@ -107,11 +133,11 @@ export class NodeGraph extends Xen.Async {
         ctx.stroke();
         circle(p1, 4);
         ctx.stroke();
-        ctx.fillStyle = n.color;
+        ctx.fillStyle = edge.color; //n.color;
         ctx.font = '14px sans-serif';
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
-        ctx.fillText(n.displayName, g0.x + g0.width/2, p0.y, g0.width - 16);
+        ctx.fillText("n.displayName", g0.x + g0.width/2, p0.y, g0.width - 16);
       });
     }
     //console.log(graph);
@@ -122,7 +148,7 @@ export class NodeGraph extends Xen.Async {
           ...n,
           style: {
             borderColor: n.selected ? n.color : n.bgColor,
-            color: n.color,
+            // color: n.color,
             background: n.bgColor,
             transform: `translate(${g.l}px, ${g.t}px)`,
           }
@@ -204,6 +230,7 @@ const template = Xen.Template.html`
   }
 </style>
 
+<!-- <div layer0 on-drop="onDrop"> -->
 <div layer0>
   <designer-layout
     on-update-box="onUpdateBox"
@@ -217,7 +244,7 @@ const template = Xen.Template.html`
 <canvas layer1 width="2000" height="800"></canvas>
 
 <template node_t>
-  <div node key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-click="onNodeClick"><span>{{displayName}}</span></div>
+  <div node key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-click="onNodeClick" on-mousedown="onMouseDown" on-mouseup="onMouseUp"><span>{{displayName}}</span></div>
 </template>
 
 `;
