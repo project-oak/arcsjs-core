@@ -23,7 +23,7 @@ const template = Xen.Template.html`
   }
   icon {
     display: none;
-    font-family: "Material Icons";
+    font-family: "Material Symbols Outlined";
     font-style: normal;
     font-feature-settings: "liga";
     -webkit-font-feature-settings: "liga";

@@ -19,7 +19,7 @@ import * as mediapipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
 import {CocoSsdNode} from '../../Library/TensorFlow/CocoSsdNode.js';
 import {GoogleMapNode} from '../../Library/Goog/GoogleMapNode.js';
 import {MacroRunnerNode} from '../../Library/Goog/MacroRunnerNode.js';
-import * as baseFieldNodes from '../../Library/Fields/FieldNodes.js';
+import * as fieldNodes from '../../Library/Fields/FieldNodes.js';
 import * as nodeGraphNodes from '../../Library/NodeGraph/NodeGraphNodes.js';
 import * as testNodes from './TestNodes.js';
 import * as ContainerNodes from './ContainerNodes.js';
@@ -28,16 +28,6 @@ import * as ContainerNodes from './ContainerNodes.js';
 //import {isPoisonousNode} from './isPoisonousNode.js';
 //import * as candyNodes from './Nodes/CandyNodes.js';
 // import {SceneNode} from '../../Library/AFrame/SceneNode.js';
-
-const fieldNodes = Object.values(baseFieldNodes).map(node => {
-  const newNode = {...node};
-  Object.keys(newNode).forEach(key => {
-    if (newNode[key].$kind) {
-      newNode[key].$kind = newNode[key].$kind.replace('$app', '$app/../nodebase/');
-    }
-  });
-  return newNode;
-});
 
 const {values} = Object;
 
@@ -48,7 +38,7 @@ const nodeTypesList = [
   ...values(mediapipeNodes),
   CocoSsdNode,
   ...values(nodeGraphNodes),
-  ...fieldNodes,
+  ...values(fieldNodes),
   ...values(ContainerNodes),
   GoogleMapNode,
   MacroRunnerNode,

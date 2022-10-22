@@ -37,6 +37,7 @@ renderGraph(inputs) {
   return {
     name: inputs.pipeline?.$meta?.name,
     graphNodes: this.renderGraphNodes(inputs),
+    graphEdges: this.renderGraphEdges(inputs),
     connectableCandidates: inputs.selectedNodeId && this.renderConnectableCandidates(inputs)
   };
 },
@@ -44,6 +45,28 @@ renderGraph(inputs) {
 renderGraphNodes(inputs) {
   const {pipeline} = inputs;
   return values(pipeline?.nodes).map(node => this.renderNode({node, ...inputs}));
+},
+
+renderGraphEdges(inputs) {
+  const {pipeline, categories} = inputs;
+  const edges = [];
+  values(pipeline?.nodes).forEach(node => {
+    //const froms = values(node.connections).map(values => values.map(({from}) => from)).flat();
+    const connects = entries(node.connections).map(([name, connects]) => connects.map(v => ({...v, toStoreName: name}))).flat();
+    //const froms = values(node.connections).flat();
+    connects.forEach(connect => edges.push({
+      from: {
+        id: connect.from,
+        storeName: connect.storeName
+      },
+      to: {
+        id: node.id,
+        storeName: connect.toStoreName
+      },
+      color: this.colorByCategory('todo', categories)
+    }));
+  });
+  return edges;
 },
 
 renderNode({node, categories, pipeline, hoveredNodeId, selectedNodeId, candidates, nodeTypes, layout}) {

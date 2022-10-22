@@ -18,9 +18,8 @@ export const Persistor = class {
   getKey(id) {
     return `${this.path}/${id}`;
   }
-  async persist(id, store) {
+  async persist(id, data) {
     let serial;
-    const data = store?.data;
     if (id && data) {
       const key = this.getKey(id);
       try {

@@ -12,6 +12,8 @@ import {IconsCss} from '../Dom/Material/material-icon-font/icons.css.js';
 
 const {assign} = Object;
 
+const GRID_SIZE = 8;
+
 export class DesignerLayout extends DragDrop {
   static get observedAttributes() {
     return [
@@ -166,7 +168,7 @@ export class DesignerLayout extends DragDrop {
   doMove(dx, dy) {
     if (this.rect && this.target) {
       // grid-snap
-      const snap = rect => DragDrop.snap(rect, 16);
+      const snap = rect => DragDrop.snap(rect, GRID_SIZE);
       // perform drag operation
       const dragRect = this.doDrag(this.rect, dx, dy, this.dragKind, this.dragFrom);
       //const dragRect = this.doDrag(snap(this.rect), dx, dy, this.dragKind, this.dragFrom);

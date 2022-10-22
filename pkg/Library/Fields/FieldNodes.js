@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
-export const TextField = {
+export const TextFieldNode = {
   $meta: {
     id: 'Text',
     category: 'Field'
@@ -20,12 +20,16 @@ export const TextField = {
     value: {
       $type: 'String',
       $value: 'value'
+    },
+    moar: {
+      $type: 'String',
+      $value: 'value'
     }
   },
   field: {
-    $kind: '$app/Library/FieldNodes/TextField',
+    $kind: '$library/Fields/TextField',
     $inputs: ['label', 'value'],
-    $outputs: ['label', 'value']
+    $outputs: ['label', 'value', 'moar']
   }
 };
 
@@ -41,41 +45,51 @@ export const BooleanField = {
     },
     value: {
       $type: 'Boolean'
+    },
+    moar: {
+      $type: 'String',
+      $value: 'value'
+    },
+    moar2: {
+      $type: 'String',
+      $value: 'value'
     }
   },
   field: {
-    $kind: '$app/Library/FieldNodes/BooleanField',
+    $kind: '$library/Fields/BooleanField',
     $inputs: ['label', 'value'],
-    $outputs: ['label', 'value']
+    $outputs: ['label', 'value', 'moar', 'moar2']
   }
 };
 
-export const TextObject = {
+export const StaticText = {
   $meta: {
     id: 'StaticText',
     displayName: 'Static Text',
-    category: 'Object'
+    category: 'Field'
   },
   $stores: {
     text: {
       $type: 'String',
-      $value: 'static text'
+      $value: 'static text',
+      connection: true
     },
     textStyle: {
       $type: 'String',
-      $value: 'font-weight: bold; color: red; font-size: 18px;'
+      $value: 'font-weight: bold; color: red; font-size: 18px;',
+      connection: true
     }
   },
   text: {
-    $kind: '$app/Library/FieldNodes/TextObject',
+    $kind: '$library/Fields/TextObject',
     $inputs: ['text', 'textStyle']
   }
 };
 
 export const LineObject = {
   $meta: {
-    id: 'Line',
-    category: 'Object',
+    id: 'LineObject',
+    category: 'Field',
   },
   $stores: {
     lineStyle: {
@@ -83,7 +97,7 @@ export const LineObject = {
     }
   },
   field: {
-    $kind: '$app/Library/FieldNodes/LineObject',
+    $kind: '$library/Fields/LineObject',
     $inputs: ['lineStyle']
   }
 };
