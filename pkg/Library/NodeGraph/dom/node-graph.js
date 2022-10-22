@@ -93,14 +93,15 @@ export class NodeGraph extends Xen.Async {
         const i1offset = spacing * (ii1-ii1c);
         const g1 = this.geom(edge.to.id, i1);
         //
-        const p0 = {x: g0.r, y: g0.y + i0offset};
+        const p0 = {x: g0.r - 1, y: g0.y + i0offset};
         const p1 = {x: g1.l, y: g1.y + i1offset};
         const path = this.getEdgePath(p0, p1);
         //
-        this.curve(ctx, path);
+        const highlight = [[210, 210, 255], [255, 210, 210], [210, 255, 210]][i%3];
+        this.curve(ctx, path, highlight);
         //
         //ctx.fillStyle = edge.color;
-        ctx.fillStyle = 'blue';
+        ctx.fillStyle = 'lightblue';
         ctx.strokeStyle = 'white';
         this.circle(ctx, p0, 3.5); ctx.stroke();
         this.circle(ctx, p1, 3.5); ctx.stroke();
@@ -139,9 +140,9 @@ export class NodeGraph extends Xen.Async {
     ctx.arc(c.x, c.y, r, 0, Math.PI*2);
     ctx.fill();
   }
-  curve(ctx, path) {
+  curve(ctx, path, highlight) {
     //const ir = r => Math.round(Math.random() * r);
-    const highlight = [210, 210, 255];
+    //const highlight = [210, 210, 255];
     // lasers!!!!
     for (let i=5; i>=0; i--) {
       ctx.beginPath();
@@ -216,14 +217,14 @@ const template = Xen.Template.html`
   }
   [dot] {
     display: inline-block;
-    width: 12px;
-    height: 12px;
+    width: 13px;
+    height: 13px;
     background: orange;
     border: 1px solid #555;
     border-radius: 50%;
   }
   [bar] {
-    padding-bottom: 4px;
+    padding: 1px 0 2px;
   }
 </style>
 
@@ -242,13 +243,13 @@ const template = Xen.Template.html`
 <template node_t>
   <div node key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-mousedown="onNodeSelect">
 
-    <div centering column repeat="socket_i_t" style="margin-left: -13px;">{{inputs}}</div>
+    <div centering column repeat="socket_i_t" style="margin-left: -14px;">{{inputs}}</div>
 
     <div flex center row style="padding: 0 4px;">
       <span>{{displayName}}</span>
     </div>
 
-    <div centering column repeat="socket_o_t" style="margin-right: -18px;">{{outputs}}</div>
+    <div centering column repeat="socket_o_t" style="margin-right: -17px;">{{outputs}}</div>
 
   </div>
 </template>
