@@ -28,9 +28,8 @@ export const Persistor = class {
         log.warn(x);
       }
       if (serial) {
-        this.upload(key, serial);
         log(`[${key}]\nPERSIST [${len(serial)}]`);
-        localStorage.setItem(key, serial);
+        this.upload(key, serial);
       }
     }
   }

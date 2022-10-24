@@ -4,11 +4,10 @@
   "version": "0.3.1",
   "action": {
     "default_icon": {
-      "16": "images/icon16.png",
-      "24": "images/icon24.png",
-      "32": "images/icon32.png"
+      "32": "assets/logo_32x32.png"
     },
-    "default_title": "Open Tools"
+    "default_title": "Open Tools",
+    "default_popup": "hello.html"
   },
   "content_security_policy": {
     "sandbox": "sandbox allow-scripts; worker-src blob:;"
@@ -26,6 +25,7 @@
   },
   "permissions": [
     "scripting",
-    "activeTab"
+    "activeTab",
+    "storage"
   ]
 }

@@ -48,13 +48,13 @@ export class XenComposer extends Composer {
     container.setAttribute('particle', id);
     // TODO(sjmiles): a_ hack is for a_frame elements that cannot live in ShadowDOM
     const root = (!id.toLowerCase().startsWith('a_') && this.useShadowRoot) ? container.attachShadow({mode: `open`}) : container;
+    const css = `/*injected by arcsjs composer*/${IconsCss}${XenCss}`;
+    dom('style', {innerHTML: css}, root);
     const slot = Xen.Template
       .stamp(template)
       .appendTo(root)
       .events(this.mapEvent.bind(this, id))
     ;
-    const css = `/*injected by arcsjs composer*/${IconsCss}${XenCss}`;
-    dom('style', {innerHTML: css}, root);
     return slot;
   }
   maybeReattachSlot(slot, container) {

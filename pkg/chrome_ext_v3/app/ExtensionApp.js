@@ -9,41 +9,52 @@
 import {App} from '../deploy/Library/App/TopLevel/App.js';
 import {logFactory} from '../deploy/Library/Core/utils.min.js';
 import {XenComposer} from '../deploy/Library/Dom/Surfaces/Default/XenComposer.js';
-import {NodegraphRecipe} from '../deploy/nodegraph/Library/NodegraphRecipe.js';
+import {HistoryService} from '../deploy/Library/App/HistoryService.js';
+import {FirebaseStoragePersistor} from '../deploy/Library/Firebase/FirebaseStoragePersistor.js';
+// import {LocalStoragePersistor} from '../deploy/Library/LocalStorage/LocalStoragePersistor.js';
+// import {ChromeStoragePersistor} from '../deploy/Library/Chrome/ChromeStoragePersistor.js';
+//import {NodegraphRecipe} from '../deploy/nodegraph/Library/NodegraphRecipe.js';
 
 const log = logFactory(true, 'ExtensionApp', 'navy');
 
 const ExtensionRecipe = {
-  echo: {
-    $kind: '$library/Echo.js',
-    $staticInputs: {html: 'World'}
-  }
-};
-
-const LibrarianRecipe = {
   $stores: {
-    library: {
-      $type: '[Particle]',
-      $tags: ['persisted']
+    html: {
+      $tags: ['persisted'],
+      $type: 'MultilineString',
+//       $value: `
+// <div style="padding: 24px;">
+//   <h3>Hello World ${Math.random()}</h3>
+// </div>
+//         `.trim(),
     }
   },
-  librarian: {
-    $kind: './deploy/librarian/Library/Librarian.js',
-    $inputs: ['library'],
-    $outputs: ['library']
+  echo: {
+    $kind: '$library/Echo.js',
+    $inputs: ['html']
   }
 };
 
 export const ExtensionApp = class extends App {
   constructor(path, root, options) {
     super(path, root, options);
-    this.services = [];
-    this.userAssembly = [NodegraphRecipe];
-    //this.userAssembly = [ExtensionRecipe, LibrarianRecipe];
+    this.services = {
+      HistoryService
+    };
+    this.persistor = new FirebaseStoragePersistor('user');
+    this.userAssembly = [ExtensionRecipe];
     this.composer = new XenComposer(document.body, true);
     this.composer.onevent = (p, e) => this.handle(p, e);
     this.arcs.render = p => this.render(p);
     log('Extension lives!');
+  }
+  async spinup() {
+    await super.spinup();
+//     this.arcs.set('user', 'html', `
+// <div style="padding: 24px;">
+//   <h3>Hello World ${Math.random()}</h3>
+// </div>
+//     `);
   }
   render(packet) {
     //log('render', packet);

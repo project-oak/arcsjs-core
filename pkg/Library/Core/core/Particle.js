@@ -330,35 +330,38 @@ export class Particle {
         return typeof this.impl?.[methodName] === 'function';
     }
     async maybeUpdate() {
-        if (await this.checkInit()) {
-            if (!this.canUpdate()) {
-                // we might want to render even if we don't update,
-                // if we `outputData` the system will add render models
-                this.outputData(null);
-            }
-            if (await this.shouldUpdate(this.inputs, this.state)) {
-                this.update();
-            }
+        if (!this.checkInit()) {
+            await this.doInit();
+        }
+        let doUpdate = false;
+        if (this.implements('update')) {
+            doUpdate = !this.implements('shouldUpdate')
+                || await (this.shouldUpdate(this.inputs, this.state));
+        }
+        if (doUpdate) {
+            return this.update();
+        }
+        else {
+            // we might want to render even if we don't update
+            // `outputData` will add render models
+            this.outputData(null);
         }
     }
-    async checkInit() {
-        if (!this.internal.initialized) {
-            this.internal.initialized = true;
-            if (this.implements('initialize')) {
-                await this.asyncMethod(this.impl.initialize);
-            }
+    checkInit() {
+        return this.internal.initialized;
+    }
+    async doInit() {
+        this.internal.initialized = true;
+        if (this.implements('initialize')) {
+            await this.asyncMethod(this.impl.initialize);
         }
-        return true;
     }
-    canUpdate() {
-        return this.implements('update');
-    }
+    // canUpdate() {
+    //   return this.implements('update');
+    // }
     async shouldUpdate(inputs, state) {
-        //return true;
-        // not implementing `shouldUpdate`, means the value should always be true
-        // TODO(sjmiles): this violates our 'false by default' convention, but the
-        // naming is awkward: `shouldNotUpdate`? `preventUpdate`?
-        return !this.impl?.shouldUpdate || (await this.impl.shouldUpdate(inputs, state) !== false);
+        // for this method, not implemented is true, if implemented, true is true
+        return !this.implements('shouldUpdate') || await this.impl.shouldUpdate(inputs, state);
     }
     update() {
         this.asyncMethod(this.impl?.update);

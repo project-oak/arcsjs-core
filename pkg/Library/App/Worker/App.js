@@ -38,7 +38,7 @@ export const App = class {
     await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     // TODO(sjmiles): pick a syntax
     const assembly = [DevToolsRecipe, ...(this.userAssembly ?? this.recipes ?? [])];
-    await Arcs.addAssembly(assembly, 'user');
+    await Arcs.addAssembly('user', assembly);
   }
   async service({request}) {
     // if we are specific
