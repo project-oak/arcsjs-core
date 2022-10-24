@@ -59,7 +59,7 @@ bgColorByCategory(category, categories) {
 render({}, {groups, showInfoPanel, infoPanelPos}) {
   return {
     groups,
-    hideNoMatchedNodesLabel: groups.length !== 0,
+    hideNoMatchedNodesLabel: groups?.length !== 0,
     showInfoPanel: String(Boolean(showInfoPanel)),
     infoPanelContainerStyle: {
       top: `${infoPanelPos?.top || 0}px`,

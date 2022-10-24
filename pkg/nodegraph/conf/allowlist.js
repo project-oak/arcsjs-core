@@ -15,6 +15,7 @@ export * from '../../Library/NodeGraph/Dom/node-graph.js';
 export * from '../../Library/NodeTypeCatalog/draggable-item.js';
 export * from '../../Library/Threejs/threejs-editor.js';
 //export * from '../../Library/AFrame/aframe.js';
+export * from '../../Library/PixiJs/pixi-view.js';
 
 // n.b. operates in outer context
 

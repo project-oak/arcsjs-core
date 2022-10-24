@@ -5,10 +5,10 @@
  * license that can be found in the LICENSE file.
  */
 
-export const Mobilenet = {
+export const MobilenetNode = {
   $meta: {
-    id: 'mobilenet',
-    category: 'Model'
+    id: 'MobilenetNode',
+    category: 'TensorFlow'
   },
   $stores: {
     Image: {
