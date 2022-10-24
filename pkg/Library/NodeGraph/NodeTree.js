@@ -137,7 +137,7 @@ getParticleNames(nodeType) {
 makeContainerModel(hostId, slotName) {
   return {
     icon: 'apps',
-    key: `${hostId}#${slotName}`,
+    id: `${hostId}#${slotName}`,
     name: slotName,
     isContainer: 'true'
   };
