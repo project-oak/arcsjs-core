@@ -12,7 +12,7 @@ const log = logFactory(logFactory.flags.services || logFactory.flags.ShaderServi
 
 //const isImproperSize = (width, height) => !width || !height;
 
-export const ShaderService = {
+export const PixiJsService = {
   makePixi({shaderId}) {
     Resources.free(shaderId);
 

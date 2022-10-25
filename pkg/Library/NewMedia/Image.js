@@ -6,7 +6,7 @@
  */
 ({
 onCanvas({eventlet: {value}}) {
-  return {image: value};
+  return {image: {...value, version: Math.random()}};
 },
 template: html`
 <style>

@@ -11,11 +11,11 @@ const log = logFactory(logFactory.flags.storage, 'FirebaseStoragePersistor', 'li
 
 const url = `https://arcsjs-core-default-rtdb.firebaseio.com`;
 
-const putJson = async (url, body) => {
+const putJson = async (url, data) => {
   return fetch(url, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(body)
+    body: JSON.stringify(data)
   });
 };
 
@@ -26,8 +26,9 @@ const getJson = async url => {
 
 export const FirebaseStoragePersistor = class extends Persistor {
   upload(key, serial) {
-    log(key);
+    log(key, serial);
     putJson(`${url}/${key}.json`, serial);
+    //putJson(`${url}/scott.json`, serial);
   }
   async download(key) {
     log(key);

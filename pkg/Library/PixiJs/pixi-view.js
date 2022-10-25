@@ -5,14 +5,15 @@
  * license that can be found in the LICENSE file.
  */
 import {Xen} from '../Dom/Xen/xen-async.js';
-//import {Resources} from '../App/Resources.js';
+import {Resources} from '../App/Resources.js';
 import {PIXI} from './pixi.js';
+import {deepEqual} from '../Core/utils.js';
 
 const assets = `../third_party/pixijs/assets`;
 
 export class PixiView extends Xen.Async {
   static get observedAttributes() {
-    return ['demo'];
+    return ['demo', 'image'];
   }
   get template() {
     return Xen.html`
@@ -24,14 +25,24 @@ export class PixiView extends Xen.Async {
 </style>
     `;
   }
-  update(inputs, state) {
-    if (state.app && inputs.demo !== state.demo) {
+  update({demo, image}, state) {
+    let demoName = demo;
+    if (image && !demoName) {
+      if (!state.image || !deepEqual(state.image, image)) {
+        const realCanvas = Resources.get(image.canvas);
+        if (realCanvas) {
+          demoName = 'ImageTexture';
+          state.image = image;
+          state.canvas = realCanvas;
+        }
+      }
+    }
+    if (state.app && demoName !== state.demo) {
       state.app.destroy(true);
       state.app = null;
-      state.demo = null;
     }
-    if (!state.app && inputs.demo) {
-      state.demo = inputs.demo;
+    if (!state.app && demoName) {
+      state.demo = demoName;
       const demos = {
         Spiral,
         Shader,
@@ -39,15 +50,16 @@ export class PixiView extends Xen.Async {
         Transparent,
         Tinting,
         CacheAsBitmap,
+        ImageTexture,
         SpineBoy
       };
-      const demo = demos[inputs.demo] ?? Object.values(demos)[inputs.demo-1];
-      if (demo) {
+      const demoFunc = demos[demoName];
+      if (demoFunc) {
         const app = state.app = new PIXI.Application({
-          backgroundAlpha: (demo === Transparent) ? 0 : 1
+          backgroundAlpha: (demoFunc === Transparent) ? 0 : 1
         });
         this.host.appendChild(app.view);
-        demo(app);
+        demoFunc(app, state);
       }
     }
   }
@@ -56,6 +68,14 @@ export class PixiView extends Xen.Async {
 customElements.define('pixi-view', PixiView);
 
 const clamp = (v, mn, mx) => Math.min(mx, Math.max(mn, v));
+
+const ImageTexture = (app, {canvas}) => {
+  //const {width, height} = app.screen;
+  const texture = PIXI.RenderTexture.from(canvas);
+  const sprite = new PIXI.Sprite(texture);
+  app.stage.addChild(sprite);
+  //app.renderer.render(app.stage, {renderTexture: texture});
+};
 
 const Spiral = app => {
   // create two render textures... these dynamic textures will be used to draw the scene into itself
@@ -428,6 +448,61 @@ const CacheAsBitmap = async app => {
     alien.anchor.y = 0.5;
     aliens.push(alien);
     alienContainer.addChild(alien);
+  }
+  // make the stage interactive
+  app.stage.interactive = true;
+  app.stage.addChild(alienContainer);
+  // Combines both mouse click + touch tap
+  app.stage.on('pointertap', onClick);
+  function onClick() {
+    alienContainer.cacheAsBitmap = !alienContainer.cacheAsBitmap;
+    // feel free to play with what's below
+    // var sprite = new PIXI.Sprite(alienContainer.generateTexture());
+    // app.stage.addChild(sprite);
+    // sprite.x = Math.random() * 800;
+    // sprite.y = Math.random() * 600;
+  }
+  app.ticker.add(() => {
+    // let's rotate the aliens a little bit
+    for (let i=0; i<100; i++) {
+      const alien = aliens[i];
+      alien.rotation += 0.1;
+    }
+    count += 0.01;
+    alienContainer.scale.x = Math.sin(count);
+    alienContainer.scale.y = Math.sin(count);
+    alienContainer.rotation += 0.01;
+  });
+  app.start();
+};
+
+const Asteroids = async app => {
+  const frames = [
+    'eggHead.png',
+    'flowerTop.png',
+    'helmlok.png',
+    'skully.png',
+  ];
+  // holder to store aliens
+  const rocks = [];
+  let count = 0;
+  // create an empty container
+  const container = new PIXI.Container();
+  container.x = 0;
+  container.y = 0;
+  // load resources
+  //await PIXI.Assets.add('spritesheet', `${assets}/spritesheet/monsters.json`);
+  // add a bunch of aliens with textures from image paths
+  for (let i = 0; i < 10; i++) {
+    const rock = PIXI.Sprite.from(`${assets}/${eggHead.png}`);
+    // alien.tint = Math.random() * 0xFFFFFF;
+    alien.x = Math.random() * 800 - 400;
+    alien.y = Math.random() * 600 - 300;
+    alien.dx = Math.floor(Math.random()*3) - 1;
+    // alien.anchor.x = 0.5;
+    // alien.anchor.y = 0.5;
+    frames.push(rock);
+    container.addChild(rock);
   }
   // make the stage interactive
   app.stage.interactive = true;

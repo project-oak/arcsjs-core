@@ -19,7 +19,6 @@ export class DesignerLayout extends DragDrop {
     return [
       'selected',
       'rects',
-      // The color of the boxer.
       'color'
     ];
   }
@@ -103,11 +102,14 @@ export class DesignerLayout extends DragDrop {
     }
   }
   select(id) {
-    this.target = this.getChildById(id);
-    // TODO(mariakleiner): it is possible that the `target` hasn't rendered yet and will remain unselected.
-    this.rect = this.target && this.getRect(this.target);
-    this.restyleSelection();
-    this.updateOrders(this.target);
+    if (this.lastSelectedId !== id) {
+      this.lastSelectedId = id;
+      this.target = this.getChildById(id);
+      // TODO(mariakleiner): it is possible that the `target` hasn't rendered yet and will remain unselected.
+      this.rect = this.target && this.getRect(this.target);
+      this.restyleSelection();
+      this.updateOrders(this.target);
+    }
   }
   firePosition(target) {
     this.key = this.getTargetKey(target);
@@ -156,6 +158,7 @@ export class DesignerLayout extends DragDrop {
     this.updateOrders(this.target);
     // This is to select the node right away when pointer is down.
     this.firePosition(this.target);
+    this.dragRect = this.rect;
     // TODO(sjmiles): hack to allow dragging only from title bar
     // if (from === ':::') {
     //   const t0 = e.composedPath?.()?.[0];
@@ -166,12 +169,12 @@ export class DesignerLayout extends DragDrop {
     // }
   }
   doMove(dx, dy) {
-    if (this.rect && this.target) {
+    if (this.dragRect && this.target) {
       // grid-snap
       const snap = rect => DragDrop.snap(rect, GRID_SIZE);
       // perform drag operation
-      const dragRect = this.doDrag(this.rect, dx, dy, this.dragKind, this.dragFrom);
-      //const dragRect = this.doDrag(snap(this.rect), dx, dy, this.dragKind, this.dragFrom);
+      const dragRect = this.doDrag(this.dragRect, dx, dy, this.dragKind, this.dragFrom);
+      //const dragRect = this.doDrag(snap(this.dragRect), dx, dy, this.dragKind, this.dragFrom);
       // install output rectangle
       this.setBoxStyle(this.target, snap(dragRect));
       // let the boxer adapt to the target end state
@@ -262,7 +265,8 @@ export class DesignerLayout extends DragDrop {
     box-sizing: border-box;
   }
   [container] {
-    flex: 1;
+    position: absolute;
+    inset: 0;
   }
   ::slotted(*) {
     position: absolute;
@@ -335,7 +339,7 @@ export class DesignerLayout extends DragDrop {
   }
 </style>
 <style>${'{{styleOverrides}}'}</style>
-<div container on-pointerdown="onContainerDown">
+<div container on-pointerdown="onDown">
   <slot on-pointerdown="onDown" on-pointerup="onUp" on-slotchange="onSlotChange"></slot>
 </div>
 <div boxer on-pointerdown="onDown">

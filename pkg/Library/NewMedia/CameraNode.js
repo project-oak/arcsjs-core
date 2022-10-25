@@ -6,9 +6,10 @@
  */
 import {DeviceUxRecipe} from '../Media/DeviceUxRecipe.js';
 
-export const Camera = {
+export const CameraNode = {
   $meta: {
-    id: 'Camera',
+    id: 'CameraNode',
+    displayName: "Camera",
     category: 'Media'
   },
   $stores: {

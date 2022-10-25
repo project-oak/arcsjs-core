@@ -9,7 +9,7 @@
 
 // arcs library
 import * as customNodes from '../Library/Librarian/CustomNodes.js';
-import * as newMediaNodes from '../../Library/NewMedia/Nodes/Nodes.js';
+import * as newMediaNodes from '../../Library/NewMedia/Nodes.js';
 import * as displayNodes from '../../Library/Display/DisplayNodes.js';
 import * as shaderNodes from '../../Library/Shader/ShaderNodes.js';
 import {ThreejsEditorNode} from '../../Library/Threejs/ThreejsEditorNode.js';
@@ -23,13 +23,13 @@ import * as fieldNodes from '../../Library/Fields/FieldNodes.js';
 import * as nodeGraphNodes from '../../Library/NodeGraph/NodeGraphNodes.js';
 import * as testNodes from './TestNodes.js';
 import * as ContainerNodes from './ContainerNodes.js';
-import * as pixijsNodes from '../../Library/PixiJs/PixiJsNode.js';
+import * as pixijsNodes from '../../Library/PixiJs/PixiJsNodes.js';
 
 // backburner
 //import {PoemNode} from './PoemNode.js';
 //import {isPoisonousNode} from './isPoisonousNode.js';
 //import * as candyNodes from './Nodes/CandyNodes.js';
-// import {SceneNode} from '../../Library/AFrame/SceneNode.js';
+//import {SceneNode} from '../../Library/AFrame/SceneNode.js';
 
 const {values} = Object;
 

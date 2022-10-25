@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "ArcsExtV3_2",
+  "version": "0.3.2",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "web_accessible_resources": [{
+    "resources": ["content.js"],
+    "matches": [
+      "https://*.meet.google.com/*",
+      "http://localhost:9888/*"
+    ]
+  }],
+  "content_scripts": [{
+    "matches": [
+      "https://*.meet.google.com/*",
+      "http://localhost:9888/*"
+    ],
+    "js": ["content.js"]
+  }]
+}

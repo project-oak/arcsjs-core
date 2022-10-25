@@ -770,7 +770,7 @@ var _Runtime = class extends EventEmitter {
   async persistStore(storeId, store) {
     if (store.shouldPersist()) {
       this.log(`persistStore "${storeId}"`);
-      return this.persistor?.persist?.(storeId, store);
+      return this.persistor?.persist?.(storeId, store.data);
     }
   }
   async restoreStore(storeId, store) {

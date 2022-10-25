@@ -122,7 +122,7 @@ export class MediaStream extends Xen.Async {
         // Prefer the rear-facing camera if available.
         facingMode: "environment",
         // TODO(sjmiles): use my best cam if available
-        //deviceId: `c0b484a66035c6517a66ba5768283a03f73950c8a3ec8cb1edac2f39c1992fde`
+        deviceId: `545b0c354475465dd731e6fe7414319c2d88f4660c6c108ca43528191638406b`
         //deviceId: '765b8e89f8e6a0630bccbab92cd75323781f9ea796e2fee147abae3c5ad45c07'
       };
       if (videodeviceid) {
@@ -132,8 +132,12 @@ export class MediaStream extends Xen.Async {
     if (enableAudio) {
       constraints.audio = audioinputdeviceid ? {deviceId: {exact: audioinputdeviceid}} : true;
     }
-    log(constraints);
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+    } catch(x) {
+      log(x);
+    }
     if (stream && enableVideo) {
       let facingMode = '';
       try {

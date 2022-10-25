@@ -68,10 +68,10 @@ export class ImageResource extends Xen.Async {
       }
     }
   }
-  updateImage(image, state) {
+  async updateImage(image, state) {
     if (!image?.canvas && image?.url) {
       image.canvas = this.canvasId;
-      this.updateImageCanvas(image);
+      await this.updateImageCanvas(image);
       this.value = image;
       this.fire('canvas');
     }
@@ -90,14 +90,12 @@ export class ImageResource extends Xen.Async {
       }
     }
   }
-  updateImageCanvas(image) {
+  async updateImageCanvas(image) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.src = image.url;
-    (async () => {
-      await img.decode();
-      this.copyImage(img);
-    })();
+    await img.decode();
+    this.copyImage(img);
   }
   // render({image}, state) {
   //   const model = {};

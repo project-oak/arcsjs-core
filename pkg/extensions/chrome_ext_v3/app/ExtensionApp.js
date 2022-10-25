@@ -11,9 +11,8 @@ import {logFactory} from '../deploy/Library/Core/utils.min.js';
 import {XenComposer} from '../deploy/Library/Dom/Surfaces/Default/XenComposer.js';
 import {HistoryService} from '../deploy/Library/App/HistoryService.js';
 import {FirebaseStoragePersistor} from '../deploy/Library/Firebase/FirebaseStoragePersistor.js';
-// import {LocalStoragePersistor} from '../deploy/Library/LocalStorage/LocalStoragePersistor.js';
-// import {ChromeStoragePersistor} from '../deploy/Library/Chrome/ChromeStoragePersistor.js';
-//import {NodegraphRecipe} from '../deploy/nodegraph/Library/NodegraphRecipe.js';
+import {DeviceUxRecipe} from '../deploy/Library/Media/DeviceUxRecipe.js';
+import {CameraNode} from '../deploy/Library/NewMedia/CameraNode.js';
 
 const log = logFactory(true, 'ExtensionApp', 'navy');
 
@@ -22,11 +21,11 @@ const ExtensionRecipe = {
     html: {
       $tags: ['persisted'],
       $type: 'MultilineString',
-//       $value: `
-// <div style="padding: 24px;">
-//   <h3>Hello World ${Math.random()}</h3>
-// </div>
-//         `.trim(),
+      $value: `
+<div style="padding: 24px;">
+  <h3>Hello World ${Math.random()}</h3>
+</div>
+        `.trim(),
     }
   },
   echo: {
@@ -42,7 +41,7 @@ export const ExtensionApp = class extends App {
       HistoryService
     };
     this.persistor = new FirebaseStoragePersistor('user');
-    this.userAssembly = [ExtensionRecipe];
+    this.userAssembly = [CameraNode, ExtensionRecipe];
     this.composer = new XenComposer(document.body, true);
     this.composer.onevent = (p, e) => this.handle(p, e);
     this.arcs.render = p => this.render(p);
@@ -50,6 +49,16 @@ export const ExtensionApp = class extends App {
   }
   async spinup() {
     await super.spinup();
+    setTimeout(() => {
+      this.arcs.set('user', 'mediaDevices', {
+        videoinput: {
+          deviceId: '545b0c354475465dd731e6fe7414319c2d88f4660c6c108ca43528191638406b',
+          kind: 'videoinput',
+          label: 'HD Pro Webcam C920 (046d:082d)',
+          groupId: '6b5db3734e5bd10ecda9de583b7ef3761be03ce1ab1b49c1a91a312fb91f6de2'
+        }
+      });
+    }, 1000);
 //     this.arcs.set('user', 'html', `
 // <div style="padding: 24px;">
 //   <h3>Hello World ${Math.random()}</h3>
@@ -57,7 +66,7 @@ export const ExtensionApp = class extends App {
 //     `);
   }
   render(packet) {
-    //log('render', packet);
+    log('render', packet);
     this.composer.render(packet);
   }
   handle(pid, eventlet) {

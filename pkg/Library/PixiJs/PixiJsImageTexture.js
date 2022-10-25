@@ -6,6 +6,6 @@
  */
 ({
   template: html`
-    <pixi-view demo="{{demo}}" image="{{image}}"></pixi-view>
+    <pixi-view demo="{{demo}}"></pixi-view>
   `
 })

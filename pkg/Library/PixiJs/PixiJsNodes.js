@@ -22,3 +22,24 @@ export const PixiJsDemoNode = {
     $inputs: [{demo: 'demoName'}]
   }
 };
+
+export const PixiTextureNode = {
+  $meta: {
+    id: 'PixiTextureNode',
+    displayName: 'Pixi Texture',
+    category: 'PixiJs'
+  },
+  $stores: {
+    demoName: {
+      noinspect: true
+    },
+    image: {
+      $type: 'Image',
+      connection: true
+    }
+  },
+  pixi: {
+    $kind: '$library/PixiJs/PixiJs',
+    $inputs: ['image']
+  }
+};
