@@ -108,8 +108,10 @@ export class NodeGraph extends Xen.Async {
         const p1 = {x: g1.l + 1, y: g1.y + i1offset};
         const path = this.getEdgePath(p0, p1);
         //
-        const highlight = [[210, 210, 255], [255, 210, 210], [210, 255, 210]][i%3];
-        this.curve(ctx, path, highlight);
+        //this.curve(ctx, path);
+        //const highlight = [[210, 210, 255], [255, 210, 210], [210, 255, 210]][i%3];
+        const highlight = [[21, 100, 100], [100, 21, 21], [21, 100, 21]][i%3];
+        this.laserCurve(ctx, path, highlight);
         //
         //ctx.fillStyle = edge.color;
         ctx.fillStyle = 'lightblue';
@@ -138,23 +140,23 @@ export class NodeGraph extends Xen.Async {
       ];
     }
   }
-  //roundedRect(ctx, x, y, width, height, radius) {
-  //   ctx.beginPath();
-  //   ctx.lineWidth = 2;
-  //   ctx.lineJoin = "round";
-  //   ctx.moveTo(x, y + radius);
-  //   ctx.arcTo(x, y + height, x + radius, y + height, radius);
-  //   ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
-  //   ctx.arcTo(x + width, y, x + width - radius, y, radius);
-  //   ctx.arcTo(x, y, x, y + radius, radius);
-  // }
+  roundedRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.lineJoin = "round";
+    ctx.moveTo(x, y + radius);
+    ctx.arcTo(x, y + height, x + radius, y + height, radius);
+    ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
+    ctx.arcTo(x + width, y, x + width - radius, y, radius);
+    ctx.arcTo(x, y, x, y + radius, radius);
+  }
   circle(ctx, c, r) {
     ctx.beginPath();
     ctx.arc(c.x, c.y, r, 0, Math.PI*2);
     ctx.fill();
     ctx.closePath();
   }
-  curve(ctx, path, highlight) {
+  curve(ctx, path) {
     ctx.beginPath();
     // draw each line, the last line in each is always white
     ctx.lineWidth = 3;
@@ -166,11 +168,11 @@ export class NodeGraph extends Xen.Async {
   };
   laserCurve(ctx, path, highlight) {
     // lasers!!!!
-    for (let i=5; i>=0; i--) {
+    for (let i=3; i>=0; i--) {
       ctx.beginPath();
       // draw each line, the last line in each is always white
-      ctx.lineWidth = (i+1)*4-3;
-      ctx.strokeStyle = !i ? '#fff' : `rgba(${highlight[0]},${highlight[1]},${highlight[2]},${0.25-0.03*i})`;
+      ctx.lineWidth = i*2.2 + 1;
+      ctx.strokeStyle = !i ? `rgba(${highlight[0]},${highlight[1]},${highlight[2]},1)` : `rgba(${highlight[0]},${highlight[1]},${highlight[2]},${0.25-0.06*i})`;
       ctx.moveTo(path[0], path[1]);
       ctx.bezierCurveTo(path[2], path[3], path[4], path[5], path[6], path[7]);
       ctx.stroke();
