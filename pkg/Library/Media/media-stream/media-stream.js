@@ -122,7 +122,7 @@ export class MediaStream extends Xen.Async {
         // Prefer the rear-facing camera if available.
         facingMode: "environment",
         // TODO(sjmiles): use my best cam if available
-        deviceId: `545b0c354475465dd731e6fe7414319c2d88f4660c6c108ca43528191638406b`
+        //deviceId: `545b0c354475465dd731e6fe7414319c2d88f4660c6c108ca43528191638406b`
         //deviceId: '765b8e89f8e6a0630bccbab92cd75323781f9ea796e2fee147abae3c5ad45c07'
       };
       if (videodeviceid) {
