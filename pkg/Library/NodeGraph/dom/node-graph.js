@@ -8,7 +8,7 @@ import {Xen} from '../../Dom/Xen/xen-async.js';
 
 export class NodeGraph extends Xen.Async {
   static get observedAttributes() {
-    return ['graph'];
+    return ['graph', 'rects'];
   }
   get host() {
     return this;
@@ -29,15 +29,18 @@ export class NodeGraph extends Xen.Async {
     this.fire('node-selected');
   }
   onUpdateBox({currentTarget: {value: rect}}) {
+    this.value = rect;
+    this.fire('node-moved')
     this.rects[this.key] = rect;
     this.invalidate();
   }
   geom(key, i) {
-    if (this.rects[key]) {
+    if (this.rects?.[key]) {
       const {l, t, w, h} = this.rects[key];
       const [w2, h2] = [w/2, h/2];
       return {x: l+w2, y: t+h2, l, t, r: l+w, b: t+h, w, h, w2, h2};
     } else {
+      console.log(key);
       const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
       const p = i => ({
         x: (i%cols)*(width+margin) + ox,
@@ -62,8 +65,10 @@ export class NodeGraph extends Xen.Async {
           inputs: n.inputs?.map(({name, type}) => ({name, type, title: `${name}: ${type}`})),
           outputs: n.outputs?.map(({name, type}) => ({name, type, title: `${name}: ${type}`})),
           nameStyle: {
-            borderRadius: '16px 16px 0 0',
+            borderRadius: '11px 11px 0 0',
+            borderColor: n.selected ? n.color : n.bgColor,
             background: n.selected ? n.color : n.bgColor,
+            fontSize: '0.8em'
           },
           style: {
             borderColor: n.selected ? n.color : n.bgColor,
@@ -78,7 +83,10 @@ export class NodeGraph extends Xen.Async {
     return model;
   }
   _didRender({graph}, {x, y}) {
-    this.renderCanvas({graph}, {x, y});
+    if (this.rects) {
+      console.log(this.rects);
+      this.renderCanvas({graph}, {x, y});
+    }
   }
   renderCanvas({graph}, {x, y}) {
     const ctx = this.canvas?.getContext('2d');
@@ -231,24 +239,25 @@ const template = Xen.Template.html`
     pointer-events: none;
   }
   [repeat="socket_i_t"] {
-    margin-left: -11px;
+    margin-left: -10px;
   }
   [repeat="socket_o_t"] {
-    margin-right: -11px;
+    margin-right: -10px;
   }
-  [repeat="socket_i_t"], [repeat="socket_o_t"] {
-    opacity: 0.8;
+  [repeat="socket_i_t"] [dot], [repeat="socket_o_t"] [dot] {
+    visibility: hidden;
   }
-  [repeat="socket_i_t"]:hover, [repeat="socket_o_t"]:hover {
-    opacity: 1;
+  [repeat="socket_i_t"]:hover [dot], [repeat="socket_o_t"]:hover [dot] {
+    visibility: visible;
   }
   [dot] {
     display: inline-block;
-    width: 13px;
-    height: 13px;
-    background: orange;
-    border: 1px solid #555;
+    width: 9px;
+    height: 9px;
+    background: lightblue;
+    border: 1px solid #eeeeff80;
     border-radius: 50%;
+    padding: 5px;
   }
   [bar] {
     padding: 3px;
@@ -259,15 +268,18 @@ const template = Xen.Template.html`
 </style>
 
 <div layer0>
-  <designer-layout selected="{{selectedKeys}}" on-update-box="onUpdateBox"
-    on-delete="onNodeDelete" repeat="node_t">{{nodes}}</designer-layout>
+  <designer-layout
+    selected="{{selectedKeys}}"
+    on-update-box="onUpdateBox"
+    on-delete="onNodeDelete"
+    repeat="node_t">{{nodes}}</designer-layout>
 </div>
 <canvas layer1 width="2000" height="800"></canvas>
 
 <template node_t>
   <div node flex column id="{{nodeId}}" key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-mousedown="onNodeSelect">
     <div row xen:style="{{nameStyle}}">
-      <span flex>{{displayName}}</span>
+      <div style="padding: 4px;" flex>{{displayName}}</div>
     </div>
     <div flex row>
       <div centering column repeat="socket_i_t">{{inputs}}</div>

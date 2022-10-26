@@ -205,6 +205,7 @@ export class DesignerLayout extends DragDrop {
     return {l, t, w, h};
   }
   doUp() {
+    this.dragRect = null;
     if (this.target) {
       this.firePosition(this.target);
     }
