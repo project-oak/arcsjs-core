@@ -40,7 +40,7 @@ export class NodeGraph extends Xen.Async {
       const [w2, h2] = [w/2, h/2];
       return {x: l+w2, y: t+h2, l, t, r: l+w, b: t+h, w, h, w2, h2};
     } else {
-      console.log(key);
+      // console.log(key);
       const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
       const p = i => ({
         x: (i%cols)*(width+margin) + ox,
@@ -84,7 +84,7 @@ export class NodeGraph extends Xen.Async {
   }
   _didRender({graph}, {x, y}) {
     if (this.rects) {
-      console.log(this.rects);
+      // console.log(this.rects);
       this.renderCanvas({graph}, {x, y});
     }
   }

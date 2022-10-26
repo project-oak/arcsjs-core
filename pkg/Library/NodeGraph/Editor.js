@@ -384,7 +384,7 @@ onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-onNodeTypeDropped({eventlet: {key: type, value}, pipeline, /*nodeTypes, layout*/ newNodeInfos}) {
+onNodeTypeDropped({eventlet: {key, value: type}, pipeline, newNodeInfos}) {
   if (pipeline) {
     return {
       newNodeInfos: [...(newNodeInfos || []), {type}]
