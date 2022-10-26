@@ -270,97 +270,97 @@ onNodeRenamed({eventlet: {key, value}, pipeline}) {
   return {pipeline};
 },
 
-onNodesDuplicated({eventlet: {value: nodeIds}, pipeline, selectedNodeId, nodeTypes, layout, previewLayout}) {
-  // A map from original node id to its duplicated node id.
-  const idMap = {};
+// onNodesDuplicated({eventlet: {value: nodeIds}, pipeline, selectedNodeId, nodeTypes, layout, previewLayout}) {
+//   // A map from original node id to its duplicated node id.
+//   const idMap = {};
 
-  // Duplicate currently selected nodes.
-  //
-  const newNodes = [];
-  const newLayout = {...layout};
-  const newPreviewLayout = {...previewLayout};
-  // nodes.forEach(node => {
-    nodeIds.forEach(id =>  {
-    const node = pipeline.nodes[id];
-    // Duplicate the node.
-    const newNode = this.duplicateNode(node, pipeline, nodeTypes);
-    // Update the pipeline with the new node.
-    pipeline.nodes[newNode.id] = newNode;
-    // keep the books
-    newNodes.push(newNode);
-    idMap[node.id] = newNode.id;
-    newLayout[newNode.id] = {...layout[node.id], y: layout[node.id].y + 60};
-    const position = newPreviewLayout[node.id];
-    if (position) {
-      newPreviewLayout[newNode.id] = {...position, t: position.t + position.h + 16};
-    }
-  });
+//   // Duplicate currently selected nodes.
+//   //
+//   const newNodes = [];
+//   const newLayout = {...layout};
+//   const newPreviewLayout = {...previewLayout};
+//   // nodes.forEach(node => {
+//     nodeIds.forEach(id =>  {
+//     const node = pipeline.nodes[id];
+//     // Duplicate the node.
+//     const newNode = this.duplicateNode(node, pipeline, nodeTypes);
+//     // Update the pipeline with the new node.
+//     pipeline.nodes[newNode.id] = newNode;
+//     // keep the books
+//     newNodes.push(newNode);
+//     idMap[node.id] = newNode.id;
+//     newLayout[newNode.id] = {...layout[node.id], y: layout[node.id].y + 60};
+//     const position = newPreviewLayout[node.id];
+//     if (position) {
+//       newPreviewLayout[newNode.id] = {...position, t: position.t + position.h + 16};
+//     }
+//   });
 
-  // Connect duplicated nodes to duplicated nodes (instead of the original ones).
-  newNodes.forEach(({connections}) => {
-    values(connections).forEach(options => {
-      options.forEach(connection => connection.from = idMap[connection.from]);
-    });
-  });
+//   // Connect duplicated nodes to duplicated nodes (instead of the original ones).
+//   newNodes.forEach(({connections}) => {
+//     values(connections).forEach(options => {
+//       options.forEach(connection => connection.from = idMap[connection.from]);
+//     });
+//   });
 
-  return {
-    pipeline,
-    selectedNodeId: idMap[selectedNodeId],
-    layout: newLayout,
-    previewLayout: newPreviewLayout
-  };
-},
+//   return {
+//     pipeline,
+//     selectedNodeId: idMap[selectedNodeId],
+//     layout: newLayout,
+//     previewLayout: newPreviewLayout
+//   };
+// },
 
-duplicateNode(node, pipeline, nodeTypes) {
-  const newNode = this.makeNewNode(nodeTypes[node.type], pipeline.nodes);
-  // Copy props.
-  if (node.props) {
-    newNode.props = {...node.props};
-  }
-  // Copy connections.
-  if (node.connections) {
-    newNode.connections = JSON.parse(JSON.stringify(node.connections));
-  }
-  // Update display name if necessary.
-  if (node.displayName) {
-    newNode.displayName = this.duplicateDisplayName(node.displayName, pipeline);
-  }
-  return newNode;
-},
+// duplicateNode(node, pipeline, nodeTypes) {
+//   const newNode = this.makeNewNode(nodeTypes[node.type], pipeline.nodes);
+//   // Copy props.
+//   if (node.props) {
+//     newNode.props = {...node.props};
+//   }
+//   // Copy connections.
+//   if (node.connections) {
+//     newNode.connections = JSON.parse(JSON.stringify(node.connections));
+//   }
+//   // Update display name if necessary.
+//   if (node.displayName) {
+//     newNode.displayName = this.duplicateDisplayName(node.displayName, pipeline);
+//   }
+//   return newNode;
+// },
 
-duplicateDisplayName(displayName, pipeline) {
-  // Mimic the way how macOS names the duplicated files:
-  //
-  // - Append "copy" if the name doesn't end with copy.
-  // - If the name ends withh "copy", append "2".
-  // - If the name ends with "copy" + a number, increment the number.
-  // Do the steps above until a unique name is found.
-  let parts = displayName.split(' ');
-  const lastPart = parts[parts.length - 1];
-  let c = 1;
-  if (parts.length >= 2 && !isNaN(lastPart) &&
-      parts[parts.length - 2] === 'copy') {
-    c = Number(lastPart) + 1;
-  } else if (lastPart === 'copy') {
-    c = 2;
-  }
-  let newParts = [...parts];
-  while (c > 0) {
-    if (c === 1) {
-      newParts.push('copy');
-    } else if (c === 2) {
-      newParts.push(c);
-    } else {
-      newParts[newParts.length - 1] = c;
-    }
-    if (!values(pipeline.nodes).find(n => n.displayName === newParts.join(' '))) {
-      parts = newParts;
-      break;
-    }
-    c++;
-  }
-  return parts.join(' ');
-},
+// duplicateDisplayName(displayName, pipeline) {
+//   // Mimic the way how macOS names the duplicated files:
+//   //
+//   // - Append "copy" if the name doesn't end with copy.
+//   // - If the name ends withh "copy", append "2".
+//   // - If the name ends with "copy" + a number, increment the number.
+//   // Do the steps above until a unique name is found.
+//   let parts = displayName.split(' ');
+//   const lastPart = parts[parts.length - 1];
+//   let c = 1;
+//   if (parts.length >= 2 && !isNaN(lastPart) &&
+//       parts[parts.length - 2] === 'copy') {
+//     c = Number(lastPart) + 1;
+//   } else if (lastPart === 'copy') {
+//     c = 2;
+//   }
+//   let newParts = [...parts];
+//   while (c > 0) {
+//     if (c === 1) {
+//       newParts.push('copy');
+//     } else if (c === 2) {
+//       newParts.push(c);
+//     } else {
+//       newParts[newParts.length - 1] = c;
+//     }
+//     if (!values(pipeline.nodes).find(n => n.displayName === newParts.join(' '))) {
+//       parts = newParts;
+//       break;
+//     }
+//     c++;
+//   }
+//   return parts.join(' ');
+// },
 
 onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType, svgX, svgY}}, pipeline, nodeTypes, layout}) {
   // Add the new node.
@@ -383,17 +383,20 @@ onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-onNodeTypeDropped({eventlet: {key, value}, pipeline, nodeTypes, layout}) {
+onNodeTypeDropped({eventlet: {key: type, value}, pipeline, /*nodeTypes, layout*/ newNodeInfos}) {
   if (pipeline) {
-    const {svgPoint} = value;
-    const newNode = this.makeNewNode(nodeTypes[key], pipeline.nodes, nodeTypes);
-    // pipeline.nodes = [...pipeline.nodes, newNode];
-    pipeline.nodes[newNode.id] = newNode;
     return {
-      pipeline,
-      selectedNodeId: newNode.id,
-      layout: {...layout, [newNode.id]: svgPoint}
+      newNodeInfos: [...(newNodeInfos || []), {type}]
     };
+  //   const {svgPoint} = value;
+  //   const newNode = this.makeNewNode(nodeTypes[key], pipeline.nodes, nodeTypes);
+  //   // pipeline.nodes = [...pipeline.nodes, newNode];
+  //   pipeline.nodes[newNode.id] = newNode;
+  //   return {
+  //     pipeline,
+  //     selectedNodeId: newNode.id,
+  //     layout: {...layout, [newNode.id]: svgPoint}
+  //   };
   }
 },
 
@@ -511,19 +514,21 @@ template: html`
   }
 </style>
 <div flex grid scrolling>
-  <node-graph flex
-      graph="{{graph}}"
-      on-nodetype-dropped="onNodeTypeDropped"
-      on-node-moved="onNodeMoved"
-      on-node-hovered="onNodeHovered"
-      on-node-selected="onNodeSelect"
-      on-node-deleted="onNodeRemove"
-      on-node-renamed="onNodeRenamed"
-      on-nodes-duplicated="onNodesDuplicated"
-      on-add-candidate="onAddCandidate"
-      on-edge-deleted="onEdgeRemove"
-      on-edge-connected="onEdgeConnected">
-  </node-graph>
+  <drop-target flex row on-target-drop="onNodeTypeDropped">
+    <node-graph flex
+        graph="{{graph}}"
+        on-nodetype-dropped="onNodeTypeDropped"
+        on-node-moved="onNodeMoved"
+        on-node-hovered="onNodeHovered"
+        on-node-selected="onNodeSelect"
+        on-node-deleted="onNodeRemove"
+        on-node-renamed="onNodeRenamed"
+        Xon-nodes-duplicated="onNodesDuplicated"
+        on-add-candidate="onAddCandidate"
+        on-edge-deleted="onEdgeRemove"
+        on-edge-connected="onEdgeConnected">
+    </node-graph>
+  </drop-target>
 </div>
 `
 });
