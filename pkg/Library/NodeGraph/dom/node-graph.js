@@ -97,16 +97,16 @@ export class NodeGraph extends Xen.Async {
         //
         const i0 = graph.graphNodes.findIndex(({key}) => key === edge.from.id);
         const i0outs = graph.graphNodes[i0]?.outputs;
-        const ii0 = i0outs.findIndex(({name}) => name === edge.from.storeName);
-        const ii0c =i0outs.length / 2 - 0.5;
+        const ii0 = i0outs?.findIndex(({name}) => name === edge.from.storeName);
+        const ii0c =i0outs?.length / 2 - 0.5;
         //console.log('out', i0, ii0, ii0c, edge.from.storeName);
         const i0offset = spacing * (ii0-ii0c) + 9;
         const g0 = this.geom(edge.from.id, i0);
         //
         const i1 = graph.graphNodes.findIndex(({key}) => key === edge.to.id);
         const i1ins = graph.graphNodes[i1]?.inputs;
-        const ii1 = i1ins.findIndex(({name}) => name === edge.to.storeName);
-        const ii1c = i1ins.length / 2 - 0.5;
+        const ii1 = i1ins?.findIndex(({name}) => name === edge.to.storeName);
+        const ii1c = i1ins?.length / 2 - 0.5;
         //console.log('in', i1, ii1, ii1c, edge.to.storeName);
         const i1offset = spacing * (ii1-ii1c) + 9;
         const g1 = this.geom(edge.to.id, i1);
