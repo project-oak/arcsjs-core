@@ -10,8 +10,6 @@ onCanvas({eventlet: {value}}) {
 },
 template: html`
 <style>
-  /* :host {
-  } */
   image-resource {
     background: transparent;
   }

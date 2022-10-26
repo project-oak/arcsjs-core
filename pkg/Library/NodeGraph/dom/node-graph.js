@@ -96,7 +96,7 @@ export class NodeGraph extends Xen.Async {
         const spacing = 16;
         //
         const i0 = graph.graphNodes.findIndex(({key}) => key === edge.from.id);
-        const i0outs = graph.graphNodes[i0].outputs;
+        const i0outs = graph.graphNodes[i0]?.outputs;
         const ii0 = i0outs.findIndex(({name}) => name === edge.from.storeName);
         const ii0c =i0outs.length / 2 - 0.5;
         //console.log('out', i0, ii0, ii0c, edge.from.storeName);
@@ -104,7 +104,7 @@ export class NodeGraph extends Xen.Async {
         const g0 = this.geom(edge.from.id, i0);
         //
         const i1 = graph.graphNodes.findIndex(({key}) => key === edge.to.id);
-        const i1ins = graph.graphNodes[i1].inputs;
+        const i1ins = graph.graphNodes[i1]?.inputs;
         const ii1 = i1ins.findIndex(({name}) => name === edge.to.storeName);
         const ii1c = i1ins.length / 2 - 0.5;
         //console.log('in', i1, ii1, ii1c, edge.to.storeName);
@@ -113,7 +113,7 @@ export class NodeGraph extends Xen.Async {
         //
         const p0 = {x: g0.r - 1, y: g0.y + i0offset};
         const p1 = {x: g1.l + 1, y: g1.y + i1offset};
-        const path = this.getEdgePath(p0, p1);
+        const path = this.calcBezier(p0, p1);
         //
         //this.curve(ctx, path);
         //const highlight = [[210, 210, 255], [255, 210, 210], [210, 255, 210]][i%3];
@@ -123,12 +123,14 @@ export class NodeGraph extends Xen.Async {
         //ctx.fillStyle = edge.color;
         ctx.fillStyle = 'lightblue';
         ctx.strokeStyle = 'white';
-        this.circle(ctx, p0, 3.5); ctx.stroke();
-        this.circle(ctx, p1, 3.5); ctx.stroke();
+        this.circle(ctx, p0, 3.5);
+        ctx.stroke();
+        this.circle(ctx, p1, 3.5);
+        ctx.stroke();
       });
     }
   }
-  getEdgePath({x:startX, y:startY}, {x:endX, y:endY}) {
+  calcBezier({x:startX, y:startY}, {x:endX, y:endY}) {
       const qx = (endX - startX) / 2;
       const qy = (endY - startY) / 2;
       if (startX < endX) {
@@ -156,6 +158,7 @@ export class NodeGraph extends Xen.Async {
     ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
     ctx.arcTo(x + width, y, x + width - radius, y, radius);
     ctx.arcTo(x, y, x, y + radius, radius);
+    ctx.closePath();
   }
   circle(ctx, c, r) {
     ctx.beginPath();
@@ -196,10 +199,6 @@ const template = Xen.Template.html`
     overflow: hidden;
   }
   [node] {
-    /* display: flex;
-    align-items: stretch;
-    justify-content: center; */
-    /**/
     position: absolute;
     min-width: 100px;
     min-height: 60px;
@@ -209,7 +208,6 @@ const template = Xen.Template.html`
     background: purple;
     font-size: 11px;
     font-weight: bold;
-    /* overflow: hidden; */
     cursor: pointer;
   }
   [node] span {
@@ -218,7 +216,6 @@ const template = Xen.Template.html`
     text-overflow: ellipsis;
   }
   [node][selected] {
-    /* border: 2px solid violet; */
     box-shadow:  23px 23px 46px #bebebe88, -23px -23px 46px #ffffff88;
   }
   [node]:not([selected]) {

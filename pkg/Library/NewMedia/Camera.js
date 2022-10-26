@@ -19,8 +19,11 @@ template: html`
     visibility: false;
   }
 </style>
+<!--
+  Camera is a stream-view with bookends.
+-->
 <div frame="device"></div>
-<stream-view flex stream="{{stream}}" frequency="{{frequency}}" on-canvas="onCanvas"></stream-view>
+<stream-view flex stream="{{stream}}"></stream-view>
 <div frame="capture"></div>
 `
 });

@@ -8,7 +8,7 @@
   async initialize({}, state, {service}) {
     state.canvas = await service({kind: 'ThreejsService', msg: 'allocateCanvas'});
   },
-  async update(inputs, state, {service}) {
+  async update(inputs, state, {service, invalidate}) {
     //log(inputs.image);
     const {shader, image, audio} = inputs;
     if (shader !== state.shader) {
