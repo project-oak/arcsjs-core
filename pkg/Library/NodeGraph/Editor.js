@@ -8,14 +8,17 @@
 catalogDelimeter: '$$',
 edgeIdDelimeter: '$$',
 
-update({pipeline, selectedNodeId}, state) {
-  if (pipeline?.$meta?.name !== state.selectedPipelineName) {
-    state.selectedPipelineName = pipeline?.$meta.name;
-    // new pipeline, choose a selectedNodeId if there isn't one
-    if (!selectedNodeId) {
-      return {selectedNodeId: keys(pipeline?.nodes)?.[0]};
+async update({pipeline, selectedNodeId, event}, state) {
+  if (event !== state.event) {
+    state.event = event;
+    const result = this.handleEvent(event, pipeline, selectedNodeId);
+    if (keys(result).length > 0) {
+      return result;
     }
   }
+  return {
+    editorToolbarIcons: this.toolbarIcons(selectedNodeId)
+  };
 },
 
 decodeBinding(value) {
@@ -30,7 +33,7 @@ decodeBinding(value) {
 render(inputs, state) {
   return {
     graph: this.renderGraph(inputs, state),
-    graphRects: inputs.layout,
+    graphRects: inputs.layout
   };
 },
 
@@ -198,14 +201,6 @@ createGroup(groups, category, categories) {
   return group;
 },
 
-findInput({$inputs}, name) {
-  const input = $inputs?.find(input => {
-    const {key, binding} = this.decodeBinding(input);
-    return key === name || binding === name;
-  });
-  return input && this.decodeBinding(input).binding;
-},
-
 renderInputs(node, nodeType, candidates) {
   return this.getInputStores(nodeType).map(([name, store]) => ({
     name,
@@ -255,10 +250,29 @@ getParticles(nodeType) {
   return this.getParticleNames(nodeType).map(name => nodeType[name]);
 },
 
+toolbarIcons(selectedNodeId) {
+  const hasSelectedNode = Boolean(selectedNodeId);
+  return [{
+    icon: 'delete',
+    title: 'Delete node',
+    key: 'delete',
+    disabled: !hasSelectedNode
+  }, {
+    icon: 'content_copy',
+    title: 'Duplicate node',
+    key: 'duplicate',
+    disabled: !hasSelectedNode
+  }, {
+    icon: 'drive_file_rename_outline',
+    title: 'Rename node',
+    key: 'rename',
+    disabled: !hasSelectedNode
+  }];
+},
+
 onNodeRemove({eventlet: {key}, pipeline, selectedNodeId}) {
-  delete pipeline.nodes[key];
   return {
-    pipeline,
+    pipeline: this.deleteNode(key, pipeline),
     selectedNodeId: (key === selectedNodeId) ? null : selectedNodeId
   };
 },
@@ -269,6 +283,33 @@ onNodeRenamed({eventlet: {key, value}, pipeline}) {
   node.displayName = value.trim();
   pipeline.nodes[node.id] = node;
   return {pipeline};
+},
+
+handleEvent(event, pipeline, selectedNodeId) {
+  switch(event) {
+    case 'delete': {
+      return {
+        pipeline: this.deleteNode(selectedNodeId, pipeline),
+        selectedNodeId: null,
+        event: null
+      };
+    }
+    case 'duplicate': {
+      // TODO(mariakleiner): implement
+      log(`Duplicated node: ${selectedNodeId}`);
+      return;
+    }
+    case 'rename': {
+      // TODO(mariakleiner): implement
+      log(`Rename node: ${selectedNodeId}`);
+      return;
+    }
+  }
+},
+
+deleteNode(nodeId, pipeline) {
+  delete pipeline.nodes[nodeId];
+  return pipeline;
 },
 
 // onNodesDuplicated({eventlet: {value: nodeIds}, pipeline, selectedNodeId, nodeTypes, layout, previewLayout}) {
@@ -513,24 +554,33 @@ template: html`
     background-color: lightgrey;
     border-color: grey;
   }
+  [frame="toolbar"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 </style>
-<div flex grid scrolling>
-  <drop-target flex row on-target-drop="onNodeTypeDropped">
-    <node-graph flex
-        graph="{{graph}}"
-        rects="{{graphRects}}"
-        on-nodetype-dropped="onNodeTypeDropped"
-        Xon-node-hovered="onNodeHovered"
-        on-node-moved="onNodeMoved"
-        on-node-selected="onNodeSelect"
-        Xon-node-deleted="onNodeRemove"
-        Xon-node-renamed="onNodeRenamed"
-        Xon-nodes-duplicated="onNodesDuplicated"
-        Xon-add-candidate="onAddCandidate"
-        Xon-edge-deleted="onEdgeRemove"
-        Xon-edge-connected="onEdgeConnected">
-    </node-graph>
-  </drop-target>
+
+<div flex rows>
+  <div flex grid scrolling>
+    <drop-target flex row on-target-drop="onNodeTypeDropped">
+      <node-graph flex
+          graph="{{graph}}"
+          rects="{{graphRects}}"
+          on-nodetype-dropped="onNodeTypeDropped"
+          on-node-moved="onNodeMoved"
+          on-node-selected="onNodeSelect"
+          Xon-node-hovered="onNodeHovered"
+          Xon-node-deleted="onNodeRemove"
+          Xon-node-renamed="onNodeRenamed"
+          Xon-nodes-duplicated="onNodesDuplicated"
+          Xon-add-candidate="onAddCandidate"
+          Xon-edge-deleted="onEdgeRemove"
+          Xon-edge-connected="onEdgeConnected">
+      </node-graph>
+    </drop-target>
+  </div>
+  <div frame="toolbar"></div>
 </div>
 `
 });

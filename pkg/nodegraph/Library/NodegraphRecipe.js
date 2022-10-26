@@ -98,6 +98,12 @@ export const NodegraphRecipe = {
     },
     newNodeInfos: {
       $type: '[Pojo]'
+    },
+    editorToolbarEvent: {
+      $type: 'String'
+    },
+    editorToolbarIcons: {
+      $type: '[Pojo]'
     }
   },
   // 'a_frame': {
@@ -144,15 +150,27 @@ export const NodegraphRecipe = {
             'candidates',
             {layout: 'nodegraphLayout'},
             {previewLayout: 'previewLayout'},
-            'newNodeInfos'
+            'newNodeInfos',
+            {event: 'editorToolbarEvent'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
             'selectedNodeId',
             {layout: 'nodegraphLayout'},
             {previewLayout: 'previewLayout'},
-            'newNodeInfos'
-          ]
+            'newNodeInfos',
+            {event: 'editorToolbarEvent'},
+            'editorToolbarIcons'
+          ],
+          $slots: {
+            toolbar: {
+              editorToolbar: {
+                $kind: '$library/NodeGraph/Toolbar',
+                $inputs: [{icons: 'editorToolbarIcons'}],
+                $outputs: [{event: 'editorToolbarEvent'}]
+              }
+            }
+          }
         }
       },
       inspector: {
