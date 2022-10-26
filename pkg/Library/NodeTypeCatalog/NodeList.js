@@ -4,7 +4,6 @@
  * license that can be found in the LICENSE file.
  */
 ({
-
 update(inputs, state) {
   state.groups = this.groupByCategory(inputs);
 },
@@ -160,6 +159,7 @@ template: html`
     display: none;
     font-family: "Material Icons";
     font-style: normal;
+    font-feature-settings: "liga";
     -webkit-font-feature-settings: "liga";
     -webkit-font-smoothing: antialiased;
     cursor: pointer;
@@ -196,6 +196,7 @@ template: html`
     display: none;
   }
   [category] {
+    font-weight: bold;
     font-size: 0.8em;
     padding: 8px 12px;
     /* border-top: 1px solid var(--nodelist-container-fg); */

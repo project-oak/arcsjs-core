@@ -29,7 +29,8 @@ decodeBinding(value) {
 
 render(inputs, state) {
   return {
-    graph: this.renderGraph(inputs, state)
+    graph: this.renderGraph(inputs, state),
+    graphRects: inputs.layout,
   };
 },
 
@@ -513,6 +514,7 @@ template: html`
 <div flex grid scrolling>
   <node-graph flex
       graph="{{graph}}"
+      rects="{{graphRects}}"
       on-nodetype-dropped="onNodeTypeDropped"
       on-node-moved="onNodeMoved"
       on-node-hovered="onNodeHovered"

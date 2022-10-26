@@ -7,10 +7,14 @@
       "32": "assets/logo_32x32.png"
     },
     "default_title": "Open Tools",
-    "default_popup": "hello.html"
+    "default_popup": "jello.html"
   },
+  "content_scripts": [{
+    "matches": ["http://localhost:9888/*"],
+    "js": ["content-script.js"]
+  }],
   "content_security_policy": {
-    "sandbox": "sandbox allow-scripts; worker-src blob:;"
+    "sandbox": "sandbox allow-scripts; worker-src blob:; camera 'self';"
   },
   "sandbox": {
     "pages": [

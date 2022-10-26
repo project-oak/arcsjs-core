@@ -25177,4 +25177,3 @@ this.PIXI.spine = this.PIXI.spine || {};
 
 })));
 if (typeof pixi_spine !== 'undefined') { Object.assign(this.PIXI.spine, pixi_spine); }
-//# sourceMappingURL=pixi-spine.umd.js.map

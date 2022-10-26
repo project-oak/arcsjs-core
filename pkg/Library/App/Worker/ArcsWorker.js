@@ -34,13 +34,13 @@ globalThis.user = user;
 
 // proxy persistance messages
 user.persistor = {
-  async restore(storeId, store) {
+  async restore(storeId) {
     log('restore', storeId);
     return serviceRequest({type: 'restore', storeId});
   },
-  async persist(storeId, store) {
+  async persist(storeId, data) {
     log('persist', storeId);
-    serviceRequest({type: 'persist', storeId, data: store.data});
+    serviceRequest({type: 'persist', storeId, data});
   }
 };
 
