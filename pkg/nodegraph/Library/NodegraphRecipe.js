@@ -96,6 +96,9 @@ export const NodegraphRecipe = {
       $type: 'Pojo',
       $value: nodeTypes
     },
+    newNodeInfos: {
+      $type: '[Pojo]'
+    }
   },
   // 'a_frame': {
   //   $kind: '$library/AFrame/Scene.js'
@@ -116,12 +119,14 @@ export const NodegraphRecipe = {
             'selectedNodeId',
             'nodeTypes',
             'categories',
-            {layout: 'previewLayout'}
+            {layout: 'previewLayout'},
+            'newNodeInfos'
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
             'selectedNodeId',
-            {layout: 'previewLayout'}
+            {layout: 'previewLayout'},
+            'newNodeInfos'
           ]
         }
       },
@@ -138,13 +143,15 @@ export const NodegraphRecipe = {
             'categories',
             'candidates',
             {layout: 'nodegraphLayout'},
-            {previewLayout: 'previewLayout'}
+            {previewLayout: 'previewLayout'},
+            'newNodeInfos'
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
             'selectedNodeId',
             {layout: 'nodegraphLayout'},
-            {previewLayout: 'previewLayout'}
+            {previewLayout: 'previewLayout'},
+            'newNodeInfos'
           ]
         }
       },
@@ -253,5 +260,17 @@ export const NodegraphRecipe = {
     $kind: '$library/NodeGraph/NodeTypesCombiner',
     $inputs: ['builtinNodeTypes', 'selectedPipeline'],
     $outputs: [{results: 'nodeTypes'}, 'selectedPipeline']
+  },
+  creator: {
+    $kind: '$library/NodeGraph/NodeCreator',
+    $inputs: [
+      'newNodeInfos',
+      'nodeTypes',
+      {pipeline: 'selectedPipeline'}
+    ],
+    $outputs: [
+      'newNodeInfos',
+      {pipeline: 'selectedPipeline'}
+    ]
   }
 };

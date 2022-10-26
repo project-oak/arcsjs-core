@@ -71,37 +71,12 @@ sortNodeTypes({displayName}, {displayName: otherDisplayName}) {
   return displayName.toLowerCase().localeCompare(otherDisplayName.toLowerCase());
 },
 
-async onItemClick({eventlet: {key}, nodeTypes, pipeline}) {
+async onItemClick({eventlet: {key: type}, pipeline, newNodeInfos}) {
   if (pipeline) {
-    const newNode = this.makeNewNode(key, pipeline, nodeTypes);
-    pipeline.nodes[newNode.id] = newNode;
-    return {pipeline};
+    return {
+      newNodeInfos: [...(newNodeInfos || []), {type}]
+    };
   }
-},
-
-makeNewNode(id, pipeline, nodeTypes) {
-  const {displayName} = nodeTypes[id].$meta;
-  const index = this.indexNewNode(id, pipeline.nodes);
-  return {
-    type: id,
-    index,
-    id: this.formatNodeId(id, index),
-    displayName: this.displayName(displayName || id, index)
-  };
-},
-
-indexNewNode(id, nodes) {
-  const typedNodes = values(nodes).filter(node => id === node.type);
-  return (typedNodes.pop()?.index || 0) + 1;
-},
-
-displayName(name, index) {
-  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
-  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
-},
-
-formatNodeId(id, index) {
-  return `${id}${index}`.replace(/ /g,'');
 },
 
 onHoverNodeType({eventlet: {key, value}, nodeTypes}, state) {

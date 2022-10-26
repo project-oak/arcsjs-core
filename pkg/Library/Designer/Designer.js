@@ -184,39 +184,12 @@ colorByCategory(category, categories) {
   return categories?.[category]?.color || 'lightblue';
 },
 
-onDrop({eventlet: {value: typeName}, nodeTypes, pipeline}) {
+onDrop({eventlet: {value: type}, pipeline, newNodeInfos}) {
   if (pipeline) {
-    const nodeType = nodeTypes[typeName];
-    if (nodeType) {
-      const index = this.countNodesOfType(pipeline.nodes, typeName) + 1;
-      const id = this.formatNodeId(typeName, index);
-      pipeline.nodes[id] = this.formatNode(id, index, nodeType.$meta);
-      return {
-        pipeline,
-        selectedNodeId: id
-      };
-    }
+    return {
+      newNodeInfos: [...(newNodeInfos || []), {type}]
+    };
   }
-},
-
-formatNode(id, index, {id: type, displayName}) {
-  return {
-    id, index, type,
-    displayName: this.formatDisplayName(displayName || type, index)
-  };
-},
-
-countNodesOfType(nodes, type) {
-  return values(nodes).filter(node => node.type === type).length;
-},
-
-formatDisplayName(name, index) {
-  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
-  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
-},
-
-formatNodeId(id, index) {
-  return `${id}${index}`.replace(/ /g,'');
 },
 
 template: html`

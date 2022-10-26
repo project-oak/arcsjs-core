@@ -44,11 +44,13 @@ export const NodeCatalogRecipe = {
             'nodeTypes',
             'categories',
             {pipeline: 'selectedPipeline'},
-            {'search': 'nodeSearch'}
+            {'search': 'nodeSearch'},
+            'newNodeInfos'
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
-            'hoveredNodeType'
+            'hoveredNodeType',
+            'newNodeInfos'
           ],
           $slots: {
             typeInfo: {
