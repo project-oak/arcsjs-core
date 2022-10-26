@@ -84,7 +84,6 @@ export class NodeGraph extends Xen.Async {
   }
   _didRender({graph}, {x, y}) {
     if (this.rects) {
-      // console.log(this.rects);
       this.renderCanvas({graph}, {x, y});
     }
   }
@@ -240,22 +239,25 @@ const template = Xen.Template.html`
   }
   [repeat="socket_i_t"] {
     margin-left: -10px;
+    overflow: hidden;
   }
   [repeat="socket_o_t"] {
     margin-right: -10px;
+    overflow: hidden;
   }
-  [repeat="socket_i_t"] [dot], [repeat="socket_o_t"] [dot] {
-    visibility: hidden;
+  [layer0] [dot] {
+    transition: opacity 100ms ease-in-out;
+    opacity: 0;
   }
-  [repeat="socket_i_t"]:hover [dot], [repeat="socket_o_t"]:hover [dot] {
-    visibility: visible;
+  [layer0]:hover [dot] {
+    opacity: 1;
   }
   [dot] {
     display: inline-block;
     width: 9px;
     height: 9px;
-    background: lightblue;
-    border: 1px solid #eeeeff80;
+    background: white;
+    border: 1px solid #33333380;
     border-radius: 50%;
     padding: 5px;
   }
@@ -278,14 +280,12 @@ const template = Xen.Template.html`
 
 <template node_t>
   <div node flex column id="{{nodeId}}" key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-mousedown="onNodeSelect">
-    <div row xen:style="{{nameStyle}}">
-      <div style="padding: 4px;" flex>{{displayName}}</div>
+    <div xen:style="{{nameStyle}}">
+      <div style="text-align: center; padding: 4px;">{{displayName}}</div>
     </div>
     <div flex row>
       <div centering column repeat="socket_i_t">{{inputs}}</div>
-      <div flex center row style="padding: 0 4px;">
-        <!-- <span>{{displayName}}</span> -->
-      </div>
+      <div flex center row style="padding: 0 4px;"></div>
       <div centering column repeat="socket_o_t">{{outputs}}</div>
     </div>
   </div>
