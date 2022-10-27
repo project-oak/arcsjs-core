@@ -55,14 +55,14 @@ const template = Xen.Template.html`
     display: flex;
     flex-direction: column;
   }
-  [flex] {
+  /* [flex] {
     flex: 1;
     flex-basis: 0px;
     overflow: hidden;
-  }
+  } */
 </style>
 
-<div startside flex>
+<div startside xen:style="{{startStyle}}">
   <slot name="one"></slot>
   <slot name="left"></slot>
   <slot name="top"></slot>
@@ -80,7 +80,7 @@ const template = Xen.Template.html`
 
 export class SplitPanel extends DragDrop {
   static get observedAttributes() {
-    return ['divider', 'vertical'];
+    return ['divider', 'endflex', 'vertical'];
   }
   get template() {
     return template;
@@ -93,7 +93,7 @@ export class SplitPanel extends DragDrop {
       this.mergeState({dragging: false});
     };
   }
-  update({divider, vertical}, state) {
+  update({divider, endflex, vertical}, state) {
     divider = isNaN(Number(divider)) ? null : Number(divider);
     // attributes are "" for true, null for false
     vertical = (vertical != null);
@@ -111,13 +111,21 @@ export class SplitPanel extends DragDrop {
       // cache clamped divider (should be normalized float?)
       state.divider = Math.max(d, 16);
       state.vertical = vertical;
+      state.endflex = endflex;
     }
   }
-  render({}, {vertical, divider, dragging}) {
+  render({}, {vertical, divider, endflex, dragging}) {
     const ord = vertical ? 'width' : 'height';
+    const flexStyle = endflex ? 'endStyle' : 'startStyle';
+    const ordStyle = endflex ? 'startStyle' : 'endStyle';
     return {
-      endStyle: {
+      [ordStyle]: {
         [ord]: `${divider}px`
+      },
+      [flexStyle] : {
+        flex: 1,
+        flexBasis: '0px',
+        overflow: 'hidden'
       },
       vertical,
       dragging
@@ -135,9 +143,10 @@ export class SplitPanel extends DragDrop {
   doMove(dx, dy, sx, sy) {
     //console.log(this.state.dividerStart, sy, dy);
     const d = this.state.vertical ? dx : dy;
-    this.mergeState({
-      divider: Math.round(this.state.dividerStart - d)
-    });
+    const divider = this.state.endflex
+      ? this.state.dividerStart + d
+      : this.state.dividerStart - d;
+    this.mergeState({divider: Math.round(divider)});
   }
 }
 customElements.define('split-panel', SplitPanel);
