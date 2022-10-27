@@ -1,36 +1,50 @@
+/**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
 /* global chrome */
 
-// no eval allowed in background.js
-// so, particle-scripts cannot be eval'd here
+import {getStream} from './source-stream.js';
+import {initRtc} from './web-rtc.js';
 
-chrome.runtime.onConnect.addListener((port) => {
-  console.log('got connected');
-  port.onMessage.addListener(msg => console.log('Background got', msg));
+import {Resources} from './arcs/index.js';
+
+// for debugging;
+globalThis.Resources = Resources;
+
+const imageInputStore = `livecamera1:image`;
+const canvasOutputStore = `deviceimage1:output`;
+
+const getArcsStream = async () => new Promise(resolve => {
+  console.log('wait for arc spin up');
+  setTimeout(() => {
+    console.log('setting mediaDeviceState');
+    app.arcs.set('user', 'mediaDeviceState', {isCameraEnabled: true, isMicEnabled: false, isAudioEnabled: false});
+    console.log('wait for media spin up');
+    setTimeout(async () => {
+      console.log('get stream data');
+      const streamId = await app.arcs.get('user', 'stream');
+      const stream = Resources.get(streamId);
+      console.log(streamId, stream);
+      // resolve with stream
+      resolve(stream);
+    }, 1000)
+  }, 5000);
 });
 
+//initRtc(getStream);
 
-// import './deploy/Library/Core/core.js';
-// import './deploy/Library/Isolation/vanilla.js';
-// //import {Arcs} from './deploy/Library/App/TopLevel/Arcs.js';
-// import {App} from './deploy/Library/App/TopLevel/App.js';
+const stream =  await getArcsStream();
 
-// const paths = {
-//   $library: './deploy/Library'
-// };
+// const rtcStream = new MediaStream();
+// const track = stream.getVideoTracks()[0];
+// rtcStream.addTrack(track);
 
-// (async () => {
-//   await import('./Test.js');
-//   const app = new App(paths);
-//   //await app.spinup();
-//   // await Arcs.init({
-//   //   //paths: this.paths,
-//   //   //root: this.root || document.body,
-//   //   //onservice: this.service.bind(this),
-//   //   //injections: {themeRules, ...this.injections}
-//   // });
-// })();
+const rtcStream = await getStream(stream);
+//console.log(other, stream);
 
-// chrome.action.onClicked.addListener(async () => {
-//   const url = chrome.runtime.getURL("hello.html");
-//   /*const tab = */await chrome.tabs.create({url});
-// });
+initRtc(async () => rtcStream);
+
+//initRtc(getArcsStream);

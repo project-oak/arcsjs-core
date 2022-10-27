@@ -1,51 +1,31 @@
-// const port = chrome.runtime.connect();
-// port.postMessage('hello from content');
+/**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
 
-// port.onMessage.addListener((msg) => {
-//   window.postMessage({ ...msg, incoming: true }, '*');
-// });
-
-// window.addEventListener('message', (message) => {
-//   if (message.data.outgoing) {
-//     port.postMessage(message.data);
-//   }
-// });
-
+// load code into the client's context (try to keep it neat!)
 const loadInPage = src => document.firstElementChild.appendChild(Object.assign(document.createElement('script'), {src}));
 loadInPage(chrome.runtime.getURL('virtual-camera.js'));
+loadInPage(chrome.runtime.getURL('virtual-stream.js'));
 
-// thunk to load other stuff ... why?
-// const client = chrome.runtime.getURL('client.js');
-(async () => {
-  // const port = chrome.runtime.connect({name: 'client'});
-  // window.addEventListener('message', (message) => {
-  //   console.log(message);
-  //   //if (message.data.outgoing) {
-  //     //port.postMessage(message.data);
-  //   //}
-  // });
-})();
+// connect to the extension
+const port = chrome.runtime.connect();
+//const port = chrome.runtime.connect({name: 'client'});
 
-// (function () {
-//   // Install webcam emulation.
-//   const SCRIPT = Object.assign(document.createElement('script'),
-//     {'src': chrome.runtime.getURL('client.js')});
-//   const root = document.documentElement;
-//   root.insertBefore(SCRIPT, root.lastChild);
-//   //
-//   // const IMAGE_SCRIPT = document.createElement('script');
-//   // IMAGE_SCRIPT.setAttribute('src', chrome.extension.getURL('interactive_image.js'));
-//   // root.insertBefore(IMAGE_SCRIPT, root.lastChild);
-//   //
-//   // critical linkage with background
-//   //
-//   const port = chrome.runtime.connect({name: 'client'});
-//   window.addEventListener('message', (message) => {
-//     if (message.data.outgoing) {
-//       port.postMessage(message.data);
-//     }
-//   });
-//   port.onMessage.addListener((msg) => {
-//     window.postMessage({ ...msg, incoming: true }, '*');
-//   });
-// })();
+// forward messages from the extension to the client window
+const forwardToClient = msg => {
+  console.log("(forwarding to client)", msg.type);
+  window.postMessage({...msg, incoming: true}, '*');
+};
+port.onMessage.addListener(forwardToClient);
+
+// forward messages from the client window to the extension
+const forwardToExtension = ({data: msg}) => {
+  if (msg.outgoing) {
+    console.log("(forwarding to extension)", msg.type);
+    port.postMessage(msg);
+  }
+};
+window.addEventListener('message', forwardToExtension);

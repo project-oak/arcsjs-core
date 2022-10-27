@@ -3,28 +3,15 @@
 const builtin = navigator.mediaDevices;
 const fallback = MediaDevices.prototype;
 
-let getVirtualMediaStream;
+let asyncStreamGetter;
 
-globalThis.patchMediaDevices = streamGetter => {
-  getVirtualMediaStream = streamGetter;
+globalThis.createVirtualCamera = _asyncStreamGetter => {
+  asyncStreamGetter = _asyncStreamGetter;
   builtin.getUserMedia = getUserMedia;
   builtin.enumerateDevices = enumerateDevices;
   builtin.dispatchEvent(
     new CustomEvent('devicechange')
   );
-};
-
-globalThis.getStream = (constraints) => {
-  console.log(constraints);
-  const dom = (tag, props) => document.body.appendChild(Object.assign(document.createElement(tag), props));
-  //const loadInPage = src => dom('script', {src});
-  const canvas = dom('canvas', {width: 80, height: 60, style: 'position: absolute;'});
-  const ctx = canvas.getContext('2d');
-  setInterval(() => {
-    ctx.fillStyle = ['red', 'white', 'blue'][Math.floor(Math.random()*3)];
-    ctx.fillRect(20, 20, 30, 20);
-  }, 50);
-  return canvas.captureStream(10);
 };
 
 const enumerateDevices = async function () {
@@ -53,7 +40,7 @@ const getUserMedia = async function (constraints) {
 
 const marshalVirtualStream = async ({audio, video}) => {
   //removeVideoMirrorMode();
-  const stream = await getVirtualMediaStream(video);
+  const stream = await asyncStreamGetter(video);
   if (audio) {
     const audioStream = await fallback.getUserMedia.call(this, {audio, video: false});
     for (const track of audioStream.getAudioTracks()) {

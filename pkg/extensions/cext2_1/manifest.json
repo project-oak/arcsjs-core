@@ -15,17 +15,16 @@
   "icons": {
     "32": "assets/logo_32x32.png"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://meet.google.com/*"
-      ],
-      "js": ["content.js"],
-      "run_at": "document_start"
-    }
-  ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "content_scripts": [{
+    "matches": [
+      "https://meet.google.com/*"
+    ],
+    "js": ["content.js"],
+    "run_at": "document_start"
+  }],
+  "content_security_policy": "script-src 'self' 'unsafe-eval' http://localhost:9888/; object-src 'self'",
   "web_accessible_resources": [
-    "virtual-camera.js"
+    "virtual-camera.js",
+    "virtual-stream.js"
   ]
 }
