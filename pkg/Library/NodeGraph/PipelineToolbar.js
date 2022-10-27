@@ -107,7 +107,7 @@
   },
   render({pipeline}, {renaming}) {
     return {
-      showRenameInput: String(renaming),
+      showRenameInput: String(Boolean(renaming)),
       showRenameIcon: String(!renaming),
       showChooser: String(!renaming),
       name: pipeline?.$meta?.name
