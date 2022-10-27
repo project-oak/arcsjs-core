@@ -30,7 +30,7 @@ export const MobilenetNode = {
     }
   },
   classifier: {
-    $kind: '$library/Mobilenet/Classifier',
+    $kind: '$library/TensorFlow/Classifier',
     $inputs: [
       {imageRef: 'Image'},
       {model: 'Model'}

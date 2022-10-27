@@ -14,7 +14,7 @@ export const GoogleMapNode = {
   },
   $stores: {
     geolocation: {
-      $type: 'Geolocation',
+      $type: 'Pojo',
       $value: {
         latitude: 38.1904808,
         longitude: -122.2901155

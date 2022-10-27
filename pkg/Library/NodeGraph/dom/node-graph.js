@@ -84,7 +84,6 @@ export class NodeGraph extends Xen.Async {
   }
   _didRender({graph}, {x, y}) {
     if (this.rects) {
-      // console.log(this.rects);
       this.renderCanvas({graph}, {x, y});
     }
   }
@@ -97,24 +96,24 @@ export class NodeGraph extends Xen.Async {
         const spacing = 16;
         //
         const i0 = graph.graphNodes.findIndex(({key}) => key === edge.from.id);
-        const i0outs = graph.graphNodes[i0].outputs;
-        const ii0 = i0outs.findIndex(({name}) => name === edge.from.storeName);
-        const ii0c =i0outs.length / 2 - 0.5;
+        const i0outs = graph.graphNodes[i0]?.outputs;
+        const ii0 = i0outs?.findIndex(({name}) => name === edge.from.storeName);
+        const ii0c =i0outs?.length / 2 - 0.5;
         //console.log('out', i0, ii0, ii0c, edge.from.storeName);
         const i0offset = spacing * (ii0-ii0c) + 9;
         const g0 = this.geom(edge.from.id, i0);
         //
         const i1 = graph.graphNodes.findIndex(({key}) => key === edge.to.id);
-        const i1ins = graph.graphNodes[i1].inputs;
-        const ii1 = i1ins.findIndex(({name}) => name === edge.to.storeName);
-        const ii1c = i1ins.length / 2 - 0.5;
+        const i1ins = graph.graphNodes[i1]?.inputs;
+        const ii1 = i1ins?.findIndex(({name}) => name === edge.to.storeName);
+        const ii1c = i1ins?.length / 2 - 0.5;
         //console.log('in', i1, ii1, ii1c, edge.to.storeName);
         const i1offset = spacing * (ii1-ii1c) + 9;
         const g1 = this.geom(edge.to.id, i1);
         //
         const p0 = {x: g0.r - 1, y: g0.y + i0offset};
         const p1 = {x: g1.l + 1, y: g1.y + i1offset};
-        const path = this.getEdgePath(p0, p1);
+        const path = this.calcBezier(p0, p1);
         //
         //this.curve(ctx, path);
         //const highlight = [[210, 210, 255], [255, 210, 210], [210, 255, 210]][i%3];
@@ -124,12 +123,14 @@ export class NodeGraph extends Xen.Async {
         //ctx.fillStyle = edge.color;
         ctx.fillStyle = 'lightblue';
         ctx.strokeStyle = 'white';
-        this.circle(ctx, p0, 3.5); ctx.stroke();
-        this.circle(ctx, p1, 3.5); ctx.stroke();
+        this.circle(ctx, p0, 3.5);
+        ctx.stroke();
+        this.circle(ctx, p1, 3.5);
+        ctx.stroke();
       });
     }
   }
-  getEdgePath({x:startX, y:startY}, {x:endX, y:endY}) {
+  calcBezier({x:startX, y:startY}, {x:endX, y:endY}) {
       const qx = (endX - startX) / 2;
       const qy = (endY - startY) / 2;
       if (startX < endX) {
@@ -157,6 +158,7 @@ export class NodeGraph extends Xen.Async {
     ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
     ctx.arcTo(x + width, y, x + width - radius, y, radius);
     ctx.arcTo(x, y, x, y + radius, radius);
+    ctx.closePath();
   }
   circle(ctx, c, r) {
     ctx.beginPath();
@@ -197,10 +199,6 @@ const template = Xen.Template.html`
     overflow: hidden;
   }
   [node] {
-    /* display: flex;
-    align-items: stretch;
-    justify-content: center; */
-    /**/
     position: absolute;
     min-width: 100px;
     min-height: 60px;
@@ -210,7 +208,6 @@ const template = Xen.Template.html`
     background: purple;
     font-size: 11px;
     font-weight: bold;
-    /* overflow: hidden; */
     cursor: pointer;
   }
   [node] span {
@@ -219,7 +216,6 @@ const template = Xen.Template.html`
     text-overflow: ellipsis;
   }
   [node][selected] {
-    /* border: 2px solid violet; */
     box-shadow:  23px 23px 46px #bebebe88, -23px -23px 46px #ffffff88;
   }
   [node]:not([selected]) {
@@ -240,22 +236,25 @@ const template = Xen.Template.html`
   }
   [repeat="socket_i_t"] {
     margin-left: -10px;
+    overflow: hidden;
   }
   [repeat="socket_o_t"] {
     margin-right: -10px;
+    overflow: hidden;
   }
-  [repeat="socket_i_t"] [dot], [repeat="socket_o_t"] [dot] {
-    visibility: hidden;
+  [layer0] [dot] {
+    transition: opacity 100ms ease-in-out;
+    opacity: 0;
   }
-  [repeat="socket_i_t"]:hover [dot], [repeat="socket_o_t"]:hover [dot] {
-    visibility: visible;
+  [layer0]:hover [dot] {
+    opacity: 1;
   }
   [dot] {
     display: inline-block;
     width: 9px;
     height: 9px;
-    background: lightblue;
-    border: 1px solid #eeeeff80;
+    background: white;
+    border: 1px solid #33333380;
     border-radius: 50%;
     padding: 5px;
   }
@@ -278,14 +277,12 @@ const template = Xen.Template.html`
 
 <template node_t>
   <div node flex column id="{{nodeId}}" key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-mousedown="onNodeSelect">
-    <div row xen:style="{{nameStyle}}">
-      <div style="padding: 4px;" flex>{{displayName}}</div>
+    <div xen:style="{{nameStyle}}">
+      <div style="text-align: center; padding: 4px;">{{displayName}}</div>
     </div>
     <div flex row>
       <div centering column repeat="socket_i_t">{{inputs}}</div>
-      <div flex center row style="padding: 0 4px;">
-        <!-- <span>{{displayName}}</span> -->
-      </div>
+      <div flex center row style="padding: 0 4px;"></div>
       <div centering column repeat="socket_o_t">{{outputs}}</div>
     </div>
   </div>

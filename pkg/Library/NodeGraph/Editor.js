@@ -520,15 +520,15 @@ template: html`
         graph="{{graph}}"
         rects="{{graphRects}}"
         on-nodetype-dropped="onNodeTypeDropped"
+        Xon-node-hovered="onNodeHovered"
         on-node-moved="onNodeMoved"
-        on-node-hovered="onNodeHovered"
         on-node-selected="onNodeSelect"
-        on-node-deleted="onNodeRemove"
-        on-node-renamed="onNodeRenamed"
+        Xon-node-deleted="onNodeRemove"
+        Xon-node-renamed="onNodeRenamed"
         Xon-nodes-duplicated="onNodesDuplicated"
-        on-add-candidate="onAddCandidate"
-        on-edge-deleted="onEdgeRemove"
-        on-edge-connected="onEdgeConnected">
+        Xon-add-candidate="onAddCandidate"
+        Xon-edge-deleted="onEdgeRemove"
+        Xon-edge-connected="onEdgeConnected">
     </node-graph>
   </drop-target>
 </div>

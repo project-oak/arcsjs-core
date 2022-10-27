@@ -271,7 +271,7 @@ export class DesignerLayout extends DragDrop {
   }
   ::slotted(*) {
     position: absolute;
-    outline: 1px dotted orange !important;
+    /* outline: 1px dotted orange !important; */
   }
   [boxer] {
     pointer-events: none;
