@@ -40,7 +40,7 @@ template: html`
 
   <!-- page 1 -->
   <div flex row>
-    <split-panel vertical flex row divider="-240">
+    <split-panel vertical flex row divider="240" endflex="true">
       <div slot="left" flex column>
         <div flex frame="catalog"></div>
       </div>
