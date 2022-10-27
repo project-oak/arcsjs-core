@@ -12,9 +12,11 @@ async update(inputs, state) {
   const {event} = inputs;
   if (event !== state.event) {
     state.event = event;
-    const result = this.handleEvent(inputs);
-    if (keys(result).length > 0) {
-      return result;
+    if (event) {
+      const result = this.handleEvent(inputs);
+      if (keys(result).length > 0) {
+        return result;
+      }
     }
   }
   const results = {
