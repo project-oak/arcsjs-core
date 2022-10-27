@@ -189,41 +189,6 @@ export const NodegraphRecipe = {
         }
       },
       editor: NodeEditor,
-      // {
-      //   Editor: {
-      //     // $kind: 'http://localhost:9876/Library/Editor',
-      //     // $kind: '$library/NodeGraph/SimpleEditor',
-      //     $kind: '$library/NodeGraph/Editor',
-      //     $inputs: [
-      //       {pipeline: 'selectedPipeline'},
-      //       'selectedNodeId',
-      //       'nodeTypes',
-      //       'categories',
-      //       {layout: 'nodegraphLayout'},
-      //       {previewLayout: 'previewLayout'},
-      //       'newNodeInfos',
-      //       {event: 'editorToolbarEvent'}
-      //     ],
-      //     $outputs: [
-      //       {pipeline: 'selectedPipeline'},
-      //       'selectedNodeId',
-      //       {layout: 'nodegraphLayout'},
-      //       {previewLayout: 'previewLayout'},
-      //       'newNodeInfos',
-      //       {event: 'editorToolbarEvent'},
-      //       'editorToolbarIcons'
-      //     ],
-      //     $slots: {
-      //       toolbar: {
-      //         editorToolbar: {
-      //           $kind: '$library/NodeGraph/Toolbar',
-      //           $inputs: [{icons: 'editorToolbarIcons'}],
-      //           $outputs: [{event: 'editorToolbarEvent'}]
-      //         }
-      //       }
-      //     }
-      //   }
-      // },
       inspector: {
         Inspector: {
           $kind: '$library/NodeGraph/Inspector',
