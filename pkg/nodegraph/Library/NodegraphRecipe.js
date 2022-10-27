@@ -123,6 +123,7 @@ export const NodegraphRecipe = {
     },
     selectedPipeline: {
       $type: 'Pojo',
+      $tags: ['persisted'],
       $value: null
     },
     selectedNodeId: {
