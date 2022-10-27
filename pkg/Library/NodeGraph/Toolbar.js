@@ -8,7 +8,19 @@
  */
 ({
 render({icons}) {
-  return {icons};
+  return {
+    icons: icons?.map(this.renderIcon)
+  };
+},
+
+renderIcon({hidden, separator, ...props}) {
+  const showIcon = Boolean(!hidden);
+  const showSeparator = Boolean(separator);
+  return {
+    ...props,
+    showIcon: String(showIcon),
+    showSeparator: String(showIcon && showSeparator)
+  };
 },
 
 onClick({eventlet: {key}}) {
@@ -20,12 +32,19 @@ template: html`
   :host {
     color: var(--theme-color-fg-1);
   }
+  [separator] {
+    width: 2px;
+    border-right: 1px solid var(--theme-color-bg-3);
+  }
 </style>
 
 <div toolbar repeat="icon_t">{{icons}}</div>
 
 <template icon_t>
-  <mwc-icon-button title="{{title}}" key="{{key}}" on-click="onClick" icon="{{icon}}" disabled="{{disabled}}"></mwc-icon-button>
+  <div columns>
+    <mwc-icon-button title="{{title}}" key="{{key}}" on-click="onClick" icon="{{icon}}" disabled="{{disabled}}" display$={{showIcon}}></mwc-icon-button>
+    <div column separator display$={{showSeparator}}></div>
+  </div>
 </template>
 `
 });

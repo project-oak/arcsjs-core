@@ -24,7 +24,8 @@ const PipelineToolbar = {
   $kind: '$library/NodeGraph/PipelineToolbar',
   $inputs: [
     {pipeline: 'selectedPipeline'},
-    'pipelines'
+    'pipelines',
+    {event: 'pipelineToolbarEvent'}
   ],
   $staticInputs: {
     publishPaths: {}
@@ -32,9 +33,18 @@ const PipelineToolbar = {
   $outputs: [
     {pipeline: 'selectedPipeline'},
     'selectedNodeId',
-    'pipelines'
+    'pipelines',
+    {icons: 'pipelineToolbarIcons'},
+    {event: 'pipelineToolbarEvent'}
   ],
   $slots: {
+    buttons: {
+      PipelineButtons: {
+        $kind: '$library/NodeGraph/Toolbar',
+        $inputs: [{icons: 'pipelineToolbarIcons'}],
+        $outputs: [{event: 'pipelineToolbarEvent'}],
+      }
+    },
     chooser: {
       PipelineChooser: {
         $kind: '$library/NodeGraph/PipelineChooser',
@@ -103,6 +113,12 @@ export const NodegraphRecipe = {
       $type: 'String'
     },
     editorToolbarIcons: {
+      $type: '[Pojo]'
+    },
+    pipelineToolbarEvent: {
+      $type: 'String'
+    },
+    pipelineToolbarIcons: {
       $type: '[Pojo]'
     }
   },

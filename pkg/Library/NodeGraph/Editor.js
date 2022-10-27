@@ -8,17 +8,19 @@
 catalogDelimeter: '$$',
 edgeIdDelimeter: '$$',
 
-async update({pipeline, selectedNodeId, event}, state) {
+async update(inputs, state) {
+  const {event} = inputs;
   if (event !== state.event) {
     state.event = event;
-    const result = this.handleEvent(event, pipeline, selectedNodeId);
+    const result = this.handleEvent(inputs);
     if (keys(result).length > 0) {
       return result;
     }
   }
-  return {
-    editorToolbarIcons: this.toolbarIcons(selectedNodeId)
+  const results = {
+    editorToolbarIcons: this.toolbarIcons(inputs)
   };
+  return results;
 },
 
 decodeBinding(value) {
@@ -250,12 +252,15 @@ getParticles(nodeType) {
   return this.getParticleNames(nodeType).map(name => nodeType[name]);
 },
 
-toolbarIcons(selectedNodeId) {
+toolbarIcons({selectedNodeId, pipeline}) {
+  if (keys(pipeline?.nodes).length === 0) {
+    return [];
+  }
   const hasSelectedNode = Boolean(selectedNodeId);
   return [{
     icon: 'delete',
     title: 'Delete node',
-    key: 'delete',
+    key: 'deleteSelectedNode',
     disabled: !hasSelectedNode
   }, {
     icon: 'content_copy',
@@ -271,10 +276,7 @@ toolbarIcons(selectedNodeId) {
 },
 
 onNodeRemove({eventlet: {key}, pipeline, selectedNodeId}) {
-  return {
-    pipeline: this.deleteNode(key, pipeline),
-    selectedNodeId: (key === selectedNodeId) ? null : selectedNodeId
-  };
+  return this.deleteNode(key, pipeline, selectedNodeId);
 },
 
 onNodeRenamed({eventlet: {key, value}, pipeline}) {
@@ -285,31 +287,26 @@ onNodeRenamed({eventlet: {key, value}, pipeline}) {
   return {pipeline};
 },
 
-handleEvent(event, pipeline, selectedNodeId) {
-  switch(event) {
-    case 'delete': {
-      return {
-        pipeline: this.deleteNode(selectedNodeId, pipeline),
-        selectedNodeId: null,
-        event: null
-      };
-    }
-    case 'duplicate': {
-      // TODO(mariakleiner): implement
-      log(`Duplicated node: ${selectedNodeId}`);
-      return;
-    }
-    case 'rename': {
-      // TODO(mariakleiner): implement
-      log(`Rename node: ${selectedNodeId}`);
-      return;
-    }
+handleEvent({event, pipeline, selectedNodeId}) {
+  if (this[event]) {
+    return {
+      ...this[event](selectedNodeId, pipeline),
+      event: null
+    };
   }
+  log(`Unhandled event '${event}' for ${selectedNodeId}`);
 },
 
-deleteNode(nodeId, pipeline) {
+deleteSelectedNode(selectedNodeId, pipeline) {
+  return this.deleteNode(selectedNodeId, pipeline, selectedNodeId);
+},
+
+deleteNode(nodeId, pipeline, selectedNodeId) {
   delete pipeline.nodes[nodeId];
-  return pipeline;
+  return {
+    pipeline,
+    selectedNodeId: (nodeId === selectedNodeId) ? null : selectedNodeId
+  };
 },
 
 // onNodesDuplicated({eventlet: {value: nodeIds}, pipeline, selectedNodeId, nodeTypes, layout, previewLayout}) {

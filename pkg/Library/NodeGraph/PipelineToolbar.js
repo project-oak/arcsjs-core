@@ -7,55 +7,12 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-  async initialize({pipelines, publishPaths}, state, {service}) {
-    const publicPipelines = await this.fetchPublicPipelines(publishPaths);
-    const pipeline = await this.retrieveSelectedPipeline(pipelines, publicPipelines, service);
-    if (!pipeline) {
-      await this.updateSelectedPipelineHistory(null, service);
-    }
-    return {pipeline, publicPipelines};
-  },
-  async fetchPublicPipelines(urls) {
-    const pipelines = (await Promise.all(values(urls).map(url => this.fetchPublicPipelinesFromUrl(url)))).flat();
-    const names = {};
-    return pipelines.filter(({$meta: {name}}) => {
-      if (names[name]) {
-        return false;
-      }
-      names[name] = true;
-      return true;
-    });
-  },
-  async fetchPublicPipelinesFromUrl(url) {
-    if (url) {
-      try {
-        if (url.endsWith('/')) {
-          url = `${url.substring(0, url.length - 1)}.json`;
-        }
-        const res = await fetch(url);
-        if (res.status === 200) {
-          const text = await res.text();
-          if (text) {
-            return values(JSON.parse(text.replace(/"\*/g, '"$')) ?? Object);
-          }
-        }
-      } catch (e) {
-        log(`Failed fetching pipelines from ${url} (${e.toString()})`);
-      }
-    }
-  },
-  async retrieveSelectedPipeline(pipelines, publicPipelines, service) {
-    const pipelineId = await service({kind: 'HistoryService', msg: 'retrieveSelectedPipeline'});
-    return this.findPipelineById(pipelineId, pipelines) ||
-           this.findPipelineById(pipelineId, publicPipelines);
-  },
-  async update({pipeline, pipelines, publishPaths}, state, {service}) {
-    if (publishPaths?.length > 0 && !state.selectedPublishKey) {
-      state.selectedPublishKey = keys(publishPaths)[0];
-    }
+  async update(inputs, state, tools) {
+    const {pipeline, pipelines} = inputs;
+    const {service} = tools;
+    const outputs = {};
     if (pipeline) {
       if (!deepEqual(pipeline, state.pipeline)) {
-        const outputs = {};
         if (state.pipeline?.$meta?.id !== pipeline.$meta.id) {
           await this.updateSelectedPipelineHistory(pipeline, service);
           outputs['selectedNodeId'] = keys(pipeline.nodes)?.[0];
@@ -63,17 +20,22 @@
         state.pipeline = pipeline;
         assign(outputs, {
           pipeline,
-          pipelines: this.updateItemInPipelines(pipeline, pipelines)
+          pipelines: this.updateItemInPipelines(pipeline, pipelines),
         });
-        return outputs;
       }
     } else {
       state.renaming = false;
-      if (pipelines?.length > 0) {
-        return {pipeline: pipelines[0]};
-      } else {
-        return this.addNewPipeline(pipelines, /* name */null, service);
-      }
+      assign(outputs, await this.chooseOrCreatePipeline(pipelines, service));
+    }
+    assign(outputs, await this.handleEvent(inputs, state, tools));
+    assign(outputs, {icons: this.toolbarIcons(inputs)});
+    return outputs;
+  },
+  async chooseOrCreatePipeline(pipelines, service) {
+    if (pipelines?.length > 0) {
+      return {pipeline: pipelines[0]};
+    } else {
+      return this.addNewPipeline(pipelines, /* name */null, service);
     }
   },
   async updateSelectedPipelineHistory(pipeline, service) {
@@ -111,19 +73,43 @@
     } while (this.findPipelineById(id, pipelines));
     return id;
   },
-  render({pipeline, pipelines, publishPaths, publicPipelinesUrl}, {renaming, selectedPublishKey}) {
-    const isOwned = this.findPipelineIndex(pipeline, pipelines) >= 0;
-    const publishKeys = keys(publishPaths || {}).map(key => ({key, selected: key === selectedPublishKey}));
-    const showRefreshIcon = String(Boolean(publicPipelinesUrl));
+  toolbarIcons() {
+    // const isOwned = this.findPipelineIndex(pipeline, pipelines) >= 0;
+    return [{
+      icon: 'add',
+      title: 'New Pipeline',
+      key: 'onNew',
+    }, {
+      icon: 'delete',
+      title: 'Delete Pipeline',
+      key: 'onDelete',
+      // hidden: !isOwned
+    }, {
+      icon: 'content_copy',
+      title: 'Duplicate Pipeline',
+      key: 'onCloneClicked'
+    }];
+  },
+  async handleEvent(inputs, state, tools) {
+    const {event, selectedNodeId} = inputs;
+    if (event !== state.event) {
+      state.event = event;
+      if (event) {
+        if (this[event]) {
+          return {
+            event: null,
+            ...await this[event](inputs, state, tools),
+          };
+        }
+        log(`Unhandled event '${event}' for ${selectedNodeId}`);
+      }
+    }
+  },
+  render({pipeline}, {renaming}) {
     return {
-      showRenameIcon: String(!renaming && isOwned),
-      showRenameInput: String(Boolean(renaming) && isOwned),
+      showRenameInput: String(renaming),
+      showRenameIcon: String(!renaming),
       showChooser: String(!renaming),
-      showDeleteIcon: String(isOwned),
-      showRefreshIcon,
-      publishKeys,
-      showPublish: String(isOwned && publishKeys.length > 0),
-      showUnpublish: String(Boolean(pipeline?.$meta?.isPublished) && isOwned),
       name: pipeline?.$meta?.name
     };
   },
@@ -136,11 +122,17 @@
         currentPipelines,
         this.makePipelineCopyName(currentPipeline.$meta?.name, currentPipelines),
         service);
-      values(currentPipeline).forEach(node => {
+      values(currentPipeline.nodes).forEach(node => {
         pipeline.nodes[node.id] = {...node};
       });
+      pipeline.position = this.copyPosition(pipeline.$meta.id, currentPipeline);
       return {pipeline, pipelines};
     }
+  },
+  copyPosition(id, {position}) {
+    const result = {};
+    keys(position).forEach(key => result[key] = {...position[key], id});
+    return result;
   },
   makePipelineCopyName(name, pipelines) {
     // Copies of a pipeline are named:
@@ -157,48 +149,16 @@
     const maxCopy = Math.max(...names);
     return `Copy ${maxCopy >= 0 ? `(${maxCopy + 1}) `: ''}of ${nameBase}`;
   },
-  async onDelete({pipeline, pipelines, publishPaths}) {
+  async onDelete({pipeline, pipelines}) {
     const index = this.findPipelineIndex(pipeline, pipelines);
     if (index >= 0) {
       pipelines?.splice(index, 1);
-    }
-    for(const publishPath of values(publishPaths)) {
-      await this.unpublishPipeline(publishPath, pipeline?.$meta?.name);
     }
     return {
       pipelines,
       pipeline: pipelines.length > 0 ? pipelines[0] : null,
       selectedNodeId: null
     };
-  },
-  onShare({pipeline, pipelines, publishPaths}, {selectedPublishKey}) {
-    const id = pipeline?.$meta?.name;
-    const value = pipeline?.json.replace(/\$/g, '*');
-    if (id && value && publishPaths[selectedPublishKey]) {
-      this.publishPipeline(publishPaths[selectedPublishKey], id, value);
-      if (!pipeline?.$meta.isPublished) {
-        return this.updatePipelineMeta({isPublished: true}, pipeline, pipelines);
-      }
-    }
-  },
-  onDontShare({pipeline, pipelines, publishPaths}) {
-    for (const publishPath of values(publishPaths)) {
-      this.unpublishPipeline(publishPath, pipeline.$meta.id);
-    }
-    return this.updatePipelineMeta({isPublished: false}, pipeline, pipelines);
-  },
-  publishPipeline(publishPath, id, body) {
-    return fetch(this.makePublicPipelinesUrl(publishPath, id), {
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body
-    });
-  },
-  unpublishPipeline(path, id) {
-    return fetch(this.makePublicPipelinesUrl(path, id), {method: 'DELETE'});
-  },
-  makePublicPipelinesUrl(path, id) {
-    return `${path}${id}.json`;
   },
   onRenameClicked({}, state) {
     state.renaming = true;
@@ -214,8 +174,9 @@
   isValidPipelineName(name) {
     return /^[a-zA-Z0-9 _-]*$/.test(name);
   },
-  onRenameBlur({}, state) {
+  onRenameBlur(inputs, state) {
     state.renaming = false;
+    return {icons: this.toolbarIcons(inputs, state)};
   },
   updatePipelineMeta(newData, pipeline, pipelines) {
     const index = this.findPipelineIndex(pipeline, pipelines);
@@ -232,13 +193,6 @@
   findPipelineByName(name, pipelines) {
     return pipelines?.find(({$meta}) => $meta.name === name);
   },
-  onPublishPathChanged({eventlet: {value}}, state) {
-    state.selectedPublishKey = value;
-  },
-  async onRefresh({publicPipelinesUrl}) {
-    const publicPipelines = await this.fetchPublicPipelines(publicPipelinesUrl);
-    return {publicPipelines};
-  },
   template: html`
 <style>
   :host {
@@ -253,7 +207,7 @@
   }
   [separator] {
     width: 2px;
-    height: 32px;
+    height: 26px;
     border-right: 1px solid #bbb;
   }
   select {
@@ -266,21 +220,10 @@
 
 <div toolbar>
   <div chooser rows frame="chooser" display$="{{showChooser}}"></div>
-  <mwc-icon-button title="Refresh Pipeline List" icon="refresh" display$={{showRefreshIcon}} on-click="onRefresh"></mwc-icon-button>
-  <div column separator></div>
-  <mwc-icon-button title="New Pipeline" on-click="onNew" icon="add"></mwc-icon-button>
-  <mwc-icon-button title="Duplicate Pipeline" on-click="onCloneClicked" icon="content_copy"></mwc-icon-button>
-  <mwc-icon-button title="Delete Pipeline" on-click="onDelete" icon="delete" display$="{{showDeleteIcon}}"></mwc-icon-button>
   <input rename type="text" value="{{name}}" display$="{{showRenameInput}}" autofocus on-change="onRename" on-blur="onRenameBlur">
   <mwc-icon-button title="Rename Pipeline" on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
   <div column separator></div>
-  <select title="Publish Target" display$="{{showPublish}}" on-change="onPublishPathChanged" repeat="option_t">{{publishKeys}}</select>
-  <mwc-icon-button title="Publish Pipeline" on-click="onShare" icon="public" display$="{{showPublish}}"></mwc-icon-button>
-  <mwc-icon-button title="Unpublish Pipeline" on-click="onDontShare" icon="visibility_off" display$="{{showUnpublish}}"></mwc-icon-button>
+  <div chooser rows frame="buttons"></div>
 </div>
-
-<template option_t>
-  <option value="{{key}}" selected="{{selected}}">{{key}}</option>
-</template>
 `
 });
