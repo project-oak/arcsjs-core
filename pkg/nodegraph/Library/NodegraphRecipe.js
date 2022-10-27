@@ -24,7 +24,8 @@ const PipelineToolbar = {
   $kind: '$library/NodeGraph/PipelineToolbar',
   $inputs: [
     {pipeline: 'selectedPipeline'},
-    'pipelines'
+    'pipelines',
+    {event: 'pipelineToolbarEvent'}
   ],
   $staticInputs: {
     publishPaths: {}
@@ -32,9 +33,18 @@ const PipelineToolbar = {
   $outputs: [
     {pipeline: 'selectedPipeline'},
     'selectedNodeId',
-    'pipelines'
+    'pipelines',
+    {icons: 'pipelineToolbarIcons'},
+    {event: 'pipelineToolbarEvent'}
   ],
   $slots: {
+    buttons: {
+      PipelineButtons: {
+        $kind: '$library/NodeGraph/Toolbar',
+        $inputs: [{icons: 'pipelineToolbarIcons'}],
+        $outputs: [{event: 'pipelineToolbarEvent'}],
+      }
+    },
     chooser: {
       PipelineChooser: {
         $kind: '$library/NodeGraph/PipelineChooser',
@@ -98,6 +108,18 @@ export const NodegraphRecipe = {
     },
     newNodeInfos: {
       $type: '[Pojo]'
+    },
+    editorToolbarEvent: {
+      $type: 'String'
+    },
+    editorToolbarIcons: {
+      $type: '[Pojo]'
+    },
+    pipelineToolbarEvent: {
+      $type: 'String'
+    },
+    pipelineToolbarIcons: {
+      $type: '[Pojo]'
     }
   },
   // 'a_frame': {
@@ -144,15 +166,27 @@ export const NodegraphRecipe = {
             'candidates',
             {layout: 'nodegraphLayout'},
             {previewLayout: 'previewLayout'},
-            'newNodeInfos'
+            'newNodeInfos',
+            {event: 'editorToolbarEvent'}
           ],
           $outputs: [
             {pipeline: 'selectedPipeline'},
             'selectedNodeId',
             {layout: 'nodegraphLayout'},
             {previewLayout: 'previewLayout'},
-            'newNodeInfos'
-          ]
+            'newNodeInfos',
+            {event: 'editorToolbarEvent'},
+            'editorToolbarIcons'
+          ],
+          $slots: {
+            toolbar: {
+              editorToolbar: {
+                $kind: '$library/NodeGraph/Toolbar',
+                $inputs: [{icons: 'editorToolbarIcons'}],
+                $outputs: [{event: 'editorToolbarEvent'}]
+              }
+            }
+          }
         }
       },
       inspector: {
@@ -270,7 +304,8 @@ export const NodegraphRecipe = {
     ],
     $outputs: [
       'newNodeInfos',
-      {pipeline: 'selectedPipeline'}
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId'
     ]
   }
 };

@@ -30,7 +30,7 @@ export class NodeGraph extends Xen.Async {
   }
   onUpdateBox({currentTarget: {value: rect}}) {
     this.value = rect;
-    this.fire('node-moved')
+    this.fire('node-moved');
     this.rects[this.key] = rect;
     this.invalidate();
   }

@@ -352,7 +352,8 @@ export class DesignerLayout extends DragDrop {
   <div bottom right corner></div>
   <div bottom left corner></div>
   <div top left corner></div>
-</div>`;
+</div>
+`;
   }
 }
 
