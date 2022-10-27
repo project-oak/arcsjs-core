@@ -25,11 +25,11 @@ async update({newNodeInfos, pipeline, nodeTypes}) {
 },
 
 makeNewNode(pipeline, nodeType) {
-  const {id: nodeTypeId, displayName: nodeTypeDisplayName} = nodeType.$meta;
-  const index = this.countNodesOfType(pipeline.nodes, nodeTypeId) + 1;
-  const id = this.formatNodeId(nodeTypeId, index);
-  const displayName = this.formatDisplayName(nodeTypeDisplayName || nodeTypeId, index);
-  return {id, type: nodeTypeId, displayName};
+  const {id: type, displayName: nodeTypeDisplayName} = nodeType.$meta;
+  const index = this.countNodesOfType(pipeline.nodes, type) + 1;
+  const id = this.formatNodeId(type, index);
+  const displayName = this.formatDisplayName(nodeTypeDisplayName || type, index);
+  return {id, type, displayName};
 },
 
 countNodesOfType(nodes, type) {
