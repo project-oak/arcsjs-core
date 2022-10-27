@@ -8,13 +8,17 @@
 
 async update({newNodeInfos, pipeline, nodeTypes}) {
   if (newNodeInfos?.length > 0) {
+    let selectedNodeId;
     newNodeInfos.forEach(({type, nodeData}) => {
       const newNode = this.makeNewNode(pipeline, nodeTypes[type]);
+      assign(newNode, nodeData);
       pipeline.nodes[newNode.id] = newNode;
+      selectedNodeId = newNode.id;
     });
     return {
       newNodeInfos: [],
-      pipeline
+      pipeline,
+      selectedNodeId
       // TODO(mariakleiner): update selectedNodeId and layout (from `nodeData`).
     };
   }

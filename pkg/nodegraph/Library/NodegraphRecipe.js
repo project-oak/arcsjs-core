@@ -304,7 +304,8 @@ export const NodegraphRecipe = {
     ],
     $outputs: [
       'newNodeInfos',
-      {pipeline: 'selectedPipeline'}
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId'
     ]
   }
 };
