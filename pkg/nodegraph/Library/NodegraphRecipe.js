@@ -15,44 +15,97 @@ const globalStores = [
   'selectedNode',
   'selectedPipeline',
   'nodeTypes',
-  'hoveredNodeId',
   'categories',
   'nodeId',
 ];
 
 const PipelineToolbar = {
-  $kind: '$library/NodeGraph/PipelineToolbar',
-  $inputs: [
-    {pipeline: 'selectedPipeline'},
-    'pipelines',
-    {event: 'pipelineToolbarEvent'}
-  ],
-  $staticInputs: {
-    publishPaths: {}
-  },
-  $outputs: [
-    {pipeline: 'selectedPipeline'},
-    'selectedNodeId',
-    'pipelines',
-    {icons: 'pipelineToolbarIcons'},
-    {event: 'pipelineToolbarEvent'}
-  ],
-  $slots: {
-    buttons: {
-      PipelineButtons: {
-        $kind: '$library/NodeGraph/Toolbar',
-        $inputs: [{icons: 'pipelineToolbarIcons'}],
-        $outputs: [{event: 'pipelineToolbarEvent'}],
-      }
+  $stores: {
+    pipelineToolbarEvent: {
+      $type: 'String'
     },
-    chooser: {
-      PipelineChooser: {
-        $kind: '$library/NodeGraph/PipelineChooser',
-        $inputs: [
-          {pipeline: 'selectedPipeline'},
-          'pipelines'
-        ],
-        $outputs: [{pipeline: 'selectedPipeline'}]
+    pipelineToolbarIcons: {
+      $type: '[Pojo]'
+    }
+  },
+  pipelineToolbar: {
+    $kind: '$library/NodeGraph/PipelineToolbar',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'pipelines',
+      {event: 'pipelineToolbarEvent'}
+    ],
+    $staticInputs: {
+      publishPaths: {}
+    },
+    $outputs: [
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId',
+      'pipelines',
+      {icons: 'pipelineToolbarIcons'},
+      {event: 'pipelineToolbarEvent'}
+    ],
+    $slots: {
+      buttons: {
+        PipelineButtons: {
+          $kind: '$library/NodeGraph/Toolbar',
+          $inputs: [{icons: 'pipelineToolbarIcons'}],
+          $outputs: [{event: 'pipelineToolbarEvent'}],
+        }
+      },
+      chooser: {
+        PipelineChooser: {
+          $kind: '$library/NodeGraph/PipelineChooser',
+          $inputs: [
+            {pipeline: 'selectedPipeline'},
+            'pipelines'
+          ],
+          $outputs: [{pipeline: 'selectedPipeline'}]
+        }
+      }
+    }
+  }
+};
+
+const NodeEditor = {
+  $stores: {
+    editorToolbarEvent: {
+      $type: 'String'
+    },
+    editorToolbarIcons: {
+      $type: '[Pojo]'
+    },
+  },
+  Editor: {
+    // $kind: 'http://localhost:9876/Library/Editor',
+    // $kind: '$library/NodeGraph/SimpleEditor',
+    $kind: '$library/NodeGraph/Editor',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId',
+      'nodeTypes',
+      'categories',
+      {layout: 'nodegraphLayout'},
+      {previewLayout: 'previewLayout'},
+      'newNodeInfos',
+      {event: 'editorToolbarEvent'}
+    ],
+    $outputs: [
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId',
+      {layout: 'nodegraphLayout'},
+      {previewLayout: 'previewLayout'},
+      'newNodeInfos',
+      {event: 'editorToolbarEvent'},
+      'editorToolbarIcons'
+    ],
+    $slots: {
+      toolbar: {
+        editorToolbar: {
+          $kind: '$library/NodeGraph/Toolbar',
+          $inputs: [{icons: 'editorToolbarIcons'}],
+          $outputs: [{event: 'editorToolbarEvent'}]
+        }
       }
     }
   }
@@ -82,9 +135,6 @@ export const NodegraphRecipe = {
       $type: 'Pojo',
       $value: nodeTypes
     },
-    hoveredNodeId: {
-      $type: 'String'
-    },
     inspectorData: {
       $type: 'Pojo'
     },
@@ -108,18 +158,6 @@ export const NodegraphRecipe = {
     },
     newNodeInfos: {
       $type: '[Pojo]'
-    },
-    editorToolbarEvent: {
-      $type: 'String'
-    },
-    editorToolbarIcons: {
-      $type: '[Pojo]'
-    },
-    pipelineToolbarEvent: {
-      $type: 'String'
-    },
-    pipelineToolbarIcons: {
-      $type: '[Pojo]'
     }
   },
   // 'a_frame': {
@@ -129,9 +167,7 @@ export const NodegraphRecipe = {
     $kind: '$nodegraph/Nodegraph',
     $slots: {
       catalog: NodeCatalogRecipe,
-      toolbar: {
-        PipelineToolbar
-      },
+      toolbar: PipelineToolbar,
       preview: {
         designer: {
           $kind: '$library/Designer/Designer',
@@ -152,43 +188,42 @@ export const NodegraphRecipe = {
           ]
         }
       },
-      editor: {
-        Editor: {
-          // $kind: 'http://localhost:9876/Library/Editor',
-          // $kind: '$library/NodeGraph/SimpleEditor',
-          $kind: '$library/NodeGraph/Editor',
-          $inputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNodeId',
-            'nodeTypes',
-            'hoveredNodeId',
-            'categories',
-            'candidates',
-            {layout: 'nodegraphLayout'},
-            {previewLayout: 'previewLayout'},
-            'newNodeInfos',
-            {event: 'editorToolbarEvent'}
-          ],
-          $outputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNodeId',
-            {layout: 'nodegraphLayout'},
-            {previewLayout: 'previewLayout'},
-            'newNodeInfos',
-            {event: 'editorToolbarEvent'},
-            'editorToolbarIcons'
-          ],
-          $slots: {
-            toolbar: {
-              editorToolbar: {
-                $kind: '$library/NodeGraph/Toolbar',
-                $inputs: [{icons: 'editorToolbarIcons'}],
-                $outputs: [{event: 'editorToolbarEvent'}]
-              }
-            }
-          }
-        }
-      },
+      editor: NodeEditor,
+      // {
+      //   Editor: {
+      //     // $kind: 'http://localhost:9876/Library/Editor',
+      //     // $kind: '$library/NodeGraph/SimpleEditor',
+      //     $kind: '$library/NodeGraph/Editor',
+      //     $inputs: [
+      //       {pipeline: 'selectedPipeline'},
+      //       'selectedNodeId',
+      //       'nodeTypes',
+      //       'categories',
+      //       {layout: 'nodegraphLayout'},
+      //       {previewLayout: 'previewLayout'},
+      //       'newNodeInfos',
+      //       {event: 'editorToolbarEvent'}
+      //     ],
+      //     $outputs: [
+      //       {pipeline: 'selectedPipeline'},
+      //       'selectedNodeId',
+      //       {layout: 'nodegraphLayout'},
+      //       {previewLayout: 'previewLayout'},
+      //       'newNodeInfos',
+      //       {event: 'editorToolbarEvent'},
+      //       'editorToolbarIcons'
+      //     ],
+      //     $slots: {
+      //       toolbar: {
+      //         editorToolbar: {
+      //           $kind: '$library/NodeGraph/Toolbar',
+      //           $inputs: [{icons: 'editorToolbarIcons'}],
+      //           $outputs: [{event: 'editorToolbarEvent'}]
+      //         }
+      //       }
+      //     }
+      //   }
+      // },
       inspector: {
         Inspector: {
           $kind: '$library/NodeGraph/Inspector',

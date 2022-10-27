@@ -43,8 +43,7 @@ renderGraph(inputs) {
   return {
     name: inputs.pipeline?.$meta?.name,
     graphNodes: this.renderGraphNodes(inputs),
-    graphEdges: this.renderGraphEdges(inputs),
-    connectableCandidates: inputs.selectedNodeId && this.renderConnectableCandidates(inputs)
+    graphEdges: this.renderGraphEdges(inputs)
   };
 },
 
@@ -57,9 +56,7 @@ renderGraphEdges(inputs) {
   const {pipeline, categories} = inputs;
   const edges = [];
   values(pipeline?.nodes).forEach(node => {
-    //const froms = values(node.connections).map(values => values.map(({from}) => from)).flat();
     const connects = entries(node.connections).map(([name, connects]) => connects.map(v => ({...v, toStoreName: name}))).flat();
-    //const froms = values(node.connections).flat();
     connects.forEach(connect => edges.push({
       from: {
         id: connect.from,
@@ -75,11 +72,9 @@ renderGraphEdges(inputs) {
   return edges;
 },
 
-renderNode({node, categories, pipeline, hoveredNodeId, selectedNodeId, candidates, nodeTypes, layout}) {
+renderNode({node, categories, pipeline, selectedNodeId, nodeTypes, layout}) {
   const nodeType = nodeTypes[node.type];
   const {category} = nodeType?.$meta || {category: 'n/a'};
-  const hasUI = keys(nodeType).some(id => id.endsWith('___frame'));
-  const hiddenUI = node.props?.hideUI === true;
   return {
     key: node.id,
     name: node.displayName,
@@ -90,10 +85,7 @@ renderNode({node, categories, pipeline, hoveredNodeId, selectedNodeId, candidate
     color: this.colorByCategory(category, categories),
     bgColor: this.bgColorByCategory(category, categories),
     selected: node.id === selectedNodeId,
-    hovered: node.id === hoveredNodeId,
-    hasUI,
-    hiddenUI,
-    inputs: this.renderInputs(node, nodeType, candidates),
+    inputs: this.renderInputs(node, nodeType),
     outputs: this.renderOutputs(nodeType),
     conns: this.renderConnections(node, pipeline),
   };
@@ -135,79 +127,10 @@ formatConnection(fromKey, fromStore, toKey, toStore) {
   };
 },
 
-renderConnectableCandidates({selectedNodeId, pipeline, nodeTypes, categories}) {
-  // Store type -> [matching node types grouped by categories]
-  const storeTypeToCandidates = {};
-  // Go through the selected node's outputs. For each output, find the store
-  // type, find the connectable node types for that store type, and group those
-  // node types by categories.
-  const selectedNode = pipeline.nodes[selectedNodeId];
-  const nodeType = nodeTypes[selectedNode?.type];
-  const particles = this.getParticles(nodeType);
-  for (const particle of particles) {
-    for (const output of particle.$outputs || []) {
-      // Find the store type for the output.
-      let storeName = output;
-      if (typeof output === 'object') {
-        storeName = values(output)[0];
-      }
-      const storeType = nodeType.$stores[storeName]?.$type;
-      // Find and group connectable candidates.
-      if (storeType && !storeTypeToCandidates[storeType]) {
-        const candidateNodeTypes = values(nodeTypes).filter(nodeType => this.isCandidate(nodeType, storeType));
-        storeTypeToCandidates[storeType] =
-          this.groupNodeTypesByCategories(candidateNodeTypes, categories);
-      }
-    }
-  }
-  return storeTypeToCandidates;
-},
-
-isCandidate(nodeType, storeType) {
-  const names = this.getParticleNames(nodeType);
-  const matches = input => {
-    const {key, binding} = this.decodeBinding(input);
-    const store = nodeType.$stores[binding || key];
-    // TODO(sjmiles): what if store doesn't exist?
-    // TODO(b/244191110): Type matching API to be wired here.
-    return storeType === store?.$type && store?.connection;
-  };
-  return names.some(
-    name => nodeType[name].$inputs?.some(input => matches(input))
-  );
-},
-
-groupNodeTypesByCategories(nodeTypes, categories) {
-  const groups = [];
-  for (const nodeType of nodeTypes) {
-    const category = nodeType.$meta.category;
-    const group = this.requireGroup(groups, category, categories);
-    group.nodeTypes.push(nodeType);
-  }
-  return groups;
-},
-
-requireGroup(groups, category, categories) {
-  return groups.find(group => group.category === category)
-      || this.createGroup(groups, category, categories);
-},
-
-createGroup(groups, category, categories) {
-  const group = {
-    category,
-    icon:  this.iconByCategory(category, categories),
-    color: this.colorByCategory(category, categories),
-    nodeTypes: []
-  };
-  groups.push(group);
-  return group;
-},
-
-renderInputs(node, nodeType, candidates) {
+renderInputs(node, nodeType) {
   return this.getInputStores(nodeType).map(([name, store]) => ({
     name,
     ...(node.connections?.[name] || {}),
-    candidates: candidates?.[node.id]?.[name] || [],
     type: store.$type,
     multiple: store.multiple
   }));
@@ -406,61 +329,33 @@ onNodeMoved({eventlet: {key, value}, layout}) {
   };
 },
 
-onNodeHovered({eventlet: {key}}) {
-  return {hoveredNodeId: key};
-},
+// onEdgeRemove({eventlet: {key}, pipeline}) {
+//   const [fromKey, fromStore, toKey, toStore] = key.split(this.edgeIdDelimeter);
+//   return {
+//     pipeline: this.updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, false)
+//   };
+// },
 
-onEdgeRemove({eventlet: {key}, pipeline}) {
-  const [fromKey, fromStore, toKey, toStore] = key.split(this.edgeIdDelimeter);
-  return {
-    pipeline: this.updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, false)
-  };
-},
+// onEdgeConnected({eventlet: {value}, pipeline}) {
+//   return {
+//     pipeline: this.updateStoreConn(pipeline, value, true)
+//   };
+// },
 
-onEdgeConnected({eventlet: {value}, pipeline}) {
-  return {
-    pipeline: this.updateStoreConn(pipeline, value, true)
-  };
-},
-
-updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
-  let node = pipeline.nodes[toKey];
-  node = {
-    ...node,
-    connections: {...(node.connections || {}), [toStore]: [...(node.connections?.[toStore] || [])]}
-  };
-  if (isSelected) {
-    node.connections[toStore].push({from: fromKey, storeName: fromStore});
-  } else {
-    delete node.connections[toStore];
-  }
-  pipeline.nodes[node.id] = node;
-  return pipeline;
-},
-
-makeNewNode({$meta: {id, displayName}}, nodes) {
-  const index = this.indexNewNode(id, nodes);
-  return {
-    type: id,
-    index,
-    id: this.formatNodeId(id, index),
-    displayName: this.displayName(displayName || id, index)
-  };
-},
-
-indexNewNode(id, nodes) {
-  const typedNodes = values(nodes).filter(node => id === node.type);
-  return (typedNodes.pop()?.index || 0) + 1;
-},
-
-displayName(name, index) {
-  const capitalize = name => name.charAt(0).toUpperCase() + name.slice(1);
-  return `${capitalize(name)}${index > 1 ? ` ${index}` : ''}`;
-},
-
-formatNodeId(id, index) {
-  return `${id}${index}`.replace(/ /g,'');
-},
+// updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
+//   let node = pipeline.nodes[toKey];
+//   node = {
+//     ...node,
+//     connections: {...(node.connections || {}), [toStore]: [...(node.connections?.[toStore] || [])]}
+//   };
+//   if (isSelected) {
+//     node.connections[toStore].push({from: fromKey, storeName: fromStore});
+//   } else {
+//     delete node.connections[toStore];
+//   }
+//   pipeline.nodes[node.id] = node;
+//   return pipeline;
+// },
 
 template: html`
 <style>
@@ -477,21 +372,6 @@ template: html`
   mwc-icon-button {
     color: #555;
   }
-  /*
-  [node] {
-    border: var(--edge-border);
-    background: #fdfdfd;
-    cursor: pointer;
-    margin: 14px 20px;
-    min-width: 100px;
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  [node][selected] {
-    margin: 12px 18px;
-    border-width: 3px;
-  }
-  */
   [category="input"] {
     background-color: #e9f2e4;
     border-color: green;
