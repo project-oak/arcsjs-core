@@ -11,8 +11,8 @@ export * from '../../Library/App/surface-imports.js';
 // export * from '../../Library/Dom/container-layout.js';
 export * from '../../Library/Designer/designer-layout.js';
 export * from '../../Library/Dom/multi-select.js';
-export * from '../../Library/NodeGraph/Dom/node-graph.js';
-export * from '../../Library/NodeTypeCatalog/draggable-item.js';
+// export * from '../../Library/NodeGraph/Dom/node-graph.js';
+// export * from '../../Library/NodeTypeCatalog/draggable-item.js';
 export * from '../../Library/Threejs/threejs-editor.js';
 //export * from '../../Library/AFrame/aframe.js';
 export * from '../../Library/PixiJs/pixi-view.js';
@@ -26,7 +26,7 @@ const url = Paths.getAbsoluteHereUrl(import.meta, 2);
 // calculate important paths
 export const paths = {
   $app: url,
-  $nodegraph: `${url}/Library`,
+  $graphs: `${url}/Library`,
   $config: `${url}/conf/config.js`,
   $library: `${url}/../Library`
 };
