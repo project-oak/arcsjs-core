@@ -51,6 +51,12 @@ export class NodeGraph extends Xen.Async {
       return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
     }
   }
+  update({graph}) {
+    this.rects ??= {};
+    graph?.graphNodes?.forEach(n => {
+      this.rects[n.key] = n.position || {l: 20, t: 40, w: 100, h: 60};
+    });
+  }
   render({graph}, {x, y}) {
     let selected = null;
     const model = {
@@ -80,6 +86,12 @@ export class NodeGraph extends Xen.Async {
       })
     };
     model.selectedKeys = selected?.key ? [`ng${selected.key}`] : null;
+    model.rects = [];
+    Object.keys(this.rects).forEach(id => {
+      if (id !== 'id') {
+        model.rects.push({id: `ng${id}`, position: this.rects[id]});
+      }
+    });
     return model;
   }
   _didRender({graph}, {x, y}) {
@@ -269,6 +281,7 @@ const template = Xen.Template.html`
 <div layer0>
   <designer-layout
     selected="{{selectedKeys}}"
+    rects="{{rects}}"
     on-update-box="onUpdateBox"
     on-delete="onNodeDelete"
     repeat="node_t">{{nodes}}</designer-layout>

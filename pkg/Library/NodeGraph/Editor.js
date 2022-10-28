@@ -81,7 +81,7 @@ renderNode({node, categories, pipeline, selectedNodeId, nodeTypes, layout}) {
     key: node.id,
     name: node.displayName,
     displayName: node.displayName,
-    position: layout?.[node.id] || {x: 0, y: 0},
+    position: layout?.[node.id],
     // TODO(mariakleiner): node-graph doesn't get updated, if nodeType (and hence color)
     // for a customNode was loaded after the node was rendered
     color: this.colorByCategory(category, categories),
