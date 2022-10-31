@@ -22,8 +22,4 @@ export const ExtApp = class extends App {
     this.userAssembly = [ExtRecipe];
     this.persistor = new LocalStoragePersistor('user');
   }
-  // async spinup() {
-  //   await super.spinup();
-  //   this.arcs.set('user', 'mediaDeviceState', {isCameraEnabled: true});
-  // }
 };

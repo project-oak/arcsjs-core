@@ -76,7 +76,7 @@ export const ExtRecipe = {
     ]
   },
   compose1: {
-    $kind: '$library/NewMedia/Composite',
+    $kind: '$library/NewMedia/ImageComposite',
     $staticInputs: {
       operation: 'overlay'
     },
@@ -89,7 +89,7 @@ export const ExtRecipe = {
     ]
   },
   compose2: {
-    $kind: '$library/NewMedia/Composite',
+    $kind: '$library/NewMedia/ImageComposite',
     $staticInputs: {
       operation: 'source-over'
     },

@@ -5,7 +5,6 @@
  * license that can be found in the LICENSE file.
  */
 /* global chrome */
-
 import {initRtc} from './web-rtc.js';
 import {getArcsCameraStream} from './cameras/arcs-camera.js';
 
