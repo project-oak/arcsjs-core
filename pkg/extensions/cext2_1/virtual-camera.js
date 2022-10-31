@@ -1,5 +1,9 @@
-(() => {
-
+/**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
 const builtin = navigator.mediaDevices;
 const fallback = MediaDevices.prototype;
 
@@ -28,18 +32,15 @@ const enumerateDevices = async function () {
 const getUserMedia = async function (constraints) {
   if (constraints) {
     const videoDeviceId = getDeviceId(constraints.video);
-    //window.selectedCameraId = videoDeviceId;
     if (videoDeviceId === 'virtual') {
       return marshalVirtualStream(constraints);
     } else {
-      //restoreVideoMirrorMode();
       return fallback.getUserMedia.call(this, constraints);
     }
   }
 };
 
 const marshalVirtualStream = async ({audio, video}) => {
-  //removeVideoMirrorMode();
   const stream = await asyncStreamGetter(video);
   if (audio) {
     const audioStream = await fallback.getUserMedia.call(this, {audio, video: false});
@@ -65,5 +66,3 @@ const getDeviceId = videoConstraints => {
   }
   return videoConstraints.deviceId.exact ?? null;
 };
-
-})();

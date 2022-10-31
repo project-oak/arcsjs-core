@@ -9,7 +9,7 @@
 
 import {utils} from '../Core/core.js';
 
-const resources = {};
+let resources = {};
 
 export const Resources = {
   newId() {
@@ -35,6 +35,8 @@ export const Resources = {
     resources = _resources;
   }
 };
+
+globalThis.Resources = Resources;
 
 // const resources2 = {};
 
@@ -66,15 +68,15 @@ export const Resources = {
 //   }
 // };
 
-/*export*/ const ResourceService = {
-  allocateResource() {
-    const id = '';
-    return id;
-  },
-  disposeResource(id) {
-  },
-  allocateCanvas() {
-    const id = '';
-    return id;
-  }
-};
+// /*export*/ const ResourceService = {
+//   allocateResource() {
+//     const id = '';
+//     return id;
+//   },
+//   disposeResource(id) {
+//   },
+//   allocateCanvas() {
+//     const id = '';
+//     return id;
+//   }
+// };

@@ -45,7 +45,7 @@ export const SelfieSegmentationService = {
       const ctx = target.getContext('2d');
       ctx.clearRect(0, 0, width, height);
       ctx.drawImage(bitmap, 0, 0, width, height);
-      // Only overwrite existing pixels.
+      // colorizing
       ctx.globalCompositeOperation = 'source-in';
       ctx.fillStyle = '#680fa3'; //'#00FF00';
       ctx.fillRect(0, 0, width, height);

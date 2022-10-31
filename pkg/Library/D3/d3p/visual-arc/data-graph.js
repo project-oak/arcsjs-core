@@ -144,7 +144,7 @@ export class DataGraph extends Xen.Async {
         });
         h.meta.outputs?.forEach(output => {
           if (output) {
-            const [key, value] = Object.entries(output).pop();
+            const [key, value] = Object.entries(output).pop() ?? ['n/a', 'n/a'];
             io.push({key, value, output: true});
           }
         });

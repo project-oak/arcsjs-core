@@ -5,8 +5,8 @@
  * license that can be found in the LICENSE file.
  */
 import './config.js';
-import {Resources, quickStart} from './arcs.js';
 import {ExtApp} from './ExtApp.js';
+import {Resources, quickStart} from './arcs.js';
 
 await quickStart(ExtApp, import.meta.url);
 

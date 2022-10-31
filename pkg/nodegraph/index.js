@@ -1,10 +1,8 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 import './conf/config.js';
 import {paths} from './conf/allowlist.js';
@@ -16,3 +14,56 @@ try {
 } catch(x) {
   console.error(x);
 }
+
+globalThis.use = (graph) => {
+  // convert 'Graph' to 'Pipeline'
+  const nodes = {};
+  const pipeline = {
+    $meta: {
+      id: "dynamic",
+      name: 'Dynamic'
+    },
+    nodes
+  };
+  Object.entries(graph).forEach(([name, value]) => {
+    const node = {...value, id: name};
+    const connections = {};
+    if (node.connections) {
+      Object.entries(node.connections).forEach(([name, connects]) => {
+        connections[name] = connects.map(conn => {
+          const [from, storeName] = conn.split(':');
+          return {from, storeName};
+        });
+      });
+    }
+    node.connections = connections;
+    nodes[name] = node;
+  });
+  app.arcs.set('user', 'selectedPipeline', pipeline)
+};
+
+globalThis.graph = {
+  "Image1": {
+    "type": "Image",
+    "displayName": "Image",
+    "props": {
+      "image": {
+        "url": "http://localhost:9888/assets/corgi.jpeg"
+      }
+    }
+  },
+  "MobilenetNode1": {
+    "type": "MobilenetNode",
+    "displayName": "Mobilenet",
+    "connections": {
+      "Image": ["Image1:image"]
+    }
+  },
+  "BarDisplayNode1": {
+    "type": "BarDisplayNode",
+    "displayName": "Bar Display",
+    "connections": {
+      "ClassifierResults": ["MobilenetNode1:ClassifierResults"]
+    }
+  }
+};

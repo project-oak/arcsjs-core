@@ -8,11 +8,12 @@ import {Paths} from '../Core/utils.js';
 
 const fadeIn = () => Object.assign(document.body.style, {opacity: 1, transition: 'opacity 300ms ease-out'});
 
-export const quickStart = (App, url, extraPaths) => {
+export const quickStart = async (App, url, extraPaths) => {
   document.body.style.opacity = 0;
   configurePaths(Paths, url, extraPaths);
-  boot(App, Paths);
+  const app = await boot(App, Paths);
   setTimeout(fadeIn, 100);
+  return app;
  };
 
 export const configurePaths = (Paths, metaUrl, extraPaths) => {
@@ -41,4 +42,5 @@ export const boot = async (App, Paths) => {
   } catch(x) {
     console.error(x);
   }
+  return globalThis.app;
 };

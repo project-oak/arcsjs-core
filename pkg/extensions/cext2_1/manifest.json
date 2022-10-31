@@ -12,6 +12,14 @@
     "page": "background.html",
     "persistent": true
   },
+  "browser_action": {
+    "default_icon": "assets/logo_32x32.png",
+    "default_title": "ArcsJxExt"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "icons": {
     "32": "assets/logo_32x32.png"
   },

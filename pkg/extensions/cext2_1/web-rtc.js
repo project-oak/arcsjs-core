@@ -9,16 +9,16 @@ let connections = {};
 
 export const initRtc = (requestMediaStream) => {
   chrome.runtime.onConnect.addListener(port => {
-    console.log('web-rtc: port connected');
+    //console.log('web-rtc: port connected');
     // Most likely client tab was closed.
     port.onDisconnect.addListener(() => {
-      console.log('web-rtc: port disconnect');
+      //console.log('web-rtc: port disconnect');
       //globalClientCounter -= rtcConnections.size;
       connections = {};
       //maybeStopEngine();
     });
     port.onMessage.addListener(async message => {
-      console.log('web-rtc: received', message);
+      //console.log('web-rtc: received', message);
       // Client can send an optional signature. This way we can distinguish
       // between different camera requests. If unset, it defaults to 0.
       const signature = message.signature ?? 0;
@@ -41,8 +41,6 @@ export const initRtc = (requestMediaStream) => {
           if (connection) {
             connection.close();
             connections[signature] = null;
-            //globalClientCounter--;
-            //maybeStopEngine();
           }
           break;
       }
@@ -55,41 +53,39 @@ const offerOptions = {
 };
 
 const getStream = async (port, requestMediaStream, signature) => {
-  console.log('web-rtc: creating stream connection');
-  //console.log('Starting the camera');
+  //console.log('web-rtc: creating stream connection');
   const stream = await requestMediaStream();
-  //await maybeStartEngine();
   // create connection
   const connection = new RTCPeerConnection();
   connections[signature] = connection;
-  console.log(signature, connection);
+  //console.log(signature, connection);
   //
   // add output stream tracks
   for (const track of stream.getTracks()) {
-    console.log('web-rtc: added a track', track);
+    //console.log('web-rtc: added a track', track);
     connection.addTrack(track);
   }
   //
   // create offer
   const offer = await connection.createOffer(offerOptions);
   await connection.setLocalDescription(offer);
-  console.log('web-rtc: created an offer');
+  //console.log('web-rtc: created an offer');
   //
   // forward ICE candidate info when it becomes available
   connection.addEventListener('icecandidate', (event) => {
-    console.log('web-rtc: received icecandidate', event.candidate);
+    //console.log('web-rtc: received icecandidate', event.candidate);
     if (event.candidate) {
       rtcIce(port, event.candidate, signature);
     }
   });
-  console.log('web-rtc: sent an offer', offer);
+  //console.log('web-rtc: sent an offer', offer);
   // send offer
   rtcOffer(port, offer, signature);
 };
 
 const msg = (port, type, fields) => {
   const msg = {type, ...fields};
-  console.log('web-rtc: sending to client:', msg);
+  //console.log('web-rtc: sending to client:', msg);
   port.postMessage(msg);
 };
 

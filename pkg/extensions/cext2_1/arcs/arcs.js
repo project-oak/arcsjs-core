@@ -20,11 +20,13 @@ export const {
   Xen, deepQuerySelector,
   quickStart,
   LocalStoragePersistor,
-  LobbyService, HistoryService, MediaService,
+  HistoryService, MediaService,
+  TensorFlowService,
   FaceMeshService, SelfieSegmentationService,
   MediapipeNodes,
   ThreejsService, ShaderService,
   CocoSsdService,
+  LobbyService,
   // must be last
   ...etc
 } = await load([
@@ -39,9 +41,13 @@ export const {
   'App/common-dom.js',
   'Designer/designer-layout.js',
   //
+  'PixiJs/pixi-view.js',
+  //
   'LocalStorage/LocalStoragePersistor.js',
+  'Media/DeviceUxRecipe.js',
   //
   'TensorFlow/TensorFlow.js',
+  'TensorFlow/TensorFlowService.js',
   'Rtc/LobbyService.js',
   'NewMedia/MediaService.js',
   'Mediapipe/FaceMeshService.js',

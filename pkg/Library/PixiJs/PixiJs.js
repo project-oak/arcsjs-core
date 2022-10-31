@@ -5,7 +5,10 @@
  * license that can be found in the LICENSE file.
  */
 ({
-  template: html`
-    <pixi-view demo="{{demo}}" image="{{image}}"></pixi-view>
-  `
+onImage({eventlet: {value: image}}) {
+  return {image};
+},
+template: html`
+  <pixi-view demo="{{demo}}" image="{{image}}" on-image="onImage"></pixi-view>
+`
 })

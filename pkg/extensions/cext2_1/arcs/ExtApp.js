@@ -4,30 +4,27 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import * as Arcs from './arcs.js';
+import {
+  Paths, App, LocalStoragePersistor,
+  HistoryService,
+  ThreejsService,
+  ShaderService,
+  TensorFlowService,
+  SelfieSegmentationService,
+  MediaService
+} from './arcs.js';
 import {ExtRecipe} from './ExtRecipe.js';
 
-//globalThis.Resources = Resources;
-
-export const ExtApp = class extends Arcs.App {
+export const ExtApp = class extends App {
   constructor() {
-    super(Arcs.Paths.map);
-    this.root = null;
-    this.services = [
-      // Arcs.AudioService,
-      // Arcs.CCaService,
-      Arcs.HistoryService,
-      Arcs.ThreejsService,
-      Arcs.ShaderService,
-      Arcs.TensorflowService,
-      Arcs.BodySegmentationService
-    ];
+    super(Paths.map);
+    this.services = {HistoryService, ThreejsService, ShaderService, TensorFlowService, SelfieSegmentationService, MediaService};
     this.userAssembly = [ExtRecipe];
-    this.persistor = new Arcs.LocalStoragePersistor('user');
+    this.persistor = new LocalStoragePersistor('user');
   }
   async spinup() {
+    //this.root = null;
     await super.spinup();
-    // this.arcs.set('user', 'selectedPipeline', selectedPipeline);
-    // this.arcs.set('user', 'pipelines', pipelines);
+    this.arcs.set('user', 'mediaDeviceState', {isCameraEnabled: true});
   }
 };
