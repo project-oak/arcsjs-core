@@ -22,7 +22,7 @@ export const MediaService = class {
     log('allocateCanvas');
     const {width, height} = size ?? {width: 240, height: 180};
     //const canvas = dom('canvas', {style: `display: none; width: ${width}px; height: ${height}px;`});
-    const canvas = dom('canvas', {width, height});
+    const canvas = dom('canvas', {width, height, style: 'display: none;'});
     return Resources.allocate(canvas);
   }
   static async drawImage({source, target, dx, dy, dw, dh, operation}) {
