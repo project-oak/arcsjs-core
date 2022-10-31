@@ -22,7 +22,7 @@ export const App = class {
   }
   constructor(paths, root) {
     this.paths = paths;
-    this.root = root;
+    this.root = root || document.body;
     log(JSON.stringify(paths, null, '  '));
   }
   get arcs() {
@@ -31,7 +31,7 @@ export const App = class {
   async spinup() {
     await Arcs.init({
       paths: this.paths,
-      root: this.root || document.body,
+      root: this.root,
       onservice: this.service.bind(this),
       injections: {themeRules, ...this.injections}
     });

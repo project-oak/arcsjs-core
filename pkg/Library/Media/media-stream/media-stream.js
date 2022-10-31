@@ -108,10 +108,10 @@ export class MediaStream extends Xen.Async {
         this.maybeHaltStreams(streamName, true, true);
       }
     }
-    notifySubscribers(streamName);
     if (streamName === defaultStreamName) {
       Resources.set(defaultStreamName, sharedStreams[streamName]);
     }
+    notifySubscribers(streamName);
   }
   async produceStream(enableVideo, enableAudio, videodeviceid, audioinputdeviceid) {
     // these are the droids we are looking for

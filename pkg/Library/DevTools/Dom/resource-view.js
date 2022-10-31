@@ -6,40 +6,46 @@
 
 import {Xen} from '../../Dom/Xen/xen-async.js';
 import {IconsCss} from '../../Dom/Material/material-icon-font/icons.css.js';
-import {Resources} from '../../App/Resources.js';
+//import {Resources} from '../../App/Resources.js';
 
 const {entries} = Object;
 
 export class ResourceView extends Xen.Async {
   static get observedAttributes() {
-    return ['version'];
+    return ['resources', 'version'];
   }
-  update(_, state) {
-    state.canvases = entries(Resources.all()).filter(([name, res]) => res?.localName === 'canvas');
+  update({resources}, state) {
+    state.resources = resources || globalThis.Resources.all();
+    state.canvases = entries(state.resources).filter(([name, res]) => res?.localName === 'canvas');
   }
-  render({}, {canvases}) {
+  render({}, {resources}) {
+    const cap = s => `${s[0].toUpperCase()}${s.slice(1)}`;
     return {
-      resources: entries(Resources.all()).filter(([name, res]) => name && res).map(([name, res]) => ({
+      resources: entries(resources).filter(([name, res]) => name && res).map(([name, res]) => ({
         key: name,
         notCanvas: res?.localName !== 'canvas',
         notStream: !(res instanceof MediaStream),
         size: res?.width ? `(${res?.width} x ${res?.height})` : '',
         canvasRatio: `aspect-ratio: ${res?.width} / ${res?.height};`,
-        typeof:
-          res?.localName === 'canvas' ? 'Canvas'
-          : (res instanceof MediaStream) ? 'Stream'
-          : (res?.sampleRate) ? 'Audio'
-          : typeof(res),
+        typeof
+          : res?.localName ? cap(res.localName)
+          // : (res instanceof MediaStream) ? 'Stream'
+          // : (res?.sampleRate) ? 'Audio'
+          : (res?.constructor?.name)
+          ?? typeof(res)
+          ,
         stream: (res instanceof MediaStream) ? res : null,
       }))
     };
   }
   _didRender({}, {canvases}) {
-    canvases?.map(([name, res]) => {
-      const canvas = this.host.querySelector(`[key="${name}"]`);
-      const ctx = canvas?.getContext('2d');
-      if (res && res.width) {
-        ctx?.drawImage(res, 0, 0, canvas.width, canvas.height);
+    canvases?.map(([name, resource]) => {
+      const previewCanvas = this.host.querySelector(`[key="${name}"]`);
+      const ctx = previewCanvas?.getContext('2d');
+      if (resource && resource.width) {
+        const {width: w, height: h} = ctx.canvas;
+        ctx.clearRect(0, 0, w, h);
+        ctx?.drawImage(resource, 0, 0, w, h);
       } else {
         // make an X?
       }
@@ -58,6 +64,7 @@ export class ResourceView extends Xen.Async {
     border: 1px solid orange;
     margin: 12px;
     padding: 8px;
+    width: 124px;
   }
   canvas, video {
     border: 1px solid purple;

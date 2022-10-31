@@ -93,14 +93,15 @@ export class NodeGraph extends Xen.Async {
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       //console.log('=');
       graph?.graphEdges.map((edge, i) => {
-        const spacing = 16;
+        const spacing = 18;
+        const margin = 10;
         //
         const i0 = graph.graphNodes.findIndex(({key}) => key === edge.from.id);
         const i0outs = graph.graphNodes[i0]?.outputs;
         const ii0 = i0outs?.findIndex(({name}) => name === edge.from.storeName);
         const ii0c =i0outs?.length / 2 - 0.5;
         //console.log('out', i0, ii0, ii0c, edge.from.storeName);
-        const i0offset = spacing * (ii0-ii0c) + 9;
+        const i0offset = spacing * (ii0-ii0c) + margin;
         const g0 = this.geom(edge.from.id, i0);
         //
         const i1 = graph.graphNodes.findIndex(({key}) => key === edge.to.id);
@@ -108,7 +109,7 @@ export class NodeGraph extends Xen.Async {
         const ii1 = i1ins?.findIndex(({name}) => name === edge.to.storeName);
         const ii1c = i1ins?.length / 2 - 0.5;
         //console.log('in', i1, ii1, ii1c, edge.to.storeName);
-        const i1offset = spacing * (ii1-ii1c) + 9;
+        const i1offset = spacing * (ii1-ii1c) + margin;
         const g1 = this.geom(edge.to.id, i1);
         //
         const p0 = {x: g0.r - 1, y: g0.y + i0offset};

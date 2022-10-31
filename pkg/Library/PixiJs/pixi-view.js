@@ -6,10 +6,10 @@
  */
 import {Xen} from '../Dom/Xen/xen-async.js';
 import {Resources} from '../App/Resources.js';
+import {Paths, deepEqual} from '../Core/utils.js';
 import {PIXI} from './pixi.js';
-import {deepEqual} from '../Core/utils.js';
 
-const assets = `../third_party/pixijs/assets`;
+const assets = Paths.resolve('$root/third_party/pixijs/assets');
 
 export class PixiView extends Xen.Async {
   static get observedAttributes() {
@@ -23,51 +23,70 @@ export class PixiView extends Xen.Async {
     height:100%;
   }
 </style>
+<!-- <canvas issamine></canvas> -->
     `;
+  }
+  _didMount() {
+    // this.canvas = this._dom.$('canvas');
   }
   update({demo, image}, state) {
     let demoName = demo;
-    if (image && !demoName) {
-      if (!state.image || !deepEqual(state.image, image)) {
-        const realCanvas = Resources.get(image.canvas);
-        if (realCanvas) {
-          demoName = 'ImageTexture';
-          state.image = image;
-          state.canvas = realCanvas;
-        }
-      }
-    }
+    const demos = {
+      Spiral,
+      Shader,
+      BlendMode,
+      Transparent,
+      Tinting,
+      CacheAsBitmap,
+      ImageTexture,
+      SpineBoy
+    };
+    //
+    // if (image && !demoName) {
+    //   if (!state.image || !deepEqual(state.image, image)) {
+    //     const realCanvas = Resources.get(image.canvas);
+    //     if (realCanvas) {
+    //       demoName = 'ImageTexture';
+    //       state.image = image;
+    //       state.canvas = realCanvas;
+    //     }
+    //   }
+    // }
+    //
     if (state.app && demoName !== state.demo) {
       state.app.destroy(true);
       state.app = null;
     }
+    //
     if (!state.app && demoName) {
       state.demo = demoName;
-      const demos = {
-        Spiral,
-        Shader,
-        BlendMode,
-        Transparent,
-        Tinting,
-        CacheAsBitmap,
-        ImageTexture,
-        SpineBoy
-      };
       const demoFunc = demos[demoName];
       if (demoFunc) {
         const app = state.app = new PIXI.Application({
+          //view: this.canvas,
+          forceCanvas: true,
           backgroundAlpha: (demoFunc === Transparent) ? 0 : 1
         });
-        this.host.appendChild(app.view);
+        //app.ticker.autoStart = true;
+        //this.host.appendChild(app.view);
         demoFunc(app, state);
+        state.appCanvasId = Resources.allocate(state.app.view);
+        console.log('appCanvasId achieved:', state.appCanvasId);
+        setInterval(app.ticker._tick, 16);
       }
+    }
+    //
+    if (state.appCanvasId) {
+      setTimeout(() => this.invalidate(), 16);
+      this.value = {canvas: state.appCanvasId, version: Math.random()};
+      this.fire('image');
     }
   }
 }
 
 customElements.define('pixi-view', PixiView);
 
-const clamp = (v, mn, mx) => Math.min(mx, Math.max(mn, v));
+//const clamp = (v, mn, mx) => Math.min(mx, Math.max(mn, v));
 
 const ImageTexture = (app, {canvas}) => {
   //const {width, height} = app.screen;
@@ -134,7 +153,9 @@ const Spiral = app => {
       clear: false
     });
   };
+  app.ticker.stop();
   app.ticker.add(tick);
+  app.ticker.start();
 };
 
 const Shader = app => {

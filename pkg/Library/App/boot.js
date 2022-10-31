@@ -4,13 +4,17 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-export const quickStart = (App, url, extraPaths) => {
+import {Paths} from '../Core/utils.js';
+
+const fadeIn = () => Object.assign(document.body.style, {opacity: 1, transition: 'opacity 300ms ease-out'});
+
+export const quickStart = async (App, url, extraPaths) => {
   document.body.style.opacity = 0;
   configurePaths(Paths, url, extraPaths);
-  boot(App, Paths);
-  setTimeout(() => Object.assign(document.body.style,
-    {opacity: 1, transition: 'opacity 300ms ease-out'}), 100);
-};
+  const app = await boot(App, Paths);
+  setTimeout(fadeIn, 100);
+  return app;
+ };
 
 export const configurePaths = (Paths, metaUrl, extraPaths) => {
   // remove parameters from import-meta url
@@ -22,11 +26,13 @@ export const configurePaths = (Paths, metaUrl, extraPaths) => {
   Paths.add({
     $app: app,
     $config: `${app}/config.js`,
-    $library: `${app}/${globalThis.config.arcsPath}`
+    $library: `${globalThis.config.arcsPath}/Library`
   });
-  Object.keys(extraPaths).forEach(key => {
-    Paths.map[key] = Paths.resolve(extraPaths[key]);
-  });
+  if (extraPaths) {
+    Object.keys(extraPaths).forEach(key => {
+      Paths.map[key] = Paths.resolve(extraPaths[key]);
+    });
+  }
 };
 
 export const boot = async (App, Paths) => {
@@ -36,4 +42,5 @@ export const boot = async (App, Paths) => {
   } catch(x) {
     console.error(x);
   }
+  return globalThis.app;
 };
