@@ -21,32 +21,24 @@ export const ExtRecipe = {
     "selfieFrame": {
       $type: 'Image'
     },
-    "composedFrame": {
-      $type: 'Image',
+    "composedFrame1": {
+      $type: 'Image'
+    },
+    "composedFrame2": {
+      $type: 'Image'
     },
     "frame": {
-      $type: 'Image',
+      $type: 'Image'
     },
-    // "mask": {
-    //   $type: 'Image',
-    // }
+    "pixiFrame": {
+      $type: 'Image'
+    }
   },
   deviceimage1: {
     $kind: '$library/NewMedia/DeviceImage.js',
     $inputs: [{image: 'frame'}],
     $outputs: [{output: 'deviceimage1:output'}]
   },
-  //
-  // pixi: {
-  //   $kind: '$library/PixiJs/PixiJs',
-  //   $staticInputs: {
-  //     demo: 'Spiral'
-  //   },
-  //   $outputs: [{
-  //     image: 'pixiFrame'
-  //     //image: 'deviceimage1:output'
-  //   }]
-  // },
   //
   // noop: {
   //   $kind: '$library/Noop',
@@ -64,6 +56,16 @@ export const ExtRecipe = {
   //   $outputs: ['deviceimage1:output']
   // },
   //
+  //
+  pixi: {
+    $kind: '$library/PixiJs/PixiJs',
+    $staticInputs: {
+      demo: 'Spiral'
+    },
+    $outputs: [{
+      image: 'pixiFrame'
+    }]
+  },
   SelfieSegmentation: {
     $kind: 'Mediapipe/SelfieSegmentation',
     $inputs: [
@@ -73,17 +75,30 @@ export const ExtRecipe = {
       {'mask': 'selfieFrame'}
     ]
   },
-  composed: {
+  compose1: {
+    $kind: '$library/NewMedia/Composite',
+    $staticInputs: {
+      operation: 'overlay'
+    },
+    $inputs: [
+      {imageA: 'camera1:input'},
+      {imageB: 'pixiFrame'}
+    ],
+    $outputs: [
+      {output: 'composedFrame1'}
+    ]
+  },
+  compose2: {
     $kind: '$library/NewMedia/Composite',
     $staticInputs: {
       operation: 'source-over'
     },
     $inputs: [
-      {imageA: 'camera1:input'},
+      {imageA: 'composedFrame1'},
       {imageB: 'selfieFrame'}
     ],
     $outputs: [
-      {output: 'composedFrame'}
+      {output: 'composedFrame2'}
     ]
   },
   shader: {
@@ -92,7 +107,7 @@ export const ExtRecipe = {
       shader: giantInLake
     },
     $inputs: [
-      {'image': 'composedFrame'}
+      {'image': 'composedFrame2'}
     ],
     $outputs: [
       {'outputImage': 'frame'}
