@@ -6,8 +6,6 @@
  */
 import './config.js';
 import {ExtApp} from './ExtApp.js';
-import {Resources, quickStart} from './arcs.js';
+import {quickStart} from './arcs.js';
 
 await quickStart(ExtApp, import.meta.url);
-
-export {Resources};

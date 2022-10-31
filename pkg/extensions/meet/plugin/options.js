@@ -5,14 +5,14 @@
  * license that can be found in the LICENSE file.
  */
 /* global chrome */
-import './arcs/config.js';
-import {Resources} from './arcs/arcs.js';
+import '../app/config.js';
+import {Resources} from '../app/arcs.js';
 
 // get extreme powers
 chrome.runtime.getBackgroundPage(bgPage => {
-  //console.log(bgPage);
   const {app, Resources: bgResources} = bgPage;
-  //console.log(app, bgResources);
+  // share resources with bgPage
   Resources.use(bgResources.all());
+  // render here
   app.arcs.setComposerRoot(document.body);
 });

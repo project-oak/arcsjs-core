@@ -7,8 +7,8 @@
 
 // load code into the client's context (try to keep it neat!)
 const loadInPage = src => document.firstElementChild.appendChild(Object.assign(document.createElement('script'), {src}));
-loadInPage(chrome.runtime.getURL('virtual-camera.js'));
-loadInPage(chrome.runtime.getURL('virtual-stream.js'));
+loadInPage(chrome.runtime.getURL('plugin/virtual-camera.js'));
+loadInPage(chrome.runtime.getURL('plugin/virtual-stream.js'));
 
 // connect to the extension
 const port = chrome.runtime.connect();

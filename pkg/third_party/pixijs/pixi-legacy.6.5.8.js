@@ -35852,9 +35852,9 @@ var PIXI = (function (exports) {
           var _this = this;
           var vertSrc = generateBlurVertSource(kernelSize, horizontal);
           var fragSrc = generateBlurFragSource(kernelSize);
-          _this = _super.call(this, 
+          _this = _super.call(this,
           // vertex shader
-          vertSrc, 
+          vertSrc,
           // fragment shader
           fragSrc) || this;
           _this.horizontal = horizontal;
@@ -37356,7 +37356,7 @@ var PIXI = (function (exports) {
        */
       ResizePlugin.init = function (options) {
           var _this = this;
-          Object.defineProperty(this, 'resizeTo', 
+          Object.defineProperty(this, 'resizeTo',
           /**
            * The HTML element or window to automatically resize the
            * renderer's view element to match width and height.
@@ -38569,9 +38569,9 @@ var PIXI = (function (exports) {
 
   extensions.add(
   // Install renderer plugins
-  AccessibilityManager, Extract, InteractionManager, ParticleRenderer, Prepare, BatchRenderer, TilingSpriteRenderer, 
+  AccessibilityManager, Extract, InteractionManager, ParticleRenderer, Prepare, BatchRenderer, TilingSpriteRenderer,
   // Install loader plugins
-  BitmapFontLoader, CompressedTextureLoader, DDSLoader, KTXLoader, SpritesheetLoader, 
+  BitmapFontLoader, CompressedTextureLoader, DDSLoader, KTXLoader, SpritesheetLoader,
   // Install application plugins
   TickerPlugin, AppLoaderPlugin);
   /**
@@ -41361,4 +41361,3 @@ var PIXI = (function (exports) {
   return exports;
 
 })({});
-//# sourceMappingURL=pixi-legacy.js.map

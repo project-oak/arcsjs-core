@@ -27,12 +27,12 @@
     "matches": [
       "https://meet.google.com/*"
     ],
-    "js": ["content.js"],
+    "js": ["plugin/content.js"],
     "run_at": "document_start"
   }],
   "content_security_policy": "script-src 'self' 'unsafe-eval' http://localhost:9888/; object-src 'self'",
   "web_accessible_resources": [
-    "virtual-camera.js",
-    "virtual-stream.js"
+    "plugin/virtual-camera.js",
+    "plugin/virtual-stream.js"
   ]
 }

@@ -7,8 +7,6 @@
 /* global chrome */
 
 import {initRtc} from './web-rtc.js';
-//import {getBasicCameraStream} from './cameras/basic-camera.js';
 import {getArcsCameraStream} from './cameras/arcs-camera.js';
 
-//initRtc(getBasicCameraStream);
 initRtc(getArcsCameraStream);

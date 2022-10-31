@@ -4,7 +4,10 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
- import {Resources} from '../arcs/index.js';
+import '../../app/config.js';
+import {Resources} from '../../app/arcs.js';
+// TODO(sjmiles): weird place to boot the app
+import '../../app/index.js';
 
 const dom = (tag, props) => document.body.appendChild(Object.assign(document.createElement(tag), props));
 

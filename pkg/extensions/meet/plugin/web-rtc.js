@@ -9,10 +9,10 @@ let connections = {};
 
 export const initRtc = (requestMediaStream) => {
   chrome.runtime.onConnect.addListener(port => {
-    //console.log('web-rtc: port connected');
+    console.log('web-rtc: port connected');
     // Most likely client tab was closed.
     port.onDisconnect.addListener(() => {
-      //console.log('web-rtc: port disconnect');
+      console.log('web-rtc: port disconnect');
       //globalClientCounter -= rtcConnections.size;
       connections = {};
       //maybeStopEngine();
@@ -30,10 +30,12 @@ export const initRtc = (requestMediaStream) => {
           break;
         // received an answer
         case 'RTC_ANSWER':
+          console.log('web-rtc: received', message);
           await connection?.setRemoteDescription(message.description);
           break;
         // received ICE candidate info
         case 'RTC_ICE':
+          console.log('web-rtc: received', message);
           await connection?.addIceCandidate(message.candidate);
           break;
         // cient closed the stream

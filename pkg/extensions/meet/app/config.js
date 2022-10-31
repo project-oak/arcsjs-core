@@ -1,5 +1,5 @@
 globalThis.config = {
-  aeon: 'cext_runner/0.4.4',
+  aeon: 'ExtVideo/0.4.4',
   //
   // use for normal loading
   //arcsPath: 'https://arcsjs.web.app/0.4.4',
