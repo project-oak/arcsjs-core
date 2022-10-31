@@ -7,7 +7,7 @@
 
 ({
 
-// ConnectionUpdator atm only initializes connections of newly added nodes,
+// ConnectionUpdater atm only initializes connections of newly added nodes,
 // if a single candidate is available.
 // In the future, a more sophisticated heuristics can be implemented to
 // automatically connect nodes.

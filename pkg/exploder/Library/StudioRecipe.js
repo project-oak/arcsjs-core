@@ -87,8 +87,8 @@ export const StudioRecipe = {
     ],
     $outputs: [{data: 'inspectorData'}]
   },
-  nodeUpdator: {
-    $kind: '$library/NodeGraph/NodeUpdator',
+  nodeUpdater: {
+    $kind: '$library/NodeGraph/NodeUpdater',
     $inputs: [
       {node: 'selectedNode'},
       {pipeline: 'selectedPipeline'},

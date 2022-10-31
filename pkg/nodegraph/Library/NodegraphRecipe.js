@@ -240,8 +240,8 @@ export const NodegraphRecipe = {
     $staticInputs: {globalStores},
     $outputs: ['candidates']
   },
-  connectionUpdator: {
-    $kind: '$library/NodeGraph/ConnectionUpdator',
+  connectionUpdater: {
+    $kind: '$library/NodeGraph/ConnectionUpdater',
     $inputs: [
       {pipeline: 'selectedPipeline'},
       'nodeTypes',
@@ -249,8 +249,8 @@ export const NodegraphRecipe = {
     ],
     $outputs: [{pipeline: 'selectedPipeline'}]
   },
-  nodeUpdator: {
-    $kind: '$library/NodeGraph/NodeUpdator',
+  nodeUpdater: {
+    $kind: '$library/NodeGraph/NodeUpdater',
     $inputs: [
       'selectedNodeId',
       {pipeline: 'selectedPipeline'},
@@ -282,8 +282,8 @@ export const NodegraphRecipe = {
       'nodegraphLayout'
     ]
   },
-  layoutUpdator: {
-    $kind: '$library/NodeGraph/LayoutUpdator',
+  layoutUpdater: {
+    $kind: '$library/NodeGraph/LayoutUpdater',
     $inputs: [
       {pipeline: 'selectedPipeline'},
       'previewLayout',
