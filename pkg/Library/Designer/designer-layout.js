@@ -29,32 +29,15 @@ export class DesignerLayout extends DragDrop {
     this.updateGeometry();
   }
   updateGeometry() {
-    this.updateSelectionAndPositions(this.selected, this.rects);
-  }
-  updateSelectionAndPositions(selected, rects) {
     this.select(null);
-    if (rects) {
-      rects.forEach(({id, position}) => this.position(id, position));
-      selected?.forEach(id => {
-        if (this.getChildById(id)) {
-          this.select(id);
-        }
-      });
-    }
+    this.rects?.forEach(({id, position}) => this.position(id, position));
+    this.selectAll(this.selected);
   }
   position(id, position) {
-    if (position == null) {
-      // set default rect
-      const target = this.getChildById(id);
-      if (target) {
-        const rect = {l: 16, t: 16, w: 240, h: 180};
-        this.setBoxStyle(target, rect);
-      }
-    } else {
-      const child = this.getChildById(id);
-      if (child && position) {
-        this.setBoxStyle(child, position);
-      }
+    const child = this.getChildById(id);
+    if (child) {
+      const defaultPosition = {l: 16, t: 16, w: 240, h: 180};
+      this.setBoxStyle(child, position ?? defaultPosition);
     }
   }
   getChildById(id) {
@@ -108,14 +91,23 @@ export class DesignerLayout extends DragDrop {
     this.updateGeometry();
   }
   select(id) {
-    if (this.lastSelectedId !== id) {
-      this.lastSelectedId = id;
-      this.target = this.getChildById(id);
-      // TODO(mariakleiner): it is possible that the `target` hasn't rendered yet and will remain unselected.
-      this.rect = this.target && this.getRect(this.target);
-      this.restyleSelection();
-      this.updateOrders(this.target);
-    }
+    this.lastSelectedId = id;
+    this.selectChild(this.getChildById(id), id);
+  }
+  selectChild(child, id) {
+    this.target = child;
+    // TODO(mariakleiner): it is possible that the `target` hasn't rendered yet and will remain unselected.
+    this.rect = this.target && this.getRect(this.target);
+    this.restyleSelection();
+    this.updateOrders(this.target);
+  }
+  selectAll(ids) {
+    ids?.forEach(id => {
+      const child = this.getChildById(id);
+      if (child) {
+        this.selectChild(child, id);
+      }
+    });
   }
   firePosition(target) {
     this.key = this.getTargetKey(target);
@@ -151,7 +143,7 @@ export class DesignerLayout extends DragDrop {
     const edges = ['top', 'right', 'bottom', 'left'];
     const from = edges.map(e => attrs[e]?.name).join(':');
     if (from === ':::') {
-      if (['input', 'button', 'textarea'].includes(e.target.localName)) {
+      if (['input', 'button', 'textarea'].includes(e.path?.[0]?.localName)) {
         return;
       }
       // component target

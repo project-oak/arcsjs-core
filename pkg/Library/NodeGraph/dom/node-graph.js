@@ -5,7 +5,6 @@
  * license that can be found in the LICENSE file.
  */
 import {Xen} from '../../Dom/Xen/xen-async.js';
-// import {XenCss} from '../Dom/Material/material-xen/xen.css.js';
 
 export class NodeGraph extends Xen.Async {
   static get observedAttributes() {
@@ -47,15 +46,15 @@ export class NodeGraph extends Xen.Async {
       return {x: l+w2, y: t+h2, l, t, r: l+w, b: t+h, w, h, w2, h2};
     } else {
       //console.log(key, 'has no rect');
-      // const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
-      // const p = i => ({
-      //   x: (i%cols)*(width+margin) + ox,
-      //   y: Math.floor(i/cols)*(height+margin) + margin*(i%2) + oy
-      // });
-      // const o = p(i % 3);
-      // const [w, h, w2, h2] = [width, height, width/2, height/2];
-      // return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
-      return {l: 0, t: 0};
+      // calculate a default landing spot
+      const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
+      const p = i => ({
+        x: (i%cols)*(width+margin) + ox,
+        y: Math.floor(i/cols)*(height+margin) + margin*(i%2) + oy
+      });
+      const o = p(i % 3);
+      const [w, h, w2, h2] = [width, height, width/2, height/2];
+      return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
     }
   }
   render({graph, rects}, {x, y}) {

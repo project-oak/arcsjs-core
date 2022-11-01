@@ -42,21 +42,20 @@ export const MediaService = class {
       ctx.drawImage(realSource, ...args);
     }
   }
-  static async compose({imageA, imageB, imageOut, operation}) {
-    const realA = Resources.get(imageA);
-    const realB = Resources.get(imageB);
+  static async compose({images, operations, imageOut}) {
+    const realImages = images.map(id => Resources.get(id));
     const realOut = Resources.get(imageOut);
-    if (realA && realB && realOut) {
-      const {width: dw, height: dh} = realA;
+    if (realImages[0] && realOut) {
+      const {width: dw, height: dh} = realImages[0];
       if (realOut.width !== dw || realOut.height != dh) {
         realOut.width = dw;
         realOut.height = dh;
       }
       const ctx = realOut.getContext('2d');
-      ctx.globalCompositeOperation = 'copy';
-      ctx.drawImage(realA, 0, 0, dw, dh);
-      ctx.globalCompositeOperation = operation ?? 'source-over';
-      ctx.drawImage(realB, 0, 0, dw, dh);
+      realImages.filter(e=>e).forEach((realImage, i) => {
+        ctx.globalCompositeOperation = operations?.[i] ?? (i ? 'source-over' : 'copy');
+        ctx.drawImage(realImage, 0, 0, dw, dh);
+      });
     }
   }
   static async allocateVideo() {

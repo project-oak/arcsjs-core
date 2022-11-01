@@ -4,6 +4,36 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
+
+const CompositeOperationValues = [
+  'source-over',
+  'source-in',
+  'source-out',
+  'source-atop',
+  'destination-over',
+  'destination-in',
+  'destination-out',
+  'destination-atop',
+  'lighter',
+  'copy',
+  'xor',
+  'multiply',
+  'screen',
+  'overlay',
+  'darken',
+  'lighten',
+  'color-dodge',
+  'color-burn',
+  'hard-light',
+  'soft-light',
+  'difference',
+  'exclusion',
+  'hue',
+  'saturation',
+  'color',
+  'luminosity'
+];
+
 export const ImageCompositeNodeType = {
   $meta: {
     // should be 'name'
@@ -12,41 +42,21 @@ export const ImageCompositeNodeType = {
     category: 'Media'
   },
   $stores: {
-    operation: {
+    opA: {
       $type: 'CompositeOperation',
-      values: [
-        'source-over',
-        'source-in',
-        'source-out',
-        'source-atop',
-        'destination-over',
-        'destination-in',
-        'destination-out',
-        'destination-atop',
-        'lighter',
-        'copy',
-        'xor',
-        'multiply',
-        'screen',
-        'overlay',
-        'darken',
-        'lighten',
-        'color-dodge',
-        'color-burn',
-        'hard-light',
-        'soft-light',
-        'difference',
-        'exclusion',
-        'hue',
-        'saturation',
-        'color',
-        'luminosity'
-      ]
+      values: CompositeOperationValues
     },
-    images: {
-      $type: '[Image]',
-      connection: true,
-      multiple: true,
+    opB: {
+      $type: 'CompositeOperation',
+      values: CompositeOperationValues
+    },
+    opC: {
+      $type: 'CompositeOperation',
+      values: CompositeOperationValues
+    },
+    opD: {
+      $type: 'CompositeOperation',
+      values: CompositeOperationValues
     },
     imageA: {
       $type: 'Image',
@@ -54,6 +64,16 @@ export const ImageCompositeNodeType = {
       nomonitor: true
     },
     imageB: {
+      $type: 'Image',
+      connection: true,
+      nomonitor: true
+    },
+    imageC: {
+      $type: 'Image',
+      connection: true,
+      nomonitor: true
+    },
+    imageD: {
       $type: 'Image',
       connection: true,
       nomonitor: true
@@ -66,7 +86,7 @@ export const ImageCompositeNodeType = {
   },
   ImageComposite: {
     $kind: '$library/NewMedia/ImageComposite',
-    $inputs: ['imageA', 'imageB', 'operation'],
+    $inputs: ['imageA', 'imageB', 'imageC', 'imageD', 'opA', 'opB', 'opC', 'opD'],
     $outputs: ['output']
   }
 };

@@ -14,7 +14,9 @@ async initialize(inputs, state) {
   state.stores = {};
 },
 
-async update({recipes}, state, {service}) {
+async update({recipes, selectedNodeId}, state, {service}) {
+  // reset selection state
+  state.selectedNodeId = selectedNodeId;
   recipes ??= [];
   await this.removeOldRecipes(recipes, state, service);
   await this.renewRecipes(recipes, state, service);
@@ -122,7 +124,7 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-render({pipeline, selectedNodeId, nodeTypes, categories, layout}, {recipes}) {
+render({pipeline, nodeTypes, categories, layout}, {selectedNodeId, recipes}) {
   const particleIdsForNode = (node) =>
       (node && !this.isUIHidden(node) &&
         this.getParticleNamesForNode(node, pipeline, recipes)) ||
@@ -142,24 +144,31 @@ isUIHidden(node) {
   return Boolean(node?.props?.hideUI);
 },
 
-onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
-  const node = this.findNodeByParticle(key, pipeline, recipes);
+onNodeDelete({eventlet: {key}, pipeline}, state) {
+  const node = this.findNodeByParticle(key, pipeline, state.recipes);
   delete pipeline.nodes[node.id];
-  return {pipeline, selectedNodeId: null};
+  return {
+    pipeline,
+    ...this.selectNode(null, state)
+  };
 },
 
-onNodePosition({eventlet: {key, value}, pipeline, layout}, {recipes}) {
-  const node = this.findNodeByParticle(key, pipeline, recipes);
-  if (node) {
-    return {
-      selectedNodeId: node.id,
-      layout: {...layout, [node.id]: value}
-    };
-  } else {
-    return {
-      selectedNodeId: null
-    };
+onNodePosition({eventlet: {key, value}, pipeline, layout}, state) {
+  const node = this.findNodeByParticle(key, pipeline, state.recipes);
+  if (!node) {
+    return this.selectNode(null, state);
   }
+  return {
+    ...this.selectNode(node.id, state),
+    layout: {...layout, [node.id]: value}
+  };
+},
+
+selectNode(id, state) {
+  state.selectedNodeId = id;
+  return {
+    selectedNodeId: id
+  };
 },
 
 findNodeByParticle(particleName, pipeline, recipes) {
