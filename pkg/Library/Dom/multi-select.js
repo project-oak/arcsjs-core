@@ -6,7 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Xen} from '../Dom/Xen/xen-async.js';
+import {Xen} from './Xen/xen-async.js';
 
 export class MultiSelect extends Xen.Async {
   static get observedAttributes() {
