@@ -63,6 +63,8 @@ export class PixiView extends Xen.Async {
       const demoFunc = demos[demoName];
       if (demoFunc) {
         const app = state.app = new PIXI.Application({
+          width: 1280, height: 720,
+          //width: 800, height: 600,
           //view: this.canvas,
           forceCanvas: true,
           backgroundAlpha: (demoFunc === Transparent) ? 0 : 1
@@ -97,16 +99,17 @@ const ImageTexture = (app, {canvas}) => {
 };
 
 const Spiral = app => {
-  // create two render textures... these dynamic textures will be used to draw the scene into itself
   const {width, height} = app.screen;
+  const [w2, h2] = [width/2, height/2];
+  // create two render textures... these dynamic textures will be used to draw the scene into itself
   let renderTexture = PIXI.RenderTexture.create({width, height});
   let renderTexture2 = PIXI.RenderTexture.create({width, height});
   const currentTexture = renderTexture;
   // create a new sprite that uses the render texture we created above
   const outputSprite = new PIXI.Sprite(currentTexture);
   // align the sprite
-  outputSprite.x = 400;
-  outputSprite.y = 300;
+  outputSprite.x = w2;
+  outputSprite.y = h2;
   outputSprite.anchor.set(0.5);
   // add to stage
   app.stage.addChild(outputSprite);
@@ -122,8 +125,8 @@ const Spiral = app => {
   // now create some items and randomly position them in the stuff container
   for (let i = 0; i < 20; i++) {
     const item = PIXI.Sprite.from(fruits[i % fruits.length]);
-    item.x = Math.random() * 400 - 200;
-    item.y = Math.random() * 400 - 200;
+    item.x = (Math.random() - 0.5) * w2;
+    item.y = (Math.random() - 0.5) * h2;
     item.anchor.set(0.5);
     stuffContainer.addChild(item);
     items.push(item);

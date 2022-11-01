@@ -42,6 +42,19 @@ export const MediaService = class {
       ctx.drawImage(realSource, ...args);
     }
   }
+  static async compose({imageA, imageB, imageOut, operation}) {
+    const realA = Resources.get(imageA);
+    const realB = Resources.get(imageB);
+    const realOut = Resources.get(imageOut);
+    if (realA && realB && realOut) {
+      const {width: dw, height: dh} = realOut;
+      const ctx = realOut.getContext('2d');
+      ctx.globalCompositeOperation = 'copy';
+      ctx.drawImage(realA, 0, 0, dw, dh);
+      ctx.globalCompositeOperation = operation ?? 'source-over';
+      ctx.drawImage(realB, 0, 0, dw, dh);
+    }
+  }
   static async allocateVideo() {
     const video = document.createElement('video');
     return Resources.allocate(video);

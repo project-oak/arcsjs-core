@@ -145,6 +145,9 @@ export class DesignerLayout extends DragDrop {
     const edges = ['top', 'right', 'bottom', 'left'];
     const from = edges.map(e => attrs[e]?.name).join(':');
     if (from === ':::') {
+      if (['input', 'button', 'textarea'].includes(e.target.localName)) {
+        return;
+      }
       // component target
       this.dragKind = 'move';
       this.target = this.getEventTarget(e);

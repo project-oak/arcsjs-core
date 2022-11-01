@@ -10,11 +10,15 @@ export const Image = {
       $value: {
         url: 'https://storage.googleapis.com/tfweb/testpics/strawberry2.jpeg',
       }
+    },
+    connectedImage: {
+      $type: 'Image',
+      connection: true
     }
   },
   field: {
     $kind: '$library/NewMedia/Image',
-    $inputs: ['image'],
+    $inputs: ['connectedImage', 'image'],
     $outputs: ['image']
   }
 };
