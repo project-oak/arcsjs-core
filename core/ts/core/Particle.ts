@@ -234,6 +234,38 @@ export class ParticleApi {
   render(inputs, state) {
     return null;
   }
+  /**
+   * Initialize is called once in the particle lifecycle, when it just gets
+   * loaded, prior to any other methods calls.
+   *
+   * This function can be overwritten to implement the desired
+   * behaviour.
+   *
+   * Inputs are the stores the particle is bound to.
+   * State is an object that can be changed and passed to sub-functions.
+   * Tools allow the particle to perform supervised activities -
+   * for example services are a tool.
+   *
+   * The initialize function can return an object containing the new desired
+   * value(s) for the stores. For example, if we wanted to update the
+   * `Person` and `Address` stores we would return:
+   *
+   * ```
+   * return {
+   *   Person: 'Jane Smith',
+   *   Address: '123 Main Street'
+   * };
+   * ```
+   *
+   * @param inputs
+   * @param state
+   * @param tools
+   *
+   * @returns [OPTIONAL] object containing store to value mappings
+   */
+  async initialize(inputs, state, tools) {
+    return null;
+  }
 }
 
 const privateProperty = initialValue => {
