@@ -25,7 +25,7 @@
   },
   "content_scripts": [{
     "matches": [
-      "https://arcsjs.webapp.com/*",
+      "https://arcsjs.web.app/*",
       "https://meet.google.com/*"
     ],
     "js": ["plugin/content.js"],
