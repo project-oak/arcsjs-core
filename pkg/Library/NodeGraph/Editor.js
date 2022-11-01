@@ -41,6 +41,34 @@ render(inputs, state) {
   };
 },
 
+// renderRects({layout, pipeline, recipes}) {
+//   return entries(layout).map(([id, value]) => ({id, ...value}));
+//   // don't like this
+//   const particleIdsForNode = node => this.getParticleNamesForNode(node, pipeline, recipes);
+//   // for each node entry, get a (nested) list of rectangles
+//   const rects = values(pipeline?.nodes).map(node => {
+//     // get a list of particle ids related to this node
+//     const ids = particleIdsForNode(node);
+//     // construct list of rectangles
+//     return ids.map(id => ({id, position: layout?.[node.id]}));
+//   })
+//   // collate all rectangles together
+//   .flat()
+//   ;
+// },
+
+// getParticleNamesForNode(node, pipeline, recipes) {
+//   if (node && pipeline && recipes) {
+//     const fullNodeId = this.encodeFullNodeId(node, pipeline);
+//     return this.getParticleNames(recipes[fullNodeId]);
+//   }
+//   return [];
+// },
+
+// encodeFullNodeId({id}, {$meta}) {
+//   return [$meta?.id, id].filter(Boolean).join(this.idDelimiter);
+// },
+
 renderGraph(inputs) {
   return {
     name: inputs.pipeline?.$meta?.name,

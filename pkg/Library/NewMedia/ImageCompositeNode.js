@@ -43,6 +43,11 @@ export const ImageCompositeNodeType = {
         'luminosity'
       ]
     },
+    images: {
+      $type: '[Image]',
+      connection: true,
+      multiple: true,
+    },
     imageA: {
       $type: 'Image',
       connection: true,

@@ -1,12 +1,9 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
-
 import {nodeTypes, categories} from './nodeTypes.js';
 import {customInspectors} from './customInspectors.js';
 import {NodeCatalogRecipe} from '../../Library/NodeTypeCatalog/NodeCatalogRecipe.js';
@@ -67,6 +64,27 @@ const PipelineToolbar = {
   }
 };
 
+const Preview = {
+  designer: {
+    $kind: '$library/Designer/Designer',
+    $inputs: [
+      'recipes',
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId',
+      'nodeTypes',
+      'categories',
+      {layout: 'previewLayout'},
+      'newNodeInfos'
+    ],
+    $outputs: [
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId',
+      {layout: 'previewLayout'},
+      'newNodeInfos'
+    ]
+  }
+};
+
 const NodeEditor = {
   $stores: {
     editorToolbarEvent: {
@@ -81,6 +99,7 @@ const NodeEditor = {
     // $kind: '$library/NodeGraph/SimpleEditor',
     $kind: '$library/NodeGraph/Editor',
     $inputs: [
+      'recipes',
       {pipeline: 'selectedPipeline'},
       'selectedNodeId',
       'nodeTypes',
@@ -108,6 +127,134 @@ const NodeEditor = {
         }
       }
     }
+  }
+};
+
+const Inspector = {
+  Inspector: {
+    $kind: '$library/NodeGraph/Inspector',
+    $staticInputs: {customInspectors},
+    $inputs: [{data: 'inspectorData'}],
+    $outputs: [{data: 'inspectorData'}]
+  },
+  nodeInspector: {
+    $kind: '$library/NodeGraph/NodeInspector',
+    $staticInputs: {
+      customInspectors,
+      inspectorData: 'inspectorData',
+    },
+    $inputs: [
+      'selectedNodeId',
+      {pipeline: 'selectedPipeline'},
+      'candidates',
+      'nodeTypes'
+    ],
+    $outputs: [{data: 'inspectorData'}]
+  },
+  nodeUpdater: {
+    $kind: '$library/NodeGraph/NodeUpdater',
+    $inputs: [
+      'selectedNodeId',
+      {pipeline: 'selectedPipeline'},
+      {data: 'inspectorData'}
+    ],
+    $outputs: [
+      'selectedNodeId',
+      {pipeline: 'selectedPipeline'}
+    ]
+  }
+};
+
+const NodeTree = {
+  NodeTree: {
+    $kind: '$library/NodeGraph/NodeTree',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId',
+      'nodeTypes',
+      'categories',
+      {layout: 'previewLayout'}
+    ],
+    $outputs: [
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId',
+      {layout: 'previewLayout'}
+    ]
+  }
+};
+
+export const NodeCreator = {
+  combiner: {
+    $kind: '$library/NodeGraph/NodeTypesCombiner',
+    $inputs: ['builtinNodeTypes', 'selectedPipeline'],
+    $outputs: [{results: 'nodeTypes'}, 'selectedPipeline']
+  },
+  creator: {
+    $kind: '$library/NodeGraph/NodeCreator',
+    $inputs: [
+      'newNodeInfos',
+      'nodeTypes',
+      {pipeline: 'selectedPipeline'}
+    ],
+    $outputs: [
+      'newNodeInfos',
+      {pipeline: 'selectedPipeline'},
+      'selectedNodeId'
+    ]
+  }
+};
+
+const Layout = {
+  layoutInitializer: {
+    $kind: '$library/NodeGraph/LayoutInitializer',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'previewLayout',
+      'nodegraphLayout'
+    ],
+    $outputs: [
+      'previewLayout',
+      'nodegraphLayout'
+    ]
+  },
+  layoutUpdater: {
+    $kind: '$library/NodeGraph/LayoutUpdater',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'previewLayout',
+      'nodegraphLayout'
+    ],
+    $outputs: [{pipeline: 'selectedPipeline'}]
+  }
+};
+
+const RecipeBuilder = {
+  candidateFinder: {
+    $kind: '$library/NodeGraph/CandidateFinder',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'nodeTypes'
+    ],
+    $staticInputs: {globalStores},
+    $outputs: ['candidates']
+  },
+  connectionUpdater: {
+    $kind: '$library/NodeGraph/ConnectionUpdater',
+    $inputs: [
+      {pipeline: 'selectedPipeline'},
+      'nodeTypes',
+      'candidates',
+    ],
+    $outputs: [{pipeline: 'selectedPipeline'}]
+  },
+  recipeBuilder: {
+    $kind: '$library/NodeGraph/RecipeBuilder',
+    $inputs: [
+      'nodeTypes',
+      {pipeline: 'selectedPipeline'},
+      {layout: 'previewLayout'}
+    ],
+    $outputs: ['recipes']
   }
 };
 
@@ -161,152 +308,18 @@ export const NodegraphRecipe = {
       $type: '[Pojo]'
     }
   },
-  // 'a_frame': {
-  //   $kind: '$library/AFrame/Scene.js'
-  // },
+  ...RecipeBuilder,
+  ...Layout,
+  ...NodeCreator,
   main: {
     $kind: '$nodegraph/Nodegraph',
     $slots: {
       catalog: NodeCatalogRecipe,
       toolbar: PipelineToolbar,
-      preview: {
-        designer: {
-          $kind: '$library/Designer/Designer',
-          $inputs: [
-            'recipes',
-            {pipeline: 'selectedPipeline'},
-            'selectedNodeId',
-            'nodeTypes',
-            'categories',
-            {layout: 'previewLayout'},
-            'newNodeInfos'
-          ],
-          $outputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNodeId',
-            {layout: 'previewLayout'},
-            'newNodeInfos'
-          ]
-        }
-      },
+      preview: Preview,
       editor: NodeEditor,
-      inspector: {
-        Inspector: {
-          $kind: '$library/NodeGraph/Inspector',
-          $staticInputs: {customInspectors},
-          $inputs: [{data: 'inspectorData'}],
-          $outputs: [{data: 'inspectorData'}]
-        }
-      },
-      tree: {
-        NodeTree: {
-          $kind: '$library/NodeGraph/NodeTree',
-          $inputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNodeId',
-            'nodeTypes',
-            'categories',
-            {layout: 'previewLayout'}
-          ],
-          $outputs: [
-            {pipeline: 'selectedPipeline'},
-            'selectedNodeId',
-            {layout: 'previewLayout'}
-          ]
-        }
-      }
+      inspector: Inspector,
+      tree: NodeTree
     }
   },
-  nodeInspector: {
-    $kind: '$library/NodeGraph/NodeInspector',
-    $staticInputs: {
-      customInspectors,
-      inspectorData: 'inspectorData',
-    },
-    $inputs: [
-      'selectedNodeId',
-      {pipeline: 'selectedPipeline'},
-      'candidates',
-      'nodeTypes'
-    ],
-    $outputs: [{data: 'inspectorData'}]
-  },
-  candidateFinder: {
-    $kind: '$library/NodeGraph/CandidateFinder',
-    $inputs: [
-      {pipeline: 'selectedPipeline'},
-      'nodeTypes'
-    ],
-    $staticInputs: {globalStores},
-    $outputs: ['candidates']
-  },
-  connectionUpdater: {
-    $kind: '$library/NodeGraph/ConnectionUpdater',
-    $inputs: [
-      {pipeline: 'selectedPipeline'},
-      'nodeTypes',
-      'candidates',
-    ],
-    $outputs: [{pipeline: 'selectedPipeline'}]
-  },
-  nodeUpdater: {
-    $kind: '$library/NodeGraph/NodeUpdater',
-    $inputs: [
-      'selectedNodeId',
-      {pipeline: 'selectedPipeline'},
-      {data: 'inspectorData'}
-    ],
-    $outputs: [
-      'selectedNodeId',
-      {pipeline: 'selectedPipeline'}
-    ]
-  },
-  recipeBuilder: {
-    $kind: '$library/NodeGraph/RecipeBuilder',
-    $inputs: [
-      {pipeline: 'selectedPipeline'},
-      'nodeTypes',
-      {layout: 'previewLayout'}
-    ],
-    $outputs: ['recipes']
-  },
-  layoutInitializer: {
-    $kind: '$library/NodeGraph/LayoutInitializer',
-    $inputs: [
-      {pipeline: 'selectedPipeline'},
-      'previewLayout',
-      'nodegraphLayout'
-    ],
-    $outputs: [
-      'previewLayout',
-      'nodegraphLayout'
-    ]
-  },
-  layoutUpdater: {
-    $kind: '$library/NodeGraph/LayoutUpdater',
-    $inputs: [
-      {pipeline: 'selectedPipeline'},
-      'previewLayout',
-      'nodegraphLayout'
-    ],
-    $outputs: [{pipeline: 'selectedPipeline'}]
-  },
-  combiner: {
-    $kind: '$library/NodeGraph/NodeTypesCombiner',
-    $inputs: ['builtinNodeTypes', 'selectedPipeline'],
-    $outputs: [{results: 'nodeTypes'}, 'selectedPipeline']
-  },
-  creator: {
-    $kind: '$library/NodeGraph/NodeCreator',
-    $inputs: [
-      'newNodeInfos',
-      'nodeTypes',
-      {pipeline: 'selectedPipeline'}
-    ],
-    $outputs: [
-      'newNodeInfos',
-      {pipeline: 'selectedPipeline'},
-      'selectedNodeId'
-    ]
-  }
 };

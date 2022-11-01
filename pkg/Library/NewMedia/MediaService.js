@@ -1,9 +1,9 @@
 /**
+ * @license
  * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-
 import {logFactory} from '../Core/core.js';
 import {Resources} from '../App/Resources.js';
 import {subscribeToStream, unsubscribeFromStream} from '../Media/media-stream/media-stream.js';
@@ -47,7 +47,11 @@ export const MediaService = class {
     const realB = Resources.get(imageB);
     const realOut = Resources.get(imageOut);
     if (realA && realB && realOut) {
-      const {width: dw, height: dh} = realOut;
+      const {width: dw, height: dh} = realA;
+      if (realOut.width !== dw || realOut.height != dh) {
+        realOut.width = dw;
+        realOut.height = dh;
+      }
       const ctx = realOut.getContext('2d');
       ctx.globalCompositeOperation = 'copy';
       ctx.drawImage(realA, 0, 0, dw, dh);

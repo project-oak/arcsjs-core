@@ -1,10 +1,8 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 import {Xen} from '../Dom/Xen/xen-async.js';
 import {DragDrop} from '../Dom/drag-drop.js';
@@ -29,6 +27,41 @@ export class DesignerLayout extends DragDrop {
   }
   update() {
     this.updateGeometry();
+  }
+  updateGeometry() {
+    this.updateSelectionAndPositions(this.selected, this.rects);
+  }
+  updateSelectionAndPositions(selected, rects) {
+    this.select(null);
+    if (rects) {
+      rects.forEach(({id, position}) => this.position(id, position));
+      selected?.forEach(id => {
+        if (this.getChildById(id)) {
+          this.select(id);
+        }
+      });
+    }
+  }
+  position(id, position) {
+    if (position == null) {
+      // set default rect
+      const target = this.getChildById(id);
+      if (target) {
+        const rect = {l: 16, t: 16, w: 240, h: 180};
+        this.setBoxStyle(target, rect);
+      }
+    } else {
+      const child = this.getChildById(id);
+      if (child && position) {
+        this.setBoxStyle(child, position);
+      }
+    }
+  }
+  getChildById(id) {
+    return this.querySelector(`#${this.sanitizeId(id)}`);
+  }
+  sanitizeId(id) {
+    return id?.replace(/[)(:]/g, '_');
   }
   onKeydown(event) {
     if (!this.hasActiveInput()) {
@@ -73,33 +106,6 @@ export class DesignerLayout extends DragDrop {
   onSlotChange() {
     //console.log('slot change');
     this.updateGeometry();
-  }
-  updateGeometry() {
-    this.updateSelectionAndPositions(this.selected, this.rects);
-  }
-  updateSelectionAndPositions(selected, rects) {
-    rects?.forEach(({id, position}) => this.position(id, position));
-    this.select(null);
-    selected?.forEach(id => {
-      if (this.getChildById(id)) {
-        this.select(id);
-      }
-    });
-  }
-  position(id, position) {
-    if (position == null) {
-      // set default rect
-      const target = this.getChildById(id);
-      if (target) {
-        const rect = {l: 16, t: 16, w: 240, h: 180};
-        this.setBoxStyle(target, rect);
-      }
-    } else {
-      const child = this.getChildById(id);
-      if (child && position) {
-        this.setBoxStyle(child, position);
-      }
-    }
   }
   select(id) {
     if (this.lastSelectedId !== id) {
@@ -214,12 +220,6 @@ export class DesignerLayout extends DragDrop {
     }
   }
   //
-  sanitizeId(id) {
-    return id?.replace(/[)(:]/g, '_');
-  }
-  getChildById(id) {
-    return this.querySelector(`#${this.sanitizeId(id)}`); // (`#${id}`);
-  }
   getEventTarget(e) {
     const p = e.composedPath();
     const i = p.indexOf(e.currentTarget);
