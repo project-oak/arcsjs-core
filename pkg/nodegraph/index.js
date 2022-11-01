@@ -41,7 +41,7 @@ try {
 //   });
 //   app.arcs.set('user', 'selectedPipeline', pipeline)
 // };
-
+//
 // globalThis.graph = {
 //   "Image1": {
 //     "type": "Image",
