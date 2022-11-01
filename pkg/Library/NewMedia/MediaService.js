@@ -1,9 +1,9 @@
 /**
+ * @license
  * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-
 import {logFactory} from '../Core/core.js';
 import {Resources} from '../App/Resources.js';
 import {subscribeToStream, unsubscribeFromStream} from '../Media/media-stream/media-stream.js';
@@ -40,6 +40,22 @@ export const MediaService = class {
       const ctx = realTarget.getContext('2d');
       ctx.globalCompositeOperation = operation ?? 'source-over';
       ctx.drawImage(realSource, ...args);
+    }
+  }
+  static async compose({images, operations, imageOut}) {
+    const realImages = images.map(id => Resources.get(id));
+    const realOut = Resources.get(imageOut);
+    if (realImages[0] && realOut) {
+      const {width: dw, height: dh} = realImages[0];
+      if (realOut.width !== dw || realOut.height != dh) {
+        realOut.width = dw;
+        realOut.height = dh;
+      }
+      const ctx = realOut.getContext('2d');
+      realImages.filter(e=>e).forEach((realImage, i) => {
+        ctx.globalCompositeOperation = operations?.[i] ?? (i ? 'source-over' : 'copy');
+        ctx.drawImage(realImage, 0, 0, dw, dh);
+      });
     }
   }
   static async allocateVideo() {

@@ -5,6 +5,9 @@
  * license that can be found in the LICENSE file.
  */
 ({
+update({connectedImage, image}, state) {
+  state.bestImage = {...image, ...connectedImage};
+},
 onCanvas({eventlet: {value}}) {
   return {image: {...value, version: Math.random()}};
 },
@@ -14,6 +17,6 @@ template: html`
     background: transparent;
   }
 </style>
-<image-resource center flex image="{{image}}" on-canvas="onCanvas"></image-resource>
+<image-resource center flex image="{{bestImage}}" on-canvas="onCanvas"></image-resource>
 `
 });

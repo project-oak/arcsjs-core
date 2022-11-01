@@ -1,10 +1,10 @@
 /**
+ * @license
  * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
 import {Xen} from '../../Dom/Xen/xen-async.js';
-// import {XenCss} from '../Dom/Material/material-xen/xen.css.js';
 
 export class NodeGraph extends Xen.Async {
   static get observedAttributes() {
@@ -19,6 +19,9 @@ export class NodeGraph extends Xen.Async {
   get container() {
     return this._dom.root;
   }
+  get idPrefix() {
+    return '';
+  }
   _didMount() {
     this.canvas = this.querySelector('canvas');
     this.rects = {};
@@ -28,19 +31,22 @@ export class NodeGraph extends Xen.Async {
     this.key = event.currentTarget.key;
     this.fire('node-selected');
   }
+  // called when user has changed a rectangle
   onUpdateBox({currentTarget: {value: rect}}) {
     this.value = rect;
     this.fire('node-moved');
     this.rects[this.key] = rect;
     this.invalidate();
   }
-  geom(key, i) {
-    if (this.rects?.[key]) {
-      const {l, t, w, h} = this.rects[key];
+  // get the geometry information for rectangle `key` (with index i)
+  geom(rects, key, i) {
+    if (rects?.[key]) {
+      const {l, t, w, h} = rects[key];
       const [w2, h2] = [w/2, h/2];
       return {x: l+w2, y: t+h2, l, t, r: l+w, b: t+h, w, h, w2, h2};
     } else {
-      // console.log(key);
+      //console.log(key, 'has no rect');
+      // calculate a default landing spot
       const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
       const p = i => ({
         x: (i%cols)*(width+margin) + ox,
@@ -51,17 +57,19 @@ export class NodeGraph extends Xen.Async {
       return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
     }
   }
-  render({graph}, {x, y}) {
+  render({graph, rects}, {x, y}) {
     let selected = null;
+    const designerRects = Object.entries(rects).map(([id, position]) => ({id, position}));
     const model = {
-      nodes: graph?.graphNodes.map((n, i) => {
-        const g = this.geom(n.key, i);
+      rects: designerRects,
+      nodes: rects && graph?.graphNodes.map((n, i) => {
+        const g = this.geom(rects, n.key, i);
         if (n.selected) {
           selected = n;
         }
         return {
           ...n,
-          nodeId: `ng${n.key}`,
+          nodeId: `${this.idPrefix}${n.key}`,
           inputs: n.inputs?.map(({name, type}) => ({name, type, title: `${name}: ${type}`})),
           outputs: n.outputs?.map(({name, type}) => ({name, type, title: `${name}: ${type}`})),
           nameStyle: {
@@ -74,25 +82,25 @@ export class NodeGraph extends Xen.Async {
             borderColor: n.selected ? n.color : n.bgColor,
             color: n.selected ? 'white' : 'gray',
             background: n.bgColor,
-            transform: `translate(${g.l}px, ${g.t}px)`,
+            //transform: `translate(${g.l}px, ${g.t}px)`,
           }
         };
       })
     };
-    model.selectedKeys = selected?.key ? [`ng${selected.key}`] : null;
+    model.selectedKeys = selected?.key ? [`${this.idPrefix}${selected.key}`] : null;
     return model;
   }
-  _didRender({graph}, {x, y}) {
-    if (this.rects) {
-      this.renderCanvas({graph}, {x, y});
+  _didRender({graph, rects}, {x, y}) {
+    if (rects) {
+      this.renderCanvas({graph, rects}, {x, y});
     }
   }
-  renderCanvas({graph}, {x, y}) {
+  renderCanvas({graph, rects}, {x, y}) {
     const ctx = this.canvas?.getContext('2d');
     if (ctx) {
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       //console.log('=');
-      graph?.graphEdges.map((edge, i) => {
+      rects && graph?.graphEdges.map((edge, i) => {
         const spacing = 18;
         const margin = 10;
         //
@@ -102,7 +110,7 @@ export class NodeGraph extends Xen.Async {
         const ii0c =i0outs?.length / 2 - 0.5;
         //console.log('out', i0, ii0, ii0c, edge.from.storeName);
         const i0offset = spacing * (ii0-ii0c) + margin;
-        const g0 = this.geom(edge.from.id, i0);
+        const g0 = this.geom(rects, edge.from.id, i0);
         //
         const i1 = graph.graphNodes.findIndex(({key}) => key === edge.to.id);
         const i1ins = graph.graphNodes[i1]?.inputs;
@@ -110,7 +118,7 @@ export class NodeGraph extends Xen.Async {
         const ii1c = i1ins?.length / 2 - 0.5;
         //console.log('in', i1, ii1, ii1c, edge.to.storeName);
         const i1offset = spacing * (ii1-ii1c) + margin;
-        const g1 = this.geom(edge.to.id, i1);
+        const g1 = this.geom(rects, edge.to.id, i1);
         //
         const p0 = {x: g0.r - 1, y: g0.y + i0offset};
         const p1 = {x: g1.l + 1, y: g1.y + i1offset};
@@ -269,6 +277,7 @@ const template = Xen.Template.html`
 
 <div layer0>
   <designer-layout
+    rects="{{rects}}"
     selected="{{selectedKeys}}"
     on-update-box="onUpdateBox"
     on-delete="onNodeDelete"
