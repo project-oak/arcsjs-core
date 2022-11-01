@@ -88,16 +88,13 @@ export class NodeGraph extends Xen.Async {
       })
     };
     model.selectedKeys = selected?.key ? [`${this.idPrefix}${selected.key}`] : null;
-    if (rects) {
-      setTimeout(() => this.renderCanvas({graph, rects}, {x, y}), 1);
-    }
     return model;
   }
-  // _didRender({graph, rects}, {x, y}) {
-  //   if (rects) {
-  //     this.renderCanvas({graph}, {x, y});
-  //   }
-  // }
+  _didRender({graph, rects}, {x, y}) {
+    if (rects) {
+      this.renderCanvas({graph, rects}, {x, y});
+    }
+  }
   renderCanvas({graph, rects}, {x, y}) {
     const ctx = this.canvas?.getContext('2d');
     if (ctx) {
