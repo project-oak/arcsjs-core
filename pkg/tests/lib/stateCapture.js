@@ -14,7 +14,7 @@ export const stateCapture = () => {
     const omit = [
       // these are kinda big
       'nodeTypes',
-      'pipelines',
+      'graphs',
       'myItems',
       // personal
       'favoriteItems',

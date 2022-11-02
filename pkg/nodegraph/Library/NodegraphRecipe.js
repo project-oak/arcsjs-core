@@ -29,7 +29,7 @@ const PipelineToolbar = {
     $kind: '$library/NodeGraph/PipelineToolbar',
     $inputs: [
       {graph: 'selectedGraph'},
-      'pipelines',
+      'graphs',
       {event: 'pipelineToolbarEvent'}
     ],
     $staticInputs: {
@@ -38,7 +38,7 @@ const PipelineToolbar = {
     $outputs: [
       {graph: 'selectedGraph'},
       'selectedNodeId',
-      'pipelines',
+      'graphs',
       {icons: 'pipelineToolbarIcons'},
       {event: 'pipelineToolbarEvent'}
     ],
@@ -55,7 +55,7 @@ const PipelineToolbar = {
           $kind: '$library/NodeGraph/PipelineChooser',
           $inputs: [
             {graph: 'selectedGraph'},
-            'pipelines'
+            'graphs'
           ],
           $outputs: [{graph: 'selectedGraph'}]
         }
@@ -263,7 +263,7 @@ export const NodegraphRecipe = {
     description: 'Node Editor Recipe'
   },
   $stores: {
-    pipelines: {
+    graphs: {
       $type: '[Pojo]',
       $tags: ['persisted'],
       $value: []

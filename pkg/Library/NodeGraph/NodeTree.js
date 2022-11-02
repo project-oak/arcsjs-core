@@ -66,7 +66,7 @@ async update(input, state, tools) {
 
 updateSelectedNodeId({graph, selectedNodeId}, state) {
   let candidate = selectedNodeId;
-  // when switching pipelines, we reset some state
+  // when switching graphs, we reset some state
   const meta = graph?.$meta;
   if (meta?.name !== state.selectedPipelineName) {
     state.selectedPipelineName = meta?.name;

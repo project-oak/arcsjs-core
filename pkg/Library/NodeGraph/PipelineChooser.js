@@ -7,28 +7,28 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-async update({publicPipelines, pipelines}, state) {
+async update({publicPipelines, graphs}, state) {
   if (publicPipelines && !state.publicPipelines) {
-    state.publicPipelines = this.filterPublicPipelines(publicPipelines, pipelines);
+    state.publicPipelines = this.filterPublicPipelines(publicPipelines, graphs);
   }
 },
-filterPublicPipelines(publicPipelines, pipelines) {
+filterPublicPipelines(publicPipelines, graphs) {
   if (Array.isArray(publicPipelines)) {
-    return publicPipelines.filter(({$meta: {name, id}}) => !this.findPipelineById(id, pipelines));
+    return publicPipelines.filter(({$meta: {name, id}}) => !this.findPipelineById(id, graphs));
   }
 },
-render({graph, pipelines}, {publicPipelines}) {
+render({graph, graphs}, {publicPipelines}) {
   const separator = {name: '_________________', selected: false, isDisabled: true};
   return {
-    pipelines: [
-      ...(this.renderPipelines(pipelines, graph) || []),
+    graphs: [
+      ...(this.renderPipelines(graphs, graph) || []),
       ...(publicPipelines?.length > 0 ? [separator] : []),
       ...(this.renderPipelines(publicPipelines, graph) || [])
     ]
   };
 },
-renderPipelines(pipelines, selectedGraph) {
-  return pipelines ? pipelines?.map?.(graph => {
+renderPipelines(graphs, selectedGraph) {
+  return graphs ? graphs?.map?.(graph => {
     const {id} = graph.$meta;
     return {
       name: graph.$meta?.name,
@@ -38,17 +38,17 @@ renderPipelines(pipelines, selectedGraph) {
     };
   }) : [];
 },
-onSelect({eventlet: {value}, pipelines}, {publicPipelines}) {
-  const graph = this.findPipelineById(value, pipelines)
+onSelect({eventlet: {value}, graphs}, {publicPipelines}) {
+  const graph = this.findPipelineById(value, graphs)
                 || this.findPipelineById(value, publicPipelines);
   log(`selected "${value}" (${graph?.$meta.name})`);
   return {graph};
 },
-findPipelineById(id, pipelines) {
-  return pipelines?.find?.(({$meta}) => $meta?.id === id);
+findPipelineById(id, graphs) {
+  return graphs?.find?.(({$meta}) => $meta?.id === id);
 },
-findPipelineByName(name, pipelines) {
-  return pipelines?.find?.(({$meta}) => $meta?.name === name);
+findPipelineByName(name, graphs) {
+  return graphs?.find?.(({$meta}) => $meta?.name === name);
 },
 template: html`
 <style>
@@ -66,7 +66,7 @@ template: html`
 
 <div bar>
   <span flex></span>
-  <select title="Current Pipeline" repeat="pipeline_t" on-change="onSelect">{{pipelines}}</select>
+  <select title="Current Pipeline" repeat="pipeline_t" on-change="onSelect">{{graphs}}</select>
 </div>
 
 <template pipeline_t>

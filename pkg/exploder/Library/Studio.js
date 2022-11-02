@@ -72,7 +72,7 @@ template: html`
     <div right center collapsed$="{{rightCollapsed}}" section frame="inspector"></div>
   </div>
   <!-- page 2 -->
-  <div flex rows frame="pipelines"></div>
+  <div flex rows frame="graphs"></div>
 </page-group>
 `
 });

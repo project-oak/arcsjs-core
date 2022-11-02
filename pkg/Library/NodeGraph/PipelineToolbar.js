@@ -8,7 +8,7 @@
  */
 ({
   async update(inputs, state, tools) {
-    const {graph, pipelines} = inputs;
+    const {graph, graphs} = inputs;
     const {service} = tools;
     const outputs = {};
     if (graph) {
@@ -20,22 +20,22 @@
         state.graph = graph;
         assign(outputs, {
           graph,
-          pipelines: this.updateItemInPipelines(graph, pipelines),
+          graphs: this.updateItemInPipelines(graph, graphs),
         });
       }
     } else {
       state.renaming = false;
-      assign(outputs, await this.chooseOrCreatePipeline(pipelines, service));
+      assign(outputs, await this.chooseOrCreatePipeline(graphs, service));
     }
     assign(outputs, await this.handleEvent(inputs, state, tools));
     assign(outputs, {icons: this.toolbarIcons(inputs)});
     return outputs;
   },
-  async chooseOrCreatePipeline(pipelines, service) {
-    if (pipelines?.length > 0) {
-      return {graph: pipelines[0]};
+  async chooseOrCreatePipeline(graphs, service) {
+    if (graphs?.length > 0) {
+      return {graph: graphs[0]};
     } else {
-      return this.addNewPipeline(pipelines, /* name */null, service);
+      return this.addNewPipeline(graphs, /* name */null, service);
     }
   },
   async updateSelectedPipelineHistory(graph, service) {
@@ -47,34 +47,34 @@
       }
     });
   },
-  updateItemInPipelines(graph, pipelines) {
-    const index = this.findPipelineIndex(graph, pipelines);
+  updateItemInPipelines(graph, graphs) {
+    const index = this.findPipelineIndex(graph, graphs);
     if (index >= 0) {
-      pipelines[index] = graph;
+      graphs[index] = graph;
     }
-    return pipelines;
+    return graphs;
   },
-  async addNewPipeline(pipelines, newName, service) {
-    const id = await this.makeUniqueId(pipelines, service);
+  async addNewPipeline(graphs, newName, service) {
+    const id = await this.makeUniqueId(graphs, service);
     const name = await this.makeNewName(newName, service);
     const graph = {$meta: {name, id}, nodes: {}};
     return {
       graph,
-      pipelines: [...(pipelines || []), graph]
+      graphs: [...(graphs || []), graph]
     };
   },
   async makeNewName(name, service) {
     return (name ?? await service({msg: 'MakeName'})) || 'new graph';
   },
-  async makeUniqueId(pipelines, service) {
+  async makeUniqueId(graphs, service) {
     let id;
     do {
       id = await service({msg: 'MakeId'});
-    } while (this.findPipelineById(id, pipelines));
+    } while (this.findPipelineById(id, graphs));
     return id;
   },
   toolbarIcons() {
-    // const isOwned = this.findPipelineIndex(graph, pipelines) >= 0;
+    // const isOwned = this.findPipelineIndex(graph, graphs) >= 0;
     return [{
       icon: 'add',
       title: 'New Pipeline',
@@ -113,12 +113,12 @@
       name: graph?.$meta?.name
     };
   },
-  async onNew({pipelines}, state, {service}) {
-    return this.addNewPipeline(pipelines, null, service);
+  async onNew({graphs}, state, {service}) {
+    return this.addNewPipeline(graphs, null, service);
   },
-  async onCloneClicked({graph: currentPipeline, pipelines: currentPipelines}, state, {service}) {
+  async onCloneClicked({graph: currentPipeline, graphs: currentPipelines}, state, {service}) {
     if (currentPipeline) {
-      const {graph, pipelines} = await this.addNewPipeline(
+      const {graph, graphs} = await this.addNewPipeline(
         currentPipelines,
         this.makePipelineCopyName(currentPipeline.$meta?.name, currentPipelines),
         service);
@@ -126,7 +126,7 @@
         graph.nodes[node.id] = {...node};
       });
       graph.position = this.copyPosition(graph.$meta.id, currentPipeline);
-      return {graph, pipelines};
+      return {graph, graphs};
     }
   },
   copyPosition(id, {position}) {
@@ -134,7 +134,7 @@
     keys(position).forEach(key => result[key] = {...position[key], id});
     return result;
   },
-  makePipelineCopyName(name, pipelines) {
+  makePipelineCopyName(name, graphs) {
     // Copies of a graph are named:
     // 'Foo', 'Copy of Foo', 'Copy (2) of Foo', etc
     // Copy of 'Copy (N) of Foo' will be named 'Copy (M) of Foo'.
@@ -143,31 +143,31 @@
     const match = name.match(regexp('([a-zA-Z\\-]+)'));
     const nameBase = match?.length > 0 ? match?.[match.length - 1] : name;
     const copyRegex = regexp(nameBase);
-    const names = pipelines.map(({$meta: {name}}) => name.match(copyRegex))
+    const names = graphs.map(({$meta: {name}}) => name.match(copyRegex))
       .filter(match => Boolean(match))
       .map(match => Number(match?.[1] || 1));
     const maxCopy = Math.max(...names);
     return `Copy ${maxCopy >= 0 ? `(${maxCopy + 1}) `: ''}of ${nameBase}`;
   },
-  async onDelete({graph, pipelines}) {
-    const index = this.findPipelineIndex(graph, pipelines);
+  async onDelete({graph, graphs}) {
+    const index = this.findPipelineIndex(graph, graphs);
     if (index >= 0) {
-      pipelines?.splice(index, 1);
+      graphs?.splice(index, 1);
     }
     return {
-      pipelines,
-      graph: pipelines.length > 0 ? pipelines[0] : null,
+      graphs,
+      graph: graphs.length > 0 ? graphs[0] : null,
       selectedNodeId: null
     };
   },
   onRenameClicked({}, state) {
     state.renaming = true;
   },
-  onRename({eventlet: {value}, graph, pipelines}, state) {
+  onRename({eventlet: {value}, graph, graphs}, state) {
     state.renaming = false;
     if (graph && value !== graph.$meta.name) {
       if (this.isValidPipelineName(value)) {
-        return this.updatePipelineMeta({name: value}, graph, pipelines);
+        return this.updatePipelineMeta({name: value}, graph, graphs);
       }
     }
   },
@@ -178,20 +178,20 @@
     state.renaming = false;
     return {icons: this.toolbarIcons(inputs, state)};
   },
-  updatePipelineMeta(newData, graph, pipelines) {
-    const index = this.findPipelineIndex(graph, pipelines);
+  updatePipelineMeta(newData, graph, graphs) {
+    const index = this.findPipelineIndex(graph, graphs);
     graph = {...graph, $meta: {...graph.$meta, ...newData}};
-    pipelines[index] = graph;
-    return {graph, pipelines};
+    graphs[index] = graph;
+    return {graph, graphs};
   },
-  findPipelineIndex(graph, pipelines) {
-    return pipelines?.findIndex(({$meta}) => $meta.id === graph?.$meta?.id);
+  findPipelineIndex(graph, graphs) {
+    return graphs?.findIndex(({$meta}) => $meta.id === graph?.$meta?.id);
   },
-  findPipelineById(id, pipelines) {
-    return pipelines?.find(({$meta}) => $meta.id === id);
+  findPipelineById(id, graphs) {
+    return graphs?.find(({$meta}) => $meta.id === id);
   },
-  findPipelineByName(name, pipelines) {
-    return pipelines?.find(({$meta}) => $meta.name === name);
+  findPipelineByName(name, graphs) {
+    return graphs?.find(({$meta}) => $meta.name === name);
   },
   template: html`
 <style>
