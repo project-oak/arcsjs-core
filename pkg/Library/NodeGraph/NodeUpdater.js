@@ -75,16 +75,11 @@ formatPropValue({value, store: {$type}}) {
 },
 
 updateConnection(name, value, node) {
-  const connections = value?.map(v => this.decodeConnectionValue(v));
-  return this.updateConnectionCandidates(node, name, connections);
-},
-
-updateConnectionCandidates(node, name, connections) {
   return {
     ...node,
     connections: {
       ...node.connections,
-      [name]: connections
+      [name]: value || []
     }
   };
 },
