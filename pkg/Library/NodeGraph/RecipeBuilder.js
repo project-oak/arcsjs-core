@@ -173,11 +173,12 @@ buildStoreSpecs(node, nodeType, state) {
     if (store.connection) {
       const connections = node.connections?.[name];
       connections?.forEach(connection => {
-        const storeId = this.constructStoreId(connection);
-        state.storeMap[name].push(storeId);
+        // const storeId = this.constructStoreId(connection);
+        state.storeMap[name].push(connection); //storeId);
       });
     } else {
-      const storeId = this.constructStoreId({from: node.id, storeName: name});
+      const storeId = `${node.id}${this.idDelim}${name}`;
+      //this.constructStoreId({from: node.id, storeName: name});
       specs[storeId] = this.buildStoreSpec(store, node.props?.[name], node);
       state.storeMap[name].push(storeId);
     }
@@ -191,13 +192,6 @@ resolveGroup(bindings, storeMap) {
     const task = (store, index) => ({[`${key}${index === 0 ? '' : index}`]: store});
     return storeMap[binding || key]?.map(task);
   }).flat();
-},
-
-constructStoreId({from, storeName}) {
-  if (from) {
-    return `${from}${this.idDelim}${storeName}`;
-  }
-  return storeName;
 },
 
 decodeBinding(value) {

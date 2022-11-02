@@ -12,6 +12,8 @@
 // In the future, a more sophisticated heuristics can be implemented to
 // automatically connect nodes.
 
+connectionDelimiter: ':',
+
 update(inputs, state) {
   if (this.inputsChanged(inputs, state)) {
     const {graph, nodeTypes, candidates} = inputs;
@@ -121,12 +123,12 @@ updateNoDisplayConnections(node, nodeType, candidates) {
 },
 
 parseConnection(connection) {
-  const [from, storeName] = connection.split(':');
+  const [from, storeName] = connection.split(this.connectionDelimiter);
   return {from, storeName};
 },
 
 formatConnection({from, storeName}) {
-  return `${from}:${storeName}`;
+  return `${from}${this.connectionDelimiter}${storeName}`;
 }
 
 });
