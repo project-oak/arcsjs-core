@@ -38,7 +38,7 @@ async update(inputs, state, {service, output, invalidate}) {
 shouldConstructData({selectedNodeId, graph, candidates}, state) {
   const node = graph.nodes[selectedNodeId];
   if (node) {
-    return this.pipelineChanged(graph, state.graph)
+    return this.graphChanged(graph, state.graph)
         || this.nodeChanged(node, state.node)
         || this.candidatesChanged(candidates?.[selectedNodeId], state.candidates?.[selectedNodeId])
         || !state.hasMonitor;
@@ -53,8 +53,8 @@ nodeChanged({key, connections, props, displayName}, node) {
       || JSON.stringify(node?.props) !== JSON.stringify(props);
 },
 
-pipelineChanged(graph, oldPipeline) {
-  return graph.$meta.id !== oldPipeline?.$meta?.id;
+graphChanged(graph, oldGraph) {
+  return graph.$meta.id !== oldGraph?.$meta?.id;
 },
 
 candidatesChanged(candidates, oldCandidates) {

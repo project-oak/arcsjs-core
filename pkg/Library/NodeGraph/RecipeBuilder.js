@@ -16,7 +16,7 @@ async update(inputs, state) {
   const {graph, nodeTypes, layout} = inputs;
   if (graph) {
     let changed = false;
-    if (this.pipelineChanged(graph, state.graph)) {
+    if (this.graphChanged(graph, state.graph)) {
       state.graph = graph;
       changed = true;
     }
@@ -29,7 +29,7 @@ async update(inputs, state) {
       changed = true;
     }
     if (changed) {
-      return {recipes: this.recipesForPipeline(inputs, state)};
+      return {recipes: this.recipesForGraph(inputs, state)};
     }
   } else {
     state.graph = null;
@@ -80,9 +80,9 @@ flattenParticleSpec(particleId, particleSpec, $container) {
   return flattened;
 },
 
-pipelineChanged(graph, oldPipeline) {
-  return graph.$meta.id !== oldPipeline?.$meta?.id
-      || this.nodesChanged(graph.nodes, oldPipeline?.nodes);
+graphChanged(graph, oldGraph) {
+  return graph.$meta.id !== oldGraph?.$meta?.id
+      || this.nodesChanged(graph.nodes, oldGraph?.nodes);
 },
 
 nodesChanged(nodes, oldNodes) {
@@ -96,7 +96,7 @@ layoutChanged(graph, layout, oldLayout) {
   return (graph.$meta.id === layout?.id) && !deepEqual(layout, oldLayout);
 },
 
-recipesForPipeline(inputs, state) {
+recipesForGraph(inputs, state) {
   const {graph} = inputs;
   return values(graph.nodes)
     .map(node => this.recipeForNode(node, inputs, state))

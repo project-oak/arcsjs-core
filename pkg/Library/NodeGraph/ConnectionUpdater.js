@@ -18,10 +18,10 @@ update(inputs, state) {
     assign(state, {graph, candidates});
     if (candidates) {
       let changed = false;
-      if (this.removePipelineOutdatedConnections(graph, candidates)) {
+      if (this.removeGraphOutdatedConnections(graph, candidates)) {
         changed = true;
       }
-      if (this.updatePipelineConnections(graph, nodeTypes, candidates)) {
+      if (this.updateGraphConnections(graph, nodeTypes, candidates)) {
         changed = true;
       }
       if (changed) {
@@ -34,19 +34,19 @@ update(inputs, state) {
 inputsChanged({graph, candidates}, state) {
   // TODO(mariakleiner): for custom nodes, recompute connections, if nodeType changed.
   return graph &&
-      (this.pipelineChanged(graph, state.graph) || this.candidatesChanged(candidates, state.candidates));
+      (this.graphChanged(graph, state.graph) || this.candidatesChanged(candidates, state.candidates));
 },
 
-pipelineChanged(graph, oldPipeline) {
-  return graph.id !== oldPipeline?.id ||
-         keys(graph.nodes).length !== keys(oldPipeline?.nodes).length;
+graphChanged(graph, oldGraph) {
+  return graph.id !== oldGraph?.id ||
+         keys(graph.nodes).length !== keys(oldGraph?.nodes).length;
 },
 
 candidatesChanged(candidates, oldCandidates) {
   return !deepEqual(candidates, oldCandidates);
 },
 
-removePipelineOutdatedConnections(graph, candidates) {
+removeGraphOutdatedConnections(graph, candidates) {
   return values(graph.nodes)
     .map(node => this.removeNodeOutdatedConnections(node, candidates[node.id]))
     .some(changed => changed);
@@ -72,7 +72,7 @@ hasMatchingCandidate(connection, candidates) {
   return candidates.some(({from, storeName}) => from === connection.from && storeName === connection.storeName);
 },
 
-updatePipelineConnections(graph, nodeTypes, candidates) {
+updateGraphConnections(graph, nodeTypes, candidates) {
   return values(graph.nodes)
     .map(node => this.updateNodeConnections(node, nodeTypes[node.type], candidates[node.id]))
     .some(changed => changed)

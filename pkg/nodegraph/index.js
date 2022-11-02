@@ -16,7 +16,7 @@ try {
 }
 
 // globalThis.use = (graph) => {
-//   // convert 'Graph' to 'Pipeline'
+//   // convert 'Graph' to 'Graph'
 //   const nodes = {};
 //   const graph = {
 //     $meta: {

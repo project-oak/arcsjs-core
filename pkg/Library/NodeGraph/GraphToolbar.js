@@ -14,47 +14,47 @@
     if (graph) {
       if (!deepEqual(graph, state.graph)) {
         if (state.graph?.$meta?.id !== graph.$meta.id) {
-          await this.updateSelectedPipelineHistory(graph, service);
+          await this.updateSelectedGraphHistory(graph, service);
           outputs['selectedNodeId'] = keys(graph.nodes)?.[0];
         }
         state.graph = graph;
         assign(outputs, {
           graph,
-          graphs: this.updateItemInPipelines(graph, graphs),
+          graphs: this.updateItemInGraphs(graph, graphs),
         });
       }
     } else {
       state.renaming = false;
-      assign(outputs, await this.chooseOrCreatePipeline(graphs, service));
+      assign(outputs, await this.chooseOrCreateGraph(graphs, service));
     }
     assign(outputs, await this.handleEvent(inputs, state, tools));
     assign(outputs, {icons: this.toolbarIcons(inputs)});
     return outputs;
   },
-  async chooseOrCreatePipeline(graphs, service) {
+  async chooseOrCreateGraph(graphs, service) {
     if (graphs?.length > 0) {
       return {graph: graphs[0]};
     } else {
-      return this.addNewPipeline(graphs, /* name */null, service);
+      return this.addNewGraph(graphs, /* name */null, service);
     }
   },
-  async updateSelectedPipelineHistory(graph, service) {
+  async updateSelectedGraphHistory(graph, service) {
     return service({
       kind: 'HistoryService',
-      msg: 'setSelectedPipeline',
+      msg: 'setSelectedGraph',
       data: {
         graph: graph?.$meta?.id
       }
     });
   },
-  updateItemInPipelines(graph, graphs) {
-    const index = this.findPipelineIndex(graph, graphs);
+  updateItemInGraphs(graph, graphs) {
+    const index = this.findGraphIndex(graph, graphs);
     if (index >= 0) {
       graphs[index] = graph;
     }
     return graphs;
   },
-  async addNewPipeline(graphs, newName, service) {
+  async addNewGraph(graphs, newName, service) {
     const id = await this.makeUniqueId(graphs, service);
     const name = await this.makeNewName(newName, service);
     const graph = {$meta: {name, id}, nodes: {}};
@@ -70,23 +70,23 @@
     let id;
     do {
       id = await service({msg: 'MakeId'});
-    } while (this.findPipelineById(id, graphs));
+    } while (this.findGraphById(id, graphs));
     return id;
   },
   toolbarIcons() {
-    // const isOwned = this.findPipelineIndex(graph, graphs) >= 0;
+    // const isOwned = this.findGraphIndex(graph, graphs) >= 0;
     return [{
       icon: 'add',
-      title: 'New Pipeline',
+      title: 'New Graph',
       key: 'onNew',
     }, {
       icon: 'delete',
-      title: 'Delete Pipeline',
+      title: 'Delete Graph',
       key: 'onDelete',
       // hidden: !isOwned
     }, {
       icon: 'content_copy',
-      title: 'Duplicate Pipeline',
+      title: 'Duplicate Graph',
       key: 'onCloneClicked'
     }];
   },
@@ -114,18 +114,18 @@
     };
   },
   async onNew({graphs}, state, {service}) {
-    return this.addNewPipeline(graphs, null, service);
+    return this.addNewGraph(graphs, null, service);
   },
-  async onCloneClicked({graph: currentPipeline, graphs: currentPipelines}, state, {service}) {
-    if (currentPipeline) {
-      const {graph, graphs} = await this.addNewPipeline(
-        currentPipelines,
-        this.makePipelineCopyName(currentPipeline.$meta?.name, currentPipelines),
+  async onCloneClicked({graph: currentGraph, graphs: currentGraphs}, state, {service}) {
+    if (currentGraph) {
+      const {graph, graphs} = await this.addNewGraph(
+        currentGraphs,
+        this.makeGraphCopyName(currentGraph.$meta?.name, currentGraphs),
         service);
-      values(currentPipeline.nodes).forEach(node => {
+      values(currentGraph.nodes).forEach(node => {
         graph.nodes[node.id] = {...node};
       });
-      graph.position = this.copyPosition(graph.$meta.id, currentPipeline);
+      graph.position = this.copyPosition(graph.$meta.id, currentGraph);
       return {graph, graphs};
     }
   },
@@ -134,7 +134,7 @@
     keys(position).forEach(key => result[key] = {...position[key], id});
     return result;
   },
-  makePipelineCopyName(name, graphs) {
+  makeGraphCopyName(name, graphs) {
     // Copies of a graph are named:
     // 'Foo', 'Copy of Foo', 'Copy (2) of Foo', etc
     // Copy of 'Copy (N) of Foo' will be named 'Copy (M) of Foo'.
@@ -150,7 +150,7 @@
     return `Copy ${maxCopy >= 0 ? `(${maxCopy + 1}) `: ''}of ${nameBase}`;
   },
   async onDelete({graph, graphs}) {
-    const index = this.findPipelineIndex(graph, graphs);
+    const index = this.findGraphIndex(graph, graphs);
     if (index >= 0) {
       graphs?.splice(index, 1);
     }
@@ -166,31 +166,31 @@
   onRename({eventlet: {value}, graph, graphs}, state) {
     state.renaming = false;
     if (graph && value !== graph.$meta.name) {
-      if (this.isValidPipelineName(value)) {
-        return this.updatePipelineMeta({name: value}, graph, graphs);
+      if (this.isValidGraphName(value)) {
+        return this.updateGraphMeta({name: value}, graph, graphs);
       }
     }
   },
-  isValidPipelineName(name) {
+  isValidGraphName(name) {
     return /^[a-zA-Z0-9 _-]*$/.test(name);
   },
   onRenameBlur(inputs, state) {
     state.renaming = false;
     return {icons: this.toolbarIcons(inputs, state)};
   },
-  updatePipelineMeta(newData, graph, graphs) {
-    const index = this.findPipelineIndex(graph, graphs);
+  updateGraphMeta(newData, graph, graphs) {
+    const index = this.findGraphIndex(graph, graphs);
     graph = {...graph, $meta: {...graph.$meta, ...newData}};
     graphs[index] = graph;
     return {graph, graphs};
   },
-  findPipelineIndex(graph, graphs) {
+  findGraphIndex(graph, graphs) {
     return graphs?.findIndex(({$meta}) => $meta.id === graph?.$meta?.id);
   },
-  findPipelineById(id, graphs) {
+  findGraphById(id, graphs) {
     return graphs?.find(({$meta}) => $meta.id === id);
   },
-  findPipelineByName(name, graphs) {
+  findGraphByName(name, graphs) {
     return graphs?.find(({$meta}) => $meta.name === name);
   },
   template: html`
@@ -221,7 +221,7 @@
 <div toolbar>
   <div chooser rows frame="chooser" display$="{{showChooser}}"></div>
   <input rename type="text" value="{{name}}" display$="{{showRenameInput}}" autofocus on-change="onRename" on-blur="onRenameBlur">
-  <mwc-icon-button title="Rename Pipeline" on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
+  <mwc-icon-button title="Rename Graph" on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
   <div column separator></div>
   <div chooser rows frame="buttons"></div>
 </div>

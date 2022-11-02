@@ -7,27 +7,27 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-async update({publicPipelines, graphs}, state) {
-  if (publicPipelines && !state.publicPipelines) {
-    state.publicPipelines = this.filterPublicPipelines(publicPipelines, graphs);
+async update({publicGraphs, graphs}, state) {
+  if (publicGraphs && !state.publicGraphs) {
+    state.publicGraphs = this.filterPublicGraphs(publicGraphs, graphs);
   }
 },
-filterPublicPipelines(publicPipelines, graphs) {
-  if (Array.isArray(publicPipelines)) {
-    return publicPipelines.filter(({$meta: {name, id}}) => !this.findPipelineById(id, graphs));
+filterPublicGraphs(publicGraphs, graphs) {
+  if (Array.isArray(publicGraphs)) {
+    return publicGraphs.filter(({$meta: {name, id}}) => !this.findGraphById(id, graphs));
   }
 },
-render({graph, graphs}, {publicPipelines}) {
+render({graph, graphs}, {publicGraphs}) {
   const separator = {name: '_________________', selected: false, isDisabled: true};
   return {
     graphs: [
-      ...(this.renderPipelines(graphs, graph) || []),
-      ...(publicPipelines?.length > 0 ? [separator] : []),
-      ...(this.renderPipelines(publicPipelines, graph) || [])
+      ...(this.renderGraphs(graphs, graph) || []),
+      ...(publicGraphs?.length > 0 ? [separator] : []),
+      ...(this.renderGraphs(publicGraphs, graph) || [])
     ]
   };
 },
-renderPipelines(graphs, selectedGraph) {
+renderGraphs(graphs, selectedGraph) {
   return graphs ? graphs?.map?.(graph => {
     const {id} = graph.$meta;
     return {
@@ -38,16 +38,16 @@ renderPipelines(graphs, selectedGraph) {
     };
   }) : [];
 },
-onSelect({eventlet: {value}, graphs}, {publicPipelines}) {
-  const graph = this.findPipelineById(value, graphs)
-                || this.findPipelineById(value, publicPipelines);
+onSelect({eventlet: {value}, graphs}, {publicGraphs}) {
+  const graph = this.findGraphById(value, graphs)
+                || this.findGraphById(value, publicGraphs);
   log(`selected "${value}" (${graph?.$meta.name})`);
   return {graph};
 },
-findPipelineById(id, graphs) {
+findGraphById(id, graphs) {
   return graphs?.find?.(({$meta}) => $meta?.id === id);
 },
-findPipelineByName(name, graphs) {
+findGraphByName(name, graphs) {
   return graphs?.find?.(({$meta}) => $meta?.name === name);
 },
 template: html`
@@ -66,10 +66,10 @@ template: html`
 
 <div bar>
   <span flex></span>
-  <select title="Current Pipeline" repeat="pipeline_t" on-change="onSelect">{{graphs}}</select>
+  <select title="Current Graph" repeat="graph_t" on-change="onSelect">{{graphs}}</select>
 </div>
 
-<template pipeline_t>
+<template graph_t>
   <option selected="{{isSelected}}" value="{{id}}" disabled="{{isDisabled}}">{{name}}</option>
 </template>
   `

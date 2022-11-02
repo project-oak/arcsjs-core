@@ -16,21 +16,21 @@ const globalStores = [
   'nodeId',
 ];
 
-const PipelineToolbar = {
+const GraphToolbar = {
   $stores: {
-    pipelineToolbarEvent: {
+    graphToolbarEvent: {
       $type: 'String'
     },
-    pipelineToolbarIcons: {
+    graphToolbarIcons: {
       $type: '[Pojo]'
     }
   },
-  pipelineToolbar: {
-    $kind: '$library/NodeGraph/PipelineToolbar',
+  graphToolbar: {
+    $kind: '$library/NodeGraph/GraphToolbar',
     $inputs: [
       {graph: 'selectedGraph'},
       'graphs',
-      {event: 'pipelineToolbarEvent'}
+      {event: 'graphToolbarEvent'}
     ],
     $staticInputs: {
       publishPaths: {}
@@ -39,20 +39,20 @@ const PipelineToolbar = {
       {graph: 'selectedGraph'},
       'selectedNodeId',
       'graphs',
-      {icons: 'pipelineToolbarIcons'},
-      {event: 'pipelineToolbarEvent'}
+      {icons: 'graphToolbarIcons'},
+      {event: 'graphToolbarEvent'}
     ],
     $slots: {
       buttons: {
-        PipelineButtons: {
+        GraphButtons: {
           $kind: '$library/NodeGraph/Toolbar',
-          $inputs: [{icons: 'pipelineToolbarIcons'}],
-          $outputs: [{event: 'pipelineToolbarEvent'}],
+          $inputs: [{icons: 'graphToolbarIcons'}],
+          $outputs: [{event: 'graphToolbarEvent'}],
         }
       },
       chooser: {
-        PipelineChooser: {
-          $kind: '$library/NodeGraph/PipelineChooser',
+        GraphChooser: {
+          $kind: '$library/NodeGraph/GraphChooser',
           $inputs: [
             {graph: 'selectedGraph'},
             'graphs'
@@ -315,7 +315,7 @@ export const NodegraphRecipe = {
     $kind: '$nodegraph/Nodegraph',
     $slots: {
       catalog: NodeCatalogRecipe,
-      toolbar: PipelineToolbar,
+      toolbar: GraphToolbar,
       preview: Preview,
       editor: NodeEditor,
       inspector: Inspector,

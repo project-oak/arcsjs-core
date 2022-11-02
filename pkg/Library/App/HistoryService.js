@@ -10,12 +10,12 @@
 import {Params} from './Params.js';
 
 export const HistoryService = {
-  retrieveSelectedPipeline() {
+  retrieveSelectedGraph() {
     const graph = Params.getParam('graph');
     Params.replaceUrlParam('graph', null);
     return graph;
   },
-  setSelectedPipeline({graph}) {
+  setSelectedGraph({graph}) {
     Params.setUrlParam('graph', graph);
   }
 };

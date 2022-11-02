@@ -9,11 +9,11 @@ async update({builtinNodeTypes, selectedGraph}, state, {service}) {
   const results = {};
   const outputs = {results};
   this.addBuiltinNodeTypes(builtinNodeTypes, results);
-  if (this.updatePipelineCustomNodeTypes(selectedGraph)) {
+  if (this.updateGraphCustomNodeTypes(selectedGraph)) {
     assign(outputs, {selectedGraph});
   }
   await this.addCustomNodeTypes(selectedGraph?.custom, results, state, service);
-  if (this.updatePipelineCustomNodes(selectedGraph, results)) {
+  if (this.updateGraphCustomNodes(selectedGraph, results)) {
     assign(outputs, {selectedGraph});
   }
   return outputs;
@@ -23,7 +23,7 @@ addBuiltinNodeTypes(builtinNodeTypes, results) {
   entries(builtinNodeTypes).forEach(([key, nodeType]) => results[key] = nodeType);
 },
 
-updatePipelineCustomNodeTypes(graph) {
+updateGraphCustomNodeTypes(graph) {
   return keys(graph?.custom)
       .map(key => {
         if (!graph.nodes[key]) {
@@ -34,7 +34,7 @@ updatePipelineCustomNodeTypes(graph) {
       .some(changed => changed);
 },
 
-updatePipelineCustomNodes(graph, nodeTypes) {
+updateGraphCustomNodes(graph, nodeTypes) {
   return entries(graph?.nodes)
       .map(([key, node]) => {
         if (!nodeTypes[node.type]) {

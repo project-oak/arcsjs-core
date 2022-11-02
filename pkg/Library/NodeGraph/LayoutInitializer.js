@@ -19,12 +19,12 @@ update({graph, ...layout}, state) {
   }
 },
 
-shouldRecomputeLayout(graph, oldPipeline) {
+shouldRecomputeLayout(graph, oldGraph) {
   if (graph) {
-    // Pipeline changed.
-    return (graph.$meta.id !== oldPipeline?.$meta?.id)
+    // Graph changed.
+    return (graph.$meta.id !== oldGraph?.$meta?.id)
       // A node was removed.
-      || (keys(oldPipeline?.nodes).some(key => !graph.nodes[key]))
+      || (keys(oldGraph?.nodes).some(key => !graph.nodes[key]))
       ;
   }
 },

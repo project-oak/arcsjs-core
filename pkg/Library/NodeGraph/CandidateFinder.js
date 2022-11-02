@@ -7,7 +7,7 @@
 ({
 
 async update({graph, nodeTypes, globalStores}, state) {
-  if (graph && this.pipelineChanged(graph, state.graph)) {
+  if (graph && this.graphChanged(graph, state.graph)) {
     state.graph = graph;
     return {
       candidates: this.findCandidates(graph, nodeTypes, globalStores)
@@ -15,9 +15,9 @@ async update({graph, nodeTypes, globalStores}, state) {
   }
 },
 
-pipelineChanged(graph, oldPipeline) {
-  return graph.id !== oldPipeline?.id || 
-         keys(graph.nodes).length !== keys(oldPipeline?.nodes).length;
+graphChanged(graph, oldGraph) {
+  return graph.id !== oldGraph?.id || 
+         keys(graph.nodes).length !== keys(oldGraph?.nodes).length;
 },
 
 findCandidates(graph, nodeTypes, globalStores) {
