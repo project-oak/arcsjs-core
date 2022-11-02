@@ -10,14 +10,14 @@
 
 inspectorDelimiter: '$$',
 
-async update({selectedNodeId, pipeline, data}, state, {service, output}) {
+async update({selectedNodeId, graph, data}, state, {service, output}) {
   if (data && selectedNodeId && this.dataChanged(data, state.data)) {
     if (state.data?.key === data?.key) {
       if (data?.shouldDelete) {
-        output(this.deleteNode(selectedNodeId, pipeline));
+        output(this.deleteNode(selectedNodeId, graph));
         state.data = null;
       } else {
-        output(this.updateValues(selectedNodeId, pipeline, data, state, service));
+        output(this.updateValues(selectedNodeId, graph, data, state, service));
         state.data = data;
       }
     } else {
@@ -31,9 +31,9 @@ dataChanged(data, oldData) {
   return JSON.stringify(data) !== JSON.stringify(oldData);
 },
 
-updateValues(selectedNodeId, pipeline, data, state, service) {
+updateValues(selectedNodeId, graph, data, state, service) {
   let changed = false;
-  let node = pipeline.nodes[selectedNodeId];
+  let node = graph.nodes[selectedNodeId];
   data?.props?.forEach((prop, index) => {
     if (prop && !prop.store.noinspect) {
       const currentValue = state.data?.props?.[index]?.value;
@@ -48,8 +48,8 @@ updateValues(selectedNodeId, pipeline, data, state, service) {
     changed = true;
   }
   if (changed) {
-    pipeline.nodes[node.id] = node;
-    return {pipeline};
+    graph.nodes[node.id] = node;
+    return {graph};
   }
 },
 
@@ -111,9 +111,9 @@ updateStoreValue(storeId, value, service) {
   return service({kind: 'StoreService', msg: 'UpdateStoreValue', data: {storeId, value}});
 },
 
-deleteNode(key, pipeline) {
-  delete pipeline.nodes[key];
-  return {pipeline, selectedNodeId: null};
+deleteNode(key, graph) {
+  delete graph.nodes[key];
+  return {graph, selectedNodeId: null};
 }
 
 });

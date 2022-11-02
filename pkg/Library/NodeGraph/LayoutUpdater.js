@@ -9,20 +9,20 @@
 
 ({
 
-update({pipeline, previewLayout, nodegraphLayout}) {
-  if (pipeline && pipeline.$meta.id === previewLayout?.id && pipeline.$meta.id === nodegraphLayout?.id) {
-    pipeline.position ??= {};
+update({graph, previewLayout, nodegraphLayout}) {
+  if (graph && graph.$meta.id === previewLayout?.id && graph.$meta.id === nodegraphLayout?.id) {
+    graph.position ??= {};
     let changed = false;
-    if (!deepEqual(previewLayout, pipeline.position.previewLayout)) {
-      assign(pipeline.position, {previewLayout});
+    if (!deepEqual(previewLayout, graph.position.previewLayout)) {
+      assign(graph.position, {previewLayout});
       changed = true;
     }
-    if (!deepEqual(nodegraphLayout, pipeline.position.nodegraphLayout)) {
-      assign(pipeline.position, {nodegraphLayout});
+    if (!deepEqual(nodegraphLayout, graph.position.nodegraphLayout)) {
+      assign(graph.position, {nodegraphLayout});
       changed = true;
     }
     if (changed) {
-      return {pipeline};
+      return {graph};
     }
   }
 }

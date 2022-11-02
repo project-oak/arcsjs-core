@@ -22,12 +22,12 @@ const editor = {
   Editor: {
     $kind: '$library/NodeGraph/Editor',
     $inputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNode',
       'nodeTypes'
     ],
     $outputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNode'
     ]
   }
@@ -47,7 +47,7 @@ export const StudioRecipe = {
     description: 'Studio Recipe'
   },
   $stores: {
-    selectedPipeline: {
+    selectedGraph: {
       $type: 'Pojo',
       $tags: ['persisted'],
       $value: null
@@ -70,8 +70,8 @@ export const StudioRecipe = {
   main: {
     $container: '#user',
     $kind: '$app/Library/Studio',
-    $inputs: [{pipeline: 'selectedPipeline'}],
-    $outputs: [{pipeline: 'selectedPipeline'}],
+    $inputs: [{graph: 'selectedGraph'}],
+    $outputs: [{graph: 'selectedGraph'}],
     $slots: {
       editor,
       catalog,
@@ -82,7 +82,7 @@ export const StudioRecipe = {
     $kind: '$library/NodeGraph/NodeInspector',
     $inputs: [
       {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'nodeTypes',
     ],
     $outputs: [{data: 'inspectorData'}]
@@ -91,23 +91,23 @@ export const StudioRecipe = {
     $kind: '$library/NodeGraph/NodeUpdater',
     $inputs: [
       {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       {data: 'inspectorData'}
     ],
     $outputs: [
       {node: 'selectedNode'},
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
     ]
   },
   nodesConnector: {
     $kind: '$library/NodeGraph/NodesConnector',
     $inputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNode',
       'nodeTypes'
     ],
     $outputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNode',
       'recipes'
     ]

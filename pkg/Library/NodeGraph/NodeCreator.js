@@ -6,27 +6,27 @@
 
 ({
 
-async update({newNodeInfos, pipeline, nodeTypes}) {
+async update({newNodeInfos, graph, nodeTypes}) {
   if (newNodeInfos?.length > 0) {
     let selectedNodeId;
     newNodeInfos.forEach(({type, nodeData}) => {
-      const newNode = this.makeNewNode(pipeline, nodeTypes[type]);
+      const newNode = this.makeNewNode(graph, nodeTypes[type]);
       assign(newNode, nodeData);
-      pipeline.nodes[newNode.id] = newNode;
+      graph.nodes[newNode.id] = newNode;
       selectedNodeId = newNode.id;
     });
     return {
       newNodeInfos: [],
-      pipeline,
+      graph,
       selectedNodeId
       // TODO(mariakleiner): update selectedNodeId and layout (from `nodeData`).
     };
   }
 },
 
-makeNewNode(pipeline, nodeType) {
+makeNewNode(graph, nodeType) {
   const {id: type, displayName: nodeTypeDisplayName} = nodeType.$meta;
-  const index = this.countNodesOfType(pipeline.nodes, type) + 1;
+  const index = this.countNodesOfType(graph.nodes, type) + 1;
   const id = this.formatNodeId(type, index);
   const displayName = this.formatDisplayName(nodeTypeDisplayName || type, index);
   return {id, type, displayName};

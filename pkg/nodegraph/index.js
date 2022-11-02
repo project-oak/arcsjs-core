@@ -16,9 +16,9 @@ try {
 }
 
 // globalThis.use = (graph) => {
-//   // convert 'Graph' to 'Pipeline'
+//   // convert 'Graph' to 'Graph'
 //   const nodes = {};
-//   const pipeline = {
+//   const graph = {
 //     $meta: {
 //       id: "dynamic",
 //       name: 'Dynamic'
@@ -39,7 +39,7 @@ try {
 //     node.connections = connections;
 //     nodes[name] = node;
 //   });
-//   app.arcs.set('user', 'selectedPipeline', pipeline)
+//   app.arcs.set('user', 'selectedGraph', graph)
 // };
 //
 // globalThis.graph = {

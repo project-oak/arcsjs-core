@@ -19,7 +19,7 @@ export const Librarian = {
       nodisplay: true,
       value: 'node.id'
     },
-    selectedPipeline: {
+    selectedGraph: {
       $type: 'JSON',
       connection: true,
       noinspect: true,
@@ -30,10 +30,10 @@ export const Librarian = {
     $kind: '$app/Library/Librarian/CustomParticle',
     $inputs: [
       'nodeId',
-      {'pipeline': 'selectedPipeline'}
+      {'graph': 'selectedGraph'}
     ],
     $outputs: [
-      {'pipeline': 'selectedPipeline'}
+      {'graph': 'selectedGraph'}
     ]
   }
 };

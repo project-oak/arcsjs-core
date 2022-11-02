@@ -9,25 +9,25 @@
 ({
 catalogDelimiter: '$$',
 
-update({pipeline, selectedNodeId}, state) {
-  if (pipeline?.$meta?.name !== state.selectedPipelineName) {
-    state.selectedPipelineName = pipeline?.$meta.name;
+update({graph, selectedNodeId}, state) {
+  if (graph?.$meta?.name !== state.selectedPipelineName) {
+    state.selectedPipelineName = graph?.$meta.name;
     selectedNodeId = null;
   }
-  if (!selectedNodeId && keys(pipeline?.nodes).length) {
-    selectedNodeId = keys(pipeline.nodes)[0];
+  if (!selectedNodeId && keys(graph?.nodes).length) {
+    selectedNodeId = keys(graph.nodes)[0];
   }
   return {selectedNodeId};
 },
 
-render({pipeline, nodeTypes, categories, selectedNodeId}) {
+render({graph, nodeTypes, categories, selectedNodeId}) {
   return {
-    graphNodes: this.renderGraphNodes(pipeline?.nodes, selectedNodeId, nodeTypes, categories),
+    graphNodes: this.renderGraphNodes(graph?.nodes, selectedNodeId, nodeTypes, categories),
   };
 },
 
 renderGraphNodes(nodes, selectedNodeId, nodeTypes, categories) {
-  const graph = {name: 'pipeline', children: []};
+  const graph = {name: 'graph', children: []};
   const graphNodes = values(nodes).map(node => {
     const nodeType = nodeTypes[node.type];
     const category = nodeType?.$meta?.category;
@@ -61,10 +61,10 @@ renderConnections(node) {
   return connections?.[0]?.from;
 },
 
-onNodeRemove({eventlet: {key}, pipeline, selectedNodeId}) {
-  delete pipeline.nodes[key];
+onNodeRemove({eventlet: {key}, graph, selectedNodeId}) {
+  delete graph.nodes[key];
   return {
-    pipeline,
+    graph,
     selectedNodeId: key === selectedNodeId ? null : selectedNodeId
   };
 },
@@ -86,17 +86,17 @@ onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-onDrop({eventlet: {value}, pipeline, nodeTypes}) {
-  if (pipeline) {
-    const newNode = this.makeNewNode(value, pipeline, nodeTypes);
-    pipeline.nodes[newNode.id] = this.makeNewNode(value, pipeline, nodeTypes);
-    return {pipeline};
+onDrop({eventlet: {value}, graph, nodeTypes}) {
+  if (graph) {
+    const newNode = this.makeNewNode(value, graph, nodeTypes);
+    graph.nodes[newNode.id] = this.makeNewNode(value, graph, nodeTypes);
+    return {graph};
   }
 },
 
-makeNewNode(id, pipeline, nodeTypes) {
+makeNewNode(id, graph, nodeTypes) {
   const {displayName} = nodeTypes[id].$meta;
-  const index = this.indexNewNode(id, pipeline.nodes);
+  const index = this.indexNewNode(id, graph.nodes);
   return {
     type: id,
     index,
@@ -119,10 +119,10 @@ formatNodeId(id, index) {
   return `${id}${index}`.replace(/ /g,'');
 },
 
-onDeleteAll({pipeline}) {
-  pipeline.nodes = {};
+onDeleteAll({graph}) {
+  graph.nodes = {};
   return {
-    pipeline,
+    graph,
     selectedNodeId: null
   };
 },

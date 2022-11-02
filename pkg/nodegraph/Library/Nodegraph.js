@@ -67,7 +67,7 @@ template: html`
   </div>
 
   <!-- page 2 -->
-  <div flex column frame="pipelines"></div>
+  <div flex column frame="graphs"></div>
 
 </page-group>
 `

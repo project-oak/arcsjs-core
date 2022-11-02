@@ -5,16 +5,16 @@
  */
 ({
 
-async update({builtinNodeTypes, selectedPipeline}, state, {service}) {
+async update({builtinNodeTypes, selectedGraph}, state, {service}) {
   const results = {};
   const outputs = {results};
   this.addBuiltinNodeTypes(builtinNodeTypes, results);
-  if (this.updatePipelineCustomNodeTypes(selectedPipeline)) {
-    assign(outputs, {selectedPipeline});
+  if (this.updateGraphCustomNodeTypes(selectedGraph)) {
+    assign(outputs, {selectedGraph});
   }
-  await this.addCustomNodeTypes(selectedPipeline?.custom, results, state, service);
-  if (this.updatePipelineCustomNodes(selectedPipeline, results)) {
-    assign(outputs, {selectedPipeline});
+  await this.addCustomNodeTypes(selectedGraph?.custom, results, state, service);
+  if (this.updateGraphCustomNodes(selectedGraph, results)) {
+    assign(outputs, {selectedGraph});
   }
   return outputs;
 },
@@ -23,22 +23,22 @@ addBuiltinNodeTypes(builtinNodeTypes, results) {
   entries(builtinNodeTypes).forEach(([key, nodeType]) => results[key] = nodeType);
 },
 
-updatePipelineCustomNodeTypes(pipeline) {
-  return keys(pipeline?.custom)
+updateGraphCustomNodeTypes(graph) {
+  return keys(graph?.custom)
       .map(key => {
-        if (!pipeline.nodes[key]) {
-          delete pipeline.custom[key];
+        if (!graph.nodes[key]) {
+          delete graph.custom[key];
           return true;
         }
       })
       .some(changed => changed);
 },
 
-updatePipelineCustomNodes(pipeline, nodeTypes) {
-  return entries(pipeline?.nodes)
+updateGraphCustomNodes(graph, nodeTypes) {
+  return entries(graph?.nodes)
       .map(([key, node]) => {
         if (!nodeTypes[node.type]) {
-          delete pipeline.nodes[key];
+          delete graph.nodes[key];
           return true;
         }
       })

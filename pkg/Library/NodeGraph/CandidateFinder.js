@@ -6,34 +6,34 @@
  */
 ({
 
-async update({pipeline, nodeTypes, globalStores}, state) {
-  if (pipeline && this.pipelineChanged(pipeline, state.pipeline)) {
-    state.pipeline = pipeline;
+async update({graph, nodeTypes, globalStores}, state) {
+  if (graph && this.graphChanged(graph, state.graph)) {
+    state.graph = graph;
     return {
-      candidates: this.findCandidates(pipeline, nodeTypes, globalStores)
+      candidates: this.findCandidates(graph, nodeTypes, globalStores)
     };
   }
 },
 
-pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.id !== oldPipeline?.id || 
-         keys(pipeline.nodes).length !== keys(oldPipeline?.nodes).length;
+graphChanged(graph, oldGraph) {
+  return graph.id !== oldGraph?.id || 
+         keys(graph.nodes).length !== keys(oldGraph?.nodes).length;
 },
 
-findCandidates(pipeline, nodeTypes, globalStores) {
+findCandidates(graph, nodeTypes, globalStores) {
   const candidates = {};
-  values(pipeline?.nodes).forEach(node => {
-    candidates[node.id] = this.findNodeCandidates(node, pipeline, nodeTypes, globalStores);
+  values(graph?.nodes).forEach(node => {
+    candidates[node.id] = this.findNodeCandidates(node, graph, nodeTypes, globalStores);
   });
   return candidates;
 },
 
-findNodeCandidates(node, pipeline, nodeTypes, globalStores) {
+findNodeCandidates(node, graph, nodeTypes, globalStores) {
   const candidates = {};
   entries(nodeTypes[node.type]?.$stores).forEach(([storeName, store]) => {
     if (store.connection) {
       candidates[storeName] =
-        this.findConnectionCandidates(node.id, storeName, store, pipeline, nodeTypes, globalStores);
+        this.findConnectionCandidates(node.id, storeName, store, graph, nodeTypes, globalStores);
     }
   });
   return candidates;

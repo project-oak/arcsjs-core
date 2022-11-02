@@ -7,11 +7,11 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-async update({pipeline}, state, {service}) {
-  if (!pipeline) {
-    //log('created pipeline!')
+async update({graph}, state, {service}) {
+  if (!graph) {
+    //log('created graph!')
     return {
-      pipeline: {
+      graph: {
         $meta: {
           name: await service({msg: 'MakeName'})
         },
@@ -72,7 +72,7 @@ template: html`
     <div right center collapsed$="{{rightCollapsed}}" section frame="inspector"></div>
   </div>
   <!-- page 2 -->
-  <div flex rows frame="pipelines"></div>
+  <div flex rows frame="graphs"></div>
 </page-group>
 `
 });

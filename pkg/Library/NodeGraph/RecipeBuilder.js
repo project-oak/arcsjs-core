@@ -13,14 +13,14 @@ idDelim: ':',
 defaultContainer: `main#runner`,
 
 async update(inputs, state) {
-  const {pipeline, nodeTypes, layout} = inputs;
-  if (pipeline) {
+  const {graph, nodeTypes, layout} = inputs;
+  if (graph) {
     let changed = false;
-    if (this.pipelineChanged(pipeline, state.pipeline)) {
-      state.pipeline = pipeline;
+    if (this.graphChanged(graph, state.graph)) {
+      state.graph = graph;
       changed = true;
     }
-    if (this.layoutChanged(pipeline, layout, state.layout)) {
+    if (this.layoutChanged(graph, layout, state.layout)) {
       assign(state, {layout});
       changed = true;
     }
@@ -29,10 +29,10 @@ async update(inputs, state) {
       changed = true;
     }
     if (changed) {
-      return {recipes: this.recipesForPipeline(inputs, state)};
+      return {recipes: this.recipesForGraph(inputs, state)};
     }
   } else {
-    state.pipeline = null;
+    state.graph = null;
   }
 },
 
@@ -80,9 +80,9 @@ flattenParticleSpec(particleId, particleSpec, $container) {
   return flattened;
 },
 
-pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.$meta.id !== oldPipeline?.$meta?.id
-      || this.nodesChanged(pipeline.nodes, oldPipeline?.nodes);
+graphChanged(graph, oldGraph) {
+  return graph.$meta.id !== oldGraph?.$meta?.id
+      || this.nodesChanged(graph.nodes, oldGraph?.nodes);
 },
 
 nodesChanged(nodes, oldNodes) {
@@ -92,27 +92,27 @@ nodesChanged(nodes, oldNodes) {
   return true;
 },
 
-layoutChanged(pipeline, layout, oldLayout) {
-  return (pipeline.$meta.id === layout?.id) && !deepEqual(layout, oldLayout);
+layoutChanged(graph, layout, oldLayout) {
+  return (graph.$meta.id === layout?.id) && !deepEqual(layout, oldLayout);
 },
 
-recipesForPipeline(inputs, state) {
-  const {pipeline} = inputs;
-  return values(pipeline.nodes)
+recipesForGraph(inputs, state) {
+  const {graph} = inputs;
+  return values(graph.nodes)
     .map(node => this.recipeForNode(node, inputs, state))
     .filter(recipe => recipe)
     ;
 },
 
 recipeForNode(node, inputs, state) {
-  const {pipeline, nodeTypes, layout} = inputs;
+  const {graph, nodeTypes, layout} = inputs;
   const nodeTypeMap = this.nodeTypeMap(nodeTypes, state);
   const nodeType = nodeTypeMap[node.type];
   if (nodeType) {
     const stores = this.buildStoreSpecs(node, nodeType, state);
     const recipe = this.buildParticleSpecs(node, nodeType, layout, state);
     recipe.$meta = {
-      name: this.encodeFullNodeId(node, pipeline, this.connectorDelim),
+      name: this.encodeFullNodeId(node, graph, this.connectorDelim),
       custom: nodeType.$meta.custom
     };
     recipe.$stores = stores;

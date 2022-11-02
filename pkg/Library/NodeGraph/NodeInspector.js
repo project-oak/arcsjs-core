@@ -10,15 +10,15 @@ inspectorDelimiter: '$$',
 defaultInspectorDataProp: 'inspectorData',
 
 async update(inputs, state, {service, output, invalidate}) {
-  const {selectedNodeId, pipeline, nodeTypes, candidates} = inputs;
-  if (pipeline && selectedNodeId) {
+  const {selectedNodeId, graph, nodeTypes, candidates} = inputs;
+  if (graph && selectedNodeId) {
     if (selectedNodeId !== state.node?.id) {
       assign(state, {data: null, hasMonitor: false});
     }
-    const node = pipeline.nodes[selectedNodeId];
+    const node = graph.nodes[selectedNodeId];
     if (this.shouldConstructData(inputs, state)) {
       await this.finagleCustomRecipes(state.recipes, service, false);
-      assign(state, {pipeline, node, candidates, recipes: []});
+      assign(state, {graph, node, candidates, recipes: []});
       const data = await this.constructData(node, inputs, state, service);
       await this.finagleCustomRecipes(state.recipes, service, true);
       await output({data});
@@ -35,10 +35,10 @@ async update(inputs, state, {service, output, invalidate}) {
   }
 },
 
-shouldConstructData({selectedNodeId, pipeline, candidates}, state) {
-  const node = pipeline.nodes[selectedNodeId];
+shouldConstructData({selectedNodeId, graph, candidates}, state) {
+  const node = graph.nodes[selectedNodeId];
   if (node) {
-    return this.pipelineChanged(pipeline, state.pipeline)
+    return this.graphChanged(graph, state.graph)
         || this.nodeChanged(node, state.node)
         || this.candidatesChanged(candidates?.[selectedNodeId], state.candidates?.[selectedNodeId])
         || !state.hasMonitor;
@@ -53,8 +53,8 @@ nodeChanged({key, connections, props, displayName}, node) {
       || JSON.stringify(node?.props) !== JSON.stringify(props);
 },
 
-pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.$meta.id !== oldPipeline?.$meta?.id;
+graphChanged(graph, oldGraph) {
+  return graph.$meta.id !== oldGraph?.$meta?.id;
 },
 
 candidatesChanged(candidates, oldCandidates) {
@@ -96,10 +96,10 @@ getMonitoredNodeStoreIds(node, {$stores}) {
 },
 
 async constructData(node, inputs, state, service) {
-  const {pipeline} = inputs;
+  const {graph} = inputs;
   const props = await this.constructProps(node, inputs, state,  service);
   return  {
-    key: this.encodeFullNodeId(node, pipeline, this.inspectorDelimiter),
+    key: this.encodeFullNodeId(node, graph, this.inspectorDelimiter),
     title: node.displayName,
     props
   };
@@ -132,8 +132,8 @@ constructStoreProps(node, inputs, state, service) {
 },
 
 async computeProp(node, {name, store}, inputs, state, service) {
-  const {pipeline} = inputs;
-  const fullNodeId = this.encodeFullNodeId(node, pipeline, this.inspectorDelimiter);
+  const {graph} = inputs;
+  const fullNodeId = this.encodeFullNodeId(node, graph, this.inspectorDelimiter);
   const value = await this.computeBindingValue(name, store, node, service);
   if (!store.noinspect) {
     this.addInspectRecipe(fullNodeId, {name, store}, inputs, state);
@@ -167,23 +167,23 @@ getStoreValue(storeId, service) {
   return service({kind: 'StoreService', msg: 'GetStoreValue', data: {storeId}});
 },
 
-async constructConnections(node, {pipeline, nodeTypes, candidates}, service) {
-  const matchingCandidates = keys(pipeline.nodes).every(id => candidates?.[id]);
+async constructConnections(node, {graph, nodeTypes, candidates}, service) {
+  const matchingCandidates = keys(graph.nodes).every(id => candidates?.[id]);
   if (matchingCandidates) {
     return Promise.all(keys(candidates[node.id]).map(storeName => {
-      return this.renderBinding(node, storeName, candidates[node.id][storeName], pipeline, nodeTypes, service);
+      return this.renderBinding(node, storeName, candidates[node.id][storeName], graph, nodeTypes, service);
     }));
   }
 },
 
-async renderBinding(node, name, candidates, pipeline, nodeTypes, service) {
+async renderBinding(node, name, candidates, graph, nodeTypes, service) {
   if (candidates) {
-    const froms = candidates.map(candidate => this.renderCandidate(candidate, pipeline)).filter(from => from);
+    const froms = candidates.map(candidate => this.renderCandidate(candidate, graph)).filter(from => from);
     const selected = node.connections?.[name] || [];
     const store = nodeTypes[node.type].$stores[name];
     const multiple = store.multiple;
     const value = selected?.map(s => this.encodeConnectionValue(s));
-    const connectedValue = await this.constructConnectedValue(selected, pipeline, nodeTypes, service);
+    const connectedValue = await this.constructConnectedValue(selected, graph, nodeTypes, service);
     return {
       name,
       store: {
@@ -230,10 +230,10 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-async constructConnectedValue(selected, pipeline, nodeTypes, service) {
+async constructConnectedValue(selected, graph, nodeTypes, service) {
   return await Promise.all(selected?.map(
     async ({from, storeName}) => {
-      const node = pipeline.nodes[from];
+      const node = graph.nodes[from];
       const nodeType = nodeTypes[node?.type];
       if (nodeType) {
         return await this.getBindingValue(storeName, nodeType.$stores[storeName], node, service);
@@ -242,8 +242,8 @@ async constructConnectedValue(selected, pipeline, nodeTypes, service) {
   ) || []);
 },
 
-renderCandidate({from, storeName}, pipeline) {
-  const node = pipeline.nodes[from];
+renderCandidate({from, storeName}, graph) {
+  const node = graph.nodes[from];
   if (node) {
     return {
       key: this.encodeConnectionValue({from, storeName}),
