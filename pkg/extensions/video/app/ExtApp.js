@@ -19,7 +19,7 @@ export const ExtApp = class extends App {
   constructor() {
     super(Paths.map);
     this.services = {HistoryService, ThreejsService, ShaderService, TensorFlowService, SelfieSegmentationService, MediaService};
-    this.userAssembly = [ExtRecipe];
+    this.recipes = [ExtRecipe];
     this.persistor = new LocalStoragePersistor('user');
   }
 };

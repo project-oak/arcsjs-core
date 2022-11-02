@@ -38,7 +38,7 @@ export const GraphsApp = class extends App {
       // CocoSsdService,
       // GoogleApisService
     };
-    this.userAssembly = [GraphsRecipe];
+    this.recipes = [GraphsRecipe];
     log('Welcome!');
   }
   // application service

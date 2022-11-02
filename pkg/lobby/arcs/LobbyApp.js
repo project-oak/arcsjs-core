@@ -16,7 +16,7 @@ export const LobbyApp = class extends App {
     super(paths);
     this.persistor = new LocalStoragePersistor('user');
     this.services = {LobbyService};
-    this.userAssembly = [FramerRecipe];
+    this.recipes = [FramerRecipe];
     log('Hello');
   }
   async spinup(persona, group) {

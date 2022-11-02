@@ -41,7 +41,7 @@ export const ExtensionApp = class extends App {
       HistoryService
     };
     this.persistor = new FirebaseStoragePersistor('user');
-    this.userAssembly = [CameraNode, ExtensionRecipe];
+    this.recipes = [CameraNode, ExtensionRecipe];
     this.composer = new XenComposer(document.body, true);
     this.composer.onevent = (p, e) => this.handle(p, e);
     this.arcs.render = p => this.render(p);
