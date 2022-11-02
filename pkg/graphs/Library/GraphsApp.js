@@ -133,5 +133,5 @@ const toPipeline = (graph) => {
     nodes[name] = node;
   });
   return graph;
-  // app.arcs.set('user', 'selectedPipeline', graph)
+  // app.arcs.set('user', 'selectedGraph', graph)
 };

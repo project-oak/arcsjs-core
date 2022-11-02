@@ -23,7 +23,7 @@ export const NodeCatalogRecipe = {
       $type: 'Pojo',
       noinspect: true
     },
-    selectedPipeline: {
+    selectedGraph: {
       $type: 'Pojo'
     }
   },
@@ -43,12 +43,12 @@ export const NodeCatalogRecipe = {
           $inputs: [
             'nodeTypes',
             'categories',
-            {graph: 'selectedPipeline'},
+            {graph: 'selectedGraph'},
             {'search': 'nodeSearch'},
             'newNodeInfos'
           ],
           $outputs: [
-            {graph: 'selectedPipeline'},
+            {graph: 'selectedGraph'},
             'hoveredNodeType',
             'newNodeInfos'
           ],

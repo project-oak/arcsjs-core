@@ -39,7 +39,7 @@ try {
 //     node.connections = connections;
 //     nodes[name] = node;
 //   });
-//   app.arcs.set('user', 'selectedPipeline', graph)
+//   app.arcs.set('user', 'selectedGraph', graph)
 // };
 //
 // globalThis.graph = {

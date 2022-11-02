@@ -5,16 +5,16 @@
  */
 ({
 
-async update({builtinNodeTypes, selectedPipeline}, state, {service}) {
+async update({builtinNodeTypes, selectedGraph}, state, {service}) {
   const results = {};
   const outputs = {results};
   this.addBuiltinNodeTypes(builtinNodeTypes, results);
-  if (this.updatePipelineCustomNodeTypes(selectedPipeline)) {
-    assign(outputs, {selectedPipeline});
+  if (this.updatePipelineCustomNodeTypes(selectedGraph)) {
+    assign(outputs, {selectedGraph});
   }
-  await this.addCustomNodeTypes(selectedPipeline?.custom, results, state, service);
-  if (this.updatePipelineCustomNodes(selectedPipeline, results)) {
-    assign(outputs, {selectedPipeline});
+  await this.addCustomNodeTypes(selectedGraph?.custom, results, state, service);
+  if (this.updatePipelineCustomNodes(selectedGraph, results)) {
+    assign(outputs, {selectedGraph});
   }
   return outputs;
 },

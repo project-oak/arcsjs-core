@@ -27,14 +27,14 @@ render({graph, pipelines}, {publicPipelines}) {
     ]
   };
 },
-renderPipelines(pipelines, selectedPipeline) {
+renderPipelines(pipelines, selectedGraph) {
   return pipelines ? pipelines?.map?.(graph => {
     const {id} = graph.$meta;
     return {
       name: graph.$meta?.name,
       id,
       isDisabled: false,
-      isSelected: id === selectedPipeline?.$meta?.id
+      isSelected: id === selectedGraph?.$meta?.id
     };
   }) : [];
 },

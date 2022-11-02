@@ -10,7 +10,7 @@ import {NodeCatalogRecipe} from '../../Library/NodeTypeCatalog/NodeCatalogRecipe
 
 const globalStores = [
   'selectedNode',
-  'selectedPipeline',
+  'selectedGraph',
   'nodeTypes',
   'categories',
   'nodeId',
@@ -28,7 +28,7 @@ const PipelineToolbar = {
   pipelineToolbar: {
     $kind: '$library/NodeGraph/PipelineToolbar',
     $inputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'pipelines',
       {event: 'pipelineToolbarEvent'}
     ],
@@ -36,7 +36,7 @@ const PipelineToolbar = {
       publishPaths: {}
     },
     $outputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNodeId',
       'pipelines',
       {icons: 'pipelineToolbarIcons'},
@@ -54,10 +54,10 @@ const PipelineToolbar = {
         PipelineChooser: {
           $kind: '$library/NodeGraph/PipelineChooser',
           $inputs: [
-            {graph: 'selectedPipeline'},
+            {graph: 'selectedGraph'},
             'pipelines'
           ],
-          $outputs: [{graph: 'selectedPipeline'}]
+          $outputs: [{graph: 'selectedGraph'}]
         }
       }
     }
@@ -69,7 +69,7 @@ const Preview = {
     $kind: '$library/Designer/Designer',
     $inputs: [
       'recipes',
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNodeId',
       'nodeTypes',
       'categories',
@@ -77,7 +77,7 @@ const Preview = {
       'newNodeInfos'
     ],
     $outputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNodeId',
       {layout: 'previewLayout'},
       'newNodeInfos'
@@ -100,7 +100,7 @@ const NodeEditor = {
     $kind: '$library/NodeGraph/Editor',
     $inputs: [
       'recipes',
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNodeId',
       'nodeTypes',
       'categories',
@@ -110,7 +110,7 @@ const NodeEditor = {
       {event: 'editorToolbarEvent'}
     ],
     $outputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNodeId',
       {layout: 'nodegraphLayout'},
       {previewLayout: 'previewLayout'},
@@ -145,7 +145,7 @@ const Inspector = {
     },
     $inputs: [
       'selectedNodeId',
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'candidates',
       'nodeTypes'
     ],
@@ -155,12 +155,12 @@ const Inspector = {
     $kind: '$library/NodeGraph/NodeUpdater',
     $inputs: [
       'selectedNodeId',
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       {data: 'inspectorData'}
     ],
     $outputs: [
       'selectedNodeId',
-      {graph: 'selectedPipeline'}
+      {graph: 'selectedGraph'}
     ]
   }
 };
@@ -169,14 +169,14 @@ const NodeTree = {
   NodeTree: {
     $kind: '$library/NodeGraph/NodeTree',
     $inputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNodeId',
       'nodeTypes',
       'categories',
       {layout: 'previewLayout'}
     ],
     $outputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNodeId',
       {layout: 'previewLayout'}
     ]
@@ -186,19 +186,19 @@ const NodeTree = {
 export const NodeCreator = {
   combiner: {
     $kind: '$library/NodeGraph/NodeTypesCombiner',
-    $inputs: ['builtinNodeTypes', 'selectedPipeline'],
-    $outputs: [{results: 'nodeTypes'}, 'selectedPipeline']
+    $inputs: ['builtinNodeTypes', 'selectedGraph'],
+    $outputs: [{results: 'nodeTypes'}, 'selectedGraph']
   },
   creator: {
     $kind: '$library/NodeGraph/NodeCreator',
     $inputs: [
       'newNodeInfos',
       'nodeTypes',
-      {graph: 'selectedPipeline'}
+      {graph: 'selectedGraph'}
     ],
     $outputs: [
       'newNodeInfos',
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'selectedNodeId'
     ]
   }
@@ -208,7 +208,7 @@ const Layout = {
   layoutInitializer: {
     $kind: '$library/NodeGraph/LayoutInitializer',
     $inputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'previewLayout',
       'nodegraphLayout'
     ],
@@ -220,11 +220,11 @@ const Layout = {
   layoutUpdater: {
     $kind: '$library/NodeGraph/LayoutUpdater',
     $inputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'previewLayout',
       'nodegraphLayout'
     ],
-    $outputs: [{graph: 'selectedPipeline'}]
+    $outputs: [{graph: 'selectedGraph'}]
   }
 };
 
@@ -232,7 +232,7 @@ const RecipeBuilder = {
   candidateFinder: {
     $kind: '$library/NodeGraph/CandidateFinder',
     $inputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'nodeTypes'
     ],
     $staticInputs: {globalStores},
@@ -241,17 +241,17 @@ const RecipeBuilder = {
   connectionUpdater: {
     $kind: '$library/NodeGraph/ConnectionUpdater',
     $inputs: [
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       'nodeTypes',
       'candidates',
     ],
-    $outputs: [{graph: 'selectedPipeline'}]
+    $outputs: [{graph: 'selectedGraph'}]
   },
   recipeBuilder: {
     $kind: '$library/NodeGraph/RecipeBuilder',
     $inputs: [
       'nodeTypes',
-      {graph: 'selectedPipeline'},
+      {graph: 'selectedGraph'},
       {layout: 'previewLayout'}
     ],
     $outputs: ['recipes']
@@ -268,7 +268,7 @@ export const NodegraphRecipe = {
       $tags: ['persisted'],
       $value: []
     },
-    selectedPipeline: {
+    selectedGraph: {
       $type: 'Pojo',
       $tags: ['persisted'],
       $value: null
