@@ -58,7 +58,11 @@ renderGraphEdges(inputs) {
   const {graph, categories} = inputs;
   const edges = [];
   values(graph?.nodes).forEach(node => {
-    const connects = entries(node.connections).map(([name, connects]) => connects.map(v => ({...v, toStoreName: name}))).flat();
+    const connects = entries(node.connections).map(
+      ([name, connects]) => connects.map(conn => {
+        const {from, storeName} = this.parseConnection(conn);
+        return {from, storeName, toStoreName: name};
+      })).flat();
     connects.forEach(connect => edges.push({
       from: {
         id: connect.from,
@@ -72,6 +76,11 @@ renderGraphEdges(inputs) {
     }));
   });
   return edges;
+},
+
+parseConnection(connection) {
+  const [from, storeName] = connection.split(':');
+  return {from, storeName};
 },
 
 renderNode({node, categories, graph, selectedNodeId, nodeTypes, layout}) {
@@ -89,7 +98,7 @@ renderNode({node, categories, graph, selectedNodeId, nodeTypes, layout}) {
     selected: node.id === selectedNodeId,
     inputs: this.renderInputs(node, nodeType),
     outputs: this.renderOutputs(nodeType),
-    conns: this.renderConnections(node, graph),
+    // conns: this.renderConnections(node, graph),
   };
 },
 
@@ -105,29 +114,29 @@ iconByCategory(category, categories) {
   return categories?.[category]?.icon || 'star_outline';
 },
 
-renderConnections(node, graph) {
-  return keys(node.connections)
-    .map(storeName => this.renderStoreConnections(storeName, node, graph))
-    .flat()
-    ;
-},
+// renderConnections(node, graph) {
+//   return keys(node.connections)
+//     .map(storeName => this.renderStoreConnections(storeName, node, graph))
+//     .flat()
+//     ;
+// },
 
-renderStoreConnections(storeName, node, graph) {
-  return node.connections[storeName]
-    .filter(conn => graph.nodes[conn.from])
-    .map(conn => this.formatConnection(conn.from, conn.storeName, node.id, storeName))
-    ;
-},
+// renderStoreConnections(storeName, node, graph) {
+//   return node.connections[storeName]
+//     .filter(conn => graph.nodes[conn.from])
+//     .map(conn => this.formatConnection(conn.from, conn.storeName, node.id, storeName))
+//     ;
+// },
 
-formatConnection(fromKey, fromStore, toKey, toStore) {
-  return {
-    fromKey,
-    fromStore,
-    toKey,
-    toStore,
-    id: [fromKey, fromStore, toKey, toStore].join(this.edgeIdDelimeter)
-  };
-},
+// formatConnection(fromKey, fromStore, toKey, toStore) {
+//   return {
+//     fromKey,
+//     fromStore,
+//     toKey,
+//     toStore,
+//     id: [fromKey, fromStore, toKey, toStore].join(this.edgeIdDelimeter)
+//   };
+// },
 
 renderInputs(node, nodeType) {
   return this.getInputStores(nodeType).map(([name, store]) => ({

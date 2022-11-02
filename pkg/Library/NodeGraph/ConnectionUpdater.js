@@ -69,7 +69,8 @@ removeNodeOutdatedConnections(node, candidates) {
 },
 
 hasMatchingCandidate(connection, candidates) {
-  return candidates.some(({from, storeName}) => from === connection.from && storeName === connection.storeName);
+  const {from, storeName} = this.parseConnection(connection);
+  return candidates.some(candidate => from === candidate.from && storeName === candidate.storeName);
 },
 
 updateGraphConnections(graph, nodeTypes, candidates) {
@@ -103,7 +104,7 @@ initializeStoreConnection(store, node, storeCandidates, used) {
   const isUsed = (candidate) => used.find(({from, storeName}) => candidate.from === from && candidate.storeName === storeName);
   const unusedCandidates = storeCandidates?.filter(candidate => !isUsed(candidate));
   if (unusedCandidates?.length === 1) {
-    node.connections[store] = [unusedCandidates?.[0]];
+    node.connections[store] = [this.formatConnection(unusedCandidates[0])];
     used.push(unusedCandidates?.[0]);
   }
 },
@@ -112,11 +113,20 @@ updateNoDisplayConnections(node, nodeType, candidates) {
   return keys(nodeType?.$stores)
     .map(store => {
       if (candidates[store] && nodeType.$stores[store].nodisplay) {
-        node.connections[store] = [...candidates[store]];
+        node.connections[store] = [candidates[store].map(this.formatConnection)];
         return true;
       }
     })
     .some(changed => changed);
+},
+
+parseConnection(connection) {
+  const [from, storeName] = connection.split(':');
+  return {from, storeName};
+},
+
+formatConnection({from, storeName}) {
+  return `${from}:${storeName}`;
 }
 
 });
