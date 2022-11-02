@@ -172,13 +172,9 @@ buildStoreSpecs(node, nodeType, state) {
     state.storeMap[name] = [];
     if (store.connection) {
       const connections = node.connections?.[name];
-      connections?.forEach(connection => {
-        // const storeId = this.constructStoreId(connection);
-        state.storeMap[name].push(connection); //storeId);
-      });
+      connections?.forEach(connection => state.storeMap[name].push(connection));
     } else {
       const storeId = `${node.id}${this.idDelim}${name}`;
-      //this.constructStoreId({from: node.id, storeName: name});
       specs[storeId] = this.buildStoreSpec(store, node.props?.[name], node);
       state.storeMap[name].push(storeId);
     }
