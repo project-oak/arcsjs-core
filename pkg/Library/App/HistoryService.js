@@ -11,11 +11,11 @@ import {Params} from './Params.js';
 
 export const HistoryService = {
   retrieveSelectedPipeline() {
-    const pipeline = Params.getParam('pipeline');
-    Params.replaceUrlParam('pipeline', null);
-    return pipeline;
+    const graph = Params.getParam('graph');
+    Params.replaceUrlParam('graph', null);
+    return graph;
   },
-  setSelectedPipeline({pipeline}) {
-    Params.setUrlParam('pipeline', pipeline);
+  setSelectedPipeline({graph}) {
+    Params.setUrlParam('graph', graph);
   }
 };

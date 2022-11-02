@@ -52,15 +52,15 @@ export const GraphsApp = class extends App {
       }
       case 'RunGraph': {
         if (data.graph) {
-          const pipeline = toPipeline(data.graph);
-          // if (pipeline) {
-          //   console.log(`GRAPH TO PIPELINE: ${JSON.stringify(pipeline)}`);
+          const graph = toPipeline(data.graph);
+          // if (graph) {
+          //   console.log(`GRAPH TO PIPELINE: ${JSON.stringify(graph)}`);
           // }
           return {
             status: 'Success!',
             details: `Dummy response for:`,
-            nodes: Object.keys(pipeline.nodes).join(', '),
-            answer: Object.keys(pipeline.nodes).length === 1 ? '13' : 'DOOOOGGGG!!!'
+            nodes: Object.keys(graph.nodes).join(', '),
+            answer: Object.keys(graph.nodes).length === 1 ? '13' : 'DOOOOGGGG!!!'
           };
         }
       }
@@ -111,7 +111,7 @@ const oneGraph = {
 const toPipeline = (graph) => {
   // convert 'Graph' to 'Pipeline'
   const nodes = {};
-  const pipeline = {
+  const graph = {
     $meta: {
       id: "dynamic",
       name: 'Dynamic'
@@ -132,6 +132,6 @@ const toPipeline = (graph) => {
     node.connections = connections;
     nodes[name] = node;
   });
-  return pipeline;
-  // app.arcs.set('user', 'selectedPipeline', pipeline)
+  return graph;
+  // app.arcs.set('user', 'selectedPipeline', graph)
 };

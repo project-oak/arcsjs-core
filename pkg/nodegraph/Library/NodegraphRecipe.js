@@ -28,7 +28,7 @@ const PipelineToolbar = {
   pipelineToolbar: {
     $kind: '$library/NodeGraph/PipelineToolbar',
     $inputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'pipelines',
       {event: 'pipelineToolbarEvent'}
     ],
@@ -36,7 +36,7 @@ const PipelineToolbar = {
       publishPaths: {}
     },
     $outputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'selectedNodeId',
       'pipelines',
       {icons: 'pipelineToolbarIcons'},
@@ -54,10 +54,10 @@ const PipelineToolbar = {
         PipelineChooser: {
           $kind: '$library/NodeGraph/PipelineChooser',
           $inputs: [
-            {pipeline: 'selectedPipeline'},
+            {graph: 'selectedPipeline'},
             'pipelines'
           ],
-          $outputs: [{pipeline: 'selectedPipeline'}]
+          $outputs: [{graph: 'selectedPipeline'}]
         }
       }
     }
@@ -69,7 +69,7 @@ const Preview = {
     $kind: '$library/Designer/Designer',
     $inputs: [
       'recipes',
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'selectedNodeId',
       'nodeTypes',
       'categories',
@@ -77,7 +77,7 @@ const Preview = {
       'newNodeInfos'
     ],
     $outputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'selectedNodeId',
       {layout: 'previewLayout'},
       'newNodeInfos'
@@ -100,7 +100,7 @@ const NodeEditor = {
     $kind: '$library/NodeGraph/Editor',
     $inputs: [
       'recipes',
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'selectedNodeId',
       'nodeTypes',
       'categories',
@@ -110,7 +110,7 @@ const NodeEditor = {
       {event: 'editorToolbarEvent'}
     ],
     $outputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'selectedNodeId',
       {layout: 'nodegraphLayout'},
       {previewLayout: 'previewLayout'},
@@ -145,7 +145,7 @@ const Inspector = {
     },
     $inputs: [
       'selectedNodeId',
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'candidates',
       'nodeTypes'
     ],
@@ -155,12 +155,12 @@ const Inspector = {
     $kind: '$library/NodeGraph/NodeUpdater',
     $inputs: [
       'selectedNodeId',
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       {data: 'inspectorData'}
     ],
     $outputs: [
       'selectedNodeId',
-      {pipeline: 'selectedPipeline'}
+      {graph: 'selectedPipeline'}
     ]
   }
 };
@@ -169,14 +169,14 @@ const NodeTree = {
   NodeTree: {
     $kind: '$library/NodeGraph/NodeTree',
     $inputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'selectedNodeId',
       'nodeTypes',
       'categories',
       {layout: 'previewLayout'}
     ],
     $outputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'selectedNodeId',
       {layout: 'previewLayout'}
     ]
@@ -194,11 +194,11 @@ export const NodeCreator = {
     $inputs: [
       'newNodeInfos',
       'nodeTypes',
-      {pipeline: 'selectedPipeline'}
+      {graph: 'selectedPipeline'}
     ],
     $outputs: [
       'newNodeInfos',
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'selectedNodeId'
     ]
   }
@@ -208,7 +208,7 @@ const Layout = {
   layoutInitializer: {
     $kind: '$library/NodeGraph/LayoutInitializer',
     $inputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'previewLayout',
       'nodegraphLayout'
     ],
@@ -220,11 +220,11 @@ const Layout = {
   layoutUpdater: {
     $kind: '$library/NodeGraph/LayoutUpdater',
     $inputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'previewLayout',
       'nodegraphLayout'
     ],
-    $outputs: [{pipeline: 'selectedPipeline'}]
+    $outputs: [{graph: 'selectedPipeline'}]
   }
 };
 
@@ -232,7 +232,7 @@ const RecipeBuilder = {
   candidateFinder: {
     $kind: '$library/NodeGraph/CandidateFinder',
     $inputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'nodeTypes'
     ],
     $staticInputs: {globalStores},
@@ -241,17 +241,17 @@ const RecipeBuilder = {
   connectionUpdater: {
     $kind: '$library/NodeGraph/ConnectionUpdater',
     $inputs: [
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       'nodeTypes',
       'candidates',
     ],
-    $outputs: [{pipeline: 'selectedPipeline'}]
+    $outputs: [{graph: 'selectedPipeline'}]
   },
   recipeBuilder: {
     $kind: '$library/NodeGraph/RecipeBuilder',
     $inputs: [
       'nodeTypes',
-      {pipeline: 'selectedPipeline'},
+      {graph: 'selectedPipeline'},
       {layout: 'previewLayout'}
     ],
     $outputs: ['recipes']

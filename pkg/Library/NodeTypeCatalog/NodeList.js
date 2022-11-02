@@ -71,8 +71,8 @@ sortNodeTypes({displayName}, {displayName: otherDisplayName}) {
   return displayName.toLowerCase().localeCompare(otherDisplayName.toLowerCase());
 },
 
-async onItemClick({eventlet: {key: type}, pipeline, newNodeInfos}) {
-  if (pipeline) {
+async onItemClick({eventlet: {key: type}, graph, newNodeInfos}) {
+  if (graph) {
     return {
       newNodeInfos: [...(newNodeInfos || []), {type}]
     };

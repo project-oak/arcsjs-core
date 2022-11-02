@@ -14,40 +14,40 @@
 
 update(inputs, state) {
   if (this.inputsChanged(inputs, state)) {
-    const {pipeline, nodeTypes, candidates} = inputs;
-    assign(state, {pipeline, candidates});
+    const {graph, nodeTypes, candidates} = inputs;
+    assign(state, {graph, candidates});
     if (candidates) {
       let changed = false;
-      if (this.removePipelineOutdatedConnections(pipeline, candidates)) {
+      if (this.removePipelineOutdatedConnections(graph, candidates)) {
         changed = true;
       }
-      if (this.updatePipelineConnections(pipeline, nodeTypes, candidates)) {
+      if (this.updatePipelineConnections(graph, nodeTypes, candidates)) {
         changed = true;
       }
       if (changed) {
-        return {pipeline};
+        return {graph};
       }
     }
   }
 },
 
-inputsChanged({pipeline, candidates}, state) {
+inputsChanged({graph, candidates}, state) {
   // TODO(mariakleiner): for custom nodes, recompute connections, if nodeType changed.
-  return pipeline &&
-      (this.pipelineChanged(pipeline, state.pipeline) || this.candidatesChanged(candidates, state.candidates));
+  return graph &&
+      (this.pipelineChanged(graph, state.graph) || this.candidatesChanged(candidates, state.candidates));
 },
 
-pipelineChanged(pipeline, oldPipeline) {
-  return pipeline.id !== oldPipeline?.id ||
-         keys(pipeline.nodes).length !== keys(oldPipeline?.nodes).length;
+pipelineChanged(graph, oldPipeline) {
+  return graph.id !== oldPipeline?.id ||
+         keys(graph.nodes).length !== keys(oldPipeline?.nodes).length;
 },
 
 candidatesChanged(candidates, oldCandidates) {
   return !deepEqual(candidates, oldCandidates);
 },
 
-removePipelineOutdatedConnections(pipeline, candidates) {
-  return values(pipeline.nodes)
+removePipelineOutdatedConnections(graph, candidates) {
+  return values(graph.nodes)
     .map(node => this.removeNodeOutdatedConnections(node, candidates[node.id]))
     .some(changed => changed);
 },
@@ -72,8 +72,8 @@ hasMatchingCandidate(connection, candidates) {
   return candidates.some(({from, storeName}) => from === connection.from && storeName === connection.storeName);
 },
 
-updatePipelineConnections(pipeline, nodeTypes, candidates) {
-  return values(pipeline.nodes)
+updatePipelineConnections(graph, nodeTypes, candidates) {
+  return values(graph.nodes)
     .map(node => this.updateNodeConnections(node, nodeTypes[node.type], candidates[node.id]))
     .some(changed => changed)
     ;

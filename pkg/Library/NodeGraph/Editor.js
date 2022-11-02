@@ -43,21 +43,21 @@ render(inputs, state) {
 
 renderGraph(inputs) {
   return {
-    name: inputs.pipeline?.$meta?.name,
+    name: inputs.graph?.$meta?.name,
     graphNodes: this.renderGraphNodes(inputs),
     graphEdges: this.renderGraphEdges(inputs)
   };
 },
 
 renderGraphNodes(inputs) {
-  const {pipeline} = inputs;
-  return values(pipeline?.nodes).map(node => this.renderNode({node, ...inputs}));
+  const {graph} = inputs;
+  return values(graph?.nodes).map(node => this.renderNode({node, ...inputs}));
 },
 
 renderGraphEdges(inputs) {
-  const {pipeline, categories} = inputs;
+  const {graph, categories} = inputs;
   const edges = [];
-  values(pipeline?.nodes).forEach(node => {
+  values(graph?.nodes).forEach(node => {
     const connects = entries(node.connections).map(([name, connects]) => connects.map(v => ({...v, toStoreName: name}))).flat();
     connects.forEach(connect => edges.push({
       from: {
@@ -74,7 +74,7 @@ renderGraphEdges(inputs) {
   return edges;
 },
 
-renderNode({node, categories, pipeline, selectedNodeId, nodeTypes, layout}) {
+renderNode({node, categories, graph, selectedNodeId, nodeTypes, layout}) {
   const nodeType = nodeTypes[node.type];
   const {category} = nodeType?.$meta || {category: 'n/a'};
   return {
@@ -89,7 +89,7 @@ renderNode({node, categories, pipeline, selectedNodeId, nodeTypes, layout}) {
     selected: node.id === selectedNodeId,
     inputs: this.renderInputs(node, nodeType),
     outputs: this.renderOutputs(nodeType),
-    conns: this.renderConnections(node, pipeline),
+    conns: this.renderConnections(node, graph),
   };
 },
 
@@ -105,16 +105,16 @@ iconByCategory(category, categories) {
   return categories?.[category]?.icon || 'star_outline';
 },
 
-renderConnections(node, pipeline) {
+renderConnections(node, graph) {
   return keys(node.connections)
-    .map(storeName => this.renderStoreConnections(storeName, node, pipeline))
+    .map(storeName => this.renderStoreConnections(storeName, node, graph))
     .flat()
     ;
 },
 
-renderStoreConnections(storeName, node, pipeline) {
+renderStoreConnections(storeName, node, graph) {
   return node.connections[storeName]
-    .filter(conn => pipeline.nodes[conn.from])
+    .filter(conn => graph.nodes[conn.from])
     .map(conn => this.formatConnection(conn.from, conn.storeName, node.id, storeName))
     ;
 },
@@ -177,8 +177,8 @@ getParticles(nodeType) {
   return this.getParticleNames(nodeType).map(name => nodeType[name]);
 },
 
-toolbarIcons({selectedNodeId, pipeline}) {
-  if (keys(pipeline?.nodes).length === 0) {
+toolbarIcons({selectedNodeId, graph}) {
+  if (keys(graph?.nodes).length === 0) {
     return [];
   }
   const hasSelectedNode = Boolean(selectedNodeId);
@@ -201,16 +201,16 @@ toolbarIcons({selectedNodeId, pipeline}) {
   }];
 },
 
-onNodeRemove({eventlet: {key}, pipeline, selectedNodeId}) {
-  return this.deleteNode(key, pipeline, selectedNodeId);
+onNodeRemove({eventlet: {key}, graph, selectedNodeId}) {
+  return this.deleteNode(key, graph, selectedNodeId);
 },
 
-onNodeRenamed({eventlet: {key, value}, pipeline}) {
+onNodeRenamed({eventlet: {key, value}, graph}) {
   // TODO(mariakleiner): renaming doesn't work, when triggered from the menu.
-  const node = pipeline.nodes[key];
+  const node = graph.nodes[key];
   node.displayName = value.trim();
-  pipeline.nodes[node.id] = node;
-  return {pipeline};
+  graph.nodes[node.id] = node;
+  return {graph};
 },
 
 handleEvent(inputs) {
@@ -224,25 +224,25 @@ handleEvent(inputs) {
   log(`Unhandled event '${event}' for ${selectedNodeId}`);
 },
 
-deleteSelectedNode({selectedNodeId, pipeline}) {
-  return this.deleteNode(selectedNodeId, pipeline, selectedNodeId);
+deleteSelectedNode({selectedNodeId, graph}) {
+  return this.deleteNode(selectedNodeId, graph, selectedNodeId);
 },
 
-deleteNode(nodeId, pipeline, selectedNodeId) {
-  delete pipeline.nodes[nodeId];
+deleteNode(nodeId, graph, selectedNodeId) {
+  delete graph.nodes[nodeId];
   return {
-    pipeline,
+    graph,
     selectedNodeId: (nodeId === selectedNodeId) ? null : selectedNodeId
   };
 },
 
-duplicateSelectedNode({selectedNodeId, pipeline, newNodeInfos}) {
-  if (pipeline && selectedNodeId) {
-    const {type, displayName, props, connections} = pipeline.nodes[selectedNodeId];
+duplicateSelectedNode({selectedNodeId, graph, newNodeInfos}) {
+  if (graph && selectedNodeId) {
+    const {type, displayName, props, connections} = graph.nodes[selectedNodeId];
     const newInfo = {
       type,
       nodeData: {
-        displayName: this.duplicateDisplayName(displayName, pipeline),
+        displayName: this.duplicateDisplayName(displayName, graph),
         props: {...props},
         connections: JSON.parse(JSON.stringify(connections))
       }
@@ -253,7 +253,7 @@ duplicateSelectedNode({selectedNodeId, pipeline, newNodeInfos}) {
   }
 },
 
-duplicateDisplayName(displayName, pipeline) {
+duplicateDisplayName(displayName, graph) {
   // Mimic the way how macOS names the duplicated files:
   //
   // - Append "copy" if the name doesn't end with copy.
@@ -278,7 +278,7 @@ duplicateDisplayName(displayName, pipeline) {
     } else {
       newParts[newParts.length - 1] = c;
     }
-    if (!values(pipeline.nodes).find(n => n.displayName === newParts.join(' '))) {
+    if (!values(graph.nodes).find(n => n.displayName === newParts.join(' '))) {
       parts = newParts;
       break;
     }
@@ -287,18 +287,18 @@ duplicateDisplayName(displayName, pipeline) {
   return parts.join(' ');
 },
 
-// onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType, svgX, svgY}}, pipeline, nodeTypes, layout}) {
+// onAddCandidate({eventlet: {value: {fromKey, fromStore, targetStoreType, nodeType, svgX, svgY}}, graph, nodeTypes, layout}) {
 //   // Add the new node.
-//   const newNode = this.makeNewNode(nodeType, pipeline.nodes, nodeTypes);
+//   const newNode = this.makeNewNode(nodeType, graph.nodes, nodeTypes);
 //   // Connect to the first store that matches toStoreType.
 //   // TODO(b/244191110): Type matching API to be wired here.
 //   const toStore = this.getInputStores(nodeType)
 //     .find(([_, store]) => store.$type === targetStoreType)[0];
 //   newNode.connections = {[toStore]: [{from: fromKey, storeName: fromStore}]};
-//   // pipeline.nodes = [...pipeline.nodes, newNode];
-//   pipeline.nodes[newNode.id] = newNode;
+//   // graph.nodes = [...graph.nodes, newNode];
+//   graph.nodes[newNode.id] = newNode;
 //   return {
-//     pipeline,
+//     graph,
 //     selectedNodeId: newNode.id,
 //     layout: {...layout, [newNode.id]: {x: svgX, y: svgY}}
 //   };
@@ -308,17 +308,17 @@ onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-onNodeTypeDropped({eventlet: {key, value: type}, pipeline, newNodeInfos}) {
-  if (pipeline) {
+onNodeTypeDropped({eventlet: {key, value: type}, graph, newNodeInfos}) {
+  if (graph) {
     return {
       newNodeInfos: [...(newNodeInfos || []), {type}]
     };
   //   const {svgPoint} = value;
-  //   const newNode = this.makeNewNode(nodeTypes[key], pipeline.nodes, nodeTypes);
-  //   // pipeline.nodes = [...pipeline.nodes, newNode];
-  //   pipeline.nodes[newNode.id] = newNode;
+  //   const newNode = this.makeNewNode(nodeTypes[key], graph.nodes, nodeTypes);
+  //   // graph.nodes = [...graph.nodes, newNode];
+  //   graph.nodes[newNode.id] = newNode;
   //   return {
-  //     pipeline,
+  //     graph,
   //     selectedNodeId: newNode.id,
   //     layout: {...layout, [newNode.id]: svgPoint}
   //   };
@@ -331,21 +331,21 @@ onNodeMoved({eventlet: {key, value}, layout}) {
   };
 },
 
-// onEdgeRemove({eventlet: {key}, pipeline}) {
+// onEdgeRemove({eventlet: {key}, graph}) {
 //   const [fromKey, fromStore, toKey, toStore] = key.split(this.edgeIdDelimeter);
 //   return {
-//     pipeline: this.updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, false)
+//     graph: this.updateStoreConn(graph, {fromKey, fromStore, toKey, toStore}, false)
 //   };
 // },
 
-// onEdgeConnected({eventlet: {value}, pipeline}) {
+// onEdgeConnected({eventlet: {value}, graph}) {
 //   return {
-//     pipeline: this.updateStoreConn(pipeline, value, true)
+//     graph: this.updateStoreConn(graph, value, true)
 //   };
 // },
 
-// updateStoreConn(pipeline, {fromKey, fromStore, toKey, toStore}, isSelected) {
-//   let node = pipeline.nodes[toKey];
+// updateStoreConn(graph, {fromKey, fromStore, toKey, toStore}, isSelected) {
+//   let node = graph.nodes[toKey];
 //   node = {
 //     ...node,
 //     connections: {...(node.connections || {}), [toStore]: [...(node.connections?.[toStore] || [])]}
@@ -355,8 +355,8 @@ onNodeMoved({eventlet: {key, value}, layout}) {
 //   } else {
 //     delete node.connections[toStore];
 //   }
-//   pipeline.nodes[node.id] = node;
-//   return pipeline;
+//   graph.nodes[node.id] = node;
+//   return graph;
 // },
 
 template: html`

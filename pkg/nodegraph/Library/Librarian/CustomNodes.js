@@ -30,10 +30,10 @@ export const Librarian = {
     $kind: '$app/Library/Librarian/CustomParticle',
     $inputs: [
       'nodeId',
-      {'pipeline': 'selectedPipeline'}
+      {'graph': 'selectedPipeline'}
     ],
     $outputs: [
-      {'pipeline': 'selectedPipeline'}
+      {'graph': 'selectedPipeline'}
     ]
   }
 };

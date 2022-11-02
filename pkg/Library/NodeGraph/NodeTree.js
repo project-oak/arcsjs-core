@@ -23,10 +23,10 @@ async update(input, state, tools) {
   }
 },
 
-// async constructContainerGraph({pipeline, nodeTypes}, {service}) {
+// async constructContainerGraph({graph, nodeTypes}, {service}) {
 //   let parsed, tree;
-//   // a pipeline is a set of Nodes + metadata (name, id)
-//   const nodes = pipeline?.nodes || [];
+//   // a graph is a set of Nodes + metadata (name, id)
+//   const nodes = graph?.nodes || [];
 //   for (const node of nodes) {
 //     // name, type, index, key, props, position: {preview: {host: {data}...}, other: {host: {data}...}}
 //     const nodeType = nodeTypes[node.type];
@@ -64,23 +64,23 @@ async update(input, state, tools) {
 //   return {parsed, tree};
 // },
 
-updateSelectedNodeId({pipeline, selectedNodeId}, state) {
+updateSelectedNodeId({graph, selectedNodeId}, state) {
   let candidate = selectedNodeId;
   // when switching pipelines, we reset some state
-  const meta = pipeline?.$meta;
+  const meta = graph?.$meta;
   if (meta?.name !== state.selectedPipelineName) {
     state.selectedPipelineName = meta?.name;
     candidate = null;
   }
   // select any first node by default
   // if (!selectedNode) {
-  //   candidate = pipeline?.nodes?.[0];
+  //   candidate = graph?.nodes?.[0];
   // }
   return candidate;
 },
 
-render({pipeline, categories, selectedNodeId, nodeTypes}) {
-  const nodes = pipeline?.nodes;
+render({graph, categories, selectedNodeId, nodeTypes}) {
+  const nodes = graph?.nodes;
   return {
     graphNodes: this.renderGraphNodes(nodes, nodeTypes, selectedNodeId, categories)
   };
@@ -155,9 +155,9 @@ async onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-async onDrop({eventlet: {key: container, value: id}, pipeline, nodeTypes, layout}, state, {service}) {
+async onDrop({eventlet: {key: container, value: id}, graph, nodeTypes, layout}, state, {service}) {
   //log('onDrop:', key, container);
-  const node = pipeline.nodes[id];
+  const node = graph.nodes[id];
   const nodeType = nodeTypes[node.type];
   const hostIds = this.getParticleNames(nodeType).map(particleName => this.hostId(node, particleName));
   await service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});

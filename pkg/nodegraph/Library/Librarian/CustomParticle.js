@@ -8,21 +8,21 @@
  */
 ({
 
-async onCodeChanged({eventlet: {key, value}, pipeline, nodeId}) {
-  const custom = this.requireCustom(pipeline, nodeId);
+async onCodeChanged({eventlet: {key, value}, graph, nodeId}) {
+  const custom = this.requireCustom(graph, nodeId);
   custom[key] = value;
-  return {pipeline};
+  return {graph};
 },
 
-onSpecChanged({eventlet: {value}, pipeline, nodeId}, state) {
+onSpecChanged({eventlet: {value}, graph, nodeId}, state) {
   try {
     const parsed = JSON.parse(value);
     state.error = '';
     const spec = this.simplifiedToSpec(parsed, nodeId);
     if (spec) {
-      const custom = this.requireCustom(pipeline, nodeId);
+      const custom = this.requireCustom(graph, nodeId);
       custom.spec = spec;
-      return {pipeline};
+      return {graph};
     }
   } catch (e) {
     state.error = `Failed parsing spec with error ${e}`;
@@ -31,16 +31,16 @@ onSpecChanged({eventlet: {value}, pipeline, nodeId}, state) {
   }
 },
 
-requireCustom(pipeline, nodeId) {
-  pipeline.custom ??= {};
-  pipeline.custom[nodeId] ??= {};
-  return pipeline.custom[nodeId];
+requireCustom(graph, nodeId) {
+  graph.custom ??= {};
+  graph.custom[nodeId] ??= {};
+  return graph.custom[nodeId];
 },
 
 async onUpdate() {},
 
-render({pipeline, nodeId}, state) {
-  const custom = pipeline?.custom?.[nodeId];
+render({graph, nodeId}, state) {
+  const custom = graph?.custom?.[nodeId];
   return {
     html: custom?.html || '',
     js: custom?.js || '',

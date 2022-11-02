@@ -23,22 +23,22 @@ addBuiltinNodeTypes(builtinNodeTypes, results) {
   entries(builtinNodeTypes).forEach(([key, nodeType]) => results[key] = nodeType);
 },
 
-updatePipelineCustomNodeTypes(pipeline) {
-  return keys(pipeline?.custom)
+updatePipelineCustomNodeTypes(graph) {
+  return keys(graph?.custom)
       .map(key => {
-        if (!pipeline.nodes[key]) {
-          delete pipeline.custom[key];
+        if (!graph.nodes[key]) {
+          delete graph.custom[key];
           return true;
         }
       })
       .some(changed => changed);
 },
 
-updatePipelineCustomNodes(pipeline, nodeTypes) {
-  return entries(pipeline?.nodes)
+updatePipelineCustomNodes(graph, nodeTypes) {
+  return entries(graph?.nodes)
       .map(([key, node]) => {
         if (!nodeTypes[node.type]) {
-          delete pipeline.nodes[key];
+          delete graph.nodes[key];
           return true;
         }
       })

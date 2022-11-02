@@ -17,21 +17,21 @@ filterPublicPipelines(publicPipelines, pipelines) {
     return publicPipelines.filter(({$meta: {name, id}}) => !this.findPipelineById(id, pipelines));
   }
 },
-render({pipeline, pipelines}, {publicPipelines}) {
+render({graph, pipelines}, {publicPipelines}) {
   const separator = {name: '_________________', selected: false, isDisabled: true};
   return {
     pipelines: [
-      ...(this.renderPipelines(pipelines, pipeline) || []),
+      ...(this.renderPipelines(pipelines, graph) || []),
       ...(publicPipelines?.length > 0 ? [separator] : []),
-      ...(this.renderPipelines(publicPipelines, pipeline) || [])
+      ...(this.renderPipelines(publicPipelines, graph) || [])
     ]
   };
 },
 renderPipelines(pipelines, selectedPipeline) {
-  return pipelines ? pipelines?.map?.(pipeline => {
-    const {id} = pipeline.$meta;
+  return pipelines ? pipelines?.map?.(graph => {
+    const {id} = graph.$meta;
     return {
-      name: pipeline.$meta?.name,
+      name: graph.$meta?.name,
       id,
       isDisabled: false,
       isSelected: id === selectedPipeline?.$meta?.id
@@ -39,10 +39,10 @@ renderPipelines(pipelines, selectedPipeline) {
   }) : [];
 },
 onSelect({eventlet: {value}, pipelines}, {publicPipelines}) {
-  const pipeline = this.findPipelineById(value, pipelines)
+  const graph = this.findPipelineById(value, pipelines)
                 || this.findPipelineById(value, publicPipelines);
-  log(`selected "${value}" (${pipeline?.$meta.name})`);
-  return {pipeline};
+  log(`selected "${value}" (${graph?.$meta.name})`);
+  return {graph};
 },
 findPipelineById(id, pipelines) {
   return pipelines?.find?.(({$meta}) => $meta?.id === id);

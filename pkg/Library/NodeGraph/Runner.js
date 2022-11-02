@@ -120,14 +120,14 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-render({pipeline, selectedNodeId, nodeTypes, categories, layout}, {recipes}) {
+render({graph, selectedNodeId, nodeTypes, categories, layout}, {recipes}) {
   const particleIdsForNode = (node) =>
       (node && !this.isUIHidden(node) &&
-        this.getParticleNamesForNode(node, pipeline, recipes)) ||
+        this.getParticleNamesForNode(node, graph, recipes)) ||
       [];
-  const rects = values(pipeline?.nodes).map(
+  const rects = values(graph?.nodes).map(
     node => particleIdsForNode(node).map(id => ({id, position: layout?.[node.id]}))).flat();
-  const node = pipeline?.nodes?.[selectedNodeId];
+  const node = graph?.nodes?.[selectedNodeId];
   const nodeType = nodeTypes?.[node?.type];
   return {
     selectedKeys: particleIdsForNode(node),
@@ -140,14 +140,14 @@ isUIHidden(node) {
   return Boolean(node?.props?.hideUI);
 },
 
-onNodeDelete({eventlet: {key}, pipeline}, {recipes}) {
-  const node = this.findNodeByParticle(key, pipeline, recipes);
-  delete pipeline.nodes[node.id];
-  return {pipeline, selectedNodeId: null};
+onNodeDelete({eventlet: {key}, graph}, {recipes}) {
+  const node = this.findNodeByParticle(key, graph, recipes);
+  delete graph.nodes[node.id];
+  return {graph, selectedNodeId: null};
 },
 
-onNodePosition({eventlet: {key, value}, pipeline, layout}, {recipes}) {
-  const node = this.findNodeByParticle(key, pipeline, recipes);
+onNodePosition({eventlet: {key, value}, graph, layout}, {recipes}) {
+  const node = this.findNodeByParticle(key, graph, recipes);
   if (node) {
     return {
       selectedNodeId: node.id,
@@ -160,16 +160,16 @@ onNodePosition({eventlet: {key, value}, pipeline, layout}, {recipes}) {
   }
 },
 
-findNodeByParticle(particleName, pipeline, recipes) {
-  return values(pipeline?.nodes).find(node => {
-    const names = this.getParticleNamesForNode(node, pipeline, recipes);
+findNodeByParticle(particleName, graph, recipes) {
+  return values(graph?.nodes).find(node => {
+    const names = this.getParticleNamesForNode(node, graph, recipes);
     return names?.find(name => name === particleName);
   });
 },
 
-getParticleNamesForNode(node, pipeline, recipes) {
-  if (pipeline) {
-    const fullNodeId = this.encodeFullNodeId(node, pipeline);
+getParticleNamesForNode(node, graph, recipes) {
+  if (graph) {
+    const fullNodeId = this.encodeFullNodeId(node, graph);
     return this.getParticleNames(recipes[fullNodeId]);
   }
 },

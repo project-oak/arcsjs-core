@@ -124,14 +124,14 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-render({pipeline, nodeTypes, categories, layout}, {selectedNodeId, recipes}) {
+render({graph, nodeTypes, categories, layout}, {selectedNodeId, recipes}) {
   const particleIdsForNode = (node) =>
       (node && !this.isUIHidden(node) &&
-        this.getParticleNamesForNode(node, pipeline, recipes)) ||
+        this.getParticleNamesForNode(node, graph, recipes)) ||
       [];
-  const rects = values(pipeline?.nodes).map(
+  const rects = values(graph?.nodes).map(
     node => particleIdsForNode(node).map(id => ({id, position: layout?.[node.id]}))).flat();
-  const node = pipeline?.nodes?.[selectedNodeId];
+  const node = graph?.nodes?.[selectedNodeId];
   const nodeType = nodeTypes?.[node?.type];
   return {
     selectedKeys: particleIdsForNode(node),
@@ -144,17 +144,17 @@ isUIHidden(node) {
   return Boolean(node?.props?.hideUI);
 },
 
-onNodeDelete({eventlet: {key}, pipeline}, state) {
-  const node = this.findNodeByParticle(key, pipeline, state.recipes);
-  delete pipeline.nodes[node.id];
+onNodeDelete({eventlet: {key}, graph}, state) {
+  const node = this.findNodeByParticle(key, graph, state.recipes);
+  delete graph.nodes[node.id];
   return {
-    pipeline,
+    graph,
     ...this.selectNode(null, state)
   };
 },
 
-onNodePosition({eventlet: {key, value}, pipeline, layout}, state) {
-  const node = this.findNodeByParticle(key, pipeline, state.recipes);
+onNodePosition({eventlet: {key, value}, graph, layout}, state) {
+  const node = this.findNodeByParticle(key, graph, state.recipes);
   if (!node) {
     return this.selectNode(null, state);
   }
@@ -171,16 +171,16 @@ selectNode(id, state) {
   };
 },
 
-findNodeByParticle(particleName, pipeline, recipes) {
-  return values(pipeline.nodes).find(node => {
-    const names = this.getParticleNamesForNode(node, pipeline, recipes);
+findNodeByParticle(particleName, graph, recipes) {
+  return values(graph.nodes).find(node => {
+    const names = this.getParticleNamesForNode(node, graph, recipes);
     return names?.find(name => name === particleName);
   });
 },
 
-getParticleNamesForNode(node, pipeline, recipes) {
-  if (pipeline) {
-    const fullNodeId = this.encodeFullNodeId(node, pipeline);
+getParticleNamesForNode(node, graph, recipes) {
+  if (graph) {
+    const fullNodeId = this.encodeFullNodeId(node, graph);
     return this.getParticleNames(recipes[fullNodeId]);
   }
 },
@@ -193,8 +193,8 @@ colorByCategory(category, categories) {
   return categories?.[category]?.color || 'lightblue';
 },
 
-onDrop({eventlet: {value: type}, pipeline, newNodeInfos}) {
-  if (pipeline) {
+onDrop({eventlet: {value: type}, graph, newNodeInfos}) {
+  if (graph) {
     return {
       newNodeInfos: [...(newNodeInfos || []), {type}]
     };
