@@ -4,7 +4,6 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-
 export const ComposerService = {
   // TODO(sjmiles): Ability to re-target the Render output of a Host
   // is a fundamentally new behavior ... so this is work-in-progress
