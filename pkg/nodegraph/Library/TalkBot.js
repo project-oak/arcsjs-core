@@ -1,3 +1,5 @@
+import { inputStyles } from "../../Library/Dom/code-mirror/lib/codemirror.min";
+
 /**
  * @license
  * Copyright (c) 2022 Google LLC All rights reserved.
@@ -6,11 +8,11 @@
  */
 ({
 shouldUpdate({input, max}) {
-  return input && input.length < max;
+  return input && input.length !== max;
 },
 update({input, max}) {
-  if (!max) {
-    return {output: []}
+  if (max < input?.length) {
+    return {output: [...input].slice(0, max)};
   };
   const say = [
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',

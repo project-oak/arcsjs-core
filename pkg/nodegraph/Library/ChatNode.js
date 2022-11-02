@@ -18,7 +18,7 @@ export const ChatNode = {
     },
     max: {
       $type: 'Number',
-      $value: 10
+      $value: 0
     }
   },
   TalkBot: {

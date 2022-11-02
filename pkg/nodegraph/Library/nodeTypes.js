@@ -25,6 +25,7 @@ import * as pixijsNodes from '../../Library/PixiJs/PixiJsNodes.js';
 import * as testNodes from './TestNodes.js';
 import * as ContainerNodes from './ContainerNodes.js';
 import {ChatNode} from './ChatNode.js';
+import {CyclerNode} from './CyclerNode.js';
 
 // backburner
 //import {PoemNode} from './PoemNode.js';
@@ -38,6 +39,7 @@ export const nodeTypes = {};
 
 const nodeTypesList = [
   ChatNode,
+  CyclerNode,
   ...values(newMediaNodes),
   ...values(mediapipeNodes),
   CocoSsdNode,
