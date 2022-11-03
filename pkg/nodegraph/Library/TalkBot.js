@@ -1,5 +1,3 @@
-import { inputStyles } from "../../Library/Dom/code-mirror/lib/codemirror.min";
-
 /**
  * @license
  * Copyright (c) 2022 Google LLC All rights reserved.
@@ -7,13 +5,19 @@ import { inputStyles } from "../../Library/Dom/code-mirror/lib/codemirror.min";
  * license that can be found in the LICENSE file.
  */
 ({
-shouldUpdate({input, max}) {
-  return input && input.length !== max;
+
+shouldUpdate({inputChat}) {
+  return Boolean(inputChat);
 },
-update({input, max}) {
-  if (max < input?.length) {
-    return {output: [...input].slice(0, max)};
-  };
+
+async update({inputChat, name}) {
+  const phrase = await this.chatBotRequest(inputChat);
+  return {
+    outputChat: [...inputChat, {name, phrase}]
+  }
+},
+
+async chatBotRequest(chat) {
   const say = [
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     'Ut tortor neque, varius vel bibendum eget, consequat id mi.',
@@ -21,11 +25,9 @@ update({input, max}) {
     'Praesent commodo non metus eu ullamcorper.',
     'Nunc euismod, tortor vel ullamcorper tempus, mauris nibh vestibulum neque, a volutpat ipsum augue quis orci.',
     'I see.',
-    'No.'
+    'Not quite.'
   ];
-  const phrase = say[Math.floor(Math.random()*say.length)]
-  return {
-    output: [...input, phrase]
-  }
+  return say[Math.floor(Math.random()*say.length)]
 }
+
 });

@@ -76,11 +76,12 @@ export class NodeGraph extends Xen.Async {
             borderRadius: '11px 11px 0 0',
             borderColor: n.selected ? n.color : n.bgColor,
             background: n.selected ? n.color : n.bgColor,
-            fontSize: '0.8em'
+            color: n.selected ? 'white' : 'black',
+            //fontSize: '0.8em'
           },
           style: {
             borderColor: n.selected ? n.color : n.bgColor,
-            color: n.selected ? 'white' : 'gray',
+            color: n.selected ? 'black' : 'gray',
             background: n.bgColor,
             //transform: `translate(${g.l}px, ${g.t}px)`,
           }
@@ -225,10 +226,10 @@ const template = Xen.Template.html`
     text-overflow: ellipsis;
   }
   [node][selected] {
-    box-shadow:  23px 23px 46px #bebebe88, -23px -23px 46px #ffffff88;
+    box-shadow: 23px 23px 46px #bebebe88, -23px -23px 46px #ffffff88;
   }
   [node]:not([selected]) {
-    box-shadow:  9px 9px 18px #cecece88, -9px -9px 18px #f2f2f288;
+    box-shadow: 9px 9px 18px #cecece88, -9px -9px 18px #f2f2f288;
   }
   /**/
   [layer0] {

@@ -24,7 +24,7 @@ import * as nodeGraphNodes from '../../Library/NodeGraph/NodeGraphNodes.js';
 import * as pixijsNodes from '../../Library/PixiJs/PixiJsNodes.js';
 import * as testNodes from './TestNodes.js';
 import * as ContainerNodes from './ContainerNodes.js';
-import {ChatNode} from './ChatNode.js';
+import * as talkBotNodes from './TalkBotNodes.js';
 import {CyclerNode} from './CyclerNode.js';
 
 // backburner
@@ -38,7 +38,7 @@ const {values} = Object;
 export const nodeTypes = {};
 
 const nodeTypesList = [
-  ChatNode,
+  ...values(talkBotNodes),
   CyclerNode,
   ...values(newMediaNodes),
   ...values(mediapipeNodes),
