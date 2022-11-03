@@ -1,5 +1,4 @@
 core/js
-pkg/extensions/video/manifest.json
 *.tsbuildinfo
 .DS_Store
 node_modules
