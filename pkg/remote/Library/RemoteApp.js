@@ -18,7 +18,7 @@ const log = logFactory(true, 'RemoteApp', 'yellow', 'navy');
 export const RemoteApp = class extends App {
   constructor(paths, root, options) {
     super(paths, root);
-    this.userAssembly = [RemoteRecipe];
+    this.recipes = [RemoteRecipe];
   }
   async spinup(user, group) {
     await super.spinup();

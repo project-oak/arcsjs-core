@@ -39,8 +39,8 @@ export const App = class {
     this.arcs.user.persistor = this.persistor;
     //await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     // TODO(sjmiles): pick a syntax
-    const assembly = [DevToolsRecipe, ...(this.userAssembly ?? this.recipes ?? [])];
-    await Arcs.addAssembly('user', assembly);
+    const recipes = [DevToolsRecipe, ...(this.recipes ?? this.recipes ?? [])];
+    await Arcs.addRecipes('user', recipes);
   }
   async service(request) {
     // if we are specific

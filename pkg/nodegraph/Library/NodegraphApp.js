@@ -36,7 +36,7 @@ export const NodegraphApp = class extends App {
       CocoSsdService,
       GoogleApisService
     };
-    this.userAssembly = [NodegraphRecipe];
+    this.recipes = [NodegraphRecipe];
     log('Welcome!');
   }
   // application service

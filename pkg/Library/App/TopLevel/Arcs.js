@@ -43,7 +43,7 @@ export const Arcs = {
   secureWorker() {
     Runtime.securityLockdown?.(Runtime.particleOptions);
   },
-  async addAssembly(arc, recipes) {
+  async addRecipes(arc, recipes) {
     const realArc = await this.requireArc(arc);
     return Chef.executeAll(recipes, this.user, realArc);
   },

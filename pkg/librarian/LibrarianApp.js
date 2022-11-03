@@ -32,7 +32,7 @@ export const LibrarianApp = class extends App {
     super(path, root, options);
     //this.persistor = LocalStoragePersistor;
     this.services = [];
-    this.userAssembly = [DeviceUxRecipe, LibrarianRecipe];
+    this.recipes = [DeviceUxRecipe, LibrarianRecipe];
     log('Librarian lives!');
   }
   // application service
