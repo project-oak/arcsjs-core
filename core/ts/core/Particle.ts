@@ -172,14 +172,16 @@ export class ParticleApi {
    * This function can be overwritten to implement the desired
    * behaviour.
    *
-   * Inputs are the data the particle is bound to.
-   * State is an object that can be changed and passed to sub-functions.
-   * Tools allow the particle to perform supervised activities -
-   * for example services are a tool.
+   * Inputs is a dictionary containing input data.
    *
-   * The update function can return an object containing the new desired
-   * value(s) for the output connections. For example, if we wanted to update
-   * the `Person` and `Address` data we would return:
+   * State is a mutable dictionary available to all lifecycle methods.
+   *
+   * Tools is a dictionary of useful functions for lifecycle methods. 
+   * Contains `{service, invalidate, output}`.
+   *
+   * `update` may return an object containing data for the output channel.
+   * For example, if we wanted to update `Person` and `Address` data we could 
+   * return:
    *
    * ```
    * return {
