@@ -5,7 +5,6 @@
  * license that can be found in the LICENSE file.
  */
 ({
-
 connectionDelimiter: ':',
 inspectorDelimiter: '$$',
 defaultInspectorDataProp: 'inspectorData',

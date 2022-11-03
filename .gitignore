@@ -1,10 +1,4 @@
 core/js
-core/arcs.js
-core/arcs.js.map
-core/arcs.min.js
-core/arcs.min.js.map
-core/utils.min.js
-core/utils.min.js.map
 *.tsbuildinfo
 .DS_Store
 node_modules

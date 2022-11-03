@@ -1,15 +1,16 @@
-<!--
+/**
  * @license
  * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
--->
-<!doctype html>
-<body>
-
-<h2>I'm here for the DevTools.</h2>
-<resource-view></resource-view>
-
-<script type="module" src="./plugin/options.js"></script>
-
-</body>
+ */
+export const SkeletonRecipe = {
+  $meta: {
+    description: 'Arcs Skeleton Recipe'
+  },
+  $stores: {
+  },
+  skeleton: {
+    $kind: '$app/Library/Skeleton'
+  }
+};

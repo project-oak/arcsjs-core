@@ -4,7 +4,7 @@ const url = Paths.getAbsoluteHereUrl(import.meta, 3);
 
 globalThis.config = {
   arcsPath: url,
-  aeon: 'nodegraph/0.4.3',
+  aeon: 'nodegraph/0.4.4',
   meta: 'nodegraph',
   //theme: 'dark',
   logFlags: {

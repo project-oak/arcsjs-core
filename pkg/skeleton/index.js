@@ -5,7 +5,10 @@
  * license that can be found in the LICENSE file.
  */
 import './config.js';
-import {ExtApp} from './ExtApp.js';
 import {quickStart} from './arcs.js';
+import {SkeletonApp} from './Library/SkeletonApp.js';
 
-await quickStart(ExtApp, import.meta.url);
+quickStart(SkeletonApp, import.meta.url, {
+  $library: `$app/../Library`,
+  $graphs: `$app/Library`
+});
