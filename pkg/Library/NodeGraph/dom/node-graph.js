@@ -58,15 +58,26 @@ export class NodeGraph extends Xen.Async {
     }
   }
   render({graph, rects}, {x, y}) {
+    // iterate graph nodes
     let selected = null;
+    graph?.graphNodes.forEach((n, i) => {
+      // - calculate missing rect
+      if (!rects[n.key]) {
+        const {l, t, w, h} = this.geom(rects, n.key, i);
+        rects[n.key] = {l, t, w, h};
+      }
+      // - memoize selected node
+      if (n.selected) {
+        selected = n;
+      }
+    });
+    // compute rects for designer-layout
     const designerRects = Object.entries(rects).map(([id, position]) => ({id, position}));
-    const model = {
+    // complete render model
+    return {
+      selectedKeys: selected?.key ? [`${this.idPrefix}${selected.key}`] : null,
       rects: designerRects,
       nodes: rects && graph?.graphNodes.map((n, i) => {
-        const g = this.geom(rects, n.key, i);
-        if (n.selected) {
-          selected = n;
-        }
         return {
           ...n,
           nodeId: `${this.idPrefix}${n.key}`,
@@ -76,19 +87,16 @@ export class NodeGraph extends Xen.Async {
             borderRadius: '11px 11px 0 0',
             borderColor: n.selected ? n.color : n.bgColor,
             background: n.selected ? n.color : n.bgColor,
-            fontSize: '0.8em'
+            color: n.selected ? 'white' : 'black',
           },
           style: {
             borderColor: n.selected ? n.color : n.bgColor,
             color: n.selected ? 'white' : 'gray',
             background: n.bgColor,
-            //transform: `translate(${g.l}px, ${g.t}px)`,
           }
         };
       })
     };
-    model.selectedKeys = selected?.key ? [`${this.idPrefix}${selected.key}`] : null;
-    return model;
   }
   _didRender({graph, rects}, {x, y}) {
     if (rects) {

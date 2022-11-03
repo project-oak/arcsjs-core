@@ -36,7 +36,7 @@ export class DesignerLayout extends DragDrop {
   position(id, position) {
     const child = this.getChildById(id);
     if (child) {
-      const defaultPosition = {l: 16, t: 16, w: 240, h: 180};
+      const defaultPosition = {l: 64, t: 64, w: 240, h: 180};
       this.setBoxStyle(child, position ?? defaultPosition);
     }
   }
@@ -179,7 +179,7 @@ export class DesignerLayout extends DragDrop {
       // install output rectangle
       this.setBoxStyle(this.target, snap(dragRect));
       // let the boxer adapt to the target end state
-      requestAnimationFrame(() => this.setBoxStyle(this.boxer, this.getRect(this.target)));
+      requestAnimationFrame(() => this.target && this.setBoxStyle(this.boxer, this.getRect(this.target)));
       this.value = dragRect;
       this.fire('update-box');
     }
