@@ -19,7 +19,7 @@ export const DbApp = class extends App {
     super(paths);
     this.persistor = new LocalStoragePersistor('user');
     this.services = {};
-    this.userAssembly = [DbRecipe];
+    this.recipes = [DbRecipe];
     log('Welcome!');
   }
   // application service

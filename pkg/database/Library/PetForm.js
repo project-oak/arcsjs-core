@@ -7,54 +7,66 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-initialize({}, state) {
-  state.props = ['name', 'kind', 'age', 'image'];
-},
 
-update({records}, state) {
-  state.pets = records;
-  if (!state.newPet) {
-    state.newPet = this.newPet(state.props);
+update({record, records}, state) {
+  if (this.recordChanged(record, state)) {
+    delete state.error;
+  }
+  state.pet = record;
+  state.isNew = Boolean(!records.find(({id}) => record.id === id));
+  if (state.pet) {
+    assign(state.pet, this.renderImageProps(state.pet.image));
   }
 },
 
-render({}, {newPet, error}) {
+recordChanged(record, {pet}) {
+  return record?.id !== pet?.id;
+},
+
+render({}, {pet, error, isNew}) {
   return {
-    ...newPet,
-    error
+    ...pet,
+    error,
+    formStyle: isNew ? {border: '10px solid lightpink'} : ''
   };
 },
 
-onChange({eventlet: {key, value}}, state) {
-  state.newPet[key] = value;
-  assign(state.newPet, this.renderImageProps(state.newPet.image));
+onChange({eventlet: {key, value}, props}, state) {
+  state.pet[key] = value;
+  assign(state.pet, this.renderImageProps(state.pet.image));
   if (state.error) {
-    this.verifyNewPet(state);
+    this.verifyPet(props, state);
   }
 },
 
-onSave({records}, state) {
-  if (this.verifyNewPet(state)) {
-    records.push(state.newPet);
-    state.newPet = this.newPet(state.props);
-    return {records};
+onSave({records, props}, state) {
+  if (this.verifyPet(props, state)) {
+    records.push(state.pet);
+    return {
+      record: state.pet,
+      records
+    };
   }
 },
 
-verifyNewPet(state) {
-  const missingProps = state.props.filter(prop => !state.newPet[prop]);
+onDelete({record, records}) {
+  const index = records.findIndex(({id}) => record.id === id);
+  if (index >= 0) {
+    records.splice(index, 1);
+  }
+  return {
+    record: null,
+    records
+  };
+},
+
+verifyPet(props, state) {
+  const missingProps = props.filter(prop => !state.pet[prop]);
   const isValid = missingProps.length === 0;
   state.error = isValid
     ? null
     : `Missing properties: ['${missingProps.join('\', \'')}']`;
   return isValid;
-},
-
-newPet(props) {
-  const newPet = {};
-  props.forEach(prop => newPet[prop] = '');
-  assign(newPet, this.renderImageProps(''));
-  return newPet;
 },
 
 renderImageProps(image) {
@@ -71,7 +83,6 @@ template: html`
       background-color: var(--theme-color-bg-0);
       --mdc-icon-button-size: 24px;
       --mdc-icon-size: 16px;
-      border: 10px solid lightpink;
       ${globalThis.themeRules}
     }
     [label] {
@@ -91,9 +102,11 @@ template: html`
     }
   </style>
 
+<div xen:style="{{formStyle}}">
 <div toolbar>
   <div flex error>{{error}}</div>
-  <mwc-button on-click="onSave" raised>Add Pet</mwc-button>
+  <mwc-icon-button icon="done" on-click="onSave"></mwc-icon-button>
+  <mwc-icon-button icon="close" on-click="onDelete"></mwc-icon-button>
 </div>
 
 <div columns>
@@ -121,6 +134,7 @@ template: html`
   </div>
   <span flex></span>
   <span flex></span>
+</div>
 </div>
 `
 });

@@ -17,15 +17,25 @@ template: html`
     padding: 100px;
     ${globalThis.themeRules}
   }
+  [frame="navigator"] {
+    border: 1px solid orange;
+    padding: 10px;
+  }
   [frame="recordsViewer"] {
     border: 1px solid purple;
+    padding: 10px;
+  }
+  [frame="new"] {
+    border: 1px solid lightgreen;
     padding: 10px;
   }
 </style>
 
 <div center><b><i>WELCOME  TO   ARCS   DATABASE</i></b></div>
 <br>
-<div frame="recordsViewer"></div>
+<div frame="navigator"></div>
+<!-- <div frame="recordsViewer"></div> -->
+<div frame="form"></div>
 <br>
 
 `
