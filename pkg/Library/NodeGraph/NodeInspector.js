@@ -180,10 +180,11 @@ async constructConnections(node, {graph, nodeTypes, candidates}, service) {
 async renderBinding(node, name, candidates, graph, nodeTypes, service) {
   if (candidates) {
     const froms = candidates.map(candidate => this.renderCandidate(candidate, graph)).filter(from => from);
-    const value = node.connections?.[name] || [];
+    const selected = node.connections?.[name] || [];
     const store = nodeTypes[node.type].$stores[name];
     const multiple = store.multiple;
-    const connectedValue = await this.constructConnectedValue(value, graph, nodeTypes, service);
+    const value = selected?.map(s => this.encodeConnectionValue(s));
+    const connectedValue = await this.constructConnectedValue(selected, graph, nodeTypes, service);
     return {
       name,
       store: {

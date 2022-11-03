@@ -99,6 +99,7 @@ renderNode({node, categories, graph, selectedNodeId, nodeTypes, layout}) {
     selected: node.id === selectedNodeId,
     inputs: this.renderInputs(node, nodeType),
     outputs: this.renderOutputs(nodeType),
+    conns: this.renderConnections(node, graph),
   };
 },
 
@@ -112,6 +113,30 @@ bgColorByCategory(category, categories) {
 
 iconByCategory(category, categories) {
   return categories?.[category]?.icon || 'star_outline';
+},
+
+renderConnections(node, graph) {
+  return keys(node.connections)
+    .map(storeName => this.renderStoreConnections(storeName, node, graph))
+    .flat()
+    ;
+},
+
+renderStoreConnections(storeName, node, graph) {
+  return node.connections[storeName]
+    .filter(conn => graph.nodes[conn.from])
+    .map(conn => this.formatConnection(conn.from, conn.storeName, node.id, storeName))
+    ;
+},
+
+formatConnection(fromKey, fromStore, toKey, toStore) {
+  return {
+    fromKey,
+    fromStore,
+    toKey,
+    toStore,
+    id: [fromKey, fromStore, toKey, toStore].join(this.edgeIdDelimeter)
+  };
 },
 
 renderInputs(node, nodeType) {
