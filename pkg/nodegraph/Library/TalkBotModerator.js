@@ -8,8 +8,7 @@
 async update({inChat, feedbackChat, max}) {
   let outChat = inChat;
   if (max && !inChat?.length) {
-    outChat = [{name: 'Moderator', phrase: 'Hello'}];
-    feedbackChat = outChat;
+    feedbackChat = outChat = [{name: 'Moderator', phrase: 'Hello'}];
   }
   else if (max < inChat?.length) {
     feedbackChat = outChat = [...inChat].slice(0, max);
