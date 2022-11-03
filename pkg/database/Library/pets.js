@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 
- const pets = [{
+export const pets = [{
   id: 'Zuko',
   name: 'Zuko',
   kind: 'cat',
@@ -19,8 +19,27 @@
   age: 5,
 }];
 
-// TODO(mariakleiner): convert to props map (with type, default value,
-// whether mandatory, etc).
-const petProps = ['name', 'kind', 'age', 'image'];
+export const petProps = {
+  name: {
+    type: 'String',
+    mandatory: true
+  },
+  kind: {
+    type: 'String',
+    values: ['dog', 'cat', 'bunny', 'bird', 'other'],
+    default: 'other',
+    mandatory: true
+  },
+  age: {
+    type: 'Number',
+    min: 0,
+    max: 100,
+    default: 0,
+    mandatory: true
+  },
+  image: {
+    type: 'Image',
+  }
+};
 
-const petFormParticleKind = '$db/PetForm';
+export const petFormParticleKind = '$db/PetForm';

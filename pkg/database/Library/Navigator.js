@@ -27,7 +27,7 @@ updateSelected(records, {current}) {
 
 async newRecord(props, service) {
   const newRecord = {id: await service({msg: 'MakeName'})};
-  props.forEach(prop => newRecord[prop] = '');
+  keys(props).forEach(prop => newRecord[prop] = props[prop].default || '');
   return newRecord;
 },
 

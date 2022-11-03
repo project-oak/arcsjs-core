@@ -22,11 +22,11 @@ template: html`
     padding: 10px;
   }
   [frame="recordsViewer"] {
-    border: 1px solid purple;
+    border: 1px solid lightgreen;
     padding: 10px;
   }
-  [frame="new"] {
-    border: 1px solid lightgreen;
+  [frame="form"] {
+    border: 1px solid purple;
     padding: 10px;
   }
 </style>

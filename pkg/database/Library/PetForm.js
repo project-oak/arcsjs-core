@@ -61,8 +61,9 @@ onDelete({record, records}) {
 },
 
 verifyPet(props, state) {
-  const missingProps = props.filter(prop => !state.pet[prop]);
+  const missingProps = keys(props).filter(prop => props[prop].mandatory && !state.pet[prop]);
   const isValid = missingProps.length === 0;
+  // TODO(mariakleiner): also verify if properties have valid values (min, max, etc).
   state.error = isValid
     ? null
     : `Missing properties: ['${missingProps.join('\', \'')}']`;
