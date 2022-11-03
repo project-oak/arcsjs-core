@@ -57,7 +57,20 @@ export class NodeGraph extends Xen.Async {
       return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
     }
   }
-  render({graph, rects}, {x, y}) {
+  render(inputs) {
+    // iterate graph nodes to find selection and ensure each rect exists
+    let selected = this.validateGraphRects(inputs);
+    // compute selectedKeys
+    const selectedKeys = selected?.key ? [`${this.idPrefix}${selected.key}`] : null
+    // compute rects for designer-layout
+    const rects = this.renderRects(inputs);
+    // compute array of graphNodes to render
+    const nodes = this.renderGraph(inputs);
+    // complete render model
+    return {selectedKeys, rects, nodes};
+    // NB: connectors are drawn after, via Canvas. See _didRender.
+  }
+  validateGraphRects({rects, graph}) {
     // iterate graph nodes
     let selected = null;
     graph?.graphNodes.forEach((n, i) => {
@@ -71,32 +84,36 @@ export class NodeGraph extends Xen.Async {
         selected = n;
       }
     });
-    // compute rects for designer-layout
-    const designerRects = Object.entries(rects).map(([id, position]) => ({id, position}));
-    // complete render model
+    return selected;
+  }
+  renderRects({rects}) {
+    return Object.entries(rects).map(([id, position]) => ({id, position}));
+  }
+  renderGraph({rects, graph}) {
+    // compute array of graphNodes to render
+    const renderNodes = (rects && graph?.graphNodes) ?? [];
+    return renderNodes.map(n => this.renderGraphNode(n));
+  }
+  renderGraphNode({key, selected, color, bgColor, inputs, outputs, ...etc}) {
     return {
-      selectedKeys: selected?.key ? [`${this.idPrefix}${selected.key}`] : null,
-      rects: designerRects,
-      nodes: rects && graph?.graphNodes.map((n, i) => {
-        return {
-          ...n,
-          nodeId: `${this.idPrefix}${n.key}`,
-          inputs: n.inputs?.map(({name, type}) => ({name, type, title: `${name}: ${type}`})),
-          outputs: n.outputs?.map(({name, type}) => ({name, type, title: `${name}: ${type}`})),
-          nameStyle: {
-            borderRadius: '11px 11px 0 0',
-            borderColor: n.selected ? n.color : n.bgColor,
-            background: n.selected ? n.color : n.bgColor,
-            color: n.selected ? 'white' : 'black',
-          },
-          style: {
-            borderColor: n.selected ? n.color : n.bgColor,
-            color: n.selected ? 'white' : 'gray',
-            background: n.bgColor,
-          }
-        };
-      })
-    };
+      ...etc,
+      key,
+      selected,
+      nodeId: `${this.idPrefix}${key}`,
+      inputs: inputs?.map(({name, type}) => ({name, type, title: `${name}: ${type}`})),
+      outputs: outputs?.map(({name, type}) => ({name, type, title: `${name}: ${type}`})),
+      nameStyle: {
+        borderRadius: '11px 11px 0 0',
+        borderColor: selected ? color : bgColor,
+        background: selected ? color : bgColor,
+        color: selected ? 'white' : 'black',
+      },
+      style: {
+        borderColor: selected ? color : bgColor,
+        color: selected ? 'white' : 'gray',
+        background: bgColor,
+      }
+    }
   }
   _didRender({graph, rects}, {x, y}) {
     if (rects) {
