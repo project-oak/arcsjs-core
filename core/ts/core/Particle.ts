@@ -172,14 +172,16 @@ export class ParticleApi {
    * This function can be overwritten to implement the desired
    * behaviour.
    *
-   * Inputs are the stores the particle is bound to.
-   * State is an object that can be changed and passed to sub-functions.
-   * Tools allow the particle to perform supervised activities -
-   * for example services are a tool.
+   * Inputs is a dictionary containing input data.
    *
-   * The update function can return an object containing the new desired
-   * value(s) for the stores. For example, if we wanted to update the
-   * `Person` and `Address` stores we would return:
+   * State is a mutable dictionary available to all lifecycle methods.
+   *
+   * Tools is a dictionary of useful functions for lifecycle methods. 
+   * Contains `{service, invalidate, output}`.
+   *
+   * `update` may return an object containing data for the output channel.
+   * For example, if we wanted to update `Person` and `Address` data we could 
+   * return:
    *
    * ```
    * return {
@@ -192,7 +194,7 @@ export class ParticleApi {
    * @param state
    * @param tools
    *
-   * @returns [OPTIONAL] object containing store to value mappings
+   * @returns [OPTIONAL] object containing output binding to value mappings
    */
   async update(inputs, state, tools) {
     return null;
@@ -232,6 +234,38 @@ export class ParticleApi {
    * @param state
    */
   render(inputs, state) {
+    return null;
+  }
+  /**
+   * Initialize is called once in the particle lifecycle, when it just gets
+   * loaded, prior to any other methods calls.
+   *
+   * This function can be overwritten to implement the desired
+   * behaviour.
+   *
+   * Inputs are the data the particle is bound to.
+   * State is an object that can be changed and passed to sub-functions.
+   * Tools allow the particle to perform supervised activities -
+   * for example services are a tool.
+   *
+   * The initialize function can return an object containing the new desired
+   * value(s) for the output connections. For example, if we wanted to update
+   * the `Person` and `Address` data we would return:
+   *
+   * ```
+   * return {
+   *   Person: 'Jane Smith',
+   *   Address: '123 Main Street'
+   * };
+   * ```
+   *
+   * @param inputs
+   * @param state
+   * @param tools
+   *
+   * @returns [OPTIONAL] object containing output binding to value mappings
+   */
+  async initialize(inputs, state, tools) {
     return null;
   }
 }
