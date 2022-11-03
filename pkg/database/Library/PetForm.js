@@ -8,18 +8,20 @@
  */
 ({
 
-update({record, records}, state) {
-  if (this.recordChanged(record, state)) {
-    delete state.error;
-  }
-  state.pet = record;
-  state.isNew = Boolean(!records.find(({id}) => record.id === id));
-  if (state.pet) {
-    assign(state.pet, this.renderImageProps(state.pet.image));
+update({event}, state) {
+  if (event) {
+    if (this.recordChanged(event, state)) {
+      delete state.error;
+    }
+    const {type, record} = event;
+    assign(state, {pet: record, isNew: type === 'new'};
+    if (state.pet) {
+      assign(state.pet, this.renderImageProps(state.pet.image));
+    }
   }
 },
 
-recordChanged(record, {pet}) {
+recordChanged({record}, {pet}) {
   return record?.id !== pet?.id;
 },
 
@@ -39,24 +41,20 @@ onChange({eventlet: {key, value}, props}, state) {
   }
 },
 
-onSave({records, props}, state) {
+onSave({props}, state) {
   if (this.verifyPet(props, state)) {
-    records.push(state.pet);
     return {
-      record: state.pet,
-      records
+      modifyRecordEvent: {
+        type: 'save',
+        record: state.pet
+      }
     };
   }
 },
 
-onDelete({record, records}) {
-  const index = records.findIndex(({id}) => record.id === id);
-  if (index >= 0) {
-    records.splice(index, 1);
-  }
+onDelete({}, {pet}) {
   return {
-    record: null,
-    records
+    event: {type: 'delete', record: pet}
   };
 },
 
