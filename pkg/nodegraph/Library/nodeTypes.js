@@ -18,8 +18,9 @@ import * as mediapipeNodes from '../../Library/Mediapipe/MediapipeNodes.js';
 import {CocoSsdNode} from '../../Library/TensorFlow/CocoSsdNode.js';
 import {MobilenetNode} from '../../Library/TensorFlow/MobilenetNodes.js';
 import {GoogleMapNode} from '../../Library/Goog/GoogleMapNode.js';
-import {MacroRunnerNode} from '../../Library/Goog/MacroRunnerNode.js';
+// import {MacroRunnerNode} from '../../Library/Goog/MacroRunnerNode.js';
 import * as fieldNodes from '../../Library/Fields/FieldNodes.js';
+import {BinaryOpNode} from '../../Library/Fields/BinaryOpNode.js';
 import * as nodeGraphNodes from '../../Library/NodeGraph/NodeGraphNodes.js';
 import * as testNodes from './TestNodes.js';
 import * as ContainerNodes from './ContainerNodes.js';
@@ -46,8 +47,8 @@ const nodeTypesList = [
   ...values(displayNodes),
   ...values(customNodes),
   GoogleMapNode,
-  MacroRunnerNode,
-  //SceneNode,
+  // MacroRunnerNode,
+  // SceneNode,
   //
   ...values(nodeGraphNodes),
   ...values(fieldNodes),
