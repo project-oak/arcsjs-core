@@ -1,52 +1,62 @@
-/**
- * @license
- * Copyright 2022 Google LLC
- *
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
- */
-const pets = [{
-  name: 'Zuko',
-  kind: 'cat',
-  age: 2,
-  pic: '../../z.png'
-}, {
-  name: 'Gracie',
-  kind: 'dog',
-  age: 5,
-  pic: '../../g.png'
-}];
+import {petProps as props, pets as records, petFormParticleKind as formParticleKind} from './pets.js';
 
 export const DbRecipe = {
   $meta: {
     description: 'Arcs Database Recipe'
   },
   $stores: {
+    props: {
+      $type: '[Pojo]',
+      $value: props
+    },
     records: {
       $type: '[Pojo]',
-      $value: pets
+      $value: records
+    },
+    recordEvent: {
+      $type: 'Pojo' // {type: new/view/save/delete, record}
     }
   },
   database: {
     $kind: '$db/DbHome',
     $slots: {
-      recordsViewer: {
-        RecordsViewer: {
-          $kind: '$db/PetsViewer',
-          $inputs: ['records'],
-          $outputs: ['records'],
-          $slots: {
-            new: {
-              PetCreator: {
-                $kind: '$db/PetForm',
-                $inputs: ['records'],
-                $outputs: ['records']
-              }
-            }
-          }
+      navigator: {
+        recordsNavigator: {
+          $kind: '$db/Navigator',
+          $inputs: [
+            'props',
+            'records',
+            {'event': 'recordEvent'}
+          ],
+          $outputs: [{'event': 'recordEvent'}]
+        }
+      },
+      // recordsViewer: {
+      //   RecordsViewer: {
+      //     $kind: '$db/PetsViewer',
+      //     $inputs: ['records'],
+      // },
+      form: {
+        RecordForm: {
+          $kind: formParticleKind,
+          $inputs: [
+            'props',
+            {event: 'recordEvent'}
+          ],
+          $outputs: [{event: 'recordEvent'}]
         }
       }
     }
+  },
+  recordsManager: {
+    $kind: '$db/RecordsManager',
+    $inputs: [
+      'records',
+      {event: 'recordEvent'}
+    ],
+    $outputs: [
+      'records',
+      {event: 'recordEvent'}
+    ]
   }
 };
