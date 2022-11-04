@@ -8,23 +8,22 @@
  */
 ({
 
-async update({records, modifyRecordEvent, props}, state, {service}) {
+async update({records, event, props}, state, {service}) {
   state.total = records?.length;
-  if (records?.length === 0) {
-    return await this.makeNew({props}, state, service);
-  }
-  if (modifyRecordEvent) {
-    const index = records.findIndex(({id}) => modifyRecordEvent.record.id === id);
+  if (event) {
+    const index = records.findIndex(({id}) => event.record.id === id);
     state.current = index >= 0 ? index : NaN;
+  } else if (records?.length === 0) {
+    return await this.makeNew({props}, state, service);
   } else {
     state.current = 0;
+    return this.updateSelected(records, state);
   }
-  return this.updateSelected(records, state);
 },
 
 updateSelected(records, {current}) {
   return {
-    selectRecordEvent: {
+    event: {
       type: 'view',
       record: records?.[current]
     }
@@ -53,7 +52,7 @@ async makeNew({props}, state, service) {
   state.current = NaN;
   const record = await this.newRecord(props, service);
   return {
-    selectRecordEvent: {type: 'new', record}
+    event: {type: 'new', record}
   };
 },
 

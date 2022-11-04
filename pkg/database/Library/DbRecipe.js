@@ -13,14 +13,8 @@ export const DbRecipe = {
       $type: '[Pojo]',
       $value: records
     },
-    // selectedRecord: {
-    //   $type: 'Pojo'
-    // }
-    selectRecordEvent: {
-      $type: 'Pojo' // {type: new/view, record}
-    },
-    modifyRecordEvent: {
-      $type: 'Pojo' // {type: save/delete, record}
+    recordEvent: {
+      $type: 'Pojo' // {type: new/view/save/delete, record}
     }
   },
   database: {
@@ -29,9 +23,12 @@ export const DbRecipe = {
       navigator: {
         recordsNavigator: {
           $kind: '$db/Navigator',
-          $inputs: ['props', 'records', 'modifyRecordEvent'], //'selectedRecord'],
-          $outputs: ['selectRecordEvent']
-          // $outputs: ['selectedRecord']
+          $inputs: [
+            'props',
+            'records',
+            {'event': 'recordEvent'}
+          ],
+          $outputs: [{'event': 'recordEvent'}]
         }
       },
       // recordsViewer: {
@@ -44,15 +41,9 @@ export const DbRecipe = {
           $kind: formParticleKind,
           $inputs: [
             'props',
-            // {record: 'selectedRecord'},
-            // 'records'
-            {event: 'selectRecordEvent'}
+            {event: 'recordEvent'}
           ],
-          $outputs: [
-            // 'records',
-            // {record: 'selectedRecord'}
-            {event: 'modifyRecordEvent'}
-          ]
+          $outputs: [{event: 'recordEvent'}]
         }
       }
     }
@@ -61,11 +52,11 @@ export const DbRecipe = {
     $kind: '$db/RecordsManager',
     $inputs: [
       'records',
-      {event: 'modifyRecordEvent'}
+      {event: 'recordEvent'}
     ],
     $outputs: [
       'records',
-      {event: 'modifyRecordEvent'}
+      {event: 'recordEvent'}
     ]
   }
 };

@@ -1,5 +1,3 @@
-import { deepEqual } from "../../Library/Core/utils.min";
-
 /**
  * @license
  * Copyright 2022 Google LLC
@@ -21,24 +19,29 @@ async update({records, event}, state) {
 
 handleEvent(records, {type, record}) {
   const index = records?.findIndex(({id}) => record.id === id);
-  const results = {records};
   switch (type) {
     case 'delete':
-      if (index >= 0) {
-        records.splice(index, 1);
-      }
-      assign(results, {event: null});
-      break;
+      return this.deleteRecord(records, index);
     case 'save': {
-      if (index >= 0) {
-        records[index] = record;
-      } else {
-        records.push(record);
-      }
-      break;
+      return this.saveRecord(records, record, index);
     }
   }
-  return results;
+},
+
+deleteRecord(records, index) {
+  if (index >= 0) {
+    records.splice(index, 1);
+  }
+  return {records, event: null};
+},
+
+saveRecord(records, record, index) {
+  if (index >= 0) {
+    records[index] = record;
+  } else {
+    records.push(record);
+  }
+  return {records};
 }
 
 });

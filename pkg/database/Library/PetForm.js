@@ -14,7 +14,7 @@ update({event}, state) {
       delete state.error;
     }
     const {type, record} = event;
-    assign(state, {pet: record, isNew: type === 'new'};
+    assign(state, {pet: record, isNew: type === 'new'});
     if (state.pet) {
       assign(state.pet, this.renderImageProps(state.pet.image));
     }
@@ -44,7 +44,7 @@ onChange({eventlet: {key, value}, props}, state) {
 onSave({props}, state) {
   if (this.verifyPet(props, state)) {
     return {
-      modifyRecordEvent: {
+      event: {
         type: 'save',
         record: state.pet
       }
