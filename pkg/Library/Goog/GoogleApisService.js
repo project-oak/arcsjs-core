@@ -16,7 +16,6 @@ export class GoogleApisService {
     }
   }
   static async newsData(country) {
-    // let results = await GoogleApis.fetch(newsDataUrl);
     return GoogleApisService.fetch(`${urls.localNewsDataUrl}${country}`);
   }
   static async weatherData(data) {
@@ -33,24 +32,5 @@ export class GoogleApisService {
   static async translate({text, inLang, outLang}) {
     const response = await GoogleApisService.fetch(`${urls.translateUrl}?inlang=${inLang}&outlang=${outLang}&text=${text}`);
     return response.sentences?.map(s => s.trans)?.join('');
-  }
-  static async runMacro({macroId, inputs}) {
-    const formData = new FormData();
-    formData.set("id", macroId);
-    formData.set("userInputs", JSON.stringify(inputs));
-    formData.set("temperature", 0.1);
-    const payload = {
-      credentials: 'include',
-      method: 'POST',
-      body: formData
-    };
-    // Make the fetch request:
-    try {
-      const response = await fetch(urls.runMacroEndpointUrl, payload);
-      return response.json();
-    } catch(x) {
-      console.error(x);
-      return null;
-    }
   }
 }
