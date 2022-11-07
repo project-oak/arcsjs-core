@@ -8,24 +8,11 @@
  */
 ({
 
-initialize({}, state) {
-  assign(state, {selectedRecords: false, selectedDetails: true});  
-},
-
-onSelected({eventlet: {value}}, state) {
+update({viewMode}, state) {
   assign(state, {
-    selectedRecords: value === 'records',
-    selectedDetails: value === 'details',
+    showRecords: String(viewMode === 'records'),
+    showDetails: String(viewMode === 'details')
   });
-},
-
-render({}, {selectedRecords, selectedDetails}) {
-  return {
-    selectedRecords,
-    selectedDetails,
-    showRecords: String(selectedRecords),
-    showDetails: String(selectedDetails)
-  };
 },
 
 template: html`
@@ -38,8 +25,8 @@ template: html`
     padding: 100px;
     ${globalThis.themeRules}
   }
-  [frame="navigator"] {
-    border: 1px solid orange;
+  [frame="chooser"] {
+    border: 1px solid grey;
     padding: 10px;
   }
   [frame="recordsViewer"] {
@@ -50,19 +37,20 @@ template: html`
     border: 1px solid purple;
     padding: 10px;
   }
+  [toolbar] {
+    border: 1px solid orange;
+  }
 </style>
 
 <div center><b><i>WELCOME  TO   ARCS   DATABASE</i></b></div>
 <br>
 <div toolbar>
-  <span flex></span>
-  <select on-change="onSelected">
-    <option key="records" selected="{{selectedRecords}}">records</option>
-    <option key="details" selected="{{selectedDetails}}">details</option>
-  </select>
+  <div flex>
+    <div frame="navigator" xdisplay$="{{showDetails}}"></div>
+  </div>  
+  <div frame="chooser"></div>
 </div>
 <div frame="recordsViewer" display$="{{showRecords}}"></div>
-<div frame="navigator" display$="{{showDetails}}"></div>
 <div frame="form" display$="{{showDetails}}"></div>
 <br>
 
