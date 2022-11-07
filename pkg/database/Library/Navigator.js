@@ -8,26 +8,31 @@
  */
 ({
 
-async update({records, event, props}, state, {service}) {
+async update({records, selectedRecord, props}, state, {service}) {
   state.total = records?.length;
-  if (event) {
-    const index = records.findIndex(({id}) => event.record.id === id);
-    state.current = index >= 0 ? index : NaN;
-  } else if (records?.length === 0) {
+  if (records?.length === 0) {
     return await this.makeNew({props}, state, service);
   } else {
-    state.current = 0;
-    return this.updateSelected(records, state);
+    state.current = records.findIndex(({id}) => id === selectedRecord?.id);
+    if (state.current >= 0) {
+      if (this.selectedRecordUpdated(selectedRecord, records[state.current])) {
+        records[state.current] = selectedRecord;
+        return {records};
+      }
+    } else {
+      state.current = 0;
+      return {'selectedRecord': records[state.current]};
+    }
   }
 },
 
+selectedRecordUpdated(selectedRecord, previousSelected) {
+  return (selectedRecord?.id === previousSelected?.id)
+    && !deepEqual(selectedRecord, previousSelected);
+}, 
+
 updateSelected(records, {current}) {
-  return {
-    event: {
-      type: 'view',
-      record: records?.[current]
-    }
-  };
+  return {selectedRecord: records[current]};
 },
 
 async newRecord(props, service) {
@@ -38,7 +43,7 @@ async newRecord(props, service) {
 
 onCurrentChange({eventlet: {value}, records}, state) {
   const current = Number(value);
-  if (!isNaN(current) && current >= 0 && current < records?.length) {
+  if (current >= 0 && current < records?.length) {
     state.current = value;
     return this.updateSelected(records, state);
   }
@@ -48,11 +53,18 @@ async onNew(inputs, state, {service}) {
   return await this.makeNew(inputs, state, service);
 },
 
-async makeNew({props}, state, service) {
-  state.current = NaN;
+onDelete({records}, {current}) {
+  records.splice(current, 1);
+  return {records};
+},
+
+async makeNew({props, records}, state, service) {
   const record = await this.newRecord(props, service);
+  records.push(record);
+  state.current = records.length - 1;
   return {
-    event: {type: 'new', record}
+    records,
+    selectedRecord: record
   };
 },
 
@@ -124,6 +136,7 @@ template: html`
 
 <div toolbar>
   <mwc-button on-click="onNew" raised>Add</mwc-button>
+  <mwc-button on-click="onDelete">Delete</mwc-button>
   <div flex></div>
   <mwc-icon-button icon="first_page" on-click="onFirst" disabled="{{previousDisabled}}"></mwc-icon-button>
   <mwc-icon-button icon="navigate_before" on-click="onPrevious" disabled="{{previousDisabled}}"></mwc-icon-button>

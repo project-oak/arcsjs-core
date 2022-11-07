@@ -8,64 +8,26 @@
  */
 ({
 
-update({event}, state) {
-  if (event) {
-    if (this.recordChanged(event, state)) {
-      delete state.error;
-    }
-    const {type, record} = event;
-    assign(state, {pet: record, isNew: type === 'new'});
-    if (state.pet) {
-      assign(state.pet, this.renderImageProps(state.pet.image));
-    }
+update({record}, state) {
+  if (record) {
+    assign(state, {pet: record});
+    assign(state.pet, this.renderImageProps(state.pet.image));
   }
 },
 
-recordChanged({record}, {pet}) {
-  return record?.id !== pet?.id;
+render({}, {pet}) {
+  return pet;
 },
 
-render({}, {pet, error, isNew}) {
-  return {
-    ...pet,
-    error,
-    formStyle: isNew ? {border: '10px solid lightpink'} : ''
-  };
-},
-
-onChange({eventlet: {key, value}, props}, state) {
+onChange({eventlet: {key, value}}, state) {
   state.pet[key] = value;
   assign(state.pet, this.renderImageProps(state.pet.image));
-  if (state.error) {
-    this.verifyPet(props, state);
-  }
 },
 
-onSave({props}, state) {
-  if (this.verifyPet(props, state)) {
-    return {
-      event: {
-        type: 'save',
-        record: state.pet
-      }
-    };
-  }
-},
-
-onDelete({}, {pet}) {
+onSave({}, state) {
   return {
-    event: {type: 'delete', record: pet}
+    record: state.pet
   };
-},
-
-verifyPet(props, state) {
-  const missingProps = keys(props).filter(prop => props[prop].mandatory && !state.pet[prop]);
-  const isValid = missingProps.length === 0;
-  // TODO(mariakleiner): also verify if properties have valid values (min, max, etc).
-  state.error = isValid
-    ? null
-    : `Missing properties: ['${missingProps.join('\', \'')}']`;
-  return isValid;
 },
 
 renderImageProps(image) {
@@ -103,9 +65,10 @@ template: html`
 
 <div xen:style="{{formStyle}}">
 <div toolbar>
-  <div flex error>{{error}}</div>
-  <mwc-icon-button icon="done" on-click="onSave"></mwc-icon-button>
-  <mwc-icon-button icon="close" on-click="onDelete"></mwc-icon-button>
+  <div flex error>
+    <!-- {{error}} -->
+  </div>
+  <mwc-icon-button icon="save" on-click="onSave"></mwc-icon-button>
 </div>
 
 <div columns>
