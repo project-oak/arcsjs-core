@@ -15,26 +15,52 @@ export const DbRecipe = {
     },
     selectedRecord: {
       $type: 'Pojo'
+    },
+    selectedRecordIds: {
+      $type: 'Pojo'
+    },
+    viewMode: {
+      $type: 'String',
+      $value: 'details'
     }
   },
   database: {
     $kind: '$db/DbHome',
+    $inputs: ['viewMode'],
     $slots: {
+      chooser: {
+        viewChooser: {
+          $kind: '$db/ViewChooser',
+          $inputs: ['viewMode'],
+          $outputs: ['viewMode']
+        }
+      },
       navigator: {
         recordsNavigator: {
           $kind: '$db/Navigator',
           $inputs: [
             'props',
             'records',
-            'selectedRecord'
+            'selectedRecord',
+            'selectedRecordIds',
+            'viewMode'
           ],
-          $outputs: ['selectedRecord']
+          $outputs: [
+            'records',
+            'selectedRecord',
+            'viewMode'
+          ]
         }
       },
       recordsViewer: {
         RecordsViewer: {
           $kind: '$db/PetsViewer',
           $inputs: ['records'],
+          $outputs: [
+            'selectedRecord',
+            'selectedRecordIds',
+            'viewMode'
+          ]
         }
       },
       form: {
