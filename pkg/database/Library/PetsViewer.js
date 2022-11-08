@@ -36,11 +36,12 @@ onChecked({eventlet: {key}, records}, state) {
   return this.updateSelectedIds(records, state);
 },
 
-onSelected({eventlet: {key}, records}) {
+onSelected({eventlet: {key}, records}, state) {
   const selectedRecord = records.find(({id}) => id === key);
+  state.checked = {};
   return {
     selectedRecord,
-    viewMode: 'details'
+    ...this.updateSelectedIds(records, state)
   };
 },
 

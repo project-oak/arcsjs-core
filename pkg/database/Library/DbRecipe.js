@@ -18,23 +18,12 @@ export const DbRecipe = {
     },
     selectedRecordIds: {
       $type: 'Pojo'
-    },
-    viewMode: {
-      $type: 'String',
-      $value: 'details'
     }
   },
   database: {
     $kind: '$db/DbHome',
-    $inputs: ['viewMode'],
+    $inputs: ['selectedRecord'],
     $slots: {
-      chooser: {
-        viewChooser: {
-          $kind: '$db/ViewChooser',
-          $inputs: ['viewMode'],
-          $outputs: ['viewMode']
-        }
-      },
       navigator: {
         recordsNavigator: {
           $kind: '$db/Navigator',
@@ -43,12 +32,10 @@ export const DbRecipe = {
             'records',
             'selectedRecord',
             'selectedRecordIds',
-            'viewMode'
           ],
           $outputs: [
             'records',
             'selectedRecord',
-            'viewMode'
           ]
         }
       },
@@ -59,7 +46,6 @@ export const DbRecipe = {
           $outputs: [
             'selectedRecord',
             'selectedRecordIds',
-            'viewMode'
           ]
         }
       },
