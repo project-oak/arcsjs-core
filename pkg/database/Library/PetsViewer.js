@@ -7,8 +7,20 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
+initialize({}, state) {
+  state.checked = {};
+},
+
 update({records}, state) {
   state.pets = this.renderPets(records);
+  return this.updateSelectedIds(records, state);
+},
+
+updateSelectedIds(records, {checked}) {
+  const selectedRecordIds = records
+    .filter(({id}) => checked[id])
+    .map(({id}) => id);
+  return {selectedRecordIds};
 },
 
 renderPets(pets) {
@@ -19,6 +31,19 @@ renderPets(pets) {
   }));
 },
 
+onChecked({eventlet: {key}, records}, state) {
+  state.checked[key] = !state.checked[key];
+  return this.updateSelectedIds(records, state);
+},
+
+onSelected({eventlet: {key}, records}) {
+  const selectedRecord = records.find(({id}) => id === key);
+  return {
+    selectedRecord,
+    viewMode: 'details'
+  };
+},
+
 onDelete({eventlet: {key}, records}, state) {
   log(`Deleted ${key}`);
   const newRecords = records.filter(r => r.name !== key);
@@ -26,8 +51,14 @@ onDelete({eventlet: {key}, records}, state) {
   return {records: newRecords};
 },
 
-render({}, {pets}) {
-  return {pets};
+render({}, {pets, checked}) {
+  return {
+    pets: pets?.map(pet => this.renderPet(pet, checked[pet.id]))
+  };
+},
+
+renderPet(pet, isChecked) {
+  return {...pet, isChecked};
 },
   
 template: html`
@@ -48,6 +79,7 @@ template: html`
     }
     [button-cell] {
       padding: 10px;
+      border: 1px dotted var(--theme-color-fg-2);
     }
     [frame="new"] {
       border: 1px solid pink;
@@ -64,7 +96,10 @@ template: html`
 
   <template pet_t>
     <div flex columns>
-      <div cell>{{name}}</div>
+      <div button-cell>
+        <input field type="checkbox" key="{{id}}" checked="{{isChecked}}" on-change="onChecked"></input>
+      </div>
+      <div cell key="{{id}}" on-click="onSelected"><a href="">{{name}}</a></div>
       <div cell>{{kind}}</div>
       <div cell>{{age}}</div>
       <div cell>

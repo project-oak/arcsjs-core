@@ -8,10 +8,12 @@
  */
 ({
 
-async update({records, selectedRecord, props}, state, {service}) {
+async update(inputs, state, {service}) {
+  const {records, selectedRecord} = inputs;
   state.total = records?.length;
   if (records?.length === 0) {
-    return await this.makeNew({props}, state, service);
+    const outputs = await this.makeNew(inputs, state, service);
+    return {...outputs, viewMode: 'details'};
   } else {
     state.current = records.findIndex(({id}) => id === selectedRecord?.id);
     if (state.current >= 0) {
@@ -50,12 +52,21 @@ onCurrentChange({eventlet: {value}, records}, state) {
 },
 
 async onNew(inputs, state, {service}) {
-  return await this.makeNew(inputs, state, service);
+  const outputs = await this.makeNew(inputs, state, service);
+  assign(outputs, {viewMode: 'details'});
+  return outputs;
 },
 
-onDelete({records}, {current}) {
-  records.splice(current, 1);
-  return {records};
+onDelete({viewMode, records, selectedRecordIds}, {current}) {
+  if (viewMode === 'details') {
+    records.splice(current, 1);
+  } else {
+    records = records.filter(({id}) => !selectedRecordIds?.find(selected => id === selected));
+  }
+  return {
+    records,
+    selectedRecord: null
+  };
 },
 
 async makeNew({props, records}, state, service) {
@@ -88,18 +99,26 @@ onLast({records}, state) {
   return this.updateSelected(records, state);
 },
 
+onBack() {
+  return {viewMode: 'records'};
+},
+
 normalizeCurrent(current, total) {
   return Math.min(Math.max(current, 0), total - 1);
 },
 
-render({}, {current, total}) {
+render({viewMode, selectedRecordIds}, {current, total}) {
   const indexDisabled = isNaN(current);
+  const showNav = String(viewMode === 'details');
+  const deleteDisabled = viewMode === 'records' && !selectedRecordIds?.length;
   return {
     total,
     indices: this.renderIndices(current, total),
     indexDisabled,
     previousDisabled: !(current > 0),
     nextDisabled: !(current < (total - 1)),
+    showNav,
+    deleteDisabled
   };
 },
 
@@ -135,16 +154,19 @@ template: html`
   </style>
 
 <div toolbar>
+  <mwc-icon-button  on-click="onBack" icon="arrow_back" display$="{{showNav}}"></mwc-icon-button>
   <mwc-button on-click="onNew" raised>Add</mwc-button>
-  <mwc-button on-click="onDelete">Delete</mwc-button>
+  <mwc-button on-click="onDelete" disabled="{{deleteDisabled}}">Delete</mwc-button>
   <div flex></div>
-  <mwc-icon-button icon="first_page" on-click="onFirst" disabled="{{previousDisabled}}"></mwc-icon-button>
-  <mwc-icon-button icon="navigate_before" on-click="onPrevious" disabled="{{previousDisabled}}"></mwc-icon-button>
-  <select current title="index" repeat="index_t" disabled="{{indexDisabled}}" on-change="onCurrentChange">{{indices}}</select>
-  <span> of </span>
-  <span>{{total}}</span>
-  <mwc-icon-button icon="navigate_next" on-click="onNext" disabled="{{nextDisabled}}"></mwc-icon-button>
-  <mwc-icon-button icon="last_page" on-click="onLast" disabled="{{nextDisabled}}"></mwc-icon-button>
+  <div display$="{{showNav}}">
+    <mwc-icon-button icon="first_page" on-click="onFirst" disabled="{{previousDisabled}}"></mwc-icon-button>
+    <mwc-icon-button icon="navigate_before" on-click="onPrevious" disabled="{{previousDisabled}}"></mwc-icon-button>
+    <select current title="index" repeat="index_t" disabled="{{indexDisabled}}" on-change="onCurrentChange">{{indices}}</select>
+    <span> of </span>
+    <span>{{total}}</span>
+    <mwc-icon-button icon="navigate_next" on-click="onNext" disabled="{{nextDisabled}}"></mwc-icon-button>
+    <mwc-icon-button icon="last_page" on-click="onLast" disabled="{{nextDisabled}}"></mwc-icon-button>
+  </div>
 </div>
 
 
