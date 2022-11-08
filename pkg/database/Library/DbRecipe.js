@@ -13,8 +13,8 @@ export const DbRecipe = {
       $type: '[Pojo]',
       $value: records
     },
-    recordEvent: {
-      $type: 'Pojo' // {type: new/view/save/delete, record}
+    selectedRecord: {
+      $type: 'Pojo'
     }
   },
   database: {
@@ -26,37 +26,24 @@ export const DbRecipe = {
           $inputs: [
             'props',
             'records',
-            {'event': 'recordEvent'}
+            'selectedRecord'
           ],
-          $outputs: [{'event': 'recordEvent'}]
+          $outputs: ['selectedRecord']
         }
       },
-      // recordsViewer: {
-      //   RecordsViewer: {
-      //     $kind: '$db/PetsViewer',
-      //     $inputs: ['records'],
-      // },
+      recordsViewer: {
+        RecordsViewer: {
+          $kind: '$db/PetsViewer',
+          $inputs: ['records'],
+        }
+      },
       form: {
         RecordForm: {
           $kind: formParticleKind,
-          $inputs: [
-            'props',
-            {event: 'recordEvent'}
-          ],
-          $outputs: [{event: 'recordEvent'}]
+          $inputs: [{record: 'selectedRecord'}],
+          $outputs: [{record: 'selectedRecord'}]
         }
       }
     }
-  },
-  recordsManager: {
-    $kind: '$db/RecordsManager',
-    $inputs: [
-      'records',
-      {event: 'recordEvent'}
-    ],
-    $outputs: [
-      'records',
-      {event: 'recordEvent'}
-    ]
   }
 };

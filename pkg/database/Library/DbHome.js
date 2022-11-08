@@ -7,6 +7,27 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
+
+initialize({}, state) {
+  assign(state, {selectedRecords: false, selectedDetails: true});  
+},
+
+onSelected({eventlet: {value}}, state) {
+  assign(state, {
+    selectedRecords: value === 'records',
+    selectedDetails: value === 'details',
+  });
+},
+
+render({}, {selectedRecords, selectedDetails}) {
+  return {
+    selectedRecords,
+    selectedDetails,
+    showRecords: String(selectedRecords),
+    showDetails: String(selectedDetails)
+  };
+},
+
 template: html`
 <style>
   :host {
@@ -33,9 +54,16 @@ template: html`
 
 <div center><b><i>WELCOME  TO   ARCS   DATABASE</i></b></div>
 <br>
-<div frame="navigator"></div>
-<!-- <div frame="recordsViewer"></div> -->
-<div frame="form"></div>
+<div toolbar>
+  <span flex></span>
+  <select on-change="onSelected">
+    <option key="records" selected="{{selectedRecords}}">records</option>
+    <option key="details" selected="{{selectedDetails}}">details</option>
+  </select>
+</div>
+<div frame="recordsViewer" display$="{{showRecords}}"></div>
+<div frame="navigator" display$="{{showDetails}}"></div>
+<div frame="form" display$="{{showDetails}}"></div>
 <br>
 
 `
