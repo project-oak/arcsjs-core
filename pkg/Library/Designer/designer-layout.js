@@ -34,10 +34,8 @@ export class DesignerLayout extends DragDrop {
       const map = {};
       this.rects?.forEach(r => map[this.sanitizeId(r.id)] = r);
       for (const child of this.children) {
-        //if (child !== this.target) {
-          const rect = map[child.id]?.position || {l: 64, t: 64, w: 240, h: 180};
-          this.position(child.id, rect);
-        //}
+        const rect = map[child.id]?.position || {l: 64, t: 64, w: 240, h: 180};
+        this.position(child.id, rect);
       }
       this.selectAll(this.selected);
     }
