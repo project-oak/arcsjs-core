@@ -12,8 +12,7 @@ async update(inputs, state, {service}) {
   const {records, selectedRecord} = inputs;
   state.total = records?.length;
   if (records?.length === 0) {
-    const outputs = await this.makeNew(inputs, state, service);
-    return {...outputs, viewMode: 'details'};
+    return this.makeNew(inputs, state, service);
   } else {
     state.current = records.findIndex(({id}) => id === selectedRecord?.id);
     if (state.current >= 0) {
@@ -21,9 +20,6 @@ async update(inputs, state, {service}) {
         records[state.current] = selectedRecord;
         return {records};
       }
-    } else {
-      state.current = 0;
-      return {'selectedRecord': records[state.current]};
     }
   }
 },
@@ -52,13 +48,11 @@ onCurrentChange({eventlet: {value}, records}, state) {
 },
 
 async onNew(inputs, state, {service}) {
-  const outputs = await this.makeNew(inputs, state, service);
-  assign(outputs, {viewMode: 'details'});
-  return outputs;
+  return this.makeNew(inputs, state, service);
 },
 
-onDelete({viewMode, records, selectedRecordIds}, {current}) {
-  if (viewMode === 'details') {
+onDelete({records, selectedRecord, selectedRecordIds}, {current}) {
+  if (selectedRecord) {
     records.splice(current, 1);
   } else {
     records = records.filter(({id}) => !selectedRecordIds?.find(selected => id === selected));
@@ -100,17 +94,17 @@ onLast({records}, state) {
 },
 
 onBack() {
-  return {viewMode: 'records'};
+  return {selectedRecord: null};
 },
 
 normalizeCurrent(current, total) {
   return Math.min(Math.max(current, 0), total - 1);
 },
 
-render({viewMode, selectedRecordIds}, {current, total}) {
-  const indexDisabled = isNaN(current);
-  const showNav = String(viewMode === 'details');
-  const deleteDisabled = viewMode === 'records' && !selectedRecordIds?.length;
+render({selectedRecord, selectedRecordIds}, {current, total}) {
+  const indexDisabled = !(total > 1);
+  const showNav = String(Boolean(selectedRecord));
+  const deleteDisabled = Boolean(!selectedRecord && !(selectedRecordIds?.length > 0));
   return {
     total,
     indices: this.renderIndices(current, total),

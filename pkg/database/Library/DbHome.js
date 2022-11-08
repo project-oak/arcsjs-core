@@ -8,10 +8,10 @@
  */
 ({
 
-update({viewMode}, state) {
+update({selectedRecord}, state) {
   assign(state, {
-    showRecords: String(viewMode === 'records'),
-    showDetails: String(viewMode === 'details')
+    showRecords: String(!selectedRecord),
+    showDetails: String(Boolean(selectedRecord))
   });
 },
 
@@ -48,7 +48,6 @@ template: html`
   <div flex>
     <div frame="navigator" xdisplay$="{{showDetails}}"></div>
   </div>  
-  <div frame="chooser"></div>
 </div>
 <div frame="recordsViewer" display$="{{showRecords}}"></div>
 <div frame="form" display$="{{showDetails}}"></div>
