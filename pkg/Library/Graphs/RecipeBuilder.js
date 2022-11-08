@@ -44,7 +44,6 @@ export const RecipeBuilder = {
     };
   },
 
-  // wtf? lol
   flattenNodeType(nodeType, $container) {
     const flattened = {};
     keys(nodeType).forEach(key => {
@@ -57,7 +56,6 @@ export const RecipeBuilder = {
     return flattened;
   },
 
-  // moar whut? lol
   flattenParticleSpec(particleId, particleSpec, $container) {
     const flattened = {
       [particleId]: {
