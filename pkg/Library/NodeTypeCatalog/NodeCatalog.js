@@ -15,15 +15,14 @@ template: html`
     overflow: hidden;
     user-select: none;
   }
-  [frame="nodetypes"] {
+  [frame="nodeList"] {
     width: 100%;
   }
 </style>
 
 <div frame="nodeSearch"></div>
 <div container>
-  <!-- <div frame="categories"></div> -->
-  <div frame="nodetypes"></div>
+  <div frame="nodeList"></div>
 </div>
 `
 });

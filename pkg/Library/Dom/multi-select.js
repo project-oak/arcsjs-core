@@ -41,16 +41,11 @@ export class MultiSelect extends Xen.Async {
     border: 1px solid var(--theme-color-fg-0);
     border-radius: 4px;
     padding: 4px;
-    color: inherit;
-    background-color: white;
   }
 </style>
-<select
-  options
-  disabled$="{{disabled}}"
-  repeat="select_option_t"
-  on-change="onChange"
-  multiple="{{multiple}}">{{options}}</select>
+
+<select options disabled="{{disabled}}" multiple="{{multiple}}" on-change="onChange"
+  repeat="select_option_t">{{options}}</select>
 
 <template select_option_t>
   <option selected="{{selected}}" value="{{key}}">{{name}}</option>

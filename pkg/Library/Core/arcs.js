@@ -70,8 +70,10 @@ logFactory.flags = globalThis.config?.logFlags || {};
 
 // js/core/Arc.js
 var customLogFactory = (id) => logFactory(logFactory.flags.arc, `Arc (${id})`, "slateblue");
-var { assign, keys, entries, create } = Object;
-var values = (o) => Object.values(o);
+var { assign, create } = Object;
+var entries = (o) => Object.entries(o ?? Object);
+var keys = (o) => Object.keys(o ?? Object);
+var values = (o) => Object.values(o ?? Object);
 var nob = () => create(null);
 var Arc = class extends EventEmitter {
   log;
@@ -114,6 +116,7 @@ var Arc = class extends EventEmitter {
   addStore(storeId, store) {
     if (store && !this.stores[storeId]) {
       this.stores[storeId] = store;
+      this.storeChanged(storeId, store);
       store.listen("change", () => this.storeChanged(storeId, store), this.id);
     }
   }
@@ -126,7 +129,7 @@ var Arc = class extends EventEmitter {
   }
   storeChanged(storeId, store) {
     this.log(`storeChanged: "${storeId}"`);
-    const isBound = (inputs) => inputs && inputs.some((input) => values(input)[0] == storeId || keys(input)[0] == storeId);
+    const isBound = (inputs) => inputs && inputs.some((input) => input && (values(input)[0] == storeId || keys(input)[0] == storeId));
     values(this.hosts).forEach((host) => {
       const inputs = host.meta?.inputs;
       if (inputs === "*" || isBound(inputs)) {
@@ -153,7 +156,7 @@ var Arc = class extends EventEmitter {
       const staticInputs = host.meta?.staticInputs;
       assign(inputs, staticInputs);
       if (inputBindings) {
-        inputBindings.forEach((input) => this.computeInput(entries(input)[0], inputs));
+        inputBindings.forEach((input) => input && this.computeInput(entries(input)[0], inputs));
         this.log(`computeInputs(${host.id}) =`, inputs);
       }
     }
@@ -1301,6 +1304,12 @@ export {
   logFactory2 as logFactory,
   utils_exports as utils
 };
+/**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
 /**
  * @license
  * Copyright 2022 Google LLC

@@ -29,9 +29,16 @@ export class DesignerLayout extends DragDrop {
     this.updateGeometry();
   }
   updateGeometry() {
-    this.select(null);
-    this.rects?.forEach(({id, position}) => this.position(id, position));
-    this.selectAll(this.selected);
+    if (!this.dragging) {
+      this.select(null);
+      const map = {};
+      this.rects?.forEach(r => map[this.sanitizeId(r.id)] = r);
+      for (const child of this.children) {
+        const rect = map[child.id]?.position || {l: 64, t: 64, w: 240, h: 180};
+        this.position(child.id, rect);
+      }
+      this.selectAll(this.selected);
+    }
   }
   position(id, position) {
     const child = this.getChildById(id);
@@ -208,7 +215,10 @@ export class DesignerLayout extends DragDrop {
   doUp() {
     this.dragRect = null;
     if (this.target) {
-      this.firePosition(this.target);
+      setTimeout(() => {
+        this.fire('update-box');
+        this.firePosition(this.target);
+      }, 100);
     }
   }
   //
@@ -266,7 +276,7 @@ export class DesignerLayout extends DragDrop {
   }
   ::slotted(*) {
     position: absolute;
-    /* outline: 1px dotted orange !important; */
+    outline: 1px dotted lightblue !important;
   }
   [boxer] {
     pointer-events: none;

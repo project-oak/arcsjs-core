@@ -7,7 +7,6 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-
 connectorDelim: '$$',
 idDelim: ':',
 defaultContainer: `main#runner`,

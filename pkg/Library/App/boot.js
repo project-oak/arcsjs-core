@@ -6,10 +6,14 @@
  */
 import {Paths} from '../Core/utils.js';
 
-const fadeIn = () => Object.assign(document.body.style, {opacity: 1, transition: 'opacity 300ms ease-out'});
+const fadeIn = () => globalThis.document &&
+  Object.assign(globalThis.document.body.style, {opacity: 1, transition: 'opacity 300ms ease-out'})
+  ;
+const fadeOut = () => globalThis.document && (globalThis.document.body.style.opacity = 0);
+  ;
 
 export const quickStart = async (App, url, extraPaths) => {
-  document.body.style.opacity = 0;
+  fadeOut();
   configurePaths(Paths, url, extraPaths);
   const app = await boot(App, Paths);
   setTimeout(fadeIn, 100);

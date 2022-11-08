@@ -1,12 +1,9 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
-
 import {EventEmitter} from './EventEmitter.js';
 import {Host} from './Host.js';
 import {logFactory} from '../utils/log.js';
@@ -15,8 +12,10 @@ import {Store} from './Store.js';
 
 const customLogFactory = (id: string) => logFactory(logFactory.flags.arc, `Arc (${id})`, 'slateblue');
 
-const {assign, keys, entries, create} = Object;
-const values = (o):any[] => Object.values(o);
+const {assign, create} = Object;
+const entries = (o):any[] => Object.entries(o ?? Object);
+const keys = (o):any[] => Object.keys(o ?? Object);
+const values = (o):any[] => Object.values(o ?? Object);
 const nob = () => create(null);
 
 export class Arc extends EventEmitter {
@@ -68,6 +67,7 @@ export class Arc extends EventEmitter {
   addStore(storeId, store) {
     if (store && !this.stores[storeId]) {
       this.stores[storeId] = store;
+      this.storeChanged(storeId, store);
       store.listen('change', () => this.storeChanged(storeId, store), this.id);
     }
   }
@@ -81,7 +81,7 @@ export class Arc extends EventEmitter {
   // TODO(sjmiles): 2nd param is used in overrides, make explicit
   protected storeChanged(storeId, store) {
     this.log(`storeChanged: "${storeId}"`);
-    const isBound = inputs => inputs && inputs.some(input => values(input)[0] == storeId || keys(input)[0] == storeId);
+    const isBound = inputs => inputs && inputs.some(input => input && (values(input)[0] == storeId || keys(input)[0] == storeId));
     values(this.hosts).forEach(host => {
       const inputs = host.meta?.inputs;
       if (inputs === '*' || isBound(inputs)) {
@@ -114,7 +114,7 @@ export class Arc extends EventEmitter {
       const staticInputs = host.meta?.staticInputs;
       assign(inputs, staticInputs);
       if (inputBindings) {
-        inputBindings.forEach(input => this.computeInput(entries(input)[0], inputs));
+        inputBindings.forEach(input => input && this.computeInput(entries(input)[0], inputs));
         this.log(`computeInputs(${host.id}) =`, inputs);
       }
     }

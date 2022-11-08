@@ -6,10 +6,16 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-
-
 export const DevToolsRecipe = {
+  $stores: {
+    graphs: {
+      $type: '[Pojo]',
+      $tags: ['persisted'],
+      $value: []
+    }
+  },
   devTools: {
-    $kind: "$library/DevTools/DevTools"
+    $kind: "$library/DevTools/DevTools",
+    $inputs: ['graphs']
   }
 };

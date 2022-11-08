@@ -1,97 +1,115 @@
 /**
+ * @license
  * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
 /* global themeRules */
 ({
-  async update({show}, state, {service}) {
-    if (show === true) {
-      state.showTools = true;
-      this.refresh(state, service);
-    }
-  },
-  async refresh(state, service) {
-    const context = await service({msg: 'request-context'});
-    assign(state, context);
-    state.kick = Math.random();
-  },
-  render({}, {runtime, showTools, capturedState, kick}) {
-    const user = runtime;
-    const users = runtime?.users || {user};
-    const storeBools = user && keys(user.stores).reduce((map, key) => (map[key] = false, map), {});
-    const hosts = this.renderAllHosts(users);
-    const stores = this.renderAllStores(users);
-    return {
-      kick,
-      showTools,
-      particles: hosts,
-      stores,
-      context: {stores: stores.user, hosts: hosts.user},
-      version: Math.random(),
-      storeBools,
-      capturedState
-    };
-  },
-  map(object, visitor) {
-    const result = {};
-    object && entries(object).map(([name, elt]) => result[name] = visitor(elt));
-    return result;
-  },
-  renderAllHosts(users) {
-    const mapHosts = arcs => this.map(arcs, arc => this.renderHosts(arc.hosts));
-    return this.map(users, user => mapHosts(user?.arcs));
-  },
-  renderHosts(hosts) {
-    return this.map(hosts, ({meta, particle: {internal: {state, inputs}}}) => {
-      const filtered = {};
-      keys(state)
-        .filter(key => (key !== 'runtime') && (typeof state[key] !== 'function'))
-        .forEach(key => filtered[key] = state[key])
-        ;
-      return {meta, inputs, state: filtered};
-    });
-  },
-  renderAllStores(users) {
-    return this.map(users, user => this.renderSimpleStores(user?.stores));
-  },
-  renderSimpleStores(stores) {
-    const result = {};
-    const mappedStores = this.map(stores, ({data, meta}) => ({value: data, meta}));
-    //const kbSize = value => !isNaN(value) ? `${(value / 1024).toFixed(1)} Kb` : '';
-    entries(mappedStores).forEach(([name, store]) => {
-      // TODO(sjmiles): really slow for big stores
-      //result[`${name} (${kbSize(stores[name]?.save()?.length)})`] = store;
-      result[name] = store;
-    });
-    return result;
-  },
-  async onToggleDevToolsClick(inputs, state, {service}) {
-    if (this.toggleState(state, 'showTools')) {
-      await this.refresh(state, service);
-    }
-  },
-  toggleState(state, name) {
-    return state[name] = !state[name];
-  },
-  async onRefreshClick(inputs, state, {service}) {
-    return this.refresh(state, service);
-  },
-  async onCaptureState(inputs, state, {service}) {
-    const capturedState = await service({kind: 'DevToolsService', msg: 'stateCapture'});
-    state.capturedState = {state: capturedState};
-  },
-  async onCreateTest(inputs, state, {service}) {
-    const capturedState = await service({kind: 'DevToolsService', msg: 'stateCapture'});
-    const name = 'auto_captured_state';
-    state.capturedState = {[name]: capturedState};
-    const put = (url, body) => fetch(url, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body});
-    put(`https://arcsjs-apps.firebaseio.com/test/specs/${name}.json`, JSON.stringify(capturedState));
-  },
-  async onTabSelected(inputs, state, {service}) {
-    return this.refresh(state, service);
-  },
-  template: html`
+async update({graphs, show}, state, {service}) {
+  if (graphs && !state.selectedGraph) {
+    state.selectedGraph = graphs?.[0];
+  }
+  if (show === true) {
+    state.showTools = true;
+    this.refresh(state, service);
+  }
+},
+async refresh(state, service) {
+  const context = await service({msg: 'request-context'});
+  assign(state, context);
+  state.kick = Math.random();
+},
+render({graphs}, {runtime, showTools, capturedState, kick, selectedGraph}) {
+  const user = runtime;
+  const users = runtime?.users || {user};
+  const storeBools = user && keys(user.stores).reduce((map, key) => (map[key] = false, map), {});
+  const hosts = this.renderAllHosts(users);
+  const stores = this.renderAllStores(users);
+  //
+  const graphText = JSON.stringify(selectedGraph, null, '  ');
+  const graphOptions = !graphs ? [] : graphs.map(({$meta}) => $meta);
+  //
+  return {
+    kick,
+    showTools,
+    particles: hosts,
+    stores,
+    context: {stores: stores.user, hosts: hosts.user},
+    version: Math.random(),
+    storeBools,
+    capturedState,
+    graphText,
+    graphOptions
+  };
+},
+map(object, visitor) {
+  const result = {};
+  object && entries(object).map(([name, elt]) => result[name] = visitor(elt));
+  return result;
+},
+renderAllHosts(users) {
+  const mapHosts = arcs => this.map(arcs, arc => this.renderHosts(arc.hosts));
+  return this.map(users, user => mapHosts(user?.arcs));
+},
+renderHosts(hosts) {
+  return this.map(hosts, ({meta, particle: {internal: {state, inputs}}}) => {
+    const filtered = {};
+    keys(state)
+      .filter(key => (key !== 'runtime') && (typeof state[key] !== 'function'))
+      .forEach(key => filtered[key] = state[key])
+      ;
+    return {meta, inputs, state: filtered};
+  });
+},
+renderAllStores(users) {
+  return this.map(users, user => this.renderSimpleStores(user?.stores));
+},
+renderSimpleStores(stores) {
+  const result = {};
+  const mappedStores = this.map(stores, ({data, meta}) => ({value: data, meta}));
+  //const kbSize = value => !isNaN(value) ? `${(value / 1024).toFixed(1)} Kb` : '';
+  entries(mappedStores).forEach(([name, store]) => {
+    // TODO(sjmiles): really slow for big stores
+    //result[`${name} (${kbSize(stores[name]?.save()?.length)})`] = store;
+    result[name] = store;
+  });
+  return result;
+},
+async onToggleDevToolsClick(inputs, state, {service}) {
+  if (this.toggleState(state, 'showTools')) {
+    await this.refresh(state, service);
+  }
+},
+toggleState(state, name) {
+  return state[name] = !state[name];
+},
+async onRefreshClick(inputs, state, {service}) {
+  return this.refresh(state, service);
+},
+async onCaptureState(inputs, state, {service}) {
+  const capturedState = await service({kind: 'DevToolsService', msg: 'stateCapture'});
+  state.capturedState = {state: capturedState};
+},
+async onCreateTest(inputs, state, {service}) {
+  const capturedState = await service({kind: 'DevToolsService', msg: 'stateCapture'});
+  const name = 'auto_captured_state';
+  state.capturedState = {[name]: capturedState};
+  const put = (url, body) => fetch(url, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body});
+  put(`https://arcsjs-apps.firebaseio.com/test/specs/${name}.json`, JSON.stringify(capturedState));
+},
+async onTabSelected(inputs, state, {service}) {
+  return this.refresh(state, service);
+},
+onSelectGraph({eventlet: {value}, graphs}, state, {service}) {
+  state.selectedGraph = graphs?.find(({$meta}) => $meta?.name === value);
+},
+async onAddGraphClick({graphs}, {selectedGraph}, {service}) {
+  if (selectedGraph) {
+    return service({msg: 'addGraph', data: {graph: selectedGraph}});
+  }
+},
+template: html`
 <style>
   :host {
     position: absolute;
@@ -178,7 +196,15 @@
     <mwc-icon-button icon="refresh" on-click="onRefreshClick"></mwc-icon-button>
   </div>
   <!-- tabbed pages -->
-  <mxc-tab-pages dark flex tabs="Stores,Particles,Resources,DOM,Graphs,Tests" on-selected="onTabSelected">
+  <mxc-tab-pages dark flex tabs="Graphs,Stores,Particles,Resources,DOM,Charts,Tests" on-selected="onTabSelected">
+    <!-- Graphs -->
+    <div flex scrolling>
+      <div toolbar>
+        <multi-select options="{{graphOptions}}" on-change="onSelectGraph"></multi-select>
+        <mwc-icon-button icon="refresh" on-click="onAddGraphClick"></mwc-icon-button>
+      </div>
+      <code-mirror flex text="{{graphText}}"></code-mirror>
+    </div>
     <!-- Stores -->
     <data-explorer flex scrolling object="{{stores}}" expand></data-explorer>
     <!-- Arcs -->
