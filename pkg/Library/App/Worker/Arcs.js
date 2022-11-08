@@ -7,8 +7,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import {MessageBus} from './MessageBus.js';
-import {XenComposer as Composer} from '../../Dom/Surfaces/Default/XenComposer.js';
 import {logFactory} from '../../Core/utils.min.js';
+import {XenComposer as Composer} from '../../Dom/Surfaces/Default/XenComposer.js';
 
 // n.b. lives in 'top' context
 
@@ -44,18 +44,6 @@ let composer;
 
 const renderPacket = packet =>  {
   composer?.render(packet);
-};
-
-arcs.setComposerRoot = root => {
-  if (root) {
-    // make a composer suitable for rendering on our document
-    composer = new Composer(root, true);
-    // channel local events into vibrations
-    composer.onevent = (pid, eventlet) => {
-      socket.sendVibration({kind: 'handleEvent', pid, eventlet});
-    };
-    socket.sendVibration({kind: 'rerender'});
-  }
 };
 
 // n.b. vibrational paths are worker-relative
@@ -122,6 +110,18 @@ arcs.get = async (arc, storeKey) => {
   });
 };
 
+arcs.setComposerRoot = root => {
+  if (root) {
+    // make a composer suitable for rendering on our document
+    composer = new Composer(root, true);
+    // channel local events into vibrations
+    composer.onevent = (pid, eventlet) => {
+      socket.sendVibration({kind: 'handleEvent', pid, eventlet});
+    };
+    socket.sendVibration({kind: 'rerender'});
+  }
+};
+
 arcs.addPaths         = (paths)                   => socket.sendVibration({kind: 'addPaths', paths});
 arcs.createArc        = (arc)                     => socket.sendVibration({kind: 'createArc', arc});
 arcs.createParticle   = (name, arc, meta, code)   => socket.sendVibration({kind: 'createParticle', name, arc, meta, code});
@@ -129,7 +129,7 @@ arcs.destroyParticle  = (name, arc)               => socket.sendVibration({kind:
 arcs.updateParticle   = (particle, code, arc)     => socket.sendVibration({kind: 'updateParticle', particle, code, arc});
 arcs.setInputs        = (arc, particle, inputs)   => socket.sendVibration({kind: 'setInputs', arc, particle, inputs});
 arcs.addRecipe        = (arc, recipe)             => socket.sendVibration({kind: 'addRecipe', recipe, arc});
-arcs.addRecipes      = (arc, recipes)            => socket.sendVibration({kind: 'addRecipes', recipes, arc});
+arcs.addRecipes       = (arc, recipes)            => socket.sendVibration({kind: 'addRecipes', recipes, arc});
 arcs.set              = (arc, storeKey, data)     => socket.sendVibration({kind: 'setStoreData', arc, storeKey, data});
 arcs.setOpaqueData    = (key, data)               => socket.sendVibration({kind: 'setOpaqueData', key, data});
 

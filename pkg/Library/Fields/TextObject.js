@@ -7,6 +7,12 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
+render({text, textStyle}) {
+  if (text && !(typeof text === 'string')) {
+    text = JSON.stringify(text);
+  }
+  return {text, textStyle};
+},
 template: html`
 <style>
   :host {

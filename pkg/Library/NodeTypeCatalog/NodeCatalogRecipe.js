@@ -37,7 +37,7 @@ export const NodeCatalogRecipe = {
           $outputs: [{'search': 'nodeSearch'}]
         }
       },
-      nodetypes: {
+      nodeList: {
         NodeList: {
           $kind: '$library/NodeTypeCatalog/NodeList',
           $inputs: [

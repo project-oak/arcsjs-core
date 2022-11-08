@@ -8,30 +8,12 @@ import * as core from '../Core/core.js';
 import {deepEqual} from '../Core/utils.js';
 import * as packager from './packager.js';
 import '../../dependencies/ses/ses.umd.min.js';
+import {SafeObject} from './safe-object.js';
 
 const {logFactory} = core;
 
 const requiredLog = logFactory(true, 'SES', 'goldenrod');
 const log = logFactory('isolation', 'SES', 'goldenrod');
-
-const {assign, keys, entries, values, create} = Object;
-const SafeObject = {
-  create,
-  assign,
-  keys(o) {
-    return o ? keys(o) : [];
-  },
-  values(o) {
-    return o ? values(o) : [];
-  },
-  entries(o) {
-    return o ? entries(o) : [];
-  },
-  mapBy(a, keyGetter) {
-    return a ? values(a).reduce((map, item) => (map[keyGetter(item)] = item, map), {}) : {};
-  },
-  deepEqual
-};
 
 const {lockdown, Compartment} = globalThis;
 let particleCompartment;
@@ -89,7 +71,8 @@ export const particleIndustry = async (kind, options) => {
   // injections
   const log = createLogger(kind);
   const injections = {
-    log, SafeObject,
+    log,
+    SafeObject: {...SafeObject, deepEqual},
     ...options?.injections
   };
   harden(injections);

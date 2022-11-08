@@ -6,9 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {logFactory} from '../../Library/Core/utils.min.js';
-import {App} from '../../Library/App/Worker/App.js';
-import {LocalStoragePersistor} from '../../Library/LocalStorage/LocalStoragePersistor.js';
+import {logFactory, App, LocalStoragePersistor} from './config/arcs.js';
 // import {HistoryService} from '../../Library/App/HistoryService.js';
 // import {MediaService} from '../../Library/NewMedia/MediaService.js';
 // import {GoogleApisService} from '../../Library/Goog/GoogleApisService.js';
@@ -18,7 +16,7 @@ import {LocalStoragePersistor} from '../../Library/LocalStorage/LocalStoragePers
 // import {TensorFlowService} from '../../Library/TensorFlow/TensorFlowService.js';
 // import {CocoSsdService} from '../../Library/TensorFlow/CocoSsdService.js';
 // import {ShaderService} from '../../Library/Shader/ShaderService.js';
-import {SkeletonRecipe} from './SkeletonRecipe.js';
+import {SkeletonRecipe} from './Library/SkeletonRecipe.js';
 
 const log = logFactory(true, 'Skeleton', 'navy');
 

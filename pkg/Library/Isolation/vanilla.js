@@ -6,32 +6,17 @@
  */
 import * as core from '../Core/core.js';
 import * as packager from './packager.js';
+import {SafeObject} from './safe-object.js';
 
 const {logFactory, Paths} = core;
 const log = logFactory('isolation', 'vanilla', 'goldenrod');
 
-const makeKey = () => `i${Math.floor((1 + Math.random() * 9) * 1e14)}`;
-const timeout = async (func, delayMs) => new Promise(resolve => setTimeout(() => resolve(func()), delayMs));
 const {deepEqual} = core.utils;
 
-const {assign, keys, entries, values, create} = Object;
-const SafeObject = {
-  create,
-  assign,
-  keys(o) {
-    return o ? keys(o) : [];
-  },
-  values(o) {
-    return o ? values(o) : [];
-  },
-  entries(o) {
-    return o ? entries(o) : [];
-  },
-  mapBy(a, keyGetter) {
-    return a ? values(a).reduce((map, item) => (map[keyGetter(item)] = item, map), {}) : {};
-  },
-  deepEqual
-};
+const html = (strings, ...values) => `${strings[0]}${values.map((v, i) => `${v}${strings[i + 1]}`).join('')}`.trim();
+const makeKey = () => `i${Math.floor((1 + Math.random() * 9) * 1e14)}`;
+const timeout = async (func, delayMs) => new Promise(resolve => setTimeout(() => resolve(func()), delayMs));
+const resolve = Paths.resolve.bind(Paths);
 
 export const initVanilla = options => {
   // requiredLog.groupCollapsed('(NO) LOCKDOWN');
@@ -55,9 +40,6 @@ export const initVanilla = options => {
   }
 };
 
-const resolve = Paths.resolve.bind(Paths);
-const html = (strings, ...values) => `${strings[0]}${values.map((v, i) => `${v}${strings[i + 1]}`).join('')}`.trim();
-
 export const particleIndustry = async (kind, options) => {
   // snatch up the custom particle code
   const implCode = await core.code.requireParticleImplCode(kind, options);
@@ -65,7 +47,8 @@ export const particleIndustry = async (kind, options) => {
   const implFactory = await requireImplFactory(kind, implCode);
   // injections
   const log = createLogger(kind);
-  const injections = {log, resolve, html, ...options?.injections, SafeObject};
+  const injections = {log, resolve, html, ...options?.injections, SafeObject: {...SafeObject, deepEqual},
+};
   // construct 3P prototype
   const proto = implFactory(injections);
   // ensure our Particle constructor exists,
@@ -85,6 +68,7 @@ export const particleIndustry = async (kind, options) => {
 
 const requireImplFactory = async (kind, implCode) => {
   let proto;
+  globalThis.html = html;
   try {
     // evaluate
     proto = (0, eval)(implCode);

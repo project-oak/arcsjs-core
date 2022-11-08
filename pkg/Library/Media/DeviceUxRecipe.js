@@ -23,7 +23,7 @@ export const DeviceUxRecipe = {
     mediaDevices: {
       $type: '[JSON]',
       noinspect: true
-    },
+    }
   },
   deviceUx: {
     $kind: 'Media/DeviceUx',

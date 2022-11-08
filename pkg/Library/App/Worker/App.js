@@ -7,7 +7,7 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import {Arcs} from './Arcs.js';
-import {loadCss} from '../../Dom/dom.js';
+//import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
 import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
 import {themeRules} from '../theme.js';
@@ -22,7 +22,7 @@ export const App = class {
   }
   constructor(paths, root) {
     this.paths = paths;
-    this.root = root || document.body;
+    this.root = root || globalThis.document?.body;
     log(JSON.stringify(paths, null, '  '));
   }
   get arcs() {
@@ -35,7 +35,7 @@ export const App = class {
       onservice: this.service.bind(this),
       injections: {themeRules, ...this.injections}
     });
-    await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
+    //await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     // TODO(sjmiles): pick a syntax
     const recipes = [DevToolsRecipe, ...(this.recipes ?? this.recipes ?? [])];
     await Arcs.addRecipes('user', recipes);
