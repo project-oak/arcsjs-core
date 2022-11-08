@@ -13,9 +13,9 @@ import {NodeTypes} from '../NodeTypes.js';
 import {initVanilla} from '../../Isolation/vanilla.js';
 import '../../Dom/common.js';
 
+// set up isolation
 initVanilla();
 
-// set up isola
 export class Graphinator extends Xen.Async {
   static get observedAttributes() {
     return ['graph', 'paths'];
