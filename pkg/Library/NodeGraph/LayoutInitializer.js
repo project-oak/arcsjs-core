@@ -34,6 +34,8 @@ computeLayout({$meta: {id}, nodes}, positions) {
   entries(positions).forEach(([id, position]) => {
     if (nodes[id]) {
       layout[id] = position;
+      const containerId = `${id}:Container`;
+      layout[containerId] = positions[containerId];
     }
     // Consider also deleting positions of non existent nodes?
   });

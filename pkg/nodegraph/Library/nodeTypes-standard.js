@@ -18,7 +18,6 @@ import {JSONataNode} from '../../Library/JSONata/JSONataNode.js';
 import {CocoSsdNode} from '../../Library/TensorFlow/CocoSsdNode.js';
 import {MobilenetNode} from '../../Library/TensorFlow/MobilenetNodes.js';
 import {GoogleMapNode} from '../../Library/Goog/GoogleMapNode.js';
-import {MacroRunnerNode} from '../../Library/Goog/MacroRunnerNode.js';
 import * as fieldNodes from '../../Library/Fields/FieldNodes.js';
 import * as nodeGraphNodes from '../../Library/NodeGraph/NodeGraphNodes.js';
 import * as testNodes from './TestNodes.js';
@@ -46,7 +45,6 @@ const nodeTypesList = [
   ...values(displayNodes),
   ...values(customNodes),
   GoogleMapNode,
-  MacroRunnerNode,
   //SceneNode,
   //
   ...values(nodeGraphNodes),
