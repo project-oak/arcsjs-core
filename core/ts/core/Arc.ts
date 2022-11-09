@@ -67,7 +67,6 @@ export class Arc extends EventEmitter {
   addStore(storeId, store) {
     if (store && !this.stores[storeId]) {
       this.stores[storeId] = store;
-      this.storeChanged(storeId, store);
       store.listen('change', () => this.storeChanged(storeId, store), this.id);
     }
   }
