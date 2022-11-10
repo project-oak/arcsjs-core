@@ -27,8 +27,11 @@ export class NodeGraph extends Xen.Async {
     this.rects = {};
   }
   onNodeSelect(event) {
-    //event.stopPropagation();
+    //event.stopPropagation();    
     this.key = event.currentTarget.key;
+    if (this.key !== this.state.textSelectedKey) {
+      delete this.state.textSelectedKey;
+    }
     this.fire('node-selected');
   }
   // called when user has changed a rectangle
@@ -94,7 +97,7 @@ export class NodeGraph extends Xen.Async {
     const renderNodes = (rects && graph?.graphNodes) ?? [];
     return renderNodes.map(n => this.renderGraphNode(n));
   }
-  renderGraphNode({key, selected, color, bgColor, inputs, outputs, ...etc}) {
+  renderGraphNode({key, selected, color, bgColor, inputs, outputs, textSelected, ...etc}) {
     return {
       ...etc,
       key,
@@ -112,8 +115,9 @@ export class NodeGraph extends Xen.Async {
         borderColor: selected ? color : bgColor,
         color: selected ? 'white' : 'gray',
         background: bgColor,
-      }
-    }
+      },
+      contenteditable: String(textSelected || (key === this.state.textSelectedKey))
+    };
   }
   _didRender({graph, rects}, {x, y}) {
     if (rects) {
@@ -209,7 +213,7 @@ export class NodeGraph extends Xen.Async {
     ctx.bezierCurveTo(path[2], path[3], path[4], path[5], path[6], path[7]);
     ctx.stroke();
     ctx.closePath();
-  };
+  }
   laserCurve(ctx, path, highlight) {
     // lasers!!!!
     for (let i=3; i>=0; i--) {
@@ -222,7 +226,31 @@ export class NodeGraph extends Xen.Async {
       ctx.stroke();
       ctx.closePath();
     }
-  };
+  }
+
+  onNodeDblClicked(event) {
+    this.state.textSelectedKey = this.key;
+    // this.selectNodeName(event);
+  }
+
+  // selectNodeName(event) {
+  //   const txtNode = event.currentTarget.childNodes[1];
+  //   if (txtNode) {
+  //     const range = document.createRange();
+  //     range.selectNodeContents(txtNode);
+  //     const sel = window.getSelection();
+  //     sel.removeAllRanges();
+  //     sel.addRange(range);
+  //   }
+  // }
+
+  onRenameNode(event){
+    const text = event.target.textContent?.trim();
+    if (text?.length > 0) {
+      this.value = text;
+      this.fire('node-renamed');
+    }
+  }
 }
 
 const template = Xen.Template.html`
@@ -312,8 +340,8 @@ const template = Xen.Template.html`
 
 <template node_t>
   <div node flex column id="{{nodeId}}" key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-mousedown="onNodeSelect">
-    <div xen:style="{{nameStyle}}">
-      <div style="text-align: center; padding: 4px;">{{displayName}}</div>
+    <div xen:style="{{nameStyle}}" on-dblclick="onNodeDblClicked">
+      <div contenteditable$="{{contenteditable}}" style="text-align: center; padding: 4px;" on-blur="onRenameNode">{{displayName}}</div>
     </div>
     <div flex row>
       <div centering column repeat="socket_i_t">{{inputs}}</div>
