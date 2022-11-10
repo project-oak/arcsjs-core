@@ -13,13 +13,18 @@ export const CameraNode = {
     category: 'Media'
   },
   $stores: {
-    // mediaDevices: DeviceUxRecipe.$stores.mediaDevices,
-    mediaDevice: {
+    mediaDevices: {
       $type: '[JSON]',
       connection: true,
-      noinspect: true
+      noinspect: true,
+      nodisplay: true
     },
-    mediaDeviceState: DeviceUxRecipe.$stores.mediaDeviceState,
+    mediaDeviceState: {
+      $type: 'MedaDeviceState',
+      connection: true,
+      noinspect: true,
+      nodisplay: true
+    },
     stream: {
       $type: 'Stream',
       $value: 'default'
@@ -43,7 +48,6 @@ export const CameraNode = {
     $slots: {
       device: {
         deviceUx: DeviceUxRecipe.deviceUx,
-        // defaultStream: DeviceUxRecipe.defaultStream
       },
       capture: {
         imageCapture: {

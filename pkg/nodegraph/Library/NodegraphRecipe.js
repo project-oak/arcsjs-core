@@ -15,7 +15,8 @@ const globalStores = [
   'nodeTypes',
   'categories',
   'nodeId',
-  'mediaDevices'
+  'mediaDevices',
+  'mediaDeviceState'
 ];
 
 const GraphToolbar = {
@@ -309,7 +310,8 @@ export const NodegraphRecipe = {
     newNodeInfos: {
       $type: '[Pojo]'
     },
-    mediaDevices: DeviceUxRecipe.$stores.mediaDevices
+    mediaDevices: DeviceUxRecipe.$stores.mediaDevices,
+    mediaDeviceState: DeviceUxRecipe.$stores.mediaDeviceState
   },
   ...RecipeBuilder,
   ...Layout,
