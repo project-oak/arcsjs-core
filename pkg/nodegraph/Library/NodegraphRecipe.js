@@ -33,7 +33,8 @@ const GraphToolbar = {
     $inputs: [
       {graph: 'selectedGraph'},
       'graphs',
-      {event: 'graphToolbarEvent'}
+      {event: 'graphToolbarEvent'},
+      'mediaDeviceState'
     ],
     $staticInputs: {
       publishPaths: {}
@@ -43,7 +44,8 @@ const GraphToolbar = {
       'selectedNodeId',
       'graphs',
       {icons: 'graphToolbarIcons'},
-      {event: 'graphToolbarEvent'}
+      {event: 'graphToolbarEvent'},
+      'mediaDeviceState'
     ],
     $slots: {
       buttons: {

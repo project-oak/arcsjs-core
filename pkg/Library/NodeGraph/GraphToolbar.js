@@ -8,7 +8,7 @@
  */
 ({
   async update(inputs, state, tools) {
-    const {graph, graphs} = inputs;
+    const {graph, graphs, mediaDeviceState} = inputs;
     const {service} = tools;
     const outputs = {};
     if (graph) {
@@ -16,6 +16,7 @@
         if (state.graph?.$meta?.id !== graph.$meta.id) {
           await this.updateSelectedGraphHistory(graph, service);
           outputs['selectedNodeId'] = keys(graph.nodes)?.[0];
+          outputs['mediaDeviceState'] = this.resetMediaDeviceState(mediaDeviceState);
         }
         state.graph = graph;
         assign(outputs, {
@@ -46,6 +47,10 @@
         graph: graph?.$meta?.id
       }
     });
+  },
+  resetMediaDeviceState(mediaDeviceState) {
+    keys(mediaDeviceState).forEach(key => mediaDeviceState[key] = false);
+    return mediaDeviceState;
   },
   updateItemInGraphs(graph, graphs) {
     const index = this.findGraphIndex(graph, graphs);
