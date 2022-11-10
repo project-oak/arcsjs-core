@@ -269,7 +269,6 @@ export const NodegraphRecipe = {
     graphs: {
       $type: '[Pojo]',
       $tags: ['persisted'],
-      $value: []
     },
     selectedGraph: {
       $type: 'Pojo',
