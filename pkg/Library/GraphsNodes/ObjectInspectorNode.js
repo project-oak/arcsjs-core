@@ -11,7 +11,8 @@ export const ObjectInspectorNode = {
   },
   $stores: {
     inspectorData: {
-      $type: 'JSON'
+      $type: 'JSON',
+      noinspect: true
     }
   },
   inspector: {
