@@ -17,6 +17,7 @@ import '../D3/d3p/visual-arc/data-graph.js';
 import '../Goog/good-map/good-map.js';
 import '../NewMedia/image-resource.js';
 import '../Media/simple-audio.js';
+import '../Media/audio/speech-recognizer';
 import '../Media/media-stream/video-view.js';
 import '../Media/media-stream/stream-view.js';
 //

@@ -34,6 +34,8 @@ template: html`
   }
 </style>
 
+<div frame="device"></div>
+
 <page-group flex column>
 
   <!-- page 1 -->

@@ -115,7 +115,7 @@ updateNoDisplayConnections(node, nodeType, candidates) {
   return keys(nodeType?.$stores)
     .map(store => {
       if (candidates[store] && nodeType.$stores[store].nodisplay) {
-        node.connections[store] = [candidates[store].map(this.formatConnection)];
+        node.connections[store] = candidates[store].map(this.formatConnection);
         return true;
       }
     })
@@ -128,7 +128,10 @@ parseConnection(connection) {
 },
 
 formatConnection({from, storeName}) {
-  return `${from}${this.connectionDelimiter}${storeName}`;
+  if (from?.length > 0) {
+    return `${from}${this.connectionDelimiter}${storeName}`;
+  }
+  return storeName;
 }
 
 });

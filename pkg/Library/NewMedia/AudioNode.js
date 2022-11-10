@@ -6,10 +6,10 @@
  */
 import {DeviceUxRecipe} from '../Media/DeviceUxRecipe.js';
 
-export const CameraNode = {
+export const AudioNode = {
   $meta: {
-    id: 'CameraNode',
-    displayName: "Camera",
+    id: 'AudioNode',
+    displayName: "Audio",
     category: 'Media'
   },
   $stores: {
@@ -25,35 +25,28 @@ export const CameraNode = {
       noinspect: true,
       nodisplay: true
     },
-    stream: {
-      $type: 'Stream',
-      $value: 'default'
-    },
-    fps: {
-      $type: 'Number',
-      $value: 30
-    },
-    frame: {
-      $type: 'Image',
+    transcript: {
+      $type: 'String',
       noinspect: true,
       nomonitor: true
     }
   },
-  camera: {
-    $kind: '$library/NewMedia/Camera',
+  audio: {
+    $kind: '$library/NewMedia/SpeechRecognizer',
     $staticInputs: {
       stream: 'default'
     },
-    $outputs: ['stream', 'frame'],
+    $inputs: ['mediaDeviceState'],
+    $outputs: ['transcript', 'mediaDeviceState'],
     $slots: {
       device: {
         deviceUx: DeviceUxRecipe.deviceUx,
       },
-      capture: {
-        imageCapture: {
-          $kind: '$library/NewMedia/ImageCapture',
-          $inputs: ['stream', 'fps'],
-          $outputs: ['frame']
+      transcript: {
+        textCapture: {
+          $kind: '$library/Fields/TextField',
+          $inputs: [{value: 'transcript'}],
+          $staticInputs: {label: 'transcript'}
         }
       }
     }

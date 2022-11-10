@@ -7,6 +7,7 @@
 import {nodeTypes, categories} from './nodeTypes.js';
 import {customInspectors} from './customInspectors.js';
 import {NodeCatalogRecipe} from '../../Library/NodeTypeCatalog/NodeCatalogRecipe.js';
+import {DeviceUxRecipe} from '../../Library/Media/DeviceUxRecipe.js';
 
 const globalStores = [
   'selectedNode',
@@ -14,6 +15,8 @@ const globalStores = [
   'nodeTypes',
   'categories',
   'nodeId',
+  'mediaDevices',
+  'mediaDeviceState'
 ];
 
 const GraphToolbar = {
@@ -306,7 +309,9 @@ export const NodegraphRecipe = {
     },
     newNodeInfos: {
       $type: '[Pojo]'
-    }
+    },
+    mediaDevices: DeviceUxRecipe.$stores.mediaDevices,
+    mediaDeviceState: DeviceUxRecipe.$stores.mediaDeviceState
   },
   ...RecipeBuilder,
   ...Layout,
@@ -319,7 +324,10 @@ export const NodegraphRecipe = {
       preview: Preview,
       editor: NodeEditor,
       inspector: Inspector,
-      tree: NodeTree
+      tree: NodeTree,
+      device: {
+        defaultStream: DeviceUxRecipe.defaultStream
+      }
     }
   },
 };
