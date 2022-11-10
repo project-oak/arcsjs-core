@@ -13,7 +13,12 @@ export const AudioNode = {
     category: 'Media'
   },
   $stores: {
-    mediaDevices: DeviceUxRecipe.$stores.mediaDevices,
+    // mediaDevices: DeviceUxRecipe.$stores.mediaDevices,
+    mediaDevice: {
+      $type: '[JSON]',
+      connection: true,
+      noinspect: true
+    },
     mediaDeviceState: DeviceUxRecipe.$stores.mediaDeviceState,
     transcript: {
       $type: 'String',
@@ -31,7 +36,7 @@ export const AudioNode = {
     $slots: {
       device: {
         deviceUx: DeviceUxRecipe.deviceUx,
-        defaultStream: DeviceUxRecipe.defaultStream
+        // defaultStream: DeviceUxRecipe.defaultStream
       },
       transcript: {
         textCapture: {
