@@ -14,7 +14,7 @@ async update(inputs, state) {
   if (event !== state.event) {
     state.event = event;
     if (event) {
-      const result = this.handleEvent(inputs);
+      const result = this.handleEvent(inputs, state);
       if (keys(result).length > 0) {
         return result;
       }
@@ -42,17 +42,17 @@ render(inputs, state) {
   };
 },
 
-renderGraph(inputs) {
+renderGraph(inputs, state) {
   return {
     name: inputs.graph?.$meta?.name,
-    graphNodes: this.renderGraphNodes(inputs),
+    graphNodes: this.renderGraphNodes(inputs, state),
     graphEdges: this.renderGraphEdges(inputs)
   };
 },
 
-renderGraphNodes(inputs) {
+renderGraphNodes(inputs, state) {
   const {graph} = inputs;
-  return values(graph?.nodes).map(node => this.renderNode({node, ...inputs}));
+  return values(graph?.nodes).map(node => this.renderNode({node, ...inputs}, state));
 },
 
 renderGraphEdges(inputs) {
@@ -84,7 +84,7 @@ parseConnection(connection) {
   return {from, storeName};
 },
 
-renderNode({node, categories, graph, selectedNodeId, nodeTypes, layout}) {
+renderNode({node, categories, graph, selectedNodeId, nodeTypes, layout}, {selectedNodeText}) {
   const nodeType = nodeTypes[node.type];
   const {category} = nodeType?.$meta || {category: 'n/a'};
   return {
@@ -99,6 +99,7 @@ renderNode({node, categories, graph, selectedNodeId, nodeTypes, layout}) {
     selected: node.id === selectedNodeId,
     inputs: this.renderInputs(node, nodeType),
     outputs: this.renderOutputs(nodeType),
+    textSelected: (node.id === selectedNodeText)
   };
 },
 
@@ -178,10 +179,9 @@ toolbarIcons({selectedNodeId, graph}) {
     key: 'duplicateSelectedNode',
     disabled: !hasSelectedNode
   }, {
-    // TODO(mariakleiner): implement!
     icon: 'drive_file_rename_outline',
     title: 'Rename node',
-    key: 'rename',
+    key: 'renameSelectedNode',
     disabled: !hasSelectedNode
   }];
 },
@@ -190,23 +190,28 @@ onNodeRemove({eventlet: {key}, graph, selectedNodeId}) {
   return this.deleteNode(key, graph, selectedNodeId);
 },
 
-onNodeRenamed({eventlet: {key, value}, graph}) {
+onNodeRenamed({eventlet: {key, value}, graph}, state) {
   // TODO(mariakleiner): renaming doesn't work, when triggered from the menu.
   const node = graph.nodes[key];
   node.displayName = value.trim();
   graph.nodes[node.id] = node;
+  delete state.selectedNodeText;
   return {graph};
 },
 
-handleEvent(inputs) {
+handleEvent(inputs, state) {
   const {event, selectedNodeId} = inputs;
   if (this[event]) {
     return {
-      ...this[event](inputs),
+      ...this[event](inputs, state),
       event: null
     };
   }
   log(`Unhandled event '${event}' for ${selectedNodeId}`);
+},
+
+renameSelectedNode({selectedNodeId}, state) {
+  state.selectedNodeText = selectedNodeId;
 },
 
 deleteSelectedNode({selectedNodeId, graph}) {
@@ -397,7 +402,7 @@ template: html`
           on-node-selected="onNodeSelect"
           Xon-node-hovered="onNodeHovered"
           Xon-node-deleted="onNodeRemove"
-          Xon-node-renamed="onNodeRenamed"
+          on-node-renamed="onNodeRenamed"
           Xon-nodes-duplicated="onNodesDuplicated"
           Xon-add-candidate="onAddCandidate"
           Xon-edge-deleted="onEdgeRemove"
