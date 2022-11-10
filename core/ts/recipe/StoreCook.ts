@@ -39,34 +39,40 @@ export class StoreCook {
     return Promise.all(stores.map(store => task.call(this, runtime, arc, store)));
   }
   static async realizeStore(runtime: Runtime, arc: Arc, rawMeta: StoreMeta) {
+    // potential initialization value
+    let value;
+    // build a StoreMeta out of parts
     const meta = this.constructMeta(runtime, arc, rawMeta);
-    let value = meta?.value;
+    // do we already own this Store?
     let store = mapStore(runtime, meta);
     if (store) {
-      log(`realizeStore: mapped "${rawMeta.name}" to "${store.meta.name}"`);
+      // use a Store
+      log(`realizeStore: mapping "${rawMeta.name}" to "${store.meta.name}"`);
     } else {
-      store = runtime.createStore(meta);
-      log(`realizeStore: created "${meta.name}"`);
-      // TODO(sjmiles): Stores no longer know their own id, so there is a wrinkle here as we
-      // re-route persistence through runtime (so we can bind in the id)
-      // Also: the 'id' is known as 'meta.name' here, this is also a problem
-      // store && (store.persistor = {
-      //   restore: store => runtime.persistor?.restore(meta.name, store),
-      //   persist: () => {}
-      // });
-      // runtime.addStore(meta.name, store);
-      //await store?.restore(meta?.value)
-      runtime.addStore(meta.name, store);
+      log(`realizeStore: creating "${meta.name}"`);
+      // create a Store
+      store = StoreCook.createStore(runtime, meta);
+      // default initial value comes from meta
+      value = meta?.value;
+      // persisted value may override default
       if (store.shouldPersist()) {
         const cached = await store.restore();
         value = (cached == null) ? value : cached;
       }
     }
+    // we have a store for the Arc now
+    arc.addStore(meta.name, store);
+    // it may need a starting value
     if (value !== undefined) {
       log(`setting data to:`, value);
       store.data = value;
     }
-    arc.addStore(meta.name, store);
+  }
+  static createStore(runtime: Runtime, meta: StoreMeta) {
+    // we need to create this Store
+    const store = runtime.createStore(meta);
+    runtime.addStore(meta.name, store);
+    return store;
   }
   static async derealizeStore(runtime: Runtime, arc: Arc, spec: StoreSpec) {
     runtime.removeStore(spec.$name);

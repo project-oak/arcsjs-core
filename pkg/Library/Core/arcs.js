@@ -116,7 +116,6 @@ var Arc = class extends EventEmitter {
   addStore(storeId, store) {
     if (store && !this.stores[storeId]) {
       this.stores[storeId] = store;
-      this.storeChanged(storeId, store);
       store.listen("change", () => this.storeChanged(storeId, store), this.id);
     }
   }
@@ -983,25 +982,30 @@ var StoreCook = class {
     return Promise.all(stores.map((store) => task.call(this, runtime, arc, store)));
   }
   static async realizeStore(runtime, arc, rawMeta) {
+    let value;
     const meta = this.constructMeta(runtime, arc, rawMeta);
-    let value = meta?.value;
     let store = mapStore(runtime, meta);
     if (store) {
-      log4(`realizeStore: mapped "${rawMeta.name}" to "${store.meta.name}"`);
+      log4(`realizeStore: mapping "${rawMeta.name}" to "${store.meta.name}"`);
     } else {
-      store = runtime.createStore(meta);
-      log4(`realizeStore: created "${meta.name}"`);
-      runtime.addStore(meta.name, store);
+      log4(`realizeStore: creating "${meta.name}"`);
+      store = StoreCook.createStore(runtime, meta);
+      value = meta?.value;
       if (store.shouldPersist()) {
         const cached = await store.restore();
         value = cached == null ? value : cached;
       }
     }
+    arc.addStore(meta.name, store);
     if (value !== void 0) {
       log4(`setting data to:`, value);
       store.data = value;
     }
-    arc.addStore(meta.name, store);
+  }
+  static createStore(runtime, meta) {
+    const store = runtime.createStore(meta);
+    runtime.addStore(meta.name, store);
+    return store;
   }
   static async derealizeStore(runtime, arc, spec) {
     runtime.removeStore(spec.$name);

@@ -5,12 +5,12 @@
  * license that can be found in the LICENSE file.
  */
 import {Runtime, Arc, Chef, Paths} from '../../Core/core.js';
-import {JSONataService} from '../../JSONata/JSONataService.js';
 import {Xen} from '../../Dom/Xen/xen-async.js';
 import {XenComposer} from '../../Dom/Surfaces/Default/XenComposer.js';
-import {RecipeBuilder} from '../RecipeBuilder.js';
-import {NodeTypes} from '../NodeTypes.js';
+import {NodeTypes} from '../../GraphsNodes/NodeTypes.js';
+import {JSONataService} from '../../JSONata/JSONataService.js';
 import {initVanilla} from '../../Isolation/vanilla.js';
+import {RecipeBuilder} from '../RecipeBuilder.js';
 import '../../Dom/common.js';
 
 // set up isolation
@@ -44,6 +44,7 @@ export class Graphinator extends Xen.Async {
     }
   }
   async updateGraph(graph) {
+    RecipeBuilder.defaultContainer = '';
     const recipes = RecipeBuilder.construct({graph, nodeTypes: NodeTypes});
     console.groupCollapsed('recipes');
     console.log(JSON.stringify(recipes, null, '  '));
