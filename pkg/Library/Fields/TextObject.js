@@ -9,7 +9,7 @@
 ({
 render({text, textStyle}) {
   if (text && !(typeof text === 'string')) {
-    text = JSON.stringify(text);
+    text = JSON.stringify(text, null, '  ');
   }
   return {text, textStyle};
 },
@@ -19,7 +19,12 @@ template: html`
     min-width: 2em;
     min-height: 4em;
   }
+  pre {
+    margin: 4px;
+    font-size: 0.75em;
+    font-family: sans-serif;
+  }
 </style>
-<div xen:style="{{textStyle}}" flex bar>{{text}}</div>
+<pre xen:style="{{textStyle}}" flex scrolling>{{text}}</pre>
 `
 });

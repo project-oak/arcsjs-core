@@ -330,5 +330,5 @@ export const NodegraphRecipe = {
         defaultStream: DeviceUxRecipe.defaultStream
       }
     }
-  },
+  }
 };
