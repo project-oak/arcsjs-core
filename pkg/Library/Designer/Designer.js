@@ -193,10 +193,14 @@ colorByCategory(category, categories) {
   return categories?.[category]?.color || 'lightblue';
 },
 
-onDrop({eventlet: {value: type}, graph, newNodeInfos}) {
+onDrop({eventlet: {value: {id: type, position}}, graph, newNodeInfos}) {
   if (graph) {
     return {
-      newNodeInfos: [...(newNodeInfos || []), {type}]
+      newNodeInfos: [...(newNodeInfos || []), {
+        type,
+        // Note: `previewLayout` shouldn't be hardcoded
+        previewLayout: position
+      }]
     };
   }
 },

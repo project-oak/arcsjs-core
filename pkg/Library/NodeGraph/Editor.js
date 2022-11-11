@@ -293,20 +293,15 @@ onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-onNodeTypeDropped({eventlet: {key, value: type}, graph, newNodeInfos}) {
+onNodeTypeDropped({eventlet: {value: {id: type, position}}, graph, newNodeInfos}) {
   if (graph) {
     return {
-      newNodeInfos: [...(newNodeInfos || []), {type}]
+      newNodeInfos: [...(newNodeInfos || []), {
+        type,
+        // Note: `nodegraphLayout` shouldn't be hardcoded
+        nodegraphLayout: position
+      }]
     };
-  //   const {svgPoint} = value;
-  //   const newNode = this.makeNewNode(nodeTypes[key], graph.nodes, nodeTypes);
-  //   // graph.nodes = [...graph.nodes, newNode];
-  //   graph.nodes[newNode.id] = newNode;
-  //   return {
-  //     graph,
-  //     selectedNodeId: newNode.id,
-  //     layout: {...layout, [newNode.id]: svgPoint}
-  //   };
   }
 },
 

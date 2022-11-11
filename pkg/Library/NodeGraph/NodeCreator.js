@@ -6,20 +6,22 @@
 
 ({
 
-async update({newNodeInfos, graph, nodeTypes}) {
+async update({newNodeInfos, graph, nodeTypes, ...graphLayouts}) {
   if (newNodeInfos?.length > 0) {
     let selectedNodeId;
-    newNodeInfos.forEach(({type, nodeData}) => {
+    const layoutOutputs = {};
+    newNodeInfos.forEach(({type, nodeData, ...nodeLayouts}) => {
       const newNode = this.makeNewNode(graph, nodeTypes[type]);
       assign(newNode, nodeData);
       graph.nodes[newNode.id] = newNode;
+      this.populateLayouts(newNode.id, nodeLayouts, graphLayouts, layoutOutputs);
       selectedNodeId = newNode.id;
     });
     return {
       newNodeInfos: [],
       graph,
-      selectedNodeId
-      // TODO(mariakleiner): update selectedNodeId and layout (from `nodeData`).
+      selectedNodeId,
+      ...layoutOutputs
     };
   }
 },
@@ -43,6 +45,19 @@ formatDisplayName(name, index) {
 
 formatNodeId(id, index) {
   return `${id}${index}`.replace(/ /g,'');
+},
+
+populateLayouts(nodeId, nodeLayouts, graphLayouts, layoutOutputs) {
+  keys(nodeLayouts).forEach(layoutKey => {
+  if (graphLayouts[layoutKey]) {
+    graphLayouts[layoutKey] = {
+      ...graphLayouts[layoutKey],
+      [nodeId]: nodeLayouts[layoutKey]
+    };
+    assign(layoutOutputs, {[layoutKey]: graphLayouts[layoutKey]});
+  }
+});
+
 }
 
 });
