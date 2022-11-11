@@ -109,14 +109,21 @@ export class NodeGraph extends Xen.Async {
         borderRadius: '11px 11px 0 0',
         borderColor: selected ? color : bgColor,
         background: selected ? color : bgColor,
-        color: selected ? 'white' : 'black',
       },
       style: {
         borderColor: selected ? color : bgColor,
         color: selected ? 'white' : 'gray',
         background: bgColor,
       },
-      contenteditable: String(textSelected || (key === this.state.textSelectedKey))
+      inputStyle: {
+        background: 'transparent',
+        borderColor: 'transparent',
+        borderRadius: '11px 11px 0 0',
+        color: selected ? 'white' : 'black',
+        textAlign: 'center',
+        width: '100%'
+      },
+      disableRename: Boolean(!textSelected && (key !== this.state.textSelectedKey))
     };
   }
   _didRender({graph, rects}, {x, y}) {
@@ -230,7 +237,6 @@ export class NodeGraph extends Xen.Async {
 
   onNodeDblClicked(event) {
     this.state.textSelectedKey = this.key;
-    // this.selectNodeName(event);
   }
 
   // selectNodeName(event) {
@@ -245,11 +251,12 @@ export class NodeGraph extends Xen.Async {
   // }
 
   onRenameNode(event){
-    const text = event.target.textContent?.trim();
+    const text = event.target.value.trim();
     if (text?.length > 0) {
       this.value = text;
       this.fire('node-renamed');
     }
+    delete this.state.textSelectedKey;
   }
 }
 
@@ -341,7 +348,7 @@ const template = Xen.Template.html`
 <template node_t>
   <div node flex column id="{{nodeId}}" key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-mousedown="onNodeSelect">
     <div xen:style="{{nameStyle}}" on-dblclick="onNodeDblClicked">
-      <div contenteditable$="{{contenteditable}}" style="text-align: center; padding: 4px;" on-blur="onRenameNode">{{displayName}}</div>
+      <input xen:style="{{inputStyle}}" disabled$="{{disableRename}}" type="text" value="{{displayName}}" on-change="onRenameNode">
     </div>
     <div flex row>
       <div centering column repeat="socket_i_t">{{inputs}}</div>
