@@ -5,6 +5,9 @@
  * license that can be found in the LICENSE file.
  */
 import {SafeObject} from '../Isolation/safe-object.js';
+import {logFactory} from '../Core/utils.js';
+
+const log = logFactory(true, 'RecipeBuilder', 'darkorange', 'darkblue');
 
 const {keys, entries, assign} = SafeObject;
 
@@ -33,8 +36,10 @@ export const RecipeBuilder = {
   },
 
   recipeForNode(node, {graph, nodeTypes, layout}, state) {
-    const nodeType = this.flattenNodeType(nodeTypes?.[node?.type]);
-    return !nodeType ? null : {
+    const rawNodeType = nodeTypes?.[node?.type] ?? nodeTypes?.LibrarianNode;
+    const nodeType = this.flattenNodeType(rawNodeType);
+    log('recipeForNode', node, nodeType);
+    return {
       $stores: this.buildStoreSpecs(node, nodeType, state),
       $meta: {
         name: this.encodeFullNodeId(node, graph, this.connectorDelim),

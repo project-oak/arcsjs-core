@@ -11,6 +11,7 @@ import {DataNode} from './DataNode.js';
 import {DisplayNode} from './DisplayNode.js';
 import {ImageNode} from './ImageNode.js';
 import {CameraNode} from './CameraNode.js';
+import {LibrarianNode} from '../Graphs/LibrarianNode.js';
 
 export const NodeTypes = {
   NodeCatalogNode,
@@ -19,5 +20,6 @@ export const NodeTypes = {
   DataNode,
   DisplayNode,
   ImageNode,
-  CameraNode
+  CameraNode,
+  LibrarianNode
 };

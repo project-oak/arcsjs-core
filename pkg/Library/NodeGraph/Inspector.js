@@ -73,6 +73,7 @@ chooseTemplate({store: {$type, values, range}, value}, isEditing, customInspecto
     string: 'text_t',
     boolean: 'checkbox_t',
     Select: 'select_t',
+    'Pojo': 'textarea_t',
     MultilineText: 'textarea_t'
   }[$type] ?? 'unimpl_t';
 
@@ -390,7 +391,7 @@ template: html`
   }
   textarea {
     width: 100%;
-    min-width: 248px;
+    /* min-width: 248px; */
     min-height: 96px;
     font-size: 0.75rem;
     font-family: "Google Sans", monospace;
@@ -532,7 +533,7 @@ template: html`
 <template textarea_t>
   <div prop-container vertical>
     <span label control>{{displayName}}</span>
-    <textarea key="{{key}}" value="{{value}}" on-input="onPropChange"></textarea>
+    <textarea key="{{key}}" value="{{value}}" on-change="onPropChange"></textarea>
   </div>
 </template>
 

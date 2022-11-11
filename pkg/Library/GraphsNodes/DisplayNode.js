@@ -14,10 +14,13 @@ export const DisplayNode = {
     text: {
       $type: 'Pojo',
       connection: true
+    },
+    textStyle: {
+      $type: 'CssStyle'
     }
   },
   text: {
     $kind: '$library/Fields/TextObject',
-    $inputs: ['text']
+    $inputs: ['text', 'textStyle']
   }
 };
