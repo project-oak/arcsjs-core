@@ -27,7 +27,7 @@ export class NodeGraph extends Xen.Async {
     this.rects = {};
   }
   onNodeSelect(event) {
-    //event.stopPropagation();    
+    //event.stopPropagation();
     this.key = event.currentTarget.key;
     if (this.key !== this.state.textSelectedKey) {
       delete this.state.textSelectedKey;
