@@ -155,7 +155,7 @@ async onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-async onDrop({eventlet: {key: container, value: id}, graph, nodeTypes, layout}, state, {service}) {
+async onDrop({eventlet: {key: container, value: {id}}, graph, nodeTypes, layout}, state, {service}) {
   //log('onDrop:', key, container);
   const node = graph.nodes[id];
   const nodeType = nodeTypes[node.type];
