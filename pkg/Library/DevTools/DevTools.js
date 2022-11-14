@@ -20,14 +20,13 @@ async refresh(state, service) {
   assign(state, context);
   state.kick = Math.random();
 },
-render({graphs}, {runtime, showTools, capturedState, kick, selectedGraph}) {
+render({graphs}, {runtime, showTools, capturedState, kick, graphText}) {
   const user = runtime;
   const users = runtime?.users || {user};
   const storeBools = user && keys(user.stores).reduce((map, key) => (map[key] = false, map), {});
   const hosts = this.renderAllHosts(users);
   const stores = this.renderAllStores(users);
   //
-  const graphText = JSON.stringify(selectedGraph, null, '  ');
   const graphOptions = !graphs ? [] : graphs.map(({$meta}) => $meta);
   //
   return {
@@ -101,12 +100,17 @@ async onCreateTest(inputs, state, {service}) {
 async onTabSelected(inputs, state, {service}) {
   return this.refresh(state, service);
 },
-onSelectGraph({eventlet: {value}, graphs}, state, {service}) {
+onSelectGraph({eventlet: {value}, graphs}, state) {
   state.selectedGraph = graphs?.find(({$meta}) => $meta?.name === value);
+  state.graphText = JSON.stringify(state.selectedGraph, null, '  ');
 },
-async onAddGraphClick({graphs}, {selectedGraph}, {service}) {
-  if (selectedGraph) {
-    return service({msg: 'addGraph', data: {graph: selectedGraph}});
+onGraphCodeChanges({eventlet: {value}}, state) {
+  state.graphText = value;
+},
+async onAddGraphClick({}, {graphText}, {service}) {
+  const graph = JSON.parse(graphText);
+  if (graph) {
+    return service({msg: 'addGraph', data: {graph}});
   }
 },
 template: html`
@@ -203,7 +207,7 @@ template: html`
         <multi-select options="{{graphOptions}}" on-change="onSelectGraph"></multi-select>
         <mwc-icon-button icon="refresh" on-click="onAddGraphClick"></mwc-icon-button>
       </div>
-      <code-mirror flex text="{{graphText}}"></code-mirror>
+      <code-mirror flex text="{{graphText}}" on-changes="onGraphCodeChanges"></code-mirror>
     </div>
     <!-- Stores -->
     <data-explorer flex scrolling object="{{stores}}" expand></data-explorer>

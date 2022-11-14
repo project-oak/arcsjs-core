@@ -16,7 +16,7 @@ async update({graph, nodeTypes, globalStores}, state) {
 },
 
 graphChanged(graph, oldGraph) {
-  return graph.id !== oldGraph?.id || 
+  return graph.id !== oldGraph?.id ||
          keys(graph.nodes).length !== keys(oldGraph?.nodes).length;
 },
 
@@ -56,11 +56,8 @@ findGlobalCandidate(storeName, type, globalStores) {
 },
 
 findCandidatesInNode(from, type, nodeType) {
-  const matchingType = (storeType) => {
-    // TODO(b/244191110): Type matching API to be wired here.
-    return storeType === type;
-  };
   const candidates = [];
+  const matchingType = storeType => this.typeMatches(type, storeType);
   const isCandidate = (storeName, {$type, connection}) => matchingType($type) && !connection && this.storeHasOutput(storeName, nodeType);
   for (const [storeName, store] of entries(nodeType?.$stores)) {
     if (isCandidate(storeName, store)) {
@@ -68,6 +65,16 @@ findCandidatesInNode(from, type, nodeType) {
     }
   }
   return candidates;
+},
+
+// TODO(b/244191110): Type matching API to be wired here.
+// TODO(sjmiles): temporarily inlined
+typeMatches(typeA, typeB) {
+  const baseTypes = ['pojo','json'];
+  return (typeA === typeB)
+    || baseTypes.includes(typeA?.toLowerCase())
+    || baseTypes.includes(typeB?.toLowerCase())
+    ;
 },
 
 storeHasOutput(storeName, nodeType) {

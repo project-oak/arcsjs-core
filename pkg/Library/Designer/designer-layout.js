@@ -17,13 +17,21 @@ export class DesignerLayout extends DragDrop {
     return [
       'selected',
       'rects',
-      'color'
+      'color',
+      'kick'
     ];
   }
   _didMount() {
     this.boxer = this._dom.$('[boxer]');
     // TODO(sjmiles): need simple 'focus' somewhere, put keydown there, perhaps on `this`
     document.addEventListener('keydown', event => this.onKeydown(event));
+    // new objects should be checked for rational geometry
+    // TODO(sjmiles): this simply does not work, it is unexplained
+    this.observer = new MutationObserver(() => {
+      console.warn('mutationObserver has observed!');
+      this.updateGeometry();
+    });
+    this.observer.observe(this, {childList: true});
   }
   update() {
     this.updateGeometry();
@@ -32,7 +40,16 @@ export class DesignerLayout extends DragDrop {
     if (!this.dragging) {
       this.select(null);
       const map = {};
-      this.rects?.forEach(r => map[this.sanitizeId(r.id)] = r);
+      this.rects?.forEach(r => {
+        const id = this.sanitizeId(r.id);
+        if (id !== 'id') {
+          const elt = this.querySelector(`[id^="${id}"]`);
+          if (elt) {
+            map[elt.id] = r;
+          }
+        }
+        //map[this.sanitizeId(r.id)] = r
+      });
       for (const child of this.children) {
         const rect = map[child.id]?.position || {l: 64, t: 64, w: 240, h: 180};
         this.position(child.id, rect);
@@ -48,7 +65,7 @@ export class DesignerLayout extends DragDrop {
     }
   }
   getChildById(id) {
-    return this.querySelector(`#${this.sanitizeId(id)}`);
+    return this.querySelector(`[id=${this.sanitizeId(id)}]`);
   }
   sanitizeId(id) {
     return id?.replace(/[)(:]/g, '_');
@@ -144,14 +161,19 @@ export class DesignerLayout extends DragDrop {
   //
   // implement drag-drop handlers
   doDown(e) {
-    e.stopPropagation();
     // dom target
     const attrs = e.target.attributes;
     const edges = ['top', 'right', 'bottom', 'left'];
     const from = edges.map(e => attrs[e]?.name).join(':');
     if (from === ':::') {
-      if (['input', 'button', 'textarea'].includes(e.path?.[0]?.localName)) {
-        return;
+      if (!e.ctrlKey && !e.metaKey) {
+        const top = e.path?.[0];
+        if (top?.hasAttribute?.('nodrag')) {
+          return;
+        }
+        if (['input', 'button', 'textarea'].includes(top?.localName)) {
+          return;
+        }
       }
       // component target
       this.dragKind = 'move';
@@ -161,6 +183,7 @@ export class DesignerLayout extends DragDrop {
       this.dragKind = 'resize';
       this.dragFrom = from;
     }
+    e.stopPropagation();
     this.rect = this.target && this.getRect(this.target);
     this.restyleSelection();
     this.updateOrders(this.target);

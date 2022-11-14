@@ -21,5 +21,8 @@ export const SafeObject = {
   },
   mapBy(a, keyGetter) {
     return a ? values(a).reduce((map, item) => (map[keyGetter(item)] = item, map), {}) : {};
+  },
+  map(o, visitor) {
+    return SafeObject.entries(o).map(([key, value]) => visitor(key, value));
   }
 };

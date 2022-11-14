@@ -1,16 +1,16 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 ({
 async onCodeChanged({eventlet: {key, value}, graph, nodeId}) {
-  const custom = this.requireCustom(graph, nodeId);
-  custom[key] = value;
-  return {graph};
+  if (graph) {
+    const custom = this.requireCustom(graph, nodeId);
+    custom[key] = value;
+    return {graph};
+  }
 },
 
 onSpecChanged({eventlet: {value}, graph, nodeId}, state) {

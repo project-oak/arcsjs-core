@@ -113,7 +113,7 @@ export class NodeGraph extends Xen.Async {
       style: {
         borderColor: selected ? color : bgColor,
         color: selected ? 'white' : 'gray',
-        background: bgColor,
+        background: bgColor
       },
       inputStyle: {
         background: 'transparent',
@@ -138,7 +138,7 @@ export class NodeGraph extends Xen.Async {
       //console.log('=');
       rects && graph?.graphEdges.map((edge, i) => {
         const spacing = 18;
-        const margin = 10;
+        const margin = 11;
         //
         const i0 = graph.graphNodes.findIndex(({key}) => key === edge.from.id);
         const i0outs = graph.graphNodes[i0]?.outputs;
@@ -156,7 +156,7 @@ export class NodeGraph extends Xen.Async {
         const i1offset = spacing * (ii1-ii1c) + margin;
         const g1 = this.geom(rects, edge.to.id, i1);
         //
-        const p0 = {x: g0.r - 1, y: g0.y + i0offset};
+        const p0 = {x: g0.r - 2, y: g0.y + i0offset};
         const p1 = {x: g1.l + 1, y: g1.y + i1offset};
         const path = this.calcBezier(p0, p1);
         //
@@ -167,7 +167,7 @@ export class NodeGraph extends Xen.Async {
         //
         //ctx.fillStyle = edge.color;
         ctx.fillStyle = 'lightblue';
-        ctx.strokeStyle = 'white';
+        ctx.strokeStyle = 'blue';
         this.circle(ctx, p0, 3.5);
         ctx.stroke();
         this.circle(ctx, p1, 3.5);
@@ -302,6 +302,12 @@ const template = Xen.Template.html`
   [layer1] {
     position: absolute;
     pointer-events: none;
+  }
+  [layer0] [repeat] {
+    color: silver;
+  }
+  [layer0]:hover [repeat] {
+    color: gray;
   }
   [repeat="socket_i_t"] {
     margin-left: -10px;

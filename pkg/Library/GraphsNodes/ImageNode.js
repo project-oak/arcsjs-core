@@ -7,6 +7,7 @@
 export const ImageNode = {
   $meta: {
     id: 'ImageNode',
+    displayName: 'Image',
     category: 'Media'
   },
   $stores: {
@@ -21,7 +22,7 @@ export const ImageNode = {
       connection: true
     }
   },
-  field: {
+  image: {
     $kind: '$library/NewMedia/Image',
     $inputs: ['connectedImage', 'image'],
     $outputs: ['image']
