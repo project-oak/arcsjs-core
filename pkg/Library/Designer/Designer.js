@@ -140,6 +140,13 @@ render({graph, nodeTypes, categories, layout}, {selectedNodeId, recipes}) {
   };
 },
 
+getParticleNamesForNode(node, graph, recipes) {
+  if (graph) {
+    const fullNodeId = this.encodeFullNodeId(node, graph);
+    return this.getParticleNames(recipes[fullNodeId]);
+  }
+},
+
 isUIHidden(node) {
   return Boolean(node?.props?.hideUI);
 },
@@ -176,13 +183,6 @@ findNodeByParticle(particleName, graph, recipes) {
     const names = this.getParticleNamesForNode(node, graph, recipes);
     return names?.find(name => name === particleName);
   });
-},
-
-getParticleNamesForNode(node, graph, recipes) {
-  if (graph) {
-    const fullNodeId = this.encodeFullNodeId(node, graph);
-    return this.getParticleNames(recipes[fullNodeId]);
-  }
 },
 
 encodeFullNodeId({id}, {$meta}) {

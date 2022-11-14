@@ -39,6 +39,8 @@ export const App = class {
     // TODO(sjmiles): pick a syntax
     const recipes = [DevToolsRecipe, ...(this.recipes ?? this.recipes ?? [])];
     await Arcs.addRecipes('user', recipes);
+    // TODO(sjmiles): fix
+    return new Promise(resolve => setTimeout(resolve, 250));
   }
   async service({request}) {
     // if we are specific

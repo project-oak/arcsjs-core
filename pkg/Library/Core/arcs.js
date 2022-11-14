@@ -871,7 +871,7 @@ __publicField(Runtime, "particleIndustry");
 __publicField(Runtime, "particleOptions");
 
 // js/recipe/RecipeParser.js
-var log3 = logFactory(logFactory.flags.recipe, "flan", "violet");
+var log3 = logFactory(logFactory.flags.recipe, "RecipeParser", "violet");
 var { entries: entries4, create: create3 } = Object;
 var Parser = class {
   stores;
@@ -939,7 +939,7 @@ var Parser = class {
       throw Error();
     }
     if (this.particles.find((s) => s.id === id)) {
-      log3("duplicate particle name");
+      log3("duplicate particle name", id, spec);
       return;
     }
     this.particles.push({ id, container, spec });
@@ -965,11 +965,21 @@ function matches(candidateMeta, targetMeta) {
 // js/recipe/StoreCook.js
 var log4 = logFactory(logFactory.flags.recipe, "StoreCook", "#99bb15");
 var { values: values3 } = Object;
-var findStores = (runtime, criteria) => {
-  return values3(runtime.stores).filter((store) => matches(store?.meta, criteria));
-};
 var mapStore = (runtime, { name, type }) => {
   return findStores(runtime, { name, type })?.[0];
+};
+var findStores = (runtime, criteria) => {
+  return values3(runtime.stores).filter((store) => storeMatches(store, criteria));
+};
+var storeMatches = (store, criteria) => {
+  const { type, ...other } = criteria;
+  if (typeMatches(type, store?.meta.type)) {
+    return matches(store?.meta, other);
+  }
+};
+var typeMatches = (typeA, typeB) => {
+  const baseTypes = ["pojo", "json"];
+  return typeA === typeB || baseTypes.includes(typeA?.toLowerCase()) || baseTypes.includes(typeB?.toLowerCase());
 };
 var StoreCook = class {
   static async execute(runtime, arc, stores) {

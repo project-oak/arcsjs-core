@@ -6,10 +6,24 @@
  */
 ({
 update({connectedImage, image}, state) {
-  state.bestImage = {...image, ...connectedImage};
+  if (connectedImage?.canvas || connectedImage?.url) {
+    state.image = connectedImage;
+  } else {
+    state.image = image;
+  }
+  // const bestImage = connectedImage || image;
+  // if (bestImage.url) {
+  //   if (!state.image || bestImage.url !== state.image.url) {
+  //     state.image = {...bestImage};
+  //   }
+  // }
 },
-onCanvas({eventlet: {value}}) {
-  return {image: {...value, version: Math.random()}};
+onCanvas({eventlet: {value}}, state) {
+  if (state.image?.url === value?.url) {
+    const image = {...value, version: Math.random()};
+    state.image = image;
+    return {image};
+  }
 },
 template: html`
 <style>
@@ -17,6 +31,6 @@ template: html`
     background: transparent;
   }
 </style>
-<image-resource center flex image="{{bestImage}}" on-canvas="onCanvas"></image-resource>
+<image-resource center flex image="{{image}}" on-canvas="onCanvas"></image-resource>
 `
 });
