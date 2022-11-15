@@ -12,17 +12,13 @@
   },
   $stores: {
     text: {
-      $type: 'String',
-      connection: true
-    },
-    textOut: {
-      $type: 'String',
-      noinspect: true
+      $type: 'MultilineText',
+      $tags: ['persisted']
     }
   },
   text: {
     $kind: '$library/CodeMirror/CodeMirror',
     $inputs: ['text'],
-    $outputs: [{text: 'textOut'}]
+    $outputs: ['text']
   }
 };

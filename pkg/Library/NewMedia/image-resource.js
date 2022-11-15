@@ -75,7 +75,10 @@ export class ImageResource extends Xen.Async {
     if (!image?.canvas && image?.url) {
       // this.updating = true;
       image.canvas = this.canvasId;
-      await this.updateImageCanvas(image);
+      if (state.url !== image?.url) {
+        state.url = image.url;
+        await this.updateImageCanvas(image);
+      }
       this.value = image;
       this.fire('canvas');
       // this.updating = false;

@@ -9,6 +9,7 @@
 async update({graphs, show}, state, {service}) {
   if (graphs && !state.selectedGraph) {
     state.selectedGraph = graphs?.[0];
+    state.graphText = JSON.stringify(state.selectedGraph, null, '  ');
   }
   if (show === true) {
     state.showTools = true;

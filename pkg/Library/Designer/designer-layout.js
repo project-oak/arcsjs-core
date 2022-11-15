@@ -81,7 +81,7 @@ export class DesignerLayout extends DragDrop {
   hasActiveInput() {
     const active = this.getActiveElement(document);
     return active?.contentEditable
-      || ['INPUT', 'SELECT', 'TEXTAREA'].includes(active?.tagName)
+      || ['input', 'select', 'textarea'].includes(active?.localName)
       ;
   }
   getActiveElement({activeElement}) {

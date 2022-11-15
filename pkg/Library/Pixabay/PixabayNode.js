@@ -8,7 +8,7 @@ export const PixabayNode = {
   $meta: {
     id: 'PixabayNode',
     displayName: 'Pixabay Image Search',
-    category: 'Search'
+    category: 'Media'
   },
   $stores: {
     connectedQuery: {

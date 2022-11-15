@@ -22,9 +22,9 @@ const template = Xen.Template.html`
     font-family: monospace;
   }
   .CodeMirror {
-    font-family: 'Roboto Mono', monospace;
+    font-size: var(--code-mirror-font-size, inherit);
+    font-family: var(--code-mirror-font-family, 'Google Sans'), sans-serif;
     background-color: #333 !important;
-    font-size: 13px;
     flex: 1;
   }
 </style>
