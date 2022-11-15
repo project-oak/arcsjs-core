@@ -96,6 +96,7 @@ export const RecipeBuilder = {
   buildStoreSpec(store, value, node) {
     return {
       $type: store.$type,
+      $tags: store.$tags,
       $value: this.formatStoreValue(store, value, node)
     };
   },
@@ -125,6 +126,7 @@ export const RecipeBuilder = {
     const bindings = this.resolveBindings(particleSpec, storeMap);
     const resolvedSpec = {
       $slots: {},
+      $staticInputs: node.props,
       ...particleSpec,
       ...bindings,
       ...($container && {$container})

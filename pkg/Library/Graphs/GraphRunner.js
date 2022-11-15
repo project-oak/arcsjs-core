@@ -7,10 +7,10 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-shouldUpdate({graph}) {
-  return graph;
+shouldUpdate({enabled, graph}) {
+  return enabled && graph;
 },
-update({graph}, state, {service}) {
+update({graph, live}, state, {service}) {
   let graph_ = graph;
   if (typeof graph === 'string') {
     try {
@@ -21,7 +21,8 @@ update({graph}, state, {service}) {
     }
   }
   if (graph_) {
-    return service({msg: 'addRunnerGraph', data: {graph: graph_}});
+    log('addRunnerGraph:', graph_, live);
+    return live && service({msg: 'addRunnerGraph', data: {graph: graph_}});
   }
 }
 });

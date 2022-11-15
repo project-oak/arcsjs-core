@@ -5,4 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 ({
+update({connectedData, data}) {
+  return {data: connectedData ?? data};
+}
 });

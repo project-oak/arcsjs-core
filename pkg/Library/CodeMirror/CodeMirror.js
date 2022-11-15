@@ -14,11 +14,6 @@ shouldRender(inputs, state) {
   return dirty;
 },
 template: html`
-<style>
-  :host {
-    --the-answer: 42;
-  }
-</style>
 <code-mirror flex text="{{text}}" on-changes="onCodeChanges"></code-mirror>
 `
 });

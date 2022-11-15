@@ -32,6 +32,7 @@ const theme = {
 export const themeRules =`
 ${paletteRules(theme)}
 ${newPaletteRules(theme)}
+  --code-mirror-font-size: 11px;
   color: var(--theme-color-fg-0);
   --font-subheader: 500 16px "Google Sans", sans-serif;
   --font-body-1: 400 16px "Google Sans", sans-serif;

@@ -7,7 +7,7 @@
 export const DisplayNode = {
   $meta: {
     id: 'DisplayNode',
-    displayName: 'Display Data',
+    displayName: 'Display',
     category: 'Fields'
   },
   $stores: {

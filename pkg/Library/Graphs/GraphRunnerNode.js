@@ -7,9 +7,17 @@
 export const GraphRunnerNode = {
   $meta: {
     id: 'GraphRunnerNode',
-    category: 'Ai'
+    displayName: 'Graph Runner',
+    category: 'AI'
   },
   $stores: {
+    live: {
+      $type: 'Boolean'
+    },
+    enabled: {
+      $type: 'Pojo',
+      connection: true
+    },
     graph: {
       $type: 'Pojo',
       connection: true
@@ -17,6 +25,6 @@ export const GraphRunnerNode = {
   },
   graphRunner: {
     $kind: 'Graphs/GraphRunner',
-    $inputs: ['graph']
+    $inputs: ['enabled', 'live', 'graph']
   }
 };
