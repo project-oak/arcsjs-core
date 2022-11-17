@@ -12,19 +12,25 @@ import {DisplayNode} from './DisplayNode.js';
 import {ImageNode} from './ImageNode.js';
 import {CameraNode} from './CameraNode.js';
 import {TextFieldNode} from './TextFieldNode.js';
+import {SelectFieldNode} from './SelectFieldNode.js';
 import {LibrarianNode} from '../Graphs/LibrarianNode.js';
 import {GraphRunnerNode} from '../Graphs/GraphRunnerNode.js';
 
+import {AudioNode, ImageCompositeNode} from '../NewMedia/Nodes.js';
+
 export const NodeTypes = {
-  NodeCatalogNode,
-  ObjectInspectorNode,
   JSONataNode,
   DataNode,
   PersistedDataNode,
   DisplayNode,
   ImageNode,
   CameraNode,
+  AudioNode,
+  ImageCompositeNode,
   TextFieldNode,
+  SelectFieldNode,
   LibrarianNode,
-  GraphRunnerNode
+  GraphRunnerNode,
+  NodeCatalogNode,
+  ObjectInspectorNode
 };

@@ -89,9 +89,10 @@ export class StoreCook {
     runtime.addStore(meta.name, store);
     return store;
   }
-  static async derealizeStore(runtime: Runtime, arc: Arc, spec: StoreSpec) {
-    runtime.removeStore(spec.$name);
-    arc.removeStore(spec.$name);
+  static async derealizeStore(runtime: Runtime, arc: Arc, meta: StoreMeta) {
+    log(`derealizeStore: derealizing "${meta.name}"`);
+    runtime.removeStore(meta.name);
+    arc.removeStore(meta.name);
   }
   static constructMeta(runtime: Runtime, arc: Arc, rawMeta: StoreMeta): StoreMeta {
     const meta = {

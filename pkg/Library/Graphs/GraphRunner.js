@@ -8,6 +8,7 @@
  */
 ({
 shouldUpdate({enabled, graph}) {
+  log(enabled, graph);
   return enabled && graph;
 },
 update({graph, live}, state, {service}) {

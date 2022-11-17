@@ -1017,9 +1017,10 @@ var StoreCook = class {
     runtime.addStore(meta.name, store);
     return store;
   }
-  static async derealizeStore(runtime, arc, spec) {
-    runtime.removeStore(spec.$name);
-    arc.removeStore(spec.$name);
+  static async derealizeStore(runtime, arc, meta) {
+    log4(`derealizeStore: derealizing "${meta.name}"`);
+    runtime.removeStore(meta.name);
+    arc.removeStore(meta.name);
   }
   static constructMeta(runtime, arc, rawMeta) {
     const meta = {
@@ -1087,6 +1088,7 @@ var Chef = class {
   static async evacipate(recipe, runtime, arc) {
     log6("|-->...| evacipating recipe: ", recipe.$meta);
     const plan = new Parser(recipe);
+    await StoreCook.evacipate(runtime, arc, plan.stores);
     await ParticleCook.evacipate(runtime, arc, plan.particles);
     log6("|...-->| recipe evacipated: ", recipe.$meta);
   }
@@ -1096,7 +1098,9 @@ var Chef = class {
     }
   }
   static async evacipateAll(recipes, runtime, arc) {
-    return Promise.all(recipes?.map((recipe) => this.evacipate(recipe, runtime, arc)));
+    for (const recipe of recipes) {
+      await this.evacipate(recipe, runtime, arc);
+    }
   }
 };
 

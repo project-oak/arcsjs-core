@@ -5,21 +5,17 @@
  * license that can be found in the LICENSE file.
  */
 ({
-update({value, connectedValue}, state) {
-  value = state.value = connectedValue ?? value;
-  return {value};
-},
-render(inputs, {value}) {
+render({label, value, options}, state) {
   return {
-    ...inputs,
-    value
+    label,
+    value,
+    options
   };
 },
 onLabelChange({eventlet: {value}}) {
   return {label: value};
 },
-onFieldChange({eventlet: {value}}, state) {
-  state.value = value;
+onFieldChange({eventlet: {value}}) {
   return {value};
 },
 template: html`
@@ -36,11 +32,6 @@ template: html`
     border: none;
     text-align: right;
   }
-  [field] {
-    padding: 6px 9px;
-    border-radius: 4px;
-    border: 1px solid #88888888;
-  }
   [delim] {
     padding-right: 12px;
   }
@@ -49,7 +40,7 @@ template: html`
 <div flex bar>
   <input label value="{{label}}" on-change="onLabelChange">
   <span delim>:</span>
-  <input flex field value="{{value}}" on-change="onFieldChange">
+  <multi-select flex field options="{{options}}" value="{{value}}" on-change="onFieldChange"></multi-select>
 </div>
 `
 });

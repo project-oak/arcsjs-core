@@ -34,7 +34,7 @@ const CompositeOperationValues = [
   'luminosity'
 ];
 
-export const ImageCompositeNodeType = {
+export const ImageCompositeNode = {
   $meta: {
     // should be 'name'
     id: 'ImageCompositeNode',

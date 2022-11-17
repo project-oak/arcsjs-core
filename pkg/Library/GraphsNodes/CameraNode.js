@@ -28,6 +28,7 @@ export const CameraNode = {
     },
     stream: {
       $type: 'Stream',
+      $tags: ['private'],
       $value: 'default'
     },
     fps: {
