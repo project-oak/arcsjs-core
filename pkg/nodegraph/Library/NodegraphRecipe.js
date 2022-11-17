@@ -251,7 +251,7 @@ const RecipeBuilder = {
     $outputs: [{graph: 'selectedGraph'}]
   },
   recipeBuilder: {
-    $kind: '$library/NodeGraph/RecipeBuilder',
+    $kind: '$library/RecipeBuider/RecipeBuilderParticle',
     $inputs: [
       'nodeTypes',
       {graph: 'selectedGraph'},

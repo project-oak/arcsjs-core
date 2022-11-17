@@ -214,7 +214,8 @@ template: html`
 </style>
 <div bar frame="chooser"></div>
 <drop-target flex row on-target-drop="onDrop">
-  <designer-layout flex scrolling column frame="runner"
+  <designer-layout flex scrolling column
+                    frame="graph"
                     on-position="onNodePosition"
                     on-delete="onNodeDelete"
                     selected="{{selectedKeys}}"

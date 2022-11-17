@@ -215,7 +215,7 @@ const handlers = {
   removeRecipe: async ({arc, recipe}) => {
     return Chef.evacipate(recipe, user, await requireArc(arc));
   },
-  removeRecipe: async ({arc, recipes}) => {
+  removeRecipes: async ({arc, recipes}) => {
     const realArc = await requireArc(arc);
     return Chef.evacipateAll(recipes, user, realArc);
   },
