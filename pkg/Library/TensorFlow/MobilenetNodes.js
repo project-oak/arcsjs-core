@@ -8,7 +8,7 @@
 export const MobilenetNode = {
   $meta: {
     id: 'MobilenetNode',
-    category: 'TensorFlow'
+    category: 'ML'
   },
   $stores: {
     Image: {

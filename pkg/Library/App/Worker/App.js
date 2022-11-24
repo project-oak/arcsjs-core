@@ -31,16 +31,22 @@ export const App = class {
   async spinup() {
     await Arcs.init({
       paths: this.paths,
-      root: this.root,
+      onrender: this.render.bind(this),
       onservice: this.service.bind(this),
       injections: {themeRules, ...this.injections}
     });
     //await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
+    this.composer = await Arcs.createComposer(this.root || document.body);
     // TODO(sjmiles): pick a syntax
     const recipes = [DevToolsRecipe, ...(this.recipes ?? this.recipes ?? [])];
     await Arcs.addRecipes('user', recipes);
     // TODO(sjmiles): fix
     return new Promise(resolve => setTimeout(resolve, 250));
+  }
+  render(packet) {
+    // figure out which composer for this packet
+    const composer = this.composers?.[packet?.arcid] ?? this.composer;
+    composer?.render(packet);
   }
   async service({request}) {
     // if we are specific
@@ -62,7 +68,7 @@ export const App = class {
     try {
       const {kind, msg, data} = request || {};
       if (service[msg]) {
-        return (service[msg])(data);
+        return (service[msg])(data, this.arcs);
       } else {
         log.warn(`no handler for "${kind}:${msg}"`);
       }

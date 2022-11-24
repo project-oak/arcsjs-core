@@ -198,7 +198,7 @@ var Arc = class extends EventEmitter {
   }
   async render(packet) {
     if (this.composer) {
-      this.composer.render(packet);
+      this.composer.render({ ...packet, arcid: this.id });
     } else {
     }
   }

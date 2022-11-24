@@ -8,7 +8,7 @@ export const RecipeBuilderNode = {
   $meta: {
     id: 'RecipeBuilderNode',
     displayName: 'Recipe Builder',
-    category: 'AI'
+    category: 'ML'
   },
   $stores: {
     graph: {

@@ -10,6 +10,14 @@ edgeIdDelimeter: '$$',
 connectionDelimiter: ':',
 
 async update(inputs, state) {
+  state.layout = inputs.layout;
+  this.handleEvents(inputs, state);
+  return {
+    editorToolbarIcons: this.toolbarIcons(inputs)
+  };
+},
+
+handleEvents(inputs, state) {
   const {event} = inputs;
   if (event !== state.event) {
     state.event = event;
@@ -20,25 +28,46 @@ async update(inputs, state) {
       }
     }
   }
-  const results = {
-    editorToolbarIcons: this.toolbarIcons(inputs)
-  };
-  return results;
 },
 
-decodeBinding(value) {
-  if (typeof value === 'string') {
-    return {key: value, binding: ''};
-  } else {
-    const [key, binding] = entries(value)[0];
-    return {key, binding};
+handleEvent(inputs) {
+  const {event, selectedNodeId} = inputs;
+  if (this[event]) {
+    return {
+      ...this[event](inputs),
+      event: null
+    };
   }
+  log(`Unhandled event '${event}' for ${selectedNodeId}`);
+},
+
+toolbarIcons({selectedNodeId, graph}) {
+  if (keys(graph?.nodes).length === 0) {
+    return [];
+  }
+  const hasSelectedNode = Boolean(selectedNodeId);
+  return [{
+    icon: 'delete',
+    title: 'Delete node',
+    key: 'deleteSelectedNode',
+    disabled: !hasSelectedNode
+  }, {
+    icon: 'content_copy',
+    title: 'Duplicate node',
+    key: 'duplicateSelectedNode',
+    disabled: !hasSelectedNode
+  }, {
+    icon: 'drive_file_rename_outline',
+    title: 'Rename node',
+    key: 'renameSelectedNode',
+    disabled: !hasSelectedNode
+  }];
 },
 
 render(inputs, state) {
   return {
     graph: this.renderGraph(inputs, state),
-    graphRects: inputs.layout
+    graphRects: state.layout
   };
 },
 
@@ -46,13 +75,31 @@ renderGraph(inputs, state) {
   return {
     name: inputs.graph?.$meta?.name,
     graphNodes: this.renderGraphNodes(inputs, state),
-    graphEdges: this.renderGraphEdges(inputs)
+    graphEdges: this.renderGraphEdges(inputs, state)
   };
 },
 
 renderGraphNodes(inputs, state) {
   const {graph} = inputs;
-  return values(graph?.nodes).map(node => this.renderNode({node, ...inputs}, state));
+  return values(graph?.nodes).map(node => this.renderNode(node, inputs, state));
+},
+
+renderNode(node, {categories, selectedNodeId, nodeTypes}, {layout}) {
+  const nodeType = nodeTypes[node.type];
+  const {category} = nodeType?.$meta || {category: 'n/a'};
+  return {
+    key: node.id,
+    name: node.displayName,
+    displayName: node.displayName,
+    position: layout?.[node.id] || {x: 0, y: 0},
+    // TODO(mariakleiner): node-graph doesn't get updated, if nodeType (and hence color)
+    // for a customNode was loaded after the node was rendered
+    color: this.colorByCategory(category, categories),
+    bgColor: this.bgColorByCategory(category, categories),
+    selected: node.id === selectedNodeId,
+    inputs: this.renderInputs(node, nodeType),
+    outputs: this.renderOutputs(nodeType),
+  };
 },
 
 renderGraphEdges(inputs) {
@@ -82,25 +129,6 @@ renderGraphEdges(inputs) {
 parseConnection(connection) {
   const [from, storeName] = connection.split(this.connectionDelimiter);
   return {from, storeName};
-},
-
-renderNode({node, categories, graph, selectedNodeId, nodeTypes, layout}, {selectedNodeText}) {
-  const nodeType = nodeTypes[node.type];
-  const {category} = nodeType?.$meta || {category: 'n/a'};
-  return {
-    key: node.id,
-    name: node.displayName,
-    displayName: node.displayName,
-    position: layout?.[node.id] || {x: 0, y: 0},
-    // TODO(mariakleiner): node-graph doesn't get updated, if nodeType (and hence color)
-    // for a customNode was loaded after the node was rendered
-    color: this.colorByCategory(category, categories),
-    bgColor: this.bgColorByCategory(category, categories),
-    selected: node.id === selectedNodeId,
-    inputs: this.renderInputs(node, nodeType),
-    outputs: this.renderOutputs(nodeType),
-    textSelected: (node.id === selectedNodeText)
-  };
 },
 
 colorByCategory(category, categories) {
@@ -153,6 +181,15 @@ isMatchingStore(storeName, connection) {
   return (binding || key) == storeName;
 },
 
+decodeBinding(value) {
+  if (typeof value === 'string') {
+    return {key: value, binding: ''};
+  } else {
+    const [key, binding] = entries(value)[0];
+    return {key, binding};
+  }
+},
+
 getParticleNames(nodeType) {
   // TODO(mariakleiner): refactor to make iterator for particles in recipe.
   const isKeyword = name => name.startsWith('$');
@@ -161,29 +198,6 @@ getParticleNames(nodeType) {
 
 getParticles(nodeType) {
   return this.getParticleNames(nodeType).map(name => nodeType[name]);
-},
-
-toolbarIcons({selectedNodeId, graph}) {
-  if (keys(graph?.nodes).length === 0) {
-    return [];
-  }
-  const hasSelectedNode = Boolean(selectedNodeId);
-  return [{
-    icon: 'delete',
-    title: 'Delete node',
-    key: 'deleteSelectedNode',
-    disabled: !hasSelectedNode
-  }, {
-    icon: 'content_copy',
-    title: 'Duplicate node',
-    key: 'duplicateSelectedNode',
-    disabled: !hasSelectedNode
-  }, {
-    icon: 'drive_file_rename_outline',
-    title: 'Rename node',
-    key: 'renameSelectedNode',
-    disabled: !hasSelectedNode
-  }];
 },
 
 onNodeRemove({eventlet: {key}, graph, selectedNodeId}) {
@@ -197,17 +211,6 @@ onNodeRenamed({eventlet: {key, value}, graph}, state) {
   graph.nodes[node.id] = node;
   delete state.selectedNodeText;
   return {graph};
-},
-
-handleEvent(inputs, state) {
-  const {event, selectedNodeId} = inputs;
-  if (this[event]) {
-    return {
-      ...this[event](inputs, state),
-      event: null
-    };
-  }
-  log(`Unhandled event '${event}' for ${selectedNodeId}`);
 },
 
 renameSelectedNode({selectedNodeId}, state) {
@@ -315,10 +318,9 @@ onNodeTypeDropped({eventlet: {key, value: type}, graph, newNodeInfos}) {
   }
 },
 
-onNodeMoved({eventlet: {key, value}, layout}) {
-  return {
-    layout: {...layout, [key]: value}
-  };
+onNodeMoved({eventlet: {key, value}, layout}, state) {
+  layout = state.layout = {...layout, [key]: value};
+  return {layout};
 },
 
 // onEdgeRemove({eventlet: {key}, graph}) {

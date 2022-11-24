@@ -7,7 +7,7 @@
 export const LibrarianNode = {
   $meta: {
     id: 'LibrarianNode',
-    category: 'AI'
+    category: 'Panels'
   },
   $stores: {
     nodeId: {

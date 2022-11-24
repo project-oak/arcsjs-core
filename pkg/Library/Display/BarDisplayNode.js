@@ -8,7 +8,7 @@ export const BarDisplayNode =  {
   $meta: {
     id: 'BarDisplayNode',
     displayName: 'Bar Display',
-    category: 'Output'
+    category: 'Fields'
   },
   $stores: {
     ClassifierResults: {

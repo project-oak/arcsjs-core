@@ -10,7 +10,7 @@ export const JsonViewer =  {
   $meta: {
     id: 'JsonViewerNode',
     displayName: 'Json Viewer',
-    category: 'Output'
+    category: 'Fields'
   },
   $stores: {
     json: {
@@ -29,7 +29,7 @@ export const OutputImage = {
   $meta: {
     id: 'OutputImageNode',
     displayName: 'Output Image',
-    category: 'Output'
+    category: 'Fields'
   },
   $stores: {
     image: {
