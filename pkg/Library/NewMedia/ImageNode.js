@@ -7,6 +7,7 @@
 export const ImageNode = {
   $meta: {
     id: 'ImageNode',
+    displayName: 'Image',
     category: 'Media'
   },
   $stores: {

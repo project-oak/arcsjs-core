@@ -37,6 +37,7 @@ export const Graph = {
     },
     JSONata: {
       type: 'JSONataNode',
+      displayName: 'JSONata Query',
       connections: {
         json: ['Input:data'],
         expression: ['Expression:data'],

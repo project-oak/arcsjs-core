@@ -190,14 +190,6 @@ export class DesignerLayout extends DragDrop {
     // This is to select the node right away when pointer is down.
     this.firePosition(this.target);
     this.dragRect = this.rect;
-    // TODO(sjmiles): hack to allow dragging only from title bar
-    // if (from === ':::') {
-    //   const t0 = e.composedPath?.()?.[0];
-    //   //console.log(t0 && t0.attributes.title);
-    //   if (t0 && !t0.attributes.title) {
-    //     return false;
-    //   }
-    // }
   }
   doMove(dx, dy) {
     if (this.dragRect && this.target) {
@@ -211,7 +203,7 @@ export class DesignerLayout extends DragDrop {
       // let the boxer adapt to the target end state
       requestAnimationFrame(() => this.target && this.setBoxStyle(this.boxer, this.getRect(this.target)));
       this.value = dragRect;
-      //this.fire('update-box');
+      this.fire('update-box');
     }
   }
   doDrag({l, t, w, h}, dx, dy, dragKind, dragFrom) {

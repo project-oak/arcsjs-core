@@ -45,7 +45,6 @@ export class NodeGraph extends Xen.Async {
       const [w2, h2] = [w/2, h/2];
       return {x: l+w2, y: t+h2, l, t, r: l+w, b: t+h, w, h, w2, h2};
     } else {
-      //console.log(key, 'has no rect');
       // calculate a default landing spot
       const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
       const p = i => ({
@@ -145,7 +144,7 @@ export class NodeGraph extends Xen.Async {
         const i1offset = spacing * (ii1-ii1c) + margin;
         const g1 = this.geom(rects, edge.to.id, i1);
         //
-        const p0 = {x: g0.r - 2, y: g0.y + i0offset};
+        const p0 = {x: g0.r - 1, y: g0.y + i0offset};
         const p1 = {x: g1.l + 1, y: g1.y + i1offset};
         const path = this.calcBezier(p0, p1);
         //
@@ -243,6 +242,7 @@ const template = Xen.Template.html`
     font-size: 11px;
     font-weight: bold;
     cursor: pointer;
+    opacity: 0.9;
   }
   [node] span {
     text-align: center;
@@ -306,6 +306,7 @@ const template = Xen.Template.html`
   }
 </style>
 
+<canvas layer1 width="2000" height="800"></canvas>
 <div layer0>
   <designer-layout
     rects="{{rects}}"
@@ -314,7 +315,6 @@ const template = Xen.Template.html`
     on-delete="onNodeDelete"
     repeat="node_t">{{nodes}}</designer-layout>
 </div>
-<canvas layer1 width="2000" height="800"></canvas>
 
 <template node_t>
   <div node flex column id="{{nodeId}}" key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-mousedown="onNodeSelect">

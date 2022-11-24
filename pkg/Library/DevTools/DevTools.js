@@ -27,6 +27,10 @@ render({graphs}, {runtime, showTools, capturedState, kick, graphText}) {
   const storeBools = user && keys(user.stores).reduce((map, key) => (map[key] = false, map), {});
   const hosts = this.renderAllHosts(users);
   const stores = this.renderAllStores(users);
+  const context = {
+    stores: stores.user,
+    hosts: hosts.user
+  };
   //
   const graphOptions = !graphs ? [] : graphs.map(({$meta}) => $meta);
   //
@@ -35,7 +39,7 @@ render({graphs}, {runtime, showTools, capturedState, kick, graphText}) {
     showTools,
     particles: hosts,
     stores,
-    context: {stores: stores.user, hosts: hosts.user},
+    context, // {stores: stores.user, hosts: hosts.user},
     version: Math.random(),
     storeBools,
     capturedState,

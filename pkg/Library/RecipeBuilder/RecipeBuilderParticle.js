@@ -14,16 +14,13 @@ initialize(inputs, state, {service}) {
 shouldUpdate({graph}) {
   return graph;
 },
-async update({graph}, state) {
-  const recipes = await state.builder(graph);
-  log(recipes);
-  // if (state.recipes?.length) {
-  //   await Promise.all(state.recipes.map(r => state.finagle(r, false)));
-  // }
-  state.recipes = recipes;
-  // if (recipes) {
-  //   await Promise.all(recipes.map(r => state.finagle(r, true)));
-  // }
-  return {recipes};
+async update(inputs, state) {
+  if (!state.tasked) {
+    await timeout(async () => {
+      const recipes = state.recipes = await state.builder(inputs.graph);
+      //log(recipes);
+    }, 500);
+    return {recipes: state.recipes};
+  }
 }
 });

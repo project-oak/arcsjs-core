@@ -15,10 +15,10 @@ template: html`
 <style>
   :host {
     min-width: 2em;
-    min-height: 4em;
+    min-height: 1em;
   }
   pre {
-    margin: 4px;
+    margin: 0; 
     font-size: 0.75em;
     font-family: sans-serif;
   }

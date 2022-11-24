@@ -14,9 +14,11 @@ async initialize(inputs, state) {
   state.stores = {};
 },
 
-async update({recipes, selectedNodeId}, state, {service}) {
+async update({recipes, selectedNodeId, layout}, state, {service}) {
   // reset selection state
   state.selectedNodeId = selectedNodeId;
+  // reset layout state
+  state.layout = layout;
   recipes ??= [];
   await this.removeOldRecipes(recipes, state, service);
   await this.renewRecipes(recipes, state, service);
@@ -107,8 +109,7 @@ async startRecipe(recipe, state, service) {
 findParticlesWithChangedConnections(recipe, runningRecipe) {
   const particleNames = this.getParticleNames(recipe);
   return particleNames.filter(particleName => {
-    return JSON.stringify(recipe[particleName].$inputs)
-      !== JSON.stringify(runningRecipe[particleName].$inputs);
+    return JSON.stringify(recipe[particleName].$inputs) !== JSON.stringify(runningRecipe[particleName].$inputs);
   });
 },
 
@@ -124,27 +125,37 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-render({graph, nodeTypes, categories, layout}, {selectedNodeId, recipes}) {
-  const particleIdsForNode = (node) =>
-      (node && !this.isUIHidden(node) &&
-        this.getParticleNamesForNode(node, graph, recipes)) ||
-      [];
-  const rects = values(graph?.nodes).map(
-    node => particleIdsForNode(node).map(id => ({id, position: layout?.[node.id]}))).flat();
+render({graph, nodeTypes, categories}, {selectedNodeId, recipes, layout}) {
   const node = graph?.nodes?.[selectedNodeId];
   const nodeType = nodeTypes?.[node?.type];
+  const ids = this.particleIdsForNode(node, graph, recipes);
+  const rects = this.getRects(graph, recipes, layout);
   return {
-    selectedKeys: particleIdsForNode(node),
     rects,
+    selectedKeys: ids,
     color: this.colorByCategory(nodeType?.$meta?.category, categories),
   };
 },
 
+particleIdsForNode(node, graph, recipes) {
+  return node
+    && !this.isUIHidden(node)
+    && this.getParticleNamesForNode(node, graph, recipes)
+    || []
+    ;
+},
+
 getParticleNamesForNode(node, graph, recipes) {
   if (graph) {
-    const fullNodeId = this.encodeFullNodeId(node, graph);
-    return this.getParticleNames(recipes[fullNodeId]);
+    const recipe = recipes[this.encodeFullNodeId(node, graph)];
+    return this.getParticleNames(recipe);
   }
+},
+
+getRects(graph, recipes, layout) {
+  const rectMap = (id, node) => ({id, position: layout?.[node.id]});
+  const nodeMap = node => this.particleIdsForNode(node, graph, recipes).map(id => rectMap(id, node));
+  return values(graph?.nodes).map(nodeMap).flat();
 },
 
 isUIHidden(node) {
@@ -165,9 +176,11 @@ onNodePosition({eventlet: {key, value}, graph, layout}, state) {
   if (!node) {
     return this.selectNode(null, state);
   }
+  //console.log('caching layout rect', node.id, value);
+  layout = state.layout = {...layout, [node.id]: value};
   return {
-    ...this.selectNode(node.id, state),
-    layout: {...layout, [node.id]: value}
+    layout,
+    ...this.selectNode(node.id, state)
   };
 },
 

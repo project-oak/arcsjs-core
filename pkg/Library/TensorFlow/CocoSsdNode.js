@@ -3,7 +3,7 @@ export const CocoSsdNode = {
     id: 'CocoSsdNode',
     displayName: 'CocoSsd',
     description: 'TensorFlow CocoSsd',
-    category: 'TensorFlow',
+    category: 'ML',
     module: `# Detects face and corresponding landmarks.
 node {
   calculator: "drishti.xeno.FaceLandmarksGpu"

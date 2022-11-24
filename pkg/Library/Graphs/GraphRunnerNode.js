@@ -8,7 +8,7 @@ export const GraphRunnerNode = {
   $meta: {
     id: 'GraphRunnerNode',
     displayName: 'Graph Runner',
-    category: 'AI'
+    category: 'ML'
   },
   $stores: {
     live: {
