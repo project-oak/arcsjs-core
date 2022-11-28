@@ -199,12 +199,16 @@ export const NodeCreator = {
     $inputs: [
       'newNodeInfos',
       'nodeTypes',
-      {graph: 'selectedGraph'}
+      {graph: 'selectedGraph'},
+      'previewLayout',
+      'nodegraphLayout'
     ],
     $outputs: [
       'newNodeInfos',
       {graph: 'selectedGraph'},
-      'selectedNodeId'
+      'selectedNodeId',
+      'previewLayout',
+      'nodegraphLayout'
     ]
   }
 };

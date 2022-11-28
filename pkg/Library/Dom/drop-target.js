@@ -20,7 +20,15 @@ Xen.DropTarget = class extends Xen.Async {
   }
   onDrop(e) {
     e.preventDefault();
-    this.value = e.dataTransfer?.getData('text/plain') || 'no dataTransfer';
+    const id = e.dataTransfer?.getData('text/plain');
+    if (id) {
+      // TODO(mariakleiner): use correct position.
+      // const {height: h, left: l, top: t, width: w} = this.calculateCoordinates(e);
+      // this.value = {id, position: {l, h, t, w}};
+      this.value = {id};
+    } else {
+      this.value = 'no dataTransfer';
+    }
     this.fire('target-drop');
   }
 };
