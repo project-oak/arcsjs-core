@@ -48,7 +48,6 @@ export class NodeGraph extends Xen.Async {
       const [w2, h2] = [w/2, h/2];
       return {x: l+w2, y: t+h2, l, t, r: l+w, b: t+h, w, h, w2, h2};
     } else {
-      //console.log(key, 'has no rect');
       // calculate a default landing spot
       const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
       const p = i => ({
@@ -113,7 +112,7 @@ export class NodeGraph extends Xen.Async {
       style: {
         borderColor: selected ? color : bgColor,
         color: selected ? 'white' : 'gray',
-        background: bgColor,
+        background: bgColor
       },
       inputStyle: {
         background: 'transparent',
@@ -138,7 +137,7 @@ export class NodeGraph extends Xen.Async {
       //console.log('=');
       rects && graph?.graphEdges.map((edge, i) => {
         const spacing = 18;
-        const margin = 10;
+        const margin = 11;
         //
         const i0 = graph.graphNodes.findIndex(({key}) => key === edge.from.id);
         const i0outs = graph.graphNodes[i0]?.outputs;
@@ -167,7 +166,7 @@ export class NodeGraph extends Xen.Async {
         //
         //ctx.fillStyle = edge.color;
         ctx.fillStyle = 'lightblue';
-        ctx.strokeStyle = 'white';
+        ctx.strokeStyle = 'blue';
         this.circle(ctx, p0, 3.5);
         ctx.stroke();
         this.circle(ctx, p1, 3.5);
@@ -278,6 +277,7 @@ const template = Xen.Template.html`
     font-size: 11px;
     font-weight: bold;
     cursor: pointer;
+    opacity: 0.9;
   }
   [node] span {
     text-align: center;
@@ -302,6 +302,12 @@ const template = Xen.Template.html`
   [layer1] {
     position: absolute;
     pointer-events: none;
+  }
+  [layer0] [repeat] {
+    color: silver;
+  }
+  [layer0]:hover [repeat] {
+    color: gray;
   }
   [repeat="socket_i_t"] {
     margin-left: -10px;
@@ -335,6 +341,7 @@ const template = Xen.Template.html`
   }
 </style>
 
+<canvas layer1 width="2000" height="800"></canvas>
 <div layer0>
   <designer-layout
     rects="{{rects}}"
@@ -343,7 +350,6 @@ const template = Xen.Template.html`
     on-delete="onNodeDelete"
     repeat="node_t">{{nodes}}</designer-layout>
 </div>
-<canvas layer1 width="2000" height="800"></canvas>
 
 <template node_t>
   <div node flex column id="{{nodeId}}" key="{{key}}" selected$="{{selected}}" xen:style="{{style}}" on-mousedown="onNodeSelect">

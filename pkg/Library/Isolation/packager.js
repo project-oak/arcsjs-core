@@ -9,7 +9,7 @@ import {code} from '../Core/core.js';
 export const packageProtoFactory = (factoryProto, kind) => {
   const {funcs, consts} = collectDecls(factoryProto);
   const factoryRewrite = `
-({log, SafeObject: {assign, keys, entries, values, create, mapBy, deepEqual}, ...etc}) => ({
+({log, SafeObject: {assign, keys, entries, values, create, map, mapBy, deepEqual}, ...etc}) => ({
 
 
 ${[funcs.join(',\n\n'), consts.join(',\n')].filter(n => n).join(',\n')}

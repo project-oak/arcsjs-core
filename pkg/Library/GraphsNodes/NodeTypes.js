@@ -7,17 +7,32 @@
 import {NodeCatalogNode} from './NodeCatalogNode.js';
 import {ObjectInspectorNode} from './ObjectInspectorNode.js';
 import {JSONataNode} from './JSONataNode.js';
-import {DataNode} from './DataNode.js';
+import {DataNode, PersistedDataNode} from './DataNode.js';
 import {DisplayNode} from './DisplayNode.js';
 import {ImageNode} from './ImageNode.js';
 import {CameraNode} from './CameraNode.js';
+import {TextFieldNode} from './TextFieldNode.js';
+import {SelectFieldNode} from './SelectFieldNode.js';
+import {LibrarianNode} from '../Graphs/LibrarianNode.js';
+import {GraphRunnerNode} from '../Graphs/GraphRunnerNode.js';
+import {ArcNode} from '../App/ArcNode.js';
+
+import {AudioNode, ImageCompositeNode} from '../NewMedia/Nodes.js';
 
 export const NodeTypes = {
-  NodeCatalogNode,
-  ObjectInspectorNode,
   JSONataNode,
   DataNode,
+  PersistedDataNode,
   DisplayNode,
   ImageNode,
-  CameraNode
+  CameraNode,
+  AudioNode,
+  ImageCompositeNode,
+  ArcNode,
+  TextFieldNode,
+  SelectFieldNode,
+  LibrarianNode,
+  GraphRunnerNode,
+  NodeCatalogNode,
+  ObjectInspectorNode
 };

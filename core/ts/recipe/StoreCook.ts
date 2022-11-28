@@ -6,7 +6,6 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-
 import {logFactory} from '../utils/log.js';
 import {matches} from '../utils/matching.js';
 import {Runtime} from '../Runtime.js';
@@ -17,13 +16,29 @@ const log = logFactory(logFactory.flags.recipe, 'StoreCook', '#99bb15');
 
 const {values} = Object;
 
-const findStores = (runtime: Runtime, criteria: Partial<StoreMeta>) => {
-  return values(runtime.stores).filter(store => matches(store?.meta, criteria));
+const mapStore = (runtime: Runtime, {name, type}) => {
+  return findStores(runtime, {name, type})?.[0];
 };
 
-const mapStore = (runtime: Runtime, {name, type}) => {
+const findStores = (runtime: Runtime, criteria: Partial<StoreMeta>) => {
+  return values(runtime.stores).filter(store => storeMatches(store, criteria));
+};
+
+const storeMatches = (store, criteria: Partial<StoreMeta>) => {
   // TODO(b/244191110): Type matching API to be wired here.
-  return findStores(runtime, {name, type})?.[0];
+  const {type, ...other} = criteria;
+  if (typeMatches(type, store?.meta.type)) {
+    // generic object comparison
+    return matches(store?.meta, other);
+  }
+};
+
+const typeMatches = (typeA, typeB) => {
+  const baseTypes = ['pojo','json'];
+  return (typeA === typeB)
+    || baseTypes.includes(typeA?.toLowerCase())
+    || baseTypes.includes(typeB?.toLowerCase())
+    ;
 };
 
 export type StoreMapFunc = (runtime: Runtime, arc: Arc, store) => void;
@@ -74,9 +89,10 @@ export class StoreCook {
     runtime.addStore(meta.name, store);
     return store;
   }
-  static async derealizeStore(runtime: Runtime, arc: Arc, spec: StoreSpec) {
-    runtime.removeStore(spec.$name);
-    arc.removeStore(spec.$name);
+  static async derealizeStore(runtime: Runtime, arc: Arc, meta: StoreMeta) {
+    log(`derealizeStore: derealizing "${meta.name}"`);
+    runtime.removeStore(meta.name);
+    arc.removeStore(meta.name);
   }
   static constructMeta(runtime: Runtime, arc: Arc, rawMeta: StoreMeta): StoreMeta {
     const meta = {

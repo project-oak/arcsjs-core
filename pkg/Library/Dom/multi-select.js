@@ -19,6 +19,9 @@ export class MultiSelect extends Xen.Async {
 
   update(inputs, state) {
     Object.assign(state, inputs);
+    state.options = inputs.options?.map(opt =>
+      typeof opt === 'string' ? {key: opt, name: opt} : opt
+    );
   }
 
   onChange() {

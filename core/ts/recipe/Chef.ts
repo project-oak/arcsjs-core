@@ -42,7 +42,7 @@ export class Chef {
     const plan = new Parser(recipe);
     // `store` work
     // TODO(sjmiles): not sure what stores are unique to this plan
-    //await StoreCook.evacipate(runtime, arc, plan);
+    await StoreCook.evacipate(runtime, arc, plan.stores);
     // `particle` work
     await ParticleCook.evacipate(runtime, arc, plan.particles);
     // seasoning
@@ -55,9 +55,10 @@ export class Chef {
     for (const recipe of recipes) {
       await this.execute(recipe, runtime, arc);
     }
-    //return Promise.all(recipes?.map(recipe => this.execute(recipe, runtime, arc)));
   }
   static async evacipateAll(recipes: Recipe[], runtime: Runtime, arc: Arc) {
-    return Promise.all(recipes?.map(recipe => this.evacipate(recipe, runtime, arc)));
+    for (const recipe of recipes) {
+      await this.evacipate(recipe, runtime, arc);
+    }
   }
 }

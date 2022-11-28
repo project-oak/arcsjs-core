@@ -38,14 +38,6 @@ arcs.blargTheWorker = async ({paths}) => {
   return worker;
 };
 
-// composer handles render packets
-
-let composer;
-
-const renderPacket = packet =>  {
-  composer?.render(packet);
-};
-
 // n.b. vibrational paths are worker-relative
 
 const receiveVibrations = msg => {
@@ -63,6 +55,11 @@ const receiveVibrations = msg => {
   }
 };
 
+// render packet from Arcs engine
+const renderPacket = packet =>  {
+  arcs.onrender?.(packet);
+};
+
 // service call from Arcs engine
 const handleServiceCall = async msg => {
   // async `onservice` handler was provided by user
@@ -71,9 +68,22 @@ const handleServiceCall = async msg => {
   socket.sendVibration({kind: 'serviceResult', sid: msg.sid, data});
 };
 
+const createComposer = async root => {
+  if (root) {
+    // make a composer suitable for rendering on our document
+    const composer = new Composer(root, true);
+    // channel local events into vibrations
+    composer.onevent = (pid, eventlet) => {
+      socket.sendVibration({kind: 'handleEvent', pid, eventlet});
+    };
+    socket.sendVibration({kind: 'rerender'});
+    return composer
+  }
+};
+
 // public API
 
-arcs.init = async ({root, paths, onservice, injections}) => {
+arcs.init = async ({paths, onrender, onservice, injections}) => {
   log.log(paths, injections);
   // worker path is document relative
   const worker = await arcs.blargTheWorker({paths});
@@ -81,9 +91,8 @@ arcs.init = async ({root, paths, onservice, injections}) => {
   socket = new MessageBus(worker);
   // listen to worker
   socket.receiveVibrations(receiveVibrations);
-  // set composer root
-  arcs.setComposerRoot(root);
   // connect app-supplied conduits
+  arcs.onrender = onrender;
   arcs.onservice = onservice;
   // memoize paths
   arcs.addPaths(paths);
@@ -110,17 +119,16 @@ arcs.get = async (arc, storeKey) => {
   });
 };
 
-arcs.setComposerRoot = root => {
-  if (root) {
-    // make a composer suitable for rendering on our document
-    composer = new Composer(root, true);
-    // channel local events into vibrations
-    composer.onevent = (pid, eventlet) => {
-      socket.sendVibration({kind: 'handleEvent', pid, eventlet});
-    };
-    socket.sendVibration({kind: 'rerender'});
-  }
+arcs.createComposer = root => {
+  return createComposer(root);
 };
+
+// arcs.setComposerRoot = root => {
+//   if (root) {
+//     // make a composer suitable for rendering on our document
+//     composer = createComposer(root);
+//   }
+// };
 
 arcs.addPaths         = (paths)                   => socket.sendVibration({kind: 'addPaths', paths});
 arcs.createArc        = (arc)                     => socket.sendVibration({kind: 'createArc', arc});
@@ -130,6 +138,8 @@ arcs.updateParticle   = (particle, code, arc)     => socket.sendVibration({kind:
 arcs.setInputs        = (arc, particle, inputs)   => socket.sendVibration({kind: 'setInputs', arc, particle, inputs});
 arcs.addRecipe        = (arc, recipe)             => socket.sendVibration({kind: 'addRecipe', recipe, arc});
 arcs.addRecipes       = (arc, recipes)            => socket.sendVibration({kind: 'addRecipes', recipes, arc});
+arcs.removeRecipe     = (arc, recipe)             => socket.sendVibration({kind: 'removeRecipe', recipe, arc});
+arcs.removeRecipes    = (arc, recipes)            => socket.sendVibration({kind: 'removeRecipes', recipes, arc});
 arcs.set              = (arc, storeKey, data)     => socket.sendVibration({kind: 'setStoreData', arc, storeKey, data});
 arcs.setOpaqueData    = (key, data)               => socket.sendVibration({kind: 'setOpaqueData', key, data});
 

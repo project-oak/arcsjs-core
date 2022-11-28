@@ -1,16 +1,25 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 ({
+update({value, connectedValue}, state) {
+  value = state.value = connectedValue ?? value;
+  return {value};
+},
+render(inputs, {value}) {
+  return {
+    ...inputs,
+    value
+  };
+},
 onLabelChange({eventlet: {value}}) {
   return {label: value};
 },
-onFieldChange({eventlet: {value}}) {
+onFieldChange({eventlet: {value}}, state) {
+  state.value = value;
   return {value};
 },
 template: html`

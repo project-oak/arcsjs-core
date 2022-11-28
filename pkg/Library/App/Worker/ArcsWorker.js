@@ -178,7 +178,6 @@ const handlers = {
     }
     return true;
   },
-
   createParticle: async ({name, arc, meta, code}) => {
     const realArc = getArc(arc);
     if (realArc) {
@@ -212,6 +211,13 @@ const handlers = {
   addRecipes: async ({arc, recipes}) => {
     const realArc = await requireArc(arc);
     return Chef.executeAll(recipes, user, realArc);
+  },
+  removeRecipe: async ({arc, recipe}) => {
+    return Chef.evacipate(recipe, user, await requireArc(arc));
+  },
+  removeRecipes: async ({arc, recipes}) => {
+    const realArc = await requireArc(arc);
+    return Chef.evacipateAll(recipes, user, realArc);
   },
   setStoreData: async ({arc, storeKey, data}) => {
     const realArc = getArc(arc);

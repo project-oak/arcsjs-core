@@ -28,6 +28,7 @@ export const CameraNode = {
     },
     stream: {
       $type: 'Stream',
+      $tags: ['private'],
       $value: 'default'
     },
     fps: {
@@ -36,6 +37,7 @@ export const CameraNode = {
     },
     frame: {
       $type: 'Image',
+      $tags: ['private'],
       noinspect: true,
       nomonitor: true
     }

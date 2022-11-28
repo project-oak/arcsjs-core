@@ -163,7 +163,7 @@ export class Arc extends EventEmitter {
   }
   async render(packet) {
     if (this.composer) {
-      this.composer.render(packet);
+      this.composer.render({...packet, arcid: this.id});
     } else {
       //this.log.low('render called, but composer is null', packet);
     }

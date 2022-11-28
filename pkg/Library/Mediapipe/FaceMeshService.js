@@ -167,7 +167,7 @@ export const FaceMeshModel = {
       // resize sticker
       const depth = lerp(z, -0.15, .1, 10, 1);
       const size = depth / scalar;
-      const [sw, sh] = [masque.width*size, masque.height*size];
+      const [sw, sh] = [sticker.width*size, sticker.height*size];
       // offset to top-left sticker corner
       const [cx, cy] = [sw/2, sh/2];
       ctx.drawImage(sticker, sx-cx, sy-cy, sw, sh);

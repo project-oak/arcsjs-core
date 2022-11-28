@@ -7,17 +7,20 @@
 export const DisplayNode = {
   $meta: {
     id: 'DisplayNode',
-    displayName: 'Display Data',
+    displayName: 'Display',
     category: 'Fields'
   },
   $stores: {
     text: {
       $type: 'Pojo',
       connection: true
+    },
+    textStyle: {
+      $type: 'CssStyle'
     }
   },
   text: {
     $kind: '$library/Fields/TextObject',
-    $inputs: ['text']
+    $inputs: ['text', 'textStyle']
   }
 };

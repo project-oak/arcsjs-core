@@ -10,7 +10,7 @@
 import {logFactory} from '../utils/log.js';
 import {Dictionary, SlotSpec, Recipe, Container, StoreSpec, ParticleSpec, ParticleId, Slot} from './types.js';
 
-const log = logFactory(logFactory.flags.recipe, 'flan', 'violet');
+const log = logFactory(logFactory.flags.recipe, 'RecipeParser', 'violet');
 
 const {entries, create} = Object;
 
@@ -86,7 +86,7 @@ export class Parser {
       throw Error();
     }
     if (this.particles.find(s => s.id === id)) {
-      log('duplicate particle name');
+      log('duplicate particle name', id, spec);
       return;
     }
     this.particles.push({id, container, spec});

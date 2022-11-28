@@ -18,7 +18,7 @@ const RecipeBuilder = {
     $outputs: [{graph: 'selectedGraph'}]
   },
   recipeBuilder: {
-    $kind: '$library/NodeGraph/RecipeBuilder',
+    $kind: '$library/RecipeBuilder/RecipeBuilder',
     $inputs: [
       'nodeTypes',
       {graph: 'selectedGraph'},

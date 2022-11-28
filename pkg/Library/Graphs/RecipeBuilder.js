@@ -5,6 +5,9 @@
  * license that can be found in the LICENSE file.
  */
 import {SafeObject} from '../Isolation/safe-object.js';
+import {logFactory} from '../Core/utils.js';
+
+const log = logFactory(logFactory.flags.RecipeBulder, 'RecipeBuilder', 'darkorange', 'darkblue');
 
 const {keys, entries, assign} = SafeObject;
 
@@ -25,17 +28,30 @@ export const RecipeBuilder = {
   },
 
   recipesForGraph(inputs, state) {
-    return entries(inputs.graph.nodes)
+    // capture all Store specs invented
+    state.allStoreSpecs = [];
+    // construct recipes
+    const recipes = entries(inputs.graph.nodes)
       .map(([n, v]) => ({id: n, ...v}))
       .map(node => this.recipeForNode(node, inputs, state))
       .filter(recipe => recipe)
       ;
+    // collapse Store specs into one namespace
+    const allSpecs = {};
+    state.allStoreSpecs.forEach(specs => Object.assign(allSpecs, specs));
+    // propagate tags from connected stores onto realized stores
+    this.retagStoreSpecs(state.storeMap, allSpecs);
+    return recipes;
   },
 
   recipeForNode(node, {graph, nodeTypes, layout}, state) {
-    const nodeType = this.flattenNodeType(nodeTypes?.[node?.type]);
-    return !nodeType ? null : {
-      $stores: this.buildStoreSpecs(node, nodeType, state),
+    const rawNodeType = nodeTypes?.[node?.type] ?? nodeTypes?.LibrarianNode;
+    const nodeType = this.flattenNodeType(rawNodeType);
+    log('recipeForNode', node, nodeType);
+    const storeSpecs = this.buildStoreSpecs(node, nodeType, state);
+    state.allStoreSpecs.push(storeSpecs);
+    return {
+      $stores: storeSpecs,
       $meta: {
         name: this.encodeFullNodeId(node, graph, this.connectorDelim),
         custom: nodeType.$meta?.custom
@@ -78,19 +94,33 @@ export const RecipeBuilder = {
       state.storeMap[name] = [];
       if (store.connection) {
         const connections = node.connections?.[name];
-        connections?.forEach(connection => state.storeMap[name].push(connection));
+        connections?.forEach?.(id => state.storeMap[name].push({id, tags: store.$tags}));
       } else {
         const storeId = this.constructId(node.id, name);
         specs[storeId] = this.buildStoreSpec(store, node.props?.[name], node);
-        state.storeMap[name].push(storeId);
+        state.storeMap[name].push({id: storeId});
       }
     });
     return specs;
   },
 
+  retagStoreSpecs(storeMap, storeSpecs) {
+    Object.values(storeMap).forEach(connections => {
+      connections?.forEach?.(({id, tags}) => {
+        if (tags) {
+          const spec = storeSpecs[id];
+          if (spec) {
+            spec.$tags = [...spec.$tags, ...tags];
+          }
+        }
+      });
+    });
+  },
+
   buildStoreSpec(store, value, node) {
     return {
       $type: store.$type,
+      $tags: store.$tags,
       $value: this.formatStoreValue(store, value, node)
     };
   },
@@ -120,6 +150,7 @@ export const RecipeBuilder = {
     const bindings = this.resolveBindings(particleSpec, storeMap);
     const resolvedSpec = {
       $slots: {},
+      $staticInputs: node.props,
       ...particleSpec,
       ...bindings,
       ...($container && {$container})
@@ -143,7 +174,7 @@ export const RecipeBuilder = {
     return bindings?.map(coded => {
       const {key, binding} = this.decodeBinding(coded);
       const task = (store, index) => ({[`${key}${index === 0 ? '' : index}`]: store});
-      return storeMap[binding || key]?.map(task);
+      return storeMap[binding || key]?.map(({id}, i) => task(id, i));
     }).flat().filter(i=>i);
   },
 

@@ -46,6 +46,9 @@ export class ImageResource extends Xen.Async {
     this.canvas = this._dom.$('canvas');
     this.canvasId = Resources.allocate(this.canvas);
   }
+  // shouldUpate() {
+  //   return !this.updating;
+  // }
   update({image, masks}, state, {service}) {
     // manage inputs
     let useMasks = masks;
@@ -70,10 +73,16 @@ export class ImageResource extends Xen.Async {
   }
   async updateImage(image, state) {
     if (!image?.canvas && image?.url) {
+      // this.updating = true;
       image.canvas = this.canvasId;
-      await this.updateImageCanvas(image);
+      if (state.url !== image?.url) {
+        state.url = image.url;
+        await this.updateImageCanvas(image);
+      }
       this.value = image;
       this.fire('canvas');
+      // this.updating = false;
+      // this.invalidate();
     }
     if (image?.canvas && image.canvas !== this.canvasId) {
       const realCanvas = Resources.get(image.canvas);
@@ -94,8 +103,12 @@ export class ImageResource extends Xen.Async {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.src = image.url;
-    await img.decode();
-    this.copyImage(img);
+    try {
+     await img.decode();
+     this.copyImage(img);
+    } catch(x) {
+      console.warn(x);
+    }
   }
   // render({image}, state) {
   //   const model = {};
