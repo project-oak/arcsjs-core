@@ -49,7 +49,14 @@ retrieveInputsAndOutputs(nodeType) {
     inputs.push(...this.retrieveBindings(nodeType[name].$inputs, nodeType));
     outputs.push(...this.retrieveBindings(nodeType[name].$outputs, nodeType));
   });
-  return {inputs, outputs};
+  return {
+    inputs: this.uniqueBindings(inputs),
+    outputs: this.uniqueBindings(outputs)
+  };
+},
+
+uniqueBindings(bindings) {
+  return bindings.filter((binding, index, self) => self.findIndex(({name}) => name === binding.name) === index);
 },
 
 getParticleNames(nodeType) {

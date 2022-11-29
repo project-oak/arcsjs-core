@@ -18,19 +18,11 @@ export const TextFieldNode = {
     value: {
       $type: 'String',
       $value: 'value'
-    },
-    connectedValue: {
-      $type: 'String',
-      connection: true
-    },
-    outputValue: {
-      $type: 'String',
-      $value: ''
     }
   },
   field: {
     $kind: '$library/Fields/TextField',
-    $inputs: ['label', 'value', 'connectedValue'],
-    $outputs: ['label', {value: 'outputValue'}]
+    $inputs: ['label', 'value'],
+    $outputs: ['label', 'value']
   }
 };

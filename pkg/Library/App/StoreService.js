@@ -5,6 +5,8 @@
  * license that can be found in the LICENSE file.
  */
 
+import {StoreCook} from '../Core/core.js';
+
 export const StoreService = async (runtime, host, request) => {
   switch (request.msg) {
     case 'GetStoreValue':
@@ -17,6 +19,8 @@ export const StoreService = async (runtime, host, request) => {
       return ListenToAllChanges(runtime, host) || null;
     case 'RemoveStore':
       return removeStore(request.data.storeId, runtime);
+    case 'AddStore':
+      return addStore(request.data, runtime, host);
   }
 };
 
@@ -70,5 +74,10 @@ const ListenToAllChanges = async (runtime, host) => {
 const removeStore = (storeId, runtime) => {
   runtime.removeStore(storeId);
   Object.values(runtime.arcs).forEach(arc => arc.removeStore(storeId));
+  return true;
+};
+
+const addStore = async({storeId, store}, runtime, host) => {
+  await StoreCook.realizeStore(runtime, host.arc, {name: storeId, ...store});
   return true;
 };

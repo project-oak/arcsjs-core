@@ -5,19 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 ({
-update(inputs, state) {
-  let {value, connectedValue, connectedValue1} = inputs;
-  if (connectedValue1 && connectedValue1 !== state.lastInputs?.connectedValue1) {
-    value = connectedValue1;
-  }
-  if (connectedValue && connectedValue !== state.lastInputs?.connectedValue) {
-    value = connectedValue;
-  }
-  state.lastInputs = {...inputs};
-  state.value = value;
-  return {value};
-},
-render({label}, {value}) {
+render({label, value}) {
   return {
     label: label ?? '',
     value: value ?? ''
@@ -26,8 +14,7 @@ render({label}, {value}) {
 onLabelChange({eventlet: {value}}) {
   return {label: value};
 },
-onFieldChange({eventlet: {value}}, state) {
-  state.value = value;
+onFieldChange({eventlet: {value}}) {
   return {value};
 },
 template: html`

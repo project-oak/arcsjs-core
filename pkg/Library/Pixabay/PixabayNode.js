@@ -11,10 +11,6 @@ export const PixabayNode = {
     category: 'Media'
   },
   $stores: {
-    connectedQuery: {
-      $type: 'String',
-      connection: true
-    },
     query: {
       $type: 'String'
     },
