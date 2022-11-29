@@ -57,8 +57,9 @@ updatePropValue(prop, currentValue, node, service) {
   if (JSON.stringify(prop.value) !== JSON.stringify(currentValue)) {
     // Note: setting entire prop value (not granular by inner props).
     const newValue = this.formatPropValue(prop);
-    if (prop.store.connection) {
-      return this.updateConnection(prop.name, newValue, node);
+    if (prop.name.endsWith('-connection')) {
+      const propName = prop.name.substring(0, prop.name.length - '-connection'.length);
+      return this.updateConnection(propName, newValue, node, service);
     } else {
       return this.updatePropInNode(prop.name, newValue, node, service);
     }
@@ -74,13 +75,20 @@ formatPropValue({value, store: {$type}}) {
   return value;
 },
 
-updateConnection(name, value, node) {
+updateConnection(name, value, node, service) {
+  const props = {...node.props};
+  const connections = {...node.connections};
+  if (value?.length > 0) {
+    delete props[name];
+    this.updateStoreValue(this.fullStoreId(node, name), undefined, service);
+    connections[name] = value;
+  } else {
+    delete connections[name];
+  }
   return {
     ...node,
-    connections: {
-      ...node.connections,
-      [name]: value || []
-    }
+    props,
+    connections
   };
 },
 

@@ -48,10 +48,10 @@ async stopRecipe(recipe, state, service) {
 
 async removeStores({$stores}, state, service) {
   return Promise.all(entries($stores || {}).map(async ([storeId, store]) => {
-    if (!store.connection) {
-      delete state.stores[storeId];
-      await service({kind: 'StoreService', msg: 'RemoveStore', data: {storeId}});
-    }
+    // if (!store.connection) {
+    delete state.stores[storeId];
+    await service({kind: 'StoreService', msg: 'RemoveStore', data: {storeId}});
+    // }
   }));
 },
 
@@ -64,10 +64,19 @@ async renewRecipes(recipes, state, service) {
       }
       await this.startRecipe(recipe, state, service);
     } else {
+      await this.updateStores(recipe, runningRecipe, state, service);
       await this.updateConnections(recipe, runningRecipe, state, service);
       await this.updateContainers(recipe, runningRecipe, state, service);
     }
   }
+},
+
+async updateStores(recipe, runningRecipe, state, service) {
+  const storeIds = this.findMissingStores(recipe, runningRecipe);
+  storeIds.forEach(storeId => {
+    service({kind: 'StoreService', msg: 'AddStore', data: {storeId, store: recipe.$stores[storeId]}});
+    state.recipes[recipe.$meta.name] = recipe;
+  });
 },
 
 async updateConnections(recipe, runningRecipe, state, service) {
@@ -104,6 +113,10 @@ async startRecipe(recipe, state, service) {
     recipe: this.omitConnectionStores(recipe, state),
     value: true
   }});
+},
+
+findMissingStores(recipe, runningRecipe) {
+  return keys(recipe.$stores).filter(storeId => !runningRecipe.$stores[storeId]);
 },
 
 findParticlesWithChangedConnections(recipe, runningRecipe) {

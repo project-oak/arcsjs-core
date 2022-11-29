@@ -94,12 +94,13 @@ chooseTemplate({store: {$type, values, range}, value}, isEditing, customInspecto
 },
 
 constructPropModel(key, prop, parent, template, state) {
-  const {name, propId, store: {$type, values, range, multiple}, value, displayName} = prop;
+  const {name, propId, store: {$type, values, range, multiple}, value, disabled, displayName} = prop;
   let model = {
     name,
     key,
     displayName: displayName || name,
     type: $type,
+    disabled,
     value
   };
   switch (template) {
@@ -285,7 +286,7 @@ template: html`
   :host {
     white-space: nowrap;
     background-color: var(--theme-color-bg-0);
-    color: var(--them-color-fg-4);
+    color: var(--theme-color-fg-4);
     position: relative;
     overflow-y: auto;
   }
@@ -526,7 +527,7 @@ template: html`
 <template text_t>
   <div prop-container vertical>
     <span label control>{{displayName}}</span>
-    <input type="text" key="{{key}}" value="{{value}}" on-change="onPropChange">
+    <input type="text" key="{{key}}" value="{{value}}" disabled="{{disabled}}" on-change="onPropChange">
   </div>
 </template>
 

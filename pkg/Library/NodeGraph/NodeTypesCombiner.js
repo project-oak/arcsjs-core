@@ -20,7 +20,35 @@ async update({builtinNodeTypes, selectedGraph}, state, {service}) {
 },
 
 addBuiltinNodeTypes(builtinNodeTypes, results) {
-  entries(builtinNodeTypes).forEach(([key, nodeType]) => results[key] = nodeType);
+  entries(builtinNodeTypes).forEach(
+      ([key, nodeType]) => results[key] = this.flattenNodeType(nodeType));
+},
+
+// TODO(mariakleiner): duplicate from RecipeBuilder, factor?
+flattenNodeType(nodeType, $container) {
+  const flattened = {};
+  keys(nodeType).forEach(key => {
+    if (key.startsWith('$')) {
+      flattened[key] = nodeType[key];
+    } else {
+      assign(flattened, this.flattenParticleSpec(key, nodeType[key], $container));
+    }
+  });
+  return flattened;
+},
+
+flattenParticleSpec(particleId, particleSpec, $container) {
+  const flattened = {
+    [particleId]: {
+      ...particleSpec,
+      $slots: {},
+      ...($container && {$container})
+    }
+  };
+  entries(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
+    assign(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`));
+  });
+  return flattened;
 },
 
 updateGraphCustomNodeTypes(graph) {
@@ -48,7 +76,7 @@ updateGraphCustomNodes(graph, nodeTypes) {
 async addCustomNodeTypes(customNodeTypes, results, state, service) {
   for (const [nodeId, {html, js, spec}] of entries(customNodeTypes)) {
     if (spec?.$meta?.id && spec?.$meta?.category) {
-      results[nodeId] = spec;
+      results[nodeId] = this.flattenNodeType(spec);
     }
     await this.registerCustomParticle(nodeId, {html, js}, state, service);
   }

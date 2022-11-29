@@ -31,10 +31,8 @@ findCandidates(graph, nodeTypes, globalStores) {
 findNodeCandidates(node, graph, nodeTypes, globalStores) {
   const candidates = {};
   entries(nodeTypes[node.type]?.$stores).forEach(([storeName, store]) => {
-    if (store.connection) {
-      candidates[storeName] =
-        this.findConnectionCandidates(node.id, storeName, store, graph, nodeTypes, globalStores);
-    }
+    candidates[storeName] =
+      this.findConnectionCandidates(node.id, storeName, store, graph, nodeTypes, globalStores);
   });
   return candidates;
 },

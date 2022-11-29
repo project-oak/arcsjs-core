@@ -38,7 +38,7 @@ export const CameraNode = {
     frame: {
       $type: 'Image',
       $tags: ['private'],
-      noinspect: true,
+      // noinspect: true,
       nomonitor: true
     }
   },

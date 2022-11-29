@@ -7,7 +7,7 @@
 import {NodeCatalogNode} from './NodeCatalogNode.js';
 import {ObjectInspectorNode} from './ObjectInspectorNode.js';
 import {JSONataNode} from './JSONataNode.js';
-import {DataNode, PersistedDataNode} from './DataNode.js';
+// import {DataNode, PersistedDataNode} from './DataNode.js';
 import {DisplayNode} from './DisplayNode.js';
 import {ImageNode} from './ImageNode.js';
 import {CameraNode} from './CameraNode.js';
@@ -23,8 +23,8 @@ import {ImageCompositeNode} from '../NewMedia/Nodes.js';
 
 export const NodeTypes = {
   JSONataNode,
-  DataNode,
-  PersistedDataNode,
+  // DataNode,
+  // PersistedDataNode,
   DisplayNode,
   ImageNode,
   CameraNode,
