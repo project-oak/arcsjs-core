@@ -5,10 +5,10 @@
  * license that can be found in the LICENSE file.
  */
 ({
-update({value, connectedValue}, state) {
-  value = state.value = connectedValue ?? value;
-  return {value};
+update({value}, state) {
+  state.value = value;
 },
+
 render(inputs, {value}) {
   return {
     ...inputs,

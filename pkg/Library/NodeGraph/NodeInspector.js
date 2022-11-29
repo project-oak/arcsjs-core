@@ -105,30 +105,32 @@ async constructData(node, inputs, state, service) {
   };
 },
 
-async constructProps(node, inputs, state, service) {
-  const props = [];
-  this.pushToProps(props, await this.constructStoreProps(node, inputs, state, service));
-  this.pushToProps(props, await this.constructConnections(node, inputs, service));
-  return props;
-},
-
 pushToProps(props, moreProps) {
   if (moreProps) {
     props.push(...moreProps);
   }
 },
 
-constructStoreProps(node, inputs, state, service) {
+async constructProps(node, inputs, state, service) {
   // construct property objects from Stores
-  const nodeType = node && inputs.nodeTypes[node.type];
+  const props = [];
+  const {graph, nodeTypes, candidates} = inputs;
+  const nodeType = node && nodeTypes[node.type];
   const stores = nodeType?.$stores;
   if (stores) {
-    return Promise.all(
-      entries(stores)
-        .filter(([name, store]) => !store.connection)
-        .map(([name, store]) => this.computeProp(node, {name, store}, inputs, state, service))
-    );
+    for(let [name, store] of entries(stores)) {
+      const prop = await this.computeProp(node, {name, store}, inputs, state, service);
+      const bindingProp = await this.renderBinding(node, name, candidates[node.id][name], graph, nodeTypes, service);
+      props.push(prop);
+      if (bindingProp) {
+        if (bindingProp?.length > 0) {
+          prop.disabled = true;
+        }
+        props.push(bindingProp);
+      }
+    }
   }
+  return props;
 },
 
 async computeProp(node, {name, store}, inputs, state, service) {
@@ -167,15 +169,6 @@ getStoreValue(storeId, service) {
   return service({kind: 'StoreService', msg: 'GetStoreValue', data: {storeId}});
 },
 
-async constructConnections(node, {graph, nodeTypes, candidates}, service) {
-  const matchingCandidates = keys(graph.nodes).every(id => candidates?.[id]);
-  if (matchingCandidates) {
-    return Promise.all(keys(candidates[node.id]).map(storeName => {
-      return this.renderBinding(node, storeName, candidates[node.id][storeName], graph, nodeTypes, service);
-    }));
-  }
-},
-
 async renderBinding(node, name, candidates, graph, nodeTypes, service) {
   if (candidates) {
     const froms = candidates.map(candidate => this.renderCandidate(candidate, graph)).filter(from => from);
@@ -184,7 +177,7 @@ async renderBinding(node, name, candidates, graph, nodeTypes, service) {
     const multiple = store.multiple;
     const connectedValue = await this.constructConnectedValue(value, graph, nodeTypes, service);
     return {
-      name,
+      name: `${name}-connection`,
       store: {
         ...store,
         $type: 'Connection',
