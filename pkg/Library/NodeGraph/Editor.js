@@ -11,8 +11,9 @@ connectionDelimiter: ':',
 
 async update(inputs, state) {
   state.layout = inputs.layout;
-  this.handleEvents(inputs, state);
+  const results = this.handleEvents(inputs, state);
   return {
+    ...results,
     editorToolbarIcons: this.toolbarIcons(inputs)
   };
 },
@@ -30,11 +31,11 @@ handleEvents(inputs, state) {
   }
 },
 
-handleEvent(inputs) {
+handleEvent(inputs, state) {
   const {event, selectedNodeId} = inputs;
   if (this[event]) {
     return {
-      ...this[event](inputs),
+      ...this[event](inputs, state),
       event: null
     };
   }
