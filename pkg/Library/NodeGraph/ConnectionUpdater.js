@@ -40,7 +40,7 @@ inputsChanged({graph, candidates}, state) {
 },
 
 graphChanged(graph, oldGraph) {
-  return graph.id !== oldGraph?.id ||
+  return graph.$meta.id !== oldGraph?.$meta?.id ||
          keys(graph.nodes).length !== keys(oldGraph?.nodes).length;
 },
 

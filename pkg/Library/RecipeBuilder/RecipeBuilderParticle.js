@@ -14,13 +14,26 @@ initialize(inputs, state, {service}) {
 shouldUpdate({graph}) {
   return graph;
 },
-async update(inputs, state) {
+async update({graph}, state) {
   if (!state.tasked) {
-    await timeout(async () => {
-      const recipes = state.recipes = await state.builder(inputs.graph);
-      //log(recipes);
-    }, 500);
-    return {recipes: state.recipes};
+    if (this.graphChanged(graph, state.graph)) {
+      state.graph = graph;
+      await timeout(async () => {
+        state.recipes = await state.builder(graph);
+        //log(recipes);
+      }, 500);
+      return {recipes: state.recipes};
+    }
   }
-}
+},
+graphChanged(graph, oldGraph) {
+  return graph.$meta.id !== oldGraph?.$meta?.id || this.nodesChanged(graph, oldGraph);
+},
+nodesChanged({nodes}, oldGraph) {
+  const oldNodes = oldGraph?.nodes;
+  if (keys(nodes).length === keys(oldNodes).length) {
+    return !keys(oldNodes).every(key => deepEqual(oldNodes[key], nodes[key]));
+  }
+  return true;
+},
 });
