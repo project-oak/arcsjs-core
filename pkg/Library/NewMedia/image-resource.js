@@ -101,10 +101,11 @@ export class ImageResource extends Xen.Async {
   }
   async updateImageCanvas(image) {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = image.url;
+    //img.crossOrigin = 'anonymous';
+    //img.crossOrigin = 'use-credentials';
     try {
-     await img.decode();
+      img.src = image.url;
+      await img.decode();
      this.copyImage(img);
     } catch(x) {
       console.warn(x);

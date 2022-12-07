@@ -17,12 +17,15 @@ export const DataNode = {
     },
     data: {
       $type: 'Pojo'
+    },
+    outputData: {
+      $type: 'Pojo'
     }
   },
   text: {
     $kind: '$library/Graphs/DataNode',
     $inputs: ['data', 'connectedData'],
-    $outputs: ['data']
+    $outputs: [{data: 'outputData'}]
   }
 };
 

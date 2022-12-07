@@ -16,6 +16,9 @@ shouldUpdate({graph}) {
 },
 async update({graph}, state) {
   if (!state.tasked) {
+    if (typeof graph === 'string') {
+      graph = JSON.parse(graph);
+    }
     if (this.graphChanged(graph, state.graph)) {
       state.graph = graph;
       await timeout(async () => {

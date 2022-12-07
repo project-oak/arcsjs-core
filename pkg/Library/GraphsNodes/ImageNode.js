@@ -15,7 +15,8 @@ export const ImageNode = {
       $type: 'Image',
       $value: {
         url: 'https://storage.googleapis.com/tfweb/testpics/strawberry2.jpeg',
-      }
+      },
+      noinspect: true
     },
     connectedImage: {
       $type: 'Image',
