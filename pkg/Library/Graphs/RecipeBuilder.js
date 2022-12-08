@@ -110,7 +110,7 @@ export const RecipeBuilder = {
         if (tags) {
           const spec = storeSpecs[id];
           if (spec) {
-            spec.$tags = [...spec.$tags, ...tags];
+            spec.$tags = [...(spec.$tags || []), ...tags];
           }
         }
       });

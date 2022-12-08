@@ -68,7 +68,7 @@ toolbarIcons({selectedNodeId, graph}) {
 render(inputs, state) {
   return {
     graph: this.renderGraph(inputs, state),
-    graphRects: state.layout
+    graphRects: state.layout || this.simpleLayout(inputs)
   };
 },
 
@@ -125,6 +125,19 @@ renderGraphEdges(inputs) {
     }));
   });
   return edges;
+},
+
+simpleLayout({graph}) {
+  const layout = {};
+  keys(graph?.nodes).forEach((id, index) => {
+    layout[id] = {
+      l: 40 + (index * 300),
+      t: 40 + (index * 40),
+      w: 144,
+      h: 100
+    };
+  });
+  return layout;
 },
 
 parseConnection(connection) {
