@@ -89,7 +89,7 @@ export class NodeGraph extends Xen.Async {
     return selected;
   }
   renderRects({rects}) {
-    return Object.entries(rects).map(([id, position]) => ({id, position}));
+    return Object.entries(rects || []).map(([id, position]) => ({id, position}));
   }
   renderGraph({rects, graph}) {
     // compute array of graphNodes to render
