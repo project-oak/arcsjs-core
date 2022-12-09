@@ -11,17 +11,30 @@ connectionDelimiter: ':',
 
 async update(inputs, state) {
   const {layout, graph} = inputs;
-  try {
-    state.graph = typeof graph === 'string' ? JSON.parse(graph) : graph;
-  } catch(x) {
-    state.graph = null;
-  }
+  state.graph = this.parseGraph(graph);
   state.layout = layout;
   const results = this.handleEvents(inputs, state);
   return {
     ...results,
     editorToolbarIcons: this.toolbarIcons(inputs, state)
   };
+},
+
+parseGraph(graph) {
+  try {
+    const graphObj = typeof graph === 'string' ? JSON.parse(graph) : graph;
+    return this.finalizeGraph(graphObj);
+  } catch(x) {
+    return null;
+  }
+},
+
+finalizeGraph(graph) {
+  entries(graph?.nodes).forEach(([id, node]) => {
+    node.id = id;
+    node.displayName = node.displayName || node.id;
+  });
+  return graph;
 },
 
 handleEvents(inputs, state) {
