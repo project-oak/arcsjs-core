@@ -7,9 +7,8 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 ({
-shouldUpdate({enabled, graph}) {
-  log(enabled, graph);
-  return enabled && graph;
+shouldUpdate({graph}) {
+  return graph;
 },
 update({graph, live}, state, {service}) {
   let graph_ = graph;
