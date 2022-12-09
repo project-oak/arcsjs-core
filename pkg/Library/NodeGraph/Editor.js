@@ -10,11 +10,17 @@ edgeIdDelimeter: '$$',
 connectionDelimiter: ':',
 
 async update(inputs, state) {
-  state.layout = inputs.layout;
+  const {layout, graph} = inputs;
+  try {
+    state.graph = typeof graph === 'string' ? JSON.parse(graph) : graph;
+  } catch(x) {
+    state.graph = null;
+  }
+  state.layout = layout;
   const results = this.handleEvents(inputs, state);
   return {
     ...results,
-    editorToolbarIcons: this.toolbarIcons(inputs)
+    editorToolbarIcons: this.toolbarIcons(inputs, state)
   };
 },
 
@@ -42,7 +48,7 @@ handleEvent(inputs, state) {
   log(`Unhandled event '${event}' for ${selectedNodeId}`);
 },
 
-toolbarIcons({selectedNodeId, graph}) {
+toolbarIcons({selectedNodeId}, {graph}) {
   if (keys(graph?.nodes).length === 0) {
     return [];
   }
@@ -68,20 +74,20 @@ toolbarIcons({selectedNodeId, graph}) {
 render(inputs, state) {
   return {
     graph: this.renderGraph(inputs, state),
-    graphRects: state.layout || this.simpleLayout(inputs)
+    graphRects: state.layout || this.simpleLayout(state)
   };
 },
 
 renderGraph(inputs, state) {
   return {
-    name: inputs.graph?.$meta?.name,
+    name: state.graph?.$meta?.name,
     graphNodes: this.renderGraphNodes(inputs, state),
     graphEdges: this.renderGraphEdges(inputs, state)
   };
 },
 
 renderGraphNodes(inputs, state) {
-  const {graph} = inputs;
+  const {graph} = state;
   return values(graph?.nodes).map(node => this.renderNode(node, inputs, state));
 },
 
@@ -103,8 +109,8 @@ renderNode(node, {categories, selectedNodeId, nodeTypes}, {layout}) {
   };
 },
 
-renderGraphEdges(inputs) {
-  const {graph, categories} = inputs;
+renderGraphEdges(inputs, {graph}) {
+  const {categories} = inputs;
   const edges = [];
   values(graph?.nodes).forEach(node => {
     const connects = entries(node.connections).map(
@@ -214,15 +220,15 @@ getParticles(nodeType) {
   return this.getParticleNames(nodeType).map(name => nodeType[name]);
 },
 
-onNodeRemove({eventlet: {key}, graph, selectedNodeId}) {
+onNodeRemove({eventlet: {key}, selectedNodeId}, {graph}) {
   return this.deleteNode(key, graph, selectedNodeId);
 },
 
-onNodeRenamed({eventlet: {key, value}, graph}, state) {
+onNodeRenamed({eventlet: {key, value}}, state) {
   // TODO(mariakleiner): renaming doesn't work, when triggered from the menu.
-  const node = graph.nodes[key];
+  const node = state.graph.nodes[key];
   node.displayName = value.trim();
-  graph.nodes[node.id] = node;
+  state.graph.nodes[node.id] = node;
   delete state.selectedNodeText;
   return {graph};
 },
@@ -231,7 +237,7 @@ renameSelectedNode({selectedNodeId}, state) {
   state.selectedNodeText = selectedNodeId;
 },
 
-deleteSelectedNode({selectedNodeId, graph}) {
+deleteSelectedNode({selectedNodeId}, {graph}) {
   return this.deleteNode(selectedNodeId, graph, selectedNodeId);
 },
 
@@ -243,7 +249,7 @@ deleteNode(nodeId, graph, selectedNodeId) {
   };
 },
 
-duplicateSelectedNode({selectedNodeId, graph, newNodeInfos}) {
+duplicateSelectedNode({selectedNodeId, newNodeInfos}, {graph}) {
   if (graph && selectedNodeId) {
     const {type, displayName, props, connections} = graph.nodes[selectedNodeId];
     const newInfo = {
@@ -315,7 +321,7 @@ onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-onNodeTypeDropped({eventlet: {value: {id: type, position}}, graph, newNodeInfos}) {
+onNodeTypeDropped({eventlet: {value: {id: type, position}}, newNodeInfos}, {graph}) {
   if (graph) {
     return {
       newNodeInfos: [...(newNodeInfos || []), {
