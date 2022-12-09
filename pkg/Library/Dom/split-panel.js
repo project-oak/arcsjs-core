@@ -55,11 +55,6 @@ const template = Xen.Template.html`
     display: flex;
     flex-direction: column;
   }
-  /* [flex] {
-    flex: 1;
-    flex-basis: 0px;
-    overflow: hidden;
-  } */
 </style>
 
 <div startside xen:style="{{startStyle}}">

@@ -22,7 +22,7 @@ export const ImageNode = {
       connection: true
     }
   },
-  field: {
+  image: {
     $kind: '$library/NewMedia/Image',
     $inputs: ['connectedImage', 'image'],
     $outputs: ['image']
