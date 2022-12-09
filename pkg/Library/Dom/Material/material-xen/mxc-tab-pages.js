@@ -57,6 +57,7 @@ export class MxcTabPages extends Xen.Async {
     this.state = {children: [...this.children]};
   }
   update(inputs, state) {
+    this.childrenChanged();
     state.disable = inputs.disabletabs;
     if (state.defaultSelected !== inputs.selected) {
       state.selected = state.defaultSelected = inputs.selected;
