@@ -14,11 +14,7 @@ export const ListenerNode = {
     mediaDeviceState: {
       $type: 'MedaDeviceState',
       $value: {
-        isCameraEnabled: false,
-        isMicEnabled: false,
-        isAudioEnabled: false
-        // videoDeviceId
-        // audioOutputDeviceId
+        isMicEnabled: false
       },
       noinspect: true
     },
@@ -26,11 +22,6 @@ export const ListenerNode = {
       $type: '[JSON]',
       noinspect: true
     },
-    // stream: {
-    //   $type: 'Stream',
-    //   $tags: ['private'],
-    //   $value: 'default'
-    // },
     transcript: {
       $type: 'String',
       $value: '',
