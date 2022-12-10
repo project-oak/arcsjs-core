@@ -11,13 +11,14 @@ import {DataNode, PersistedDataNode} from './DataNode.js';
 import {DisplayNode} from './DisplayNode.js';
 import {ImageNode} from './ImageNode.js';
 import {CameraNode} from './CameraNode.js';
+import {ListenerNode} from './ListenerNode.js';
 import {TextFieldNode} from './TextFieldNode.js';
 import {SelectFieldNode} from './SelectFieldNode.js';
 import {LibrarianNode} from '../Graphs/LibrarianNode.js';
 import {GraphRunnerNode} from '../Graphs/GraphRunnerNode.js';
 import {ArcNode} from '../App/ArcNode.js';
 
-import {AudioNode, ImageCompositeNode} from '../NewMedia/Nodes.js';
+import {ImageCompositeNode} from '../NewMedia/Nodes.js';
 
 export const NodeTypes = {
   JSONataNode,
@@ -26,7 +27,7 @@ export const NodeTypes = {
   DisplayNode,
   ImageNode,
   CameraNode,
-  AudioNode,
+  ListenerNode,
   ImageCompositeNode,
   ArcNode,
   TextFieldNode,

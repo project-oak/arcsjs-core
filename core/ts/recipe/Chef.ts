@@ -23,7 +23,7 @@ export class Chef {
       return;
     }
     //log.groupCollapsed('executing recipe...', recipe.$meta);
-    log('|-->...| executing recipe: ', recipe.$meta ?? '');
+    log('|-->...| executing recipe: ', recipe);
     const plan = new Parser(recipe);
     // `store` preparation
     await StoreCook.execute(runtime, arc, plan.stores);

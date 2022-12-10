@@ -5,7 +5,7 @@
  */
 ({
 render({mediaDeviceState}) {
-  return {micEnabled: Boolean(mediaDeviceState.isMicEnabled)};
+  return {micEnabled: Boolean(mediaDeviceState?.isMicEnabled)};
 },
 onTranscript({eventlet: {value}, mediaDeviceState}) {
   const transcript = value.transcript || value.interimTranscript;

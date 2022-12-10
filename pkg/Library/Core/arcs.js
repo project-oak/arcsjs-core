@@ -1078,7 +1078,7 @@ var Chef = class {
       log6.error("`arc` must be an Arc, not a Promise. Make sure `boostrapArc` is awaited.");
       return;
     }
-    log6("|-->...| executing recipe: ", recipe.$meta ?? "");
+    log6("|-->...| executing recipe: ", recipe);
     const plan = new Parser(recipe);
     await StoreCook.execute(runtime, arc, plan.stores);
     await ParticleCook.execute(runtime, arc, plan.particles);

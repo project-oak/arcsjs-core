@@ -15,16 +15,20 @@ const log = logFactory(logFactory.flags.services || logFactory.flags.RecipeBuild
 export const RecipeBuilderService = {
   async build({graph/*, nodeTypesResource*/}) {
     try {
+      log.groupCollapsed('building Graph...');
       if (typeof graph === 'string') {
+        log('graph is in string format');
         graph = JSON.parse(graph.replace('/[""""]/g', '"'));
       }
-      log('building graph', graph);
+      log('target graph:', graph);
       //const nodeTypes = Resources.get(nodeTypesResource);
-      log('got NodeTypes', NodeTypes);
+      log('using NodeTypes:', NodeTypes);
       const recipes = await RecipeBuilder.construct({graph, NodeTypes});
-      log('made recipes', recipes);
+      log('made recipes:', recipes);
+      log.groupEnd();
       return recipes;
     } catch(x) {
+      log.groupEnd();
       log('failed:', x?.message);
       return [];
     }

@@ -7,6 +7,9 @@
 import {Xen} from '../Dom/Xen/xen-async.js';
 import {DragDrop} from '../Dom/drag-drop.js';
 import {IconsCss} from '../Dom/Material/material-icon-font/icons.css.js';
+import {logFactory} from '../Core/utils.js';
+
+const log = logFactory(logFactory.flags['designer-layout'], 'designer-layout', '#8B8000', '#333');
 
 const {assign} = Object;
 
@@ -183,19 +186,24 @@ export class DesignerLayout extends DragDrop {
       this.dragKind = 'resize';
       this.dragFrom = from;
     }
+    //
     e.stopPropagation();
+    //
     this.rect = this.target && this.getRect(this.target);
+    this.dragRect = this.rect;
+    this.dragStarted = false;
+    //
     this.restyleSelection();
     this.updateOrders(this.target);
     // This is to select the node right away when pointer is down.
     this.firePosition(this.target);
-    this.dragRect = this.rect;
   }
   doMove(dx, dy) {
     if (this.dragRect && this.target) {
       // grid-snap
       const snap = rect => DragDrop.snap(rect, GRID_SIZE);
       // perform drag operation
+      this.dragStarted = true;
       const dragRect = this.doDrag(this.dragRect, dx, dy, this.dragKind, this.dragFrom);
       //const dragRect = this.doDrag(snap(this.dragRect), dx, dy, this.dragKind, this.dragFrom);
       // install output rectangle
@@ -203,6 +211,7 @@ export class DesignerLayout extends DragDrop {
       // let the boxer adapt to the target end state
       requestAnimationFrame(() => this.target && this.setBoxStyle(this.boxer, this.getRect(this.target)));
       this.value = dragRect;
+      log('fire update-box', this.target.id, this.value);
       this.fire('update-box');
     }
   }
@@ -229,9 +238,13 @@ export class DesignerLayout extends DragDrop {
   }
   doUp() {
     this.dragRect = null;
-    if (this.target) {
+    if (this.target && this.dragStarted) {
+      this.dragStarted = false;
+      log('drag terminated');
       setTimeout(() => {
+        log('fire update-box', this.target.id);
         this.fire('update-box');
+        log('firePosition', this.target.id);
         this.firePosition(this.target);
       }, 100);
     }

@@ -27,19 +27,21 @@ export class NodeGraph extends Xen.Async {
     this.rects = {};
   }
   onNodeSelect(event) {
-    //event.stopPropagation();    
     this.key = event.currentTarget.key;
     if (this.key !== this.state.textSelectedKey) {
       delete this.state.textSelectedKey;
     }
     this.fire('node-selected');
   }
-  // called when user has changed a rectangle
+  // called when user has changed a rectangle (high freq)
   onUpdateBox({currentTarget: {value: rect}}) {
     this.value = rect;
-    this.fire('node-moved');
     this.rects[this.key] = rect;
     this.invalidate();
+  }
+  // called when committed a change to a rectangle (low freq)
+  onUpdatePosition({currentTarget: {value: rect}}) {
+    this.fire('node-moved');
   }
   // get the geometry information for rectangle `key` (with index i)
   geom(rects, key, i) {
@@ -59,7 +61,7 @@ export class NodeGraph extends Xen.Async {
       return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
     }
   }
-  render(inputs) {
+  render(inputs, state) {
     // iterate graph nodes to find selection and ensure each rect exists
     let selected = this.validateGraphRects(inputs);
     // compute selectedKeys
@@ -68,9 +70,10 @@ export class NodeGraph extends Xen.Async {
     const rects = this.renderRects(inputs);
     // compute array of graphNodes to render
     const nodes = this.renderGraph(inputs);
+    // NB: connectors are drawn after, via Canvas. See _didRender.
+    state.didRender = {rects: inputs.rects, graph: inputs.graph};
     // complete render model
     return {selectedKeys, rects, nodes};
-    // NB: connectors are drawn after, via Canvas. See _didRender.
   }
   validateGraphRects({rects, graph}) {
     // iterate graph nodes
@@ -125,7 +128,7 @@ export class NodeGraph extends Xen.Async {
       disableRename: Boolean(!textSelected && (key !== this.state.textSelectedKey))
     };
   }
-  _didRender({graph, rects}, {x, y}) {
+  _didRender({}, {x, y, didRender: {graph, rects}}) {
     if (rects) {
       this.renderCanvas({graph, rects}, {x, y});
     }
@@ -346,6 +349,7 @@ const template = Xen.Template.html`
   <designer-layout
     rects="{{rects}}"
     selected="{{selectedKeys}}"
+    on-position="onUpdatePosition"
     on-update-box="onUpdateBox"
     on-delete="onNodeDelete"
     repeat="node_t">{{nodes}}</designer-layout>
