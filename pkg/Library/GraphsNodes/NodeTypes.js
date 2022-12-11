@@ -13,6 +13,7 @@ import {ImageNode} from './ImageNode.js';
 import {CameraNode} from './CameraNode.js';
 import {ListenerNode} from './ListenerNode.js';
 import {TextFieldNode} from './TextFieldNode.js';
+import {MultilineTextFieldNode} from './MultilineTextFieldNode.js';
 import {SelectFieldNode} from './SelectFieldNode.js';
 import {LibrarianNode} from '../Graphs/LibrarianNode.js';
 import {GraphRunnerNode} from '../Graphs/GraphRunnerNode.js';
@@ -31,6 +32,7 @@ export const NodeTypes = {
   ImageCompositeNode,
   ArcNode,
   TextFieldNode,
+  MultilineTextFieldNode,
   SelectFieldNode,
   LibrarianNode,
   GraphRunnerNode,

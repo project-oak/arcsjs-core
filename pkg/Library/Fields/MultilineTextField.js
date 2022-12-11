@@ -5,14 +5,22 @@
  * license that can be found in the LICENSE file.
  */
 ({
-update({value, connectedValue}, state) {
-  value = state.value = connectedValue ?? value;
+update(inputs, state) {
+  let {value, connectedValue, connectedValue1} = inputs;
+  if (connectedValue1 && connectedValue1 !== state.lastInputs?.connectedValue1) {
+    value = connectedValue1;
+  }
+  if (connectedValue && connectedValue !== state.lastInputs?.connectedValue) {
+    value = connectedValue;
+  }
+  state.lastInputs = {...inputs};
+  state.value = value;
   return {value};
 },
-render(inputs, {value}) {
+render({label}, {value}) {
   return {
-    ...inputs,
-    value
+    label: label ?? '',
+    value: value ?? ''
   };
 },
 onLabelChange({eventlet: {value}}) {
@@ -26,7 +34,7 @@ template: html`
 <style>
   :host {
     padding: 0 6px;
-    height: 2em;
+    display: flex;
   }
   [label] {
     background: inherit;
@@ -40,6 +48,10 @@ template: html`
     padding: 6px 9px;
     border-radius: 4px;
     border: 1px solid #88888888;
+    font-size: 1em;
+    font-family: 'Goole Sans', sans-serif;
+    width: 100%;
+    height: 100%;
   }
   [delim] {
     padding-right: 12px;
@@ -49,7 +61,7 @@ template: html`
 <div flex bar>
   <input label value="{{label}}" on-change="onLabelChange">
   <span delim>:</span>
-  <input flex field value="{{value}}" on-change="onFieldChange">
+  <textarea field value="{{value}}" on-change="onFieldChange"></textarea>
 </div>
 `
 });

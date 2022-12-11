@@ -87,7 +87,7 @@ toolbarIcons({selectedNodeId}, {graph}) {
 render(inputs, state) {
   return {
     graph: this.renderGraph(inputs, state),
-    graphRects: state.layout || this.simpleLayout(state)
+    graphRects: state.layout //|| this.simpleLayout(state)
   };
 },
 

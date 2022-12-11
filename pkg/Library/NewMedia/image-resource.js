@@ -6,6 +6,9 @@
  */
 import {Xen} from '../Dom/Xen/xen-async.js';
 import {Resources} from '../App/Resources.js';
+import {logFactory} from '../Core/utils.js';
+
+const log = logFactory(logFactory.flags.dom || true, 'image-resource', 'yellow', 'darkgray');
 
 const template = Xen.Template.html`
 <style>
@@ -46,9 +49,9 @@ export class ImageResource extends Xen.Async {
     this.canvas = this._dom.$('canvas');
     this.canvasId = Resources.allocate(this.canvas);
   }
-  // shouldUpate() {
-  //   return !this.updating;
-  // }
+  _wouldChangeProp(name, value) {
+    return true;
+  }
   update({image, masks}, state, {service}) {
     // manage inputs
     let useMasks = masks;
@@ -72,13 +75,15 @@ export class ImageResource extends Xen.Async {
     }
   }
   async updateImage(image, state) {
+    //log('updateImage', image, state);
     if (!image?.canvas && image?.url) {
       // this.updating = true;
-      image.canvas = this.canvasId;
       if (state.url !== image?.url) {
         state.url = image.url;
         await this.updateImageCanvas(image);
       }
+      image.canvas = this.canvasId;
+      log('firing canvas update for ', image);
       this.value = image;
       this.fire('canvas');
       // this.updating = false;
@@ -106,7 +111,7 @@ export class ImageResource extends Xen.Async {
     try {
       img.src = image.url;
       await img.decode();
-     this.copyImage(img);
+      this.copyImage(img);
     } catch(x) {
       console.warn(x);
     }
