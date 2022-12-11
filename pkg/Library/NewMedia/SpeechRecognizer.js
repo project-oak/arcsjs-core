@@ -5,13 +5,14 @@
  */
 ({
 render({mediaDeviceState}) {
-  return {micEnabled: Boolean(mediaDeviceState.isMicEnabled)};
+  return {micEnabled: Boolean(mediaDeviceState?.isMicEnabled)};
 },
 onTranscript({eventlet: {value}, mediaDeviceState}) {
-  const transcript = value.transcript || value.interimTranscript;
-  const outputs = {transcript};
+  const outputs = value;
   if (value.transcript) {
-    assign(outputs, {mediaDeviceState: {...mediaDeviceState, isMicEnabled: false}});
+    assign(outputs, {
+      mediaDeviceState: {...mediaDeviceState, isMicEnabled: false}
+    });
   }
   return outputs;
 },

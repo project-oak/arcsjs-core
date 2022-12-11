@@ -47,7 +47,7 @@ export const CameraNode = {
     $outputs: ['stream', 'frame'],
     $slots: {
       device: {
-        deviceUx: DeviceUxRecipe.deviceUx,
+        deviceUx: DeviceUxRecipe.deviceUx
       },
       capture: {
         imageCapture: {

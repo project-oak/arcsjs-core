@@ -24,69 +24,66 @@ export class NodeGraph extends Xen.Async {
   }
   _didMount() {
     this.canvas = this.querySelector('canvas');
-    this.rects = {};
+    this._rects = {};
   }
-  onNodeSelect(event) {
-    //event.stopPropagation();    
-    this.key = event.currentTarget.key;
-    if (this.key !== this.state.textSelectedKey) {
-      delete this.state.textSelectedKey;
+  render(inputs, state) {
+    // iterate graph nodes to find selection and ensure each rect exists
+    let selected = this.validateGraphRects(inputs);
+    console.log(inputs.rects);
+    // compute selectedKeys
+    const selectedKeys = selected?.key ? [`${this.idPrefix}${selected.key}`] : null
+    // covert rects into render model objects
+    const rects = this.renderRects(inputs);
+    console.log(rects);
+    // compute array of graphNodes to render
+    const nodes = this.renderGraph(inputs);
+    // NB: connectors are drawn after, via Canvas. See _didRender.
+    state.didRender = {rects: inputs.rects, graph: inputs.graph};
+    // complete render model
+    return {selectedKeys, rects, nodes};
+  }
+  validateGraphRects(inputs) {
+    inputs.rects = inputs.rects ?? this._rects;
+    const {rects, graph} = inputs;
+    // iterate graph nodes
+    let selected = null;
+    if (graph) {
+      const nodes = [...graph.graphNodes].sort((a,b) => a.key?.localeCompare(b.key));
+      nodes.forEach((n, i) => {
+        // - calculate missing rect
+        if (!rects[n.key]) {
+          const {l, t, w, h} = this.geom(rects, n.key, i, n);
+          rects[n.key] = {l, t, w, h};
+        }
+        // - memoize selected node
+        if (n.selected) {
+          selected = n;
+        }
+      });
     }
-    this.fire('node-selected');
-  }
-  // called when user has changed a rectangle
-  onUpdateBox({currentTarget: {value: rect}}) {
-    this.value = rect;
-    this.fire('node-moved');
-    this.rects[this.key] = rect;
-    this.invalidate();
+    return selected;
   }
   // get the geometry information for rectangle `key` (with index i)
-  geom(rects, key, i) {
+  geom(rects, key, i, node) {
     if (rects?.[key]) {
       const {l, t, w, h} = rects[key];
       const [w2, h2] = [w/2, h/2];
       return {x: l+w2, y: t+h2, l, t, r: l+w, b: t+h, w, h, w2, h2};
     } else {
       // calculate a default landing spot
-      const [width, height, cols, margin, ox, oy] = [140, 60, 8, 50, 100, 128];
+      let [width, height] = [140, 60];
+      if (node) {
+        height = Math.max(node?.inputs.length, node?.outputs.length) * 26;
+      }
+      const [cols, margin, ox, oy] = [3, 50, 116, 116];
       const p = i => ({
         x: (i%cols)*(width+margin) + ox,
-        y: Math.floor(i/cols)*(height+margin) + margin*(i%2) + oy
+        y: Math.floor(i/cols)*(128+margin) + 16*(i%2) + oy
       });
-      const o = p(i % 3);
+      const o = p(i); // % 3);
       const [w, h, w2, h2] = [width, height, width/2, height/2];
       return {x: o.x, y: o.y, l: o.x-w2, t: o.y-h2, r: o.x+w2, b: o.y+w2, w, h, w2, h2};
     }
-  }
-  render(inputs) {
-    // iterate graph nodes to find selection and ensure each rect exists
-    let selected = this.validateGraphRects(inputs);
-    // compute selectedKeys
-    const selectedKeys = selected?.key ? [`${this.idPrefix}${selected.key}`] : null
-    // compute rects for designer-layout
-    const rects = this.renderRects(inputs);
-    // compute array of graphNodes to render
-    const nodes = this.renderGraph(inputs);
-    // complete render model
-    return {selectedKeys, rects, nodes};
-    // NB: connectors are drawn after, via Canvas. See _didRender.
-  }
-  validateGraphRects({rects, graph}) {
-    // iterate graph nodes
-    let selected = null;
-    graph?.graphNodes.forEach((n, i) => {
-      // - calculate missing rect
-      if (!rects[n.key]) {
-        const {l, t, w, h} = this.geom(rects, n.key, i);
-        rects[n.key] = {l, t, w, h};
-      }
-      // - memoize selected node
-      if (n.selected) {
-        selected = n;
-      }
-    });
-    return selected;
   }
   renderRects({rects}) {
     return Object.entries(rects || []).map(([id, position]) => ({id, position}));
@@ -125,7 +122,7 @@ export class NodeGraph extends Xen.Async {
       disableRename: Boolean(!textSelected && (key !== this.state.textSelectedKey))
     };
   }
-  _didRender({graph, rects}, {x, y}) {
+  _didRender({}, {x, y, didRender: {graph, rects}}) {
     if (rects) {
       this.renderCanvas({graph, rects}, {x, y});
     }
@@ -232,6 +229,26 @@ export class NodeGraph extends Xen.Async {
       ctx.stroke();
       ctx.closePath();
     }
+  }
+
+  onNodeSelect(event) {
+    this.key = event.currentTarget.key;
+    if (this.key !== this.state.textSelectedKey) {
+      delete this.state.textSelectedKey;
+    }
+    this.fire('node-selected');
+  }
+
+  // called when user has changed a rectangle (high freq)
+  onUpdateBox({currentTarget: {value: rect}}) {
+    this.value = rect;
+    this.rects[this.key] = rect;
+    this.invalidate();
+  }
+
+  // called when committed a change to a rectangle (low freq)
+  onUpdatePosition({currentTarget: {value: rect}}) {
+    this.fire('node-moved');
   }
 
   onNodeDblClicked(event) {
@@ -346,6 +363,7 @@ const template = Xen.Template.html`
   <designer-layout
     rects="{{rects}}"
     selected="{{selectedKeys}}"
+    on-position="onUpdatePosition"
     on-update-box="onUpdateBox"
     on-delete="onNodeDelete"
     repeat="node_t">{{nodes}}</designer-layout>

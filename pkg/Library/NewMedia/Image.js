@@ -11,6 +11,8 @@ update({connectedImage, image}, state) {
   } else {
     state.image = image;
   }
+  //log('update: connectedImage, image', connectedImage, image);
+  //log('update: state.image', image);
   // const bestImage = connectedImage || image;
   // if (bestImage.url) {
   //   if (!state.image || bestImage.url !== state.image.url) {
@@ -18,10 +20,16 @@ update({connectedImage, image}, state) {
   //   }
   // }
 },
+render(input, {image}) {
+  //log('render image: ', image);
+  return {image};
+},
 onCanvas({eventlet: {value}}, state) {
+  //log('state.image', state.image, value);
   if (state.image?.url === value?.url) {
     const image = {...value, version: Math.random()};
     state.image = image;
+    //log('output image w/canvas', image, value);
     return {image};
   }
 },

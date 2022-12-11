@@ -31,6 +31,7 @@ template: html`
     font-size: 75%;
     border: none;
     text-align: right;
+    width: 8em;
   }
   [delim] {
     padding-right: 12px;

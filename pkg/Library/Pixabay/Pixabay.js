@@ -53,6 +53,14 @@ walkUrl({hits, url}, delta) {
 },
 template: html`
 <style>
+  [toolbar] {
+    position: absolute;
+    background: transparent;
+  }
+  icon {
+    text-shadow: 1px 1px 1px #f1f1f1;
+    text-shadow: -1px -1px 1px #f1f1f1;
+  }
   image-resource {
     background: transparent;
   }

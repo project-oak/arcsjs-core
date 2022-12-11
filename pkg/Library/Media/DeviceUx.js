@@ -10,6 +10,8 @@ shouldRender({mediaDevices}) {
 },
 render({mediaDevices, mediaDeviceState}) {
   const {isCameraEnabled, isMicEnabled, isAudioEnabled, videoDeviceId, audioInputDeviceId, audioOutputDeviceId} = mediaDeviceState;
+  const showCamera = String(isCameraEnabled !== undefined);
+  const showSpeaker = String(isAudioEnabled !== undefined);
   const cameraEnabled = Boolean(isCameraEnabled);
   const micEnabled = Boolean(isMicEnabled);
   const audioEnabled = Boolean(isAudioEnabled);
@@ -21,10 +23,12 @@ render({mediaDevices, mediaDeviceState}) {
     videoInputs,
     audioInputs,
     audioOutputs,
+    showCamera,
     cameraEnabled,
     cameraLigature: cameraEnabled ? `videocam` : `videocam_off`,
     micEnabled,
     micLigature: isMicEnabled ? `mic` : `mic_off`,
+    showSpeaker,
     audioEnabled,
     audioLigature: audioEnabled ? `volume_up` : `volume_off`,
   };
@@ -91,12 +95,12 @@ template: html`
 </style>
 
 <div scrub toolbar>
-  <icon on-click="onCameraClick">{{cameraLigature}}</icon>
-  <select repeat="option_t" on-change="onSelectChange" key="videoDeviceId">{{videoInputs}}</select>
+  <icon show$="{{showCamera}}" on-click="onCameraClick">{{cameraLigature}}</icon>
+  <select show$="{{showCamera}}" repeat="option_t" on-change="onSelectChange" key="videoDeviceId">{{videoInputs}}</select>
   <icon on-click="onMicClick">{{micLigature}}</icon>
   <select repeat="option_t" on-change="onSelectChange" key="audioInputDeviceId">{{audioInputs}}</select>
-  <icon on-click="onAudioClick">{{audioLigature}}</icon>
-  <select repeat="option_t" on-change="onSelectChange" key="audioOutputDeviceId">{{audioOutputs}}</select>
+  <icon show$="{{showSpeaker}}" on-click="onAudioClick">{{audioLigature}}</icon>
+  <select show$="{{showSpeaker}}" repeat="option_t" on-change="onSelectChange" key="audioOutputDeviceId">{{audioOutputs}}</select>
   <span flex></span>
 </div>
 
