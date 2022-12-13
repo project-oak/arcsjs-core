@@ -80,9 +80,8 @@ updateConnection(name, value, node, service) {
   const connections = {...node.connections};
   if (value?.length > 0) {
     delete props[name];
-    this.updateStoreValue(this.fullStoreId(node, name), value, service);
+    this.updateStoreValue(this.fullStoreId(node, name), undefined, service);
     connections[name] = value;
-    // TODO: also delete the store!
   } else {
     delete connections[name];
   }
