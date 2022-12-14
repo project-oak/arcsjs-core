@@ -5,20 +5,8 @@
  * license that can be found in the LICENSE file.
  */
 ({
-update({connectedImage, image}, state) {
-  if (connectedImage?.canvas || connectedImage?.url) {
-    state.image = connectedImage;
-  } else {
-    state.image = image;
-  }
-  //log('update: connectedImage, image', connectedImage, image);
-  //log('update: state.image', image);
-  // const bestImage = connectedImage || image;
-  // if (bestImage.url) {
-  //   if (!state.image || bestImage.url !== state.image.url) {
-  //     state.image = {...bestImage};
-  //   }
-  // }
+update({image}, state) {
+  state.image = image;
 },
 render(input, {image}) {
   //log('render image: ', image);

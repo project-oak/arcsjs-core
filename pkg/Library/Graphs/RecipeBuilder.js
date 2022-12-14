@@ -46,7 +46,7 @@ export const RecipeBuilder = {
 
   recipeForNode(node, {graph, nodeTypes, layout}, state) {
     const rawNodeType = nodeTypes?.[node?.type] ?? nodeTypes?.LibrarianNode;
-    const nodeType = this.flattenNodeType(rawNodeType);
+    const nodeType = rawNodeType; //this.flattenNodeType(rawNodeType);
     log('recipeForNode', node, nodeType);
     const storeSpecs = this.buildStoreSpecs(node, nodeType, state);
     state.allStoreSpecs.push(storeSpecs);
@@ -60,31 +60,31 @@ export const RecipeBuilder = {
     };
   },
 
-  flattenNodeType(nodeType, $container) {
-    const flattened = {};
-    keys(nodeType).forEach(key => {
-      if (key.startsWith('$')) {
-        flattened[key] = nodeType[key];
-      } else {
-        assign(flattened, this.flattenParticleSpec(key, nodeType[key], $container));
-      }
-    });
-    return flattened;
-  },
+  // flattenNodeType(nodeType, $container) {
+  //   const flattened = {};
+  //   keys(nodeType).forEach(key => {
+  //     if (key.startsWith('$')) {
+  //       flattened[key] = nodeType[key];
+  //     } else {
+  //       assign(flattened, this.flattenParticleSpec(key, nodeType[key], $container));
+  //     }
+  //   });
+  //   return flattened;
+  // },
 
-  flattenParticleSpec(particleId, particleSpec, $container) {
-    const flattened = {
-      [particleId]: {
-        ...particleSpec,
-        $slots: {},
-        ...($container && {$container})
-      }
-    };
-    entries(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
-      assign(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`));
-    });
-    return flattened;
-  },
+  // flattenParticleSpec(particleId, particleSpec, $container) {
+  //   const flattened = {
+  //     [particleId]: {
+  //       ...particleSpec,
+  //       $slots: {},
+  //       ...($container && {$container})
+  //     }
+  //   };
+  //   entries(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
+  //     assign(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`));
+  //   });
+  //   return flattened;
+  // },
 
   /* */
 

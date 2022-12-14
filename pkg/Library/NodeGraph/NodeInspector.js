@@ -181,7 +181,7 @@ async renderBinding(node, name, candidates, graph, nodeTypes, service) {
       store: {
         ...store,
         $type: 'Connection',
-        noinspect: store.nodisplay,
+        noinspect: store.nodisplay || store.noinspect,
         multiple,
         values: froms
       },

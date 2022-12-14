@@ -16,16 +16,12 @@ export const ImageNode = {
       $value: {
         url: 'https://storage.googleapis.com/tfweb/testpics/strawberry2.jpeg',
       },
-      noinspect: true
-    },
-    connectedImage: {
-      $type: 'Image',
-      connection: true
+      // noinspect: true // ??
     }
   },
   image: {
     $kind: '$library/NewMedia/Image',
-    $inputs: ['connectedImage', 'image'],
+    $inputs: ['image'],
     $outputs: ['image']
   }
 };

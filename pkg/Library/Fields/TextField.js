@@ -47,7 +47,7 @@ template: html`
 </style>
 
 <div flex bar>
-  <input label value="{{label}}" on-change="onLabelChange">
+  <input label value="{label}" on-change="onLabelChange">
   <span delim>:</span>
   <input flex field value="{{value}}" on-change="onFieldChange">
 </div>

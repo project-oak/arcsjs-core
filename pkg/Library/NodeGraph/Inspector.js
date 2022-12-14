@@ -286,7 +286,7 @@ template: html`
   :host {
     white-space: nowrap;
     background-color: var(--theme-color-bg-0);
-    color: var(--them-color-fg-4);
+    color: var(--theme-color-fg-4);
     position: relative;
     overflow-y: auto;
   }
