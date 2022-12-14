@@ -11,10 +11,10 @@ export const TextFieldNode = {
     category: 'Fields'
   },
   $stores: {
-    // label: {
-    //   $type: 'String',
-    //   $value: 'text field'
-    // },
+    label: {
+      $type: 'String',
+      $value: 'text field'
+    },
     value: {
       $type: 'String',
       $value: 'value'
@@ -22,7 +22,7 @@ export const TextFieldNode = {
   },
   field: {
     $kind: '$library/Fields/TextField',
-    $inputs: [/*'label',*/ 'value'],
-    $outputs: [/*'label',*/ 'value']
+    $inputs: ['label', 'value'],
+    $outputs: ['label', 'value']
   }
 };
