@@ -5,21 +5,16 @@
  * license that can be found in the LICENSE file.
  */
 ({
-update({value}, state) {
-  state.value = value;
-},
 
-render(inputs, {value}) {
+render(inputs) {
   return {
     ...inputs,
-    value
   };
 },
 onLabelChange({eventlet: {value}}) {
   return {label: value};
 },
-onFieldChange({eventlet: {value}}, state) {
-  state.value = value;
+onFieldChange({eventlet: {value}}) {
   return {value};
 },
 template: html`
@@ -47,7 +42,7 @@ template: html`
 </style>
 
 <div flex bar>
-  <input label value="{label}" on-change="onLabelChange">
+  <input label value="{{label}}" on-change="onLabelChange">
   <span delim>:</span>
   <input flex field value="{{value}}" on-change="onFieldChange">
 </div>
