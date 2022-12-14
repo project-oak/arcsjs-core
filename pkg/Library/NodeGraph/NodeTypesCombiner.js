@@ -24,6 +24,7 @@ addBuiltinNodeTypes(builtinNodeTypes, results) {
       ([key, nodeType]) => results[key] = this.flattenNodeType(nodeType));
 },
 
+// TODO(mariakleiner): duplicate from RecipeBuilder, factor?
 flattenNodeType(nodeType, $container) {
   const flattened = {};
   keys(nodeType).forEach(key => {
