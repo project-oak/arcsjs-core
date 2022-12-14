@@ -176,6 +176,7 @@ async renderBinding(node, name, candidates, graph, nodeTypes, service) {
     const store = nodeTypes[node.type].$stores[name];
     const multiple = store.multiple;
     const connectedValue = await this.constructConnectedValue(value, graph, nodeTypes, service);
+<<<<<<< HEAD:pkg/Library/NodeInspector/NodeInspector.js
     const skipConn = (store.nodisplay || (store.noinspect && !(froms.length > 0)));
     if (!skipConn) {
       return {
@@ -192,6 +193,20 @@ async renderBinding(node, name, candidates, graph, nodeTypes, service) {
         connectedStore: {$type: store.$type, $value: connectedValue}
       };
     }
+=======
+    return {
+      name: `${name}-connection`,
+      store: {
+        ...store,
+        $type: 'Connection',
+        noinspect: store.nodisplay || store.noinspect,
+        multiple,
+        values: froms
+      },
+      value,
+      connectedStore: {$type: store.$type, $value: connectedValue}
+    };
+>>>>>>> a32a687 (update nodes with connections, and fix Designer):pkg/Library/NodeGraph/NodeInspector.js
   }
 },
 
