@@ -40,9 +40,3 @@ export const {LobbyService} = modules;
 export const {GoogleApisService} = modules;
 export const {ArcService} = modules;
 export const {RecipeBuilderService} = modules;
-
-// export {RecipeBuilderService} from '../Library/RecipeBuilder/RecipeBuilderService.js';
-// export {OpenAiService} from '../../Library/OpenAi/OpenAiService.js';
-// export {CallosumService} from '../../Library/Callosum/CallosumService.js';
-// export {RakshaService} from '../../Library/Raksha/RakshaService.js';
-// export {GraphService} from './Library/GraphService.js';
