@@ -233,7 +233,7 @@ const Layout = {
 
 const RecipeBuilder = {
   candidateFinder: {
-    $kind: '$library/NodeGraph/CandidateFinder',
+    $kind: '$library/RecipeBuilder/CandidateFinder',
     $inputs: [
       {graph: 'selectedGraph'},
       'nodeTypes'
@@ -242,7 +242,7 @@ const RecipeBuilder = {
     $outputs: ['candidates']
   },
   connectionUpdater: {
-    $kind: '$library/NodeGraph/ConnectionUpdater',
+    $kind: '$library/RecipeBuilder/ConnectionUpdater',
     $inputs: [
       {graph: 'selectedGraph'},
       'nodeTypes',
