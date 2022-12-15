@@ -9,7 +9,7 @@ update(inputs, state) {
 },
 
 groupByCategory({nodeTypes, search, categories}) {
-  const matchSearch = (name) => (!search || name.toLowerCase().includes(search.toLowerCase()));
+  const matchSearch = name => (!search || name?.toLowerCase().includes(search.toLowerCase()));
   const groups = {};
   values(nodeTypes).forEach(({$meta: {id, category, displayName}}) => {
     if (matchSearch(displayName || id)) {
@@ -68,7 +68,7 @@ render({}, {groups, showInfoPanel, infoPanelPos}) {
 },
 
 sortNodeTypes({displayName}, {displayName: otherDisplayName}) {
-  return displayName.toLowerCase().localeCompare(otherDisplayName.toLowerCase());
+  return displayName?.toLowerCase().localeCompare(otherDisplayName.toLowerCase());
 },
 
 async onItemClick({eventlet: {key: type}, graph, newNodeInfos}) {

@@ -15,7 +15,7 @@ const template = Xen.Template.html`
     --resizer-size: 11px;
     --handle-size: 16px;
     display: flex;
-    background-color: var(--theme-color-bg-4);
+    background-color: var(--theme-color-bg-3);
   }
   [resizer] {
     display: flex;
@@ -54,6 +54,7 @@ const template = Xen.Template.html`
   [startside], [endside] {
     display: flex;
     flex-direction: column;
+    background-color: var(--theme-color-bg-4);
   }
 </style>
 
@@ -88,10 +89,15 @@ export class SplitPanel extends DragDrop {
       this.mergeState({dragging: false});
     };
   }
+  _wouldChangeProp(name, value) {
+    return true;
+  }
   update({divider, endflex, vertical}, state) {
     divider = isNaN(Number(divider)) ? null : Number(divider);
     // attributes are "" for true, null for false
-    vertical = (vertical != null);
+    vertical = (vertical === '') || vertical;
+    state.vertical = vertical;
+    state.endflex = endflex;
     if (!state.divider) {
       // which direction are we splitting
       const ord = vertical ? 'offsetWidth' : 'offsetHeight';
@@ -105,17 +111,17 @@ export class SplitPanel extends DragDrop {
       const d = divider || Math.floor(ordValue/2);
       // cache clamped divider (should be normalized float?)
       state.divider = Math.max(d, 16);
-      state.vertical = vertical;
-      state.endflex = endflex;
     }
   }
   render({}, {vertical, divider, endflex, dragging}) {
     const ord = vertical ? 'width' : 'height';
+    const offOrd = vertical ? 'height' : 'width';
     const flexStyle = endflex ? 'endStyle' : 'startStyle';
     const ordStyle = endflex ? 'startStyle' : 'endStyle';
     return {
       [ordStyle]: {
-        [ord]: `${divider}px`
+        [ord]: `${divider}px`,
+        [offOrd]: null
       },
       [flexStyle] : {
         flex: 1,

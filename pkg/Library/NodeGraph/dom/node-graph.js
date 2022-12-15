@@ -29,12 +29,12 @@ export class NodeGraph extends Xen.Async {
   render(inputs, state) {
     // iterate graph nodes to find selection and ensure each rect exists
     let selected = this.validateGraphRects(inputs);
-    console.log(inputs.rects);
+    //console.log(inputs.rects);
     // compute selectedKeys
     const selectedKeys = selected?.key ? [`${this.idPrefix}${selected.key}`] : null
     // covert rects into render model objects
     const rects = this.renderRects(inputs);
-    console.log(rects);
+    //console.log(rects);
     // compute array of graphNodes to render
     const nodes = this.renderGraph(inputs);
     // NB: connectors are drawn after, via Canvas. See _didRender.
@@ -55,6 +55,8 @@ export class NodeGraph extends Xen.Async {
           const {l, t, w, h} = this.geom(rects, n.key, i, n);
           rects[n.key] = {l, t, w, h};
         }
+        // - force a height based on connection points
+        rects[n.key].h = (Math.max(n?.inputs.length, n?.outputs.length) || 2) * 20 + 36;
         // - memoize selected node
         if (n.selected) {
           selected = n;
@@ -71,10 +73,7 @@ export class NodeGraph extends Xen.Async {
       return {x: l+w2, y: t+h2, l, t, r: l+w, b: t+h, w, h, w2, h2};
     } else {
       // calculate a default landing spot
-      let [width, height] = [140, 60];
-      if (node) {
-        height = Math.max(node?.inputs.length, node?.outputs.length) * 26;
-      }
+      let [width, height] = [140, 56];
       const [cols, margin, ox, oy] = [3, 50, 116, 116];
       const p = i => ({
         x: (i%cols)*(width+margin) + ox,

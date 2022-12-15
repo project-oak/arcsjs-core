@@ -9,8 +9,12 @@
 
 ({
 
+shouldUpdate({graph}) {
+  return graph;
+},
+
 update({graph, previewLayout, nodegraphLayout}) {
-  if (graph && graph.$meta.id === previewLayout?.id && graph.$meta.id === nodegraphLayout?.id) {
+  //if (graph.$meta.id === previewLayout?.id && graph.$meta.id === nodegraphLayout?.id) {
     graph.position ??= {};
     let changed = false;
     if (!deepEqual(previewLayout, graph.position.previewLayout)) {
@@ -24,7 +28,7 @@ update({graph, previewLayout, nodegraphLayout}) {
     if (changed) {
       return {graph};
     }
-  }
+  //}
 }
 
 });

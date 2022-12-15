@@ -1,31 +1,30 @@
 /**
+ * @license
  * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-export const PanelNode = {
+export const SplitPanelNode = {
   $meta: {
-    id: 'PanelNode',
-    displayName: 'Panel',
+    id: 'SplitPanelNode',
+    displayName: 'Split Panel',
     category: 'Panels'
   },
   $stores: {
-    style: {
-      $type: 'String'
-    },
     layout: {
       $type: 'String',
-      values: ['row', 'column']
+      values: ['vertical', 'horizontal']
     },
-    center: {
-      $type: 'Boolean'
+    style: {
+      $type: 'String'
     }
   },
   panel: {
-    $kind: "Layout/Panel",
+    $kind: "Layout/SplitPanel",
     $inputs: ['layout', 'center', 'style'],
     $slots: {
-      container: {}
+      topLeft: {},
+      bottomRight: {}
     }
   }
 };

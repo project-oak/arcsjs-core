@@ -3,27 +3,25 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
- import {logFactory/*, Resources*/} from '../Core/core.js';
-
+import {logFactory} from '../Core/core.js';
 import {RecipeBuilder} from '../Graphs/RecipeBuilder.js';
-import {NodeTypes} from '../GraphsNodes/NodeTypes.js';
 
-const log = logFactory(logFactory.flags.services || logFactory.flags.RecipeBuilderService, 'RecipeBuilderService', 'coral');
-
-//Resources.set(nodeTypesResource, nodeTypes);
+const log = logFactory(logFactory.flags.services || logFactory.flags.RecipeBuilderService, 'RecipeBuilderService', 'pink', 'black');
 
 export const RecipeBuilderService = {
-  async build({graph/*, nodeTypesResource*/}) {
+  // must be attached to the service by owner
+  nodeTypes: {},
+  async build({graph}) {
     try {
-      log.groupCollapsed('building Graph...');
+      log.groupCollapsed('Graph -> Recipes');
       if (typeof graph === 'string') {
         log('graph is in string format');
         graph = JSON.parse(graph.replace('/[""""]/g', '"'));
       }
-      log('target graph:', graph);
-      //const nodeTypes = Resources.get(nodeTypesResource);
-      log('using NodeTypes:', NodeTypes);
-      const recipes = await RecipeBuilder.construct({graph, NodeTypes});
+      log('source graph:', graph);
+      log('using NodeTypes:', this.nodeTypes);
+      const layout = graph.position?.previewLayout;
+      const recipes = await RecipeBuilder.construct({graph, layout, nodeTypes: this.nodeTypes});
       log('made recipes:', recipes);
       log.groupEnd();
       return recipes;
