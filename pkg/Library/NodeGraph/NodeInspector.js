@@ -176,18 +176,22 @@ async renderBinding(node, name, candidates, graph, nodeTypes, service) {
     const store = nodeTypes[node.type].$stores[name];
     const multiple = store.multiple;
     const connectedValue = await this.constructConnectedValue(value, graph, nodeTypes, service);
-    return {
-      name: `${name}-connection`,
-      store: {
-        ...store,
-        $type: 'Connection',
-        noinspect: store.nodisplay || store.noinspect,
-        multiple,
-        values: froms
-      },
-      value,
-      connectedStore: {$type: store.$type, $value: connectedValue}
-    };
+    const skipConn = (store.nodisplay || (store.noinspect && !(froms.length > 0)));
+    if (!skipConn) {
+      return {
+        name: `${name}-connection`,
+        store: {
+          ...store,
+          $type: 'Connection',
+          noinspect: store.nodisplay,
+          // noinspect: store.nodisplay,// || store.noinspect,
+          multiple,
+          values: froms
+        },
+        value,
+        connectedStore: {$type: store.$type, $value: connectedValue}
+      };
+    }
   }
 },
 
