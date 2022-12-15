@@ -18,7 +18,7 @@ import {SelectFieldNode} from './SelectFieldNode.js';
 import {LibrarianNode} from '../Graphs/LibrarianNode.js';
 import {GraphRunnerNode} from '../Graphs/GraphRunnerNode.js';
 import {ArcNode} from '../App/ArcNode.js';
-
+import {PixiJsDemoNode} from '../PixiJs/PixiJsNodes.js';
 import {ImageCompositeNode} from '../NewMedia/Nodes.js';
 
 export const NodeTypes = {
@@ -37,5 +37,6 @@ export const NodeTypes = {
   LibrarianNode,
   GraphRunnerNode,
   NodeCatalogNode,
-  ObjectInspectorNode
+  ObjectInspectorNode,
+  PixiJsDemoNode
 };

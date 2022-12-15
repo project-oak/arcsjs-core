@@ -75,9 +75,9 @@ export const RecipeBuilder = {
   flattenParticleSpec(particleId, particleSpec, $container) {
     const flattened = {
       [particleId]: {
+        ...($container && {$container}),
         ...particleSpec,
-        $slots: {},
-        ...($container && {$container})
+        $slots: {}
       }
     };
     entries(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {

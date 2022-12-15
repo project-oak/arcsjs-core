@@ -7,7 +7,7 @@
 
 export const PixiJsDemoNode = {
   $meta: {
-    id: 'PixiJsDemo',
+    id: 'PixiJsDemoNode',
     displayName: 'PixiJs Multi Demo',
     category: 'PixiJs'
   },

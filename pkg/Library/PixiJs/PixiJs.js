@@ -9,6 +9,6 @@ onImage({eventlet: {value: image}}) {
   return {image};
 },
 template: html`
-  <pixi-view demo="{{demo}}" image="{{image}}" on-image="onImage"></pixi-view>
+  <pixi-view flex demo="{{demo}}" image="{{image}}" on-image="onImage"></pixi-view>
 `
 })

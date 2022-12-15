@@ -5,16 +5,17 @@
  * license that can be found in the LICENSE file.
  */
 ({
-shouldUpdate({arcName, graphName}, state) {
+shouldUpdate({arcName}, state) {
   return arcName && (state.arcName !== arcName);
 },
-async update({arcName, graphName}, state, {service}) {
+async update({arcName, ...etc}, state, {service}) {
   state.arcName = arcName;
-  await this.doTheThing({arcName, graphName}, state, {service})
+  await this.doTheThing({arcName, ...etc}, state, {service})
 },
-async doTheThing({arcName, graphName}, state, {service}) {
-  const result = await service({kind: 'GraphService', msg: 'AddGraph', data: {arcName, graphName}});
+async doTheThing({arcName, graphName, defaultContainer}, state, {service}) {
+  defaultContainer = 'ArcNode1:arc#arc';
+  const result = await service({kind: 'GraphService', msg: 'AddGraph', data: {arcName, graphName, defaultContainer}});
   log(result);
 },
-template: html`<div frame="arc"></div>`
+template: html`<div flex row frame="arc"></div>`
 })

@@ -65,12 +65,11 @@ export class PixiView extends Xen.Async {
         const app = state.app = new PIXI.Application({
           width: 1280, height: 720,
           //width: 800, height: 600,
-          //view: this.canvas,
+          // view: this.canvas,
           forceCanvas: true,
           backgroundAlpha: (demoFunc === Transparent) ? 0 : 1
         });
-        //app.ticker.autoStart = true;
-        //this.host.appendChild(app.view);
+        this.host.appendChild(app.view);
         demoFunc(app, state);
         state.appCanvasId = Resources.allocate(state.app.view);
         console.log('appCanvasId achieved:', state.appCanvasId);
