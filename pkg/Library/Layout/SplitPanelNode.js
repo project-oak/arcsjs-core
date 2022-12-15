@@ -13,11 +13,14 @@ export const SplitPanelNode = {
     layout: {
       $type: 'String',
       values: ['vertical', 'horizontal']
+    },
+    style: {
+      $type: 'String'
     }
   },
   panel: {
     $kind: "Layout/SplitPanel",
-    $inputs: ['layout', 'center'],
+    $inputs: ['layout', 'center', 'style'],
     $slots: {
       topLeft: {},
       bottomRight: {}
