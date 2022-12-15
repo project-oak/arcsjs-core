@@ -8,18 +8,14 @@
  */
 ({
 
-update({graph, ...layout}, state) {
-  if (this.shouldRecomputeLayout(graph, state.graph)) {
-    const outputs = {};
+update({graph, ...layouts}, state) {
+  if (this.graphChanged(graph, state.graph)) {
     state.graph = graph;
-    keys(layout).forEach(id => {
-      assign(outputs, {[id]: this.computeLayout(graph, graph.position?.[id])});
-    });
-    return outputs;
+    return this.outputLayouts(graph);
   }
 },
 
-shouldRecomputeLayout(graph, oldGraph) {
+graphChanged(graph, oldGraph) {
   if (graph) {
     // Graph changed.
     return (graph.$meta.id !== oldGraph?.$meta?.id)
@@ -29,17 +25,32 @@ shouldRecomputeLayout(graph, oldGraph) {
   }
 },
 
-computeLayout({$meta: {id}, nodes}, positions) {
-  const layout = {id};
-  entries(positions).forEach(([id, position]) => {
-    if (nodes[id]) {
-      layout[id] = position;
-      const containerId = `${id}:Container`;
-      layout[containerId] = positions[containerId];
-    }
-    // Consider also deleting positions of non existent nodes?
+outputLayouts(graph) {
+  const layouts = {};
+  // all inputs not 'graph' are layouts
+  keys(layouts).forEach(layoutId => {
+    // if there is position data for this layout
+    const layout = graph.position?.[layoutId];
+    // add it to the set
+    assign(outputs, {[layoutId]: layout});
+    //assign(outputs, {[layoutId]: this.computeLayout(graph, graph.position?.[id])});
   });
-  return layout;
-}
+  return layouts;
+},
+
+// computeLayout({$meta: {id}, nodes}, positions) {
+//   const layout = {id};
+//   entries(positions).forEach(([id, position]) => {
+//     if (nodes[id]) {
+//       layout[id] = position;
+//       // note sure what this is for
+//       //const containerId = `${id}:Container`;
+//       // make the layout.containerId == positions.containerId
+//       //layout[containerId] = positions[containerId];
+//     }
+//     // Consider also deleting positions of non existent nodes?
+//   });
+//   return layout;
+// }
 
 });

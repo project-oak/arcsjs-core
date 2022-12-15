@@ -4,9 +4,9 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-export const ObjectInspectorNode = {
+export const InspectorNode = {
   $meta: {
-    id: 'ObjectInspectorNode',
+    id: 'InspectorNode',
     category: 'Panels'
   },
   $stores: {
@@ -16,11 +16,11 @@ export const ObjectInspectorNode = {
     }
   },
   inspector: {
-    $kind: '$library/NodeGraph/Inspector',
+    $kind: '$library/NodeInspector/Inspector',
     $inputs: [{data: 'inspectorData'}]
   },
   nodeInspector: {
-    $kind: '$library/NodeGraph/NodeInspector',
+    $kind: '$library/NodeInspector/NodeInspector',
     $staticInputs: {
       inspectorData: 'inspectorData',
     },
