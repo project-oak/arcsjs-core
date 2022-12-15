@@ -15,11 +15,11 @@ async initialize(inputs, state) {
 },
 
 async update({recipes, selectedNodeId, layout}, state, {service}) {
+  recipes ??= [];
   // reset selection state
   state.selectedNodeId = selectedNodeId;
   // reset layout state
   state.layout = layout;
-  recipes ??= [];
   await this.removeOldRecipes(recipes, state, service);
   await this.renewRecipes(recipes, state, service);
 },

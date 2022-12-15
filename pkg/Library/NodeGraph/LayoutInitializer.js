@@ -8,10 +8,11 @@
  */
 ({
 
-update({graph, ...layouts}, state) {
+update({graph}, state) {
   if (this.graphChanged(graph, state.graph)) {
     state.graph = graph;
-    return this.outputLayouts(graph);
+    return graph.position;
+    //return this.outputLayouts(graph);
   }
 },
 
@@ -25,18 +26,18 @@ graphChanged(graph, oldGraph) {
   }
 },
 
-outputLayouts(graph) {
-  const layouts = {};
-  // all inputs not 'graph' are layouts
-  keys(layouts).forEach(layoutId => {
-    // if there is position data for this layout
-    const layout = graph.position?.[layoutId];
-    // add it to the set
-    assign(outputs, {[layoutId]: layout});
-    //assign(outputs, {[layoutId]: this.computeLayout(graph, graph.position?.[id])});
-  });
-  return layouts;
-},
+// outputLayouts(graph) {
+//   const layouts = {};
+//   // graph.position maps layouts by id
+//   keys(graph.position).forEach(layoutId => {
+//     // if there is position data for this layout
+//     const layout = graph.position?.[layoutId];
+//     // add it to the set
+//     assign(layouts, {[layoutId]: layout});
+//     //assign(outputs, {[layoutId]: this.computeLayout(graph, graph.position?.[id])});
+//   });
+//   return layouts;
+// },
 
 // computeLayout({$meta: {id}, nodes}, positions) {
 //   const layout = {id};

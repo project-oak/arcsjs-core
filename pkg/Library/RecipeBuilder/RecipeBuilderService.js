@@ -20,7 +20,8 @@ export const RecipeBuilderService = {
       }
       log('source graph:', graph);
       log('using NodeTypes:', this.nodeTypes);
-      const recipes = await RecipeBuilder.construct({graph, nodeTypes: this.nodeTypes});
+      const layout = graph.position?.previewLayout;
+      const recipes = await RecipeBuilder.construct({graph, layout, nodeTypes: this.nodeTypes});
       log('made recipes:', recipes);
       log.groupEnd();
       return recipes;
