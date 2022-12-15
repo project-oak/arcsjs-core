@@ -5,12 +5,9 @@
  * license that can be found in the LICENSE file.
  */
 import {nodeTypes, categories} from './nodeTypes.js';
-//import {customInspectors} from './customInspectors.js';
+import {customInspectors} from './customInspectors.js';
 
 export {nodeTypes};
-
-const customInspectors = [
-];
 
 const globalStores = [
   'selectedNode',
