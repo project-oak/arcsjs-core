@@ -6,22 +6,24 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-const NodeTypeInfoPanel = {
-  $stores: {
-    categories: {
-      $type: 'Pojo',
-      noinspect: true
+const typeInfo = {
+  NodeTypeInfoPanel: {
+    $stores: {
+      categories: {
+        $type: 'Pojo',
+        noinspect: true
+      },
+      hoveredNodeType: {
+        $type: 'Pojo',
+        noinspect: true
+      }
     },
-    hoveredNodeType: {
-      $type: 'Pojo',
-      noinspect: true
-    }
-  },
-  $kind: '$library/NodeCatalog/NodeTypeInfoPanel',
-  $inputs: [
-    {nodeType: 'hoveredNodeType'},
-    'categories'
-  ]
+    $kind: '$library/NodeCatalog/NodeTypeInfoPanel',
+    $inputs: [
+      {nodeType: 'hoveredNodeType'},
+      'categories'
+    ]
+  }
 };
 
 const nodeList = {
@@ -33,6 +35,9 @@ const nodeList = {
     categories: {
       $type: 'Pojo',
       noinspect: true
+    },
+    newNodeInfos: {
+      $type: '[Pojo]'
     },
     selectedGraph: {
       $type: 'Pojo'
@@ -54,7 +59,7 @@ const nodeList = {
       'hoveredNodeType',  'newNodeInfos'
     ],
     $slots: {
-      typeInfo: {NodeTypeInfoPanel}
+      typeInfo
     }
   }
 };
