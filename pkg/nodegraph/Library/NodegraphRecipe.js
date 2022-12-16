@@ -135,7 +135,7 @@ const NodeEditor = {
 
 const Inspector = {
   Inspector: {
-    $kind: '$library/NodeInspector/Inspector',
+    $kind: '$library/NodeInspector/ObjectInspector',
     $staticInputs: {customInspectors},
     $inputs: [{data: 'inspectorData'}],
     $outputs: [{data: 'inspectorData'}]

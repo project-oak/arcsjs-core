@@ -12,8 +12,7 @@ export const DisplayNode = {
   },
   $stores: {
     text: {
-      $type: 'Pojo',
-      connection: true
+      $type: 'Pojo'
     },
     textStyle: {
       $type: 'CssStyle'

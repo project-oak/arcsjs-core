@@ -9,7 +9,7 @@ export const load = async paths => (await Promise.all(paths.map(p => import(`${l
 
 const etc = await load([
   'Data/DisplayNode.js',
-  'NewMedia/ImageNode.js',
+  'GraphsNodes/ImageNode.js',
   'Layout/LayoutNodes.js',
   'NodeCatalog/NodeCatalogNode.js',
   'NodeInspector/NodeInspectorNode.js',
