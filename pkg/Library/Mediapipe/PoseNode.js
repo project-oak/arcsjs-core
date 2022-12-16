@@ -9,8 +9,7 @@ export const PoseNode = {
     image: {
       $type: 'Image',
       noinspect: true,
-      nomonitor: true,
-      connection: true
+      nomonitor: true
     },
     pose: {
       $type: 'PoseData',
