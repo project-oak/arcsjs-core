@@ -206,7 +206,7 @@ export const NodeCreator = {
 
 const Layout = {
   layoutInitializer: {
-    $kind: '$library/NodeGraph/LayoutInitializer',
+    $kind: '$library/NodeLayout/LayoutInitializer',
     $inputs: [
       {graph: 'selectedGraph'},
       'previewLayout',
@@ -218,7 +218,7 @@ const Layout = {
     ]
   },
   layoutUpdater: {
-    $kind: '$library/NodeGraph/LayoutUpdater',
+    $kind: '$library/NodeLayout/LayoutUpdater',
     $inputs: [
       {graph: 'selectedGraph'},
       'previewLayout',

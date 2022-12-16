@@ -22,6 +22,7 @@ const modules = await load([
   'NewMedia/MediaService.js',
   'Mediapipe/FaceMeshService.js',
   'Mediapipe/SelfieSegmentationService.js',
+  'Mediapipe/PoseService.js',
   'Threejs/ThreejsService.js',
   'Shader/ShaderService.js',
   'TensorFlow/TensorFlowService.js',
@@ -40,3 +41,4 @@ export const {LobbyService} = modules;
 export const {GoogleApisService} = modules;
 export const {ArcService} = modules;
 export const {RecipeBuilderService} = modules;
+export const {PoseService} = modules;
