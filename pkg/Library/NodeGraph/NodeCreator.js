@@ -6,22 +6,24 @@
 
 ({
 
-async update({newNodeInfos, graph, nodeTypes, ...graphLayouts}) {
+async update({newNodeInfos, graph, nodeTypes}) {
   if (newNodeInfos?.length > 0) {
     let selectedNodeId;
-    const layoutOutputs = {};
-    newNodeInfos.forEach(({type, nodeData, ...nodeLayouts}) => {
+    newNodeInfos.forEach(({type, nodeData, ...layouts}) => {
       const newNode = this.makeNewNode(graph, nodeTypes[type]);
       assign(newNode, nodeData);
       graph.nodes[newNode.id] = newNode;
-      this.populateLayouts(newNode.id, nodeLayouts, graphLayouts, layoutOutputs);
+      graph.layout ??= {};
+      keys(layouts).forEach(layoutId => {
+        graph.layout[layoutId] ??= {};
+        graph.layout[layoutId][newNode.id] = layouts[layoutId];
+      });
       selectedNodeId = newNode.id;
     });
     return {
       newNodeInfos: [],
       graph,
-      selectedNodeId,
-      ...layoutOutputs
+      selectedNodeId
     };
   }
 },
@@ -45,19 +47,6 @@ formatDisplayName(name, index) {
 
 formatNodeId(id, index) {
   return `${id}${index}`.replace(/ /g,'');
-},
-
-populateLayouts(nodeId, nodeLayouts, graphLayouts, layoutOutputs) {
-  keys(nodeLayouts).forEach(layoutKey => {
-  if (graphLayouts[layoutKey]) {
-    graphLayouts[layoutKey] = {
-      ...graphLayouts[layoutKey],
-      [nodeId]: nodeLayouts[layoutKey]
-    };
-    assign(layoutOutputs, {[layoutKey]: graphLayouts[layoutKey]});
-  }
-});
-
 }
 
 });

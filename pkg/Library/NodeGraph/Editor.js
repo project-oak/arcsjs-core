@@ -10,9 +10,8 @@ edgeIdDelimeter: '$$',
 connectionDelimiter: ':',
 
 async update(inputs, state) {
-  const {layout, graph} = inputs;
+  const {graph} = inputs;
   state.graph = this.parseGraph(graph);
-  state.layout = layout;
   const results = this.handleEvents(inputs, state);
   return {
     ...results,
@@ -85,9 +84,10 @@ toolbarIcons({selectedNodeId}, {graph}) {
 },
 
 render(inputs, state) {
+  const {graph, layoutId} = inputs;
   return {
     graph: this.renderGraph(inputs, state),
-    graphRects: state.layout //|| this.simpleLayout(state)
+    graphRects: graph?.layout?.[layoutId]
   };
 },
 
@@ -104,8 +104,9 @@ renderGraphNodes(inputs, state) {
   return values(graph?.nodes).map(node => this.renderNode(node, inputs, state));
 },
 
-renderNode(node, {categories, selectedNodeId, nodeTypes}, {layout}) {
+renderNode(node, {graph, categories, selectedNodeId, nodeTypes, layoutId}) {
   const nodeType = nodeTypes[node.type];
+  const layout = graph.layout?.[layoutId];
   const {category} = nodeType?.$meta || {category: 'n/a'};
   return {
     key: node.id,
@@ -144,19 +145,6 @@ renderGraphEdges(inputs, {graph}) {
     }));
   });
   return edges;
-},
-
-simpleLayout({graph}) {
-  const layout = {};
-  keys(graph?.nodes).forEach((id, index) => {
-    layout[id] = {
-      l: 40 + (index * 300),
-      t: 40 + (index * 40),
-      w: 144,
-      h: 100
-    };
-  });
-  return layout;
 },
 
 parseConnection(connection) {
@@ -243,7 +231,7 @@ onNodeRenamed({eventlet: {key, value}}, state) {
   node.displayName = value.trim();
   state.graph.nodes[node.id] = node;
   delete state.selectedNodeText;
-  return {graph};
+  return {graph: state.graph};
 },
 
 renameSelectedNode({selectedNodeId}, state) {
@@ -256,6 +244,9 @@ deleteSelectedNode({selectedNodeId}, {graph}) {
 
 deleteNode(nodeId, graph, selectedNodeId) {
   delete graph.nodes[nodeId];
+  keys(graph.layout).forEach(layoutId => {
+    delete graph.layout[layoutId][nodeId];
+  });
   return {
     graph,
     selectedNodeId: (nodeId === selectedNodeId) ? null : selectedNodeId
@@ -334,21 +325,24 @@ onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-onNodeTypeDropped({eventlet: {value: {id: type, position}}, newNodeInfos}, {graph}) {
+onNodeTypeDropped({eventlet: {value: {id: type, position}}, newNodeInfos, layoutId}, {graph}) {
   if (graph) {
     return {
       newNodeInfos: [...(newNodeInfos || []), {
         type,
-        // Note: `nodegraphLayout` shouldn't be hardcoded
-        nodegraphLayout: position
+        [layoutId]: position
       }]
     };
   }
 },
 
-onNodeMoved({eventlet: {key, value}, layout}, state) {
-  layout = state.layout = {...layout, [key]: value};
-  return {layout};
+onNodeMoved({eventlet: {key, value}, graph, layoutId}) {
+  graph.layout ??= {};
+  graph.layout[layoutId] ??= {};
+  if (graph.nodes[key]) {
+    graph.layout[layoutId][key] = value;
+    return {graph};
+  }
 },
 
 // onEdgeRemove({eventlet: {key}, graph}) {

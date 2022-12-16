@@ -74,13 +74,14 @@ const Preview = {
       'selectedNodeId',
       'nodeTypes',
       'categories',
-      {layout: 'previewLayout'},
       'newNodeInfos'
     ],
+    $staticInputs: {
+      layoutId: 'preview'
+    },
     $outputs: [
       {graph: 'selectedGraph'},
       'selectedNodeId',
-      {layout: 'previewLayout'},
       'newNodeInfos'
     ]
   }
@@ -104,16 +105,15 @@ const NodeEditor = {
       'selectedNodeId',
       'nodeTypes',
       'categories',
-      {layout: 'nodegraphLayout'},
-      {previewLayout: 'previewLayout'},
       'newNodeInfos',
       {event: 'editorToolbarEvent'}
     ],
+    $staticInputs: {
+      layoutId: 'nodegraph'
+    },
     $outputs: [
       {graph: 'selectedGraph'},
       'selectedNodeId',
-      {layout: 'nodegraphLayout'},
-      //{previewLayout: 'previewLayout'},
       'newNodeInfos',
       {event: 'editorToolbarEvent'},
       'editorToolbarIcons'
@@ -172,13 +172,14 @@ const NodeTree = {
       {graph: 'selectedGraph'},
       'selectedNodeId',
       'nodeTypes',
-      'categories',
-      {layout: 'previewLayout'}
+      'categories'
     ],
+    $staticInputs: {
+      layoutId: 'preview'
+    },
     $outputs: [
       {graph: 'selectedGraph'},
-      'selectedNodeId',
-      {layout: 'previewLayout'}
+      'selectedNodeId'
     ]
   }
 };
@@ -201,30 +202,6 @@ export const NodeCreator = {
       {graph: 'selectedGraph'},
       'selectedNodeId'
     ]
-  }
-};
-
-const Layout = {
-  layoutInitializer: {
-    $kind: '$library/NodeLayout/LayoutInitializer',
-    $inputs: [
-      {graph: 'selectedGraph'},
-      'previewLayout',
-      'nodegraphLayout'
-    ],
-    $outputs: [
-      'previewLayout',
-      'nodegraphLayout'
-    ]
-  },
-  layoutUpdater: {
-    $kind: '$library/NodeLayout/LayoutUpdater',
-    $inputs: [
-      {graph: 'selectedGraph'},
-      'previewLayout',
-      'nodegraphLayout'
-    ],
-    $outputs: [{graph: 'selectedGraph'}]
   }
 };
 
@@ -251,8 +228,7 @@ const RecipeBuilder = {
     $kind: '$library/RecipeBuilder/RecipeBuilderParticle',
     $inputs: [
       'nodeTypes',
-      {graph: 'selectedGraph'},
-      {layout: 'previewLayout'}
+      {graph: 'selectedGraph'}
     ],
     $outputs: ['recipes']
   }
@@ -294,12 +270,6 @@ export const NodegraphRecipe = {
       $type: 'Pojo',
       $value: categories
     },
-    previewLayout: {
-      $type: 'Pojo'
-    },
-    nodegraphLayout: {
-      $type: 'Pojo'
-    },
     nodeTypes: {
       $type: 'Pojo',
       $value: nodeTypes
@@ -309,12 +279,11 @@ export const NodegraphRecipe = {
     }
   },
   ...RecipeBuilder,
-  ...Layout,
   ...NodeCreator,
   main: {
     $kind: '$library/NodeGraph/Nodegraph',
     $slots: {
-      catalog: nodeTypes.NodeCatalogNode, //Recipe,
+      catalog: nodeTypes.NodeCatalogNode,
       toolbar: GraphToolbar,
       preview: Preview,
       editor: NodeEditor,
