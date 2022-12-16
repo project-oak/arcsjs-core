@@ -6,9 +6,8 @@
  */
 export const MultilineTextFieldNode = {
   $meta: {
-    id: 'MultilineTextFieldNode',
-    displayName: 'Multiline Text Field',
-    category: 'Fields'
+    id: 'Text',
+    category: 'Field'
   },
   $stores: {
     label: {
@@ -18,19 +17,11 @@ export const MultilineTextFieldNode = {
     value: {
       $type: 'String',
       $value: 'value'
-    },
-    connectedValue: {
-      $type: 'String',
-      connection: true
-    },
-    outputValue: {
-      $type: 'String',
-      $value: ''
     }
   },
   field: {
     $kind: '$library/Fields/MultilineTextField',
-    $inputs: ['label', 'value', 'connectedValue'],
-    $outputs: ['label', {value: 'outputValue'}]
+    $inputs: ['label', 'value'],
+    $outputs: ['label', 'value']
   }
 };

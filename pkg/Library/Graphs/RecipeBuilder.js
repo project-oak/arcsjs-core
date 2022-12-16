@@ -75,9 +75,9 @@ export const RecipeBuilder = {
   flattenParticleSpec(particleId, particleSpec, $container) {
     const flattened = {
       [particleId]: {
-        ...($container && {$container}),
         ...particleSpec,
-        $slots: {}
+        $slots: {},
+        ...($container && {$container})
       }
     };
     entries(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
@@ -92,9 +92,9 @@ export const RecipeBuilder = {
     const specs = {};
     entries(nodeType?.$stores).forEach(([name, store]) => {
       state.storeMap[name] = [];
-      if (store.connection) {
-        const connections = node.connections?.[name];
-        connections?.forEach?.(id => state.storeMap[name].push({id, tags: store.$tags}));
+      const connections = node.connections?.[name];
+      if (connections) {
+        connections.forEach?.(id => state.storeMap[name].push({id, tags: store.$tags}));
       } else {
         const storeId = this.constructId(node.id, name);
         specs[storeId] = this.buildStoreSpec(store, node.props?.[name], node);

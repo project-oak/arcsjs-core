@@ -5,21 +5,15 @@
  * license that can be found in the LICENSE file.
  */
 ({
-update({value, connectedValue}, state) {
-  value = state.value = connectedValue ?? value;
-  return {value};
-},
-render(inputs, {value}) {
+render(inputs) {
   return {
     ...inputs,
-    value
   };
 },
 onLabelChange({eventlet: {value}}) {
   return {label: value};
 },
-onFieldChange({eventlet: {value}}, state) {
-  state.value = value;
+onFieldChange({eventlet: {value}}) {
   return {value};
 },
 template: html`

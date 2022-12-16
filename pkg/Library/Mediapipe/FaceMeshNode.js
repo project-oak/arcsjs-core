@@ -33,7 +33,7 @@ node {
       $type: 'Image',
       noinspect: true,
       nomonitor: true,
-      connection: true
+      // connection: true
     },
     outputImage: {
       $type: 'Image',
