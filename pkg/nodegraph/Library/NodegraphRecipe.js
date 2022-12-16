@@ -6,8 +6,6 @@
  */
 import {nodeTypes, categories} from './nodeTypes.js';
 import {customInspectors} from './customInspectors.js';
-import {NodeCatalogRecipe} from '../../Library/NodeTypeCatalog/NodeCatalogRecipe.js';
-import {DeviceUxRecipe} from '../../Library/Media/DeviceUxRecipe.js';
 
 const globalStores = [
   'selectedNode',
@@ -137,13 +135,13 @@ const NodeEditor = {
 
 const Inspector = {
   Inspector: {
-    $kind: '$library/NodeGraph/Inspector',
+    $kind: '$library/NodeInspector/Inspector',
     $staticInputs: {customInspectors},
     $inputs: [{data: 'inspectorData'}],
     $outputs: [{data: 'inspectorData'}]
   },
   nodeInspector: {
-    $kind: '$library/NodeGraph/NodeInspector',
+    $kind: '$library/NodeInspector/NodeInspector',
     $staticInputs: {
       customInspectors,
       inspectorData: 'inspectorData',
@@ -157,7 +155,7 @@ const Inspector = {
     $outputs: [{data: 'inspectorData'}]
   },
   nodeUpdater: {
-    $kind: '$library/NodeGraph/NodeUpdater',
+    $kind: '$library/NodeInspector/NodeUpdater',
     $inputs: [
       'selectedNodeId',
       {graph: 'selectedGraph'},
@@ -172,7 +170,7 @@ const Inspector = {
 
 const NodeTree = {
   NodeTree: {
-    $kind: '$library/NodeGraph/NodeTree',
+    $kind: '$library/NodeTree/NodeTree',
     $inputs: [
       {graph: 'selectedGraph'},
       'selectedNodeId',
@@ -239,7 +237,7 @@ const Layout = {
 
 const RecipeBuilder = {
   candidateFinder: {
-    $kind: '$library/NodeGraph/CandidateFinder',
+    $kind: '$library/RecipeBuilder/CandidateFinder',
     $inputs: [
       {graph: 'selectedGraph'},
       'nodeTypes'
@@ -248,7 +246,7 @@ const RecipeBuilder = {
     $outputs: ['candidates']
   },
   connectionUpdater: {
-    $kind: '$library/NodeGraph/ConnectionUpdater',
+    $kind: '$library/RecipeBuilder/ConnectionUpdater',
     $inputs: [
       {graph: 'selectedGraph'},
       'nodeTypes',
@@ -315,8 +313,6 @@ export const NodegraphRecipe = {
     newNodeInfos: {
       $type: '[Pojo]'
     },
-    mediaDevices: DeviceUxRecipe.$stores.mediaDevices,
-    mediaDeviceState: DeviceUxRecipe.$stores.mediaDeviceState
   },
   ...RecipeBuilder,
   ...Layout,
@@ -324,15 +320,12 @@ export const NodegraphRecipe = {
   main: {
     $kind: '$nodegraph/Nodegraph',
     $slots: {
-      catalog: NodeCatalogRecipe,
+      catalog: nodeTypes.NodeCatalogNode,
       toolbar: GraphToolbar,
       preview: Preview,
       editor: NodeEditor,
       inspector: Inspector,
       tree: NodeTree,
-      device: {
-        defaultStream: DeviceUxRecipe.defaultStream
-      }
     }
   }
 };
