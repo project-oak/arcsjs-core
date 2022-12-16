@@ -8,10 +8,13 @@ const lib = `${globalThis.config.arcsPath}/Library`;
 export const load = async paths => (await Promise.all(paths.map(p => import(`${lib}/${p}`)))).reduce((e, m) =>({...e, ...m}),{});
 
 const etc = await load([
+  'Data/DisplayNode.js',
   'NewMedia/ImageNode.js',
   'Layout/LayoutNodes.js',
   'NodeCatalog/NodeCatalogNode.js',
-  'NodeInspector/InspectorNode.js'
+  'NodeInspector/NodeInspectorNode.js',
+  'Mediapipe/PoseNode.js',
+  'Mediapipe/DetectRaisedHandNode.js'
 ]);
 
 const nodeTypes = {
