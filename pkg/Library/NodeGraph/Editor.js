@@ -337,8 +337,7 @@ onNodeTypeDropped({eventlet: {value: {id: type, position}}, newNodeInfos, layout
 },
 
 onNodeMoved({eventlet: {key, value}, graph, layoutId}) {
-  graph.layout ??= {};
-  graph.layout[layoutId] ??= {};
+  (graph.layout ??= {})[layoutId] ??= {};
   if (graph.nodes[key]) {
     graph.layout[layoutId][key] = value;
     return {graph};

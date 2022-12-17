@@ -187,10 +187,7 @@ onNodePosition({eventlet: {key, value}, graph, layoutId}, state) {
   if (!node) {
     return this.selectNode(null, state);
   }
-  graph.layout ??= {};
-  graph.layout[layoutId] ??= {};
-  graph.layout[layoutId][node.id] = value;
-
+  ((graph.layout ??= {})[layoutId] ??= {})[node.id] = value;
   //console.log('caching layout rect', node.id, value);
   return {
     graph,
