@@ -8,15 +8,16 @@ import {App, RecipeBuilder} from '../arcs/arcs.js';
 import {GraphRecipe} from './GraphRecipe.js';
 
 export const GraphApp = class extends App {
-  // constructor(paths) {
-  //   super(paths);
-  // }
   async spinup() {
-    // the GraphRecipe actually wants only the layouts
-    GraphRecipe.main.$staticInputs.graph = this.graph;
-    this.recipes = [GraphRecipe];
+    this.layoutId ??= 'preview';
+    this.configure(this.graph, this.layoutId);
     await super.spinup();
-    await this.addGraph(this.graph);
+    await this.addGraph(this.graph, this.layoutId);
+  }
+  configure(graph, layoutId) {
+    // the GraphRecipe actually only wants the rectangles from the graph layouts
+    GraphRecipe.main.$staticInputs = {graph, layoutId};
+    this.recipes = [GraphRecipe];
   }
   async onservice(user, host, request) {
     if (request?.msg === 'addRunnerGraph') {
@@ -33,14 +34,14 @@ export const GraphApp = class extends App {
     const recipes = RecipeBuilder.construct({graph, nodeTypes: this.nodeTypes});
     this.arcs.removeRecipes('user', recipes);
   }
-  async addGraph(graph) {
+  async addGraph(graph, layoutId) {
     if (this.lastRecipes) {
       await this.arcs.removeRecipes('user', this.lastRecipes);
       this.lastRecipes = null;
     }
     RecipeBuilder.defaultContainer = 'main#root';
-    // the RecipeBuilder actually wants only the containers
-    const layoutId = 'preview';
+    // the RecipeBuilder wants the nodes and the containers from the layout,
+    // but not the rectangles
     const recipes = RecipeBuilder.construct({graph, layoutId, nodeTypes: this.nodeTypes});
     await this.arcs.addRecipes('user', recipes);
   }
