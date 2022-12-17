@@ -104,6 +104,10 @@ constructPropModel(key, prop, parent, template, state) {
     value
   };
   switch (template) {
+    case 'imageupload_t': {
+      model.value ||= 'assets/icon.png';
+      break;
+    }
     case 'select_t': {
       const selected = model.value;
       model.value = values.map(v => {

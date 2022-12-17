@@ -9,10 +9,10 @@
     return pose?.poseLandmarks;
   },
   async update({pose: {poseLandmarks}}, state, {service}) {
-    const y = i => poseLandmarks[i][1];
+    const y = i => poseLandmarks[i].y;
     const [shoulderA, shoulderB, elbowA, elbowB] = [11, 12, 13, 14];
     // elbow above shoulder is considered a raised hand :)
-    const raisedHands = y(shoulderA) < y(elbowA) || y(shoulderB) < y(elbowB);
+    const raisedHands = y(shoulderA) > y(elbowA) || y(shoulderB) > y(elbowB);
     return {raisedHands};
   }
 });

@@ -4,54 +4,50 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {Resources} from '../App/Resources.js';
-import {MediapipeClassifier} from './MediapipeClassifier.js';
 
-// late-bind the dependencies so we pay for it only when using it
+let waitFor = 0;
 
-const local = import.meta.url.split('/').slice(0, -1).join('/');
-const locateFile = file => {
-  console.log(file, `${local}/../../third_party/mediapipe/pose/${file}`);
-  return `${local}/../../third_party/mediapipe/pose/${file}`;
-};
+// JIT
+const pose = await globalThis.requirePose();
 
-let Pose;
-const requirePose = async () => {
-  if (!Pose) {
-    await MediapipeClassifier.import('../../third_party/mediapipe/pose/pose.js');
-    Pose = globalThis.Pose;
-  }
-};
+const dom = (tag, props, container) => (container ?? document.body).appendChild(Object.assign(document.createElement(tag), props));
+const canvas = dom('canvas', {width: 640, height: 480, style: 'display: none;'});
+
+//dom('iframe', {src: '../Library/Mediapipe/smoke/pose-raw-smoke.html', style: 'display: inline-block; height: 240px;'});
 
 export const PoseService = {
-  async classify({image, target}) {
-    // get our input canvas object
-    const realImage = Resources.get(image?.canvas);
-    // confirm stability
-    if (realImage?.width && realImage?.height) {
-      // classify!
-      return MediapipePoseModel.pose(realImage);
+  async classify({image}) {
+     // don't hammer the mediapipe
+    if (!PoseService.classify.busy) {
+      PoseService.classify.busy = true;
+      try {
+        // must be a real boy
+        const realImage = Resources.get(image?.canvas);
+        // confirm stability
+        if (realImage?.width && realImage?.height) {
+          //const ctx = canvas.getContext('2d');
+          //ctx.drawImage(realImage, 0, 0);
+          const result = await classifyPose(realImage);
+          const {poseLandmarks} = result;
+          return {poseLandmarks}
+        }
+      } finally {
+        PoseService.classify.busy = false;
+      }
     }
   }
 };
 
-export const MediapipePoseModel = {
-  ...MediapipeClassifier,
-  async pose(image) {
-    return this.classify(await this.getPose(), image);
-  },
-  async getPose() {
-    await requirePose();
-    const pose = new Pose({locateFile});
-    pose.setOptions({
-      staticImageMode: true, // optimize with frame coherence, or not
-      // maxNumFaces: 1,
-      // modelComplexity: 1, // 0, 1, 2
-      // smoothLandmarks: true,
-      // minDetectionConfidence: 0.5,
-      // minTrackingConfidence: 0.5
+let poseData;
+
+const classifyPose = image => {
+  // convert callback to async syntax (sampling)
+  return new Promise(async resolve => {
+    pose.onResults(results => {
+      poseData = results;
     });
-    this.getPose = () => pose;
-    return pose;
-  },
+    await pose.send({image});
+    resolve(poseData);
+    //console.log('returned', poseData);
+  });
 };

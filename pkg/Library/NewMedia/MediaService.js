@@ -21,7 +21,6 @@ export const MediaService = class {
   static async allocateCanvas(size) {
     log('allocateCanvas');
     const {width, height} = size ?? {width: 240, height: 180};
-    //const canvas = dom('canvas', {style: `display: none; width: ${width}px; height: ${height}px;`});
     const canvas = dom('canvas', {width, height, style: 'display: none;'});
     return Resources.allocate(canvas);
   }

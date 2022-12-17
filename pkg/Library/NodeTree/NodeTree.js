@@ -23,47 +23,6 @@ async update(input, state, tools) {
   }
 },
 
-// async constructContainerGraph({graph, nodeTypes}, {service}) {
-//   let parsed, tree;
-//   // a graph is a set of Nodes + metadata (name, id)
-//   const nodes = graph?.nodes || [];
-//   for (const node of nodes) {
-//     // name, type, index, key, props, position: {preview: {host: {data}...}, other: {host: {data}...}}
-//     const nodeType = nodeTypes[node.type];
-//     parsed = await service({kind: 'RecipeService', msg: 'ParseRecipe', data: {recipe: nodeType}});
-//     // TODO(sjmiles): boo, parser doesn't handle placeholder slots correctly
-//     const slots = {root: []};
-//     // every particle is assigned a slot
-//     for (const p of parsed.particles) {
-//       slots[p.container || 'root'] = [...(slots[p.container] || []), p];
-//     }
-//     //log(slots);
-//     // reconstruct tree from flattened representation
-//     const makeTree = (slots, here) => {
-//       // always making a new tree
-//       const treeNode = {
-//         name: here,
-//         chiles: []
-//       };
-//       // starting from this slot
-//       const hosts = slots[here];
-//       // these are the hosts in the slot
-//       for (const h of hosts) {
-//         // find slots that are owned by this host
-//         const childSlots = keys(slots).filter(k => k.startsWith(h.id));
-//         // build child trees off each slot
-//         for (const key of childSlots) {
-//           treeNode.chiles.push(makeTree(slots, key));
-//         }
-//       }
-//       return treeNode;
-//     };
-//     tree = makeTree(slots, 'root');
-//     //tree.chiles.length && log(tree);
-//   }
-//   return {parsed, tree};
-// },
-
 updateSelectedNodeId({graph, selectedNodeId}, state) {
   let candidate = selectedNodeId;
   // when switching graphs, we reset some state
@@ -120,16 +79,16 @@ getHostId(node) {
 
 containersForNode(node, nodeType) {
   const containers = [];
-  for (const particleName of this.getParticleNames(nodeType)) {
-    const slots = nodeType[particleName].$slots;
+  for (const hostName of this.getHostNames(nodeType)) {
+    const slots = nodeType[hostName].$slots;
     keys(slots).forEach(slotName => containers.push(
-      this.makeContainerModel(this.hostId(node, particleName), slotName)
+      this.makeContainerModel(this.hostId(node, hostName), slotName)
     ));
   }
   return containers;
 },
 
-getParticleNames(nodeType) {
+getHostNames(nodeType) {
   const notKeyword = name => !name.startsWith('$');
   return keys(nodeType).filter(notKeyword);
 },
@@ -143,41 +102,36 @@ makeContainerModel(hostId, slotName) {
   };
 },
 
-// renderContainers(nodes, nodeTypesMap, nodeId) {
-//   // function mapping nodes to lists of containers
-//   const mapFn = node => this.containersForNode(node, nodeTypesMap);
-//   // nodes may have multiple containers, flatten the list, remove selected node
-//   // (it cannot be it's own container)
-//   return nodes?.map(mapFn).flat().filter(n => !n.id.startsWith(nodeId));
-// },
-
 async onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
 async onDrop({eventlet: {key: container, value: {id}}, graph, nodeTypes, layoutId}, state, {service}) {
-  //log('onDrop:', key, container);
+  // crunch the numbers
   const node = graph.nodes[id];
   const nodeType = nodeTypes[node.type];
-  const hostIds = this.getParticleNames(nodeType).map(particleName => this.hostId(node, particleName));
-  await service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
+  const hostNames = this.getHostNames(nodeType);
+  const hostIds = hostNames.map(name => this.hostId(node, name));
+  // inform the render agent
+  const setContainer = async (hostIds, container) => service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
+  await setContainer(hostIds, container);
+  // map the container layout, create objects as needed
   ((graph.layout ??= {})[layoutId] ??= {})[`${id}:Container`] = container;
+  // modified data
   return {
     selectedNodeId: id,
     graph
   };
 },
 
-hostId(node, particleName) {
-  return `${node.id}${this.nameDelim}${particleName}`;
+hostId(node, hostName) {
+  return `${node.id}${this.nameDelim}${hostName}`;
 },
-
 
 template: html`
 <style>
   :host {
     display: block;
-    /* font-size: 16px; */
     color: var(--theme-color-fg-0);
     background-color: var(--theme-color-bg-0);
     --edge-border: 1px solid #555;
@@ -189,7 +143,7 @@ template: html`
   }
   [node] {
     cursor: pointer;
-    padding: 8px;
+    margin: 8px;
     font-size: 0.9em;
   }
   [bar] {
@@ -214,23 +168,14 @@ template: html`
 
 <template node_t>
   <div node selected$="{{selected}}" key="{{id}}" on-click="onNodeSelect">
-
     <div bar>
-      <!-- -->
       <icon>{{icon}}</icon>
-      <!-- -->
-      <draggable-item flex row hide$="{{isContainer}}" key="{{id}}" name="{{displayName}}">
-        <span flex name>{{name}}</span>
-      </draggable-item>
-      <!-- -->
+      <draggable-item flex row hide$="{{isContainer}}" key="{{id}}" name="{{displayName}}"> </draggable-item>
       <drop-target clip row key="{{id}}" show$="{{isContainer}}" on-target-drop="onDrop">
         <span flex name>{{name}}</span>
       </drop-target>
-      <!-- -->
     </div>
-
     <div containers repeat="node_t">{{graphNodes}}</div>
-
   </div>
 </template>
 `
