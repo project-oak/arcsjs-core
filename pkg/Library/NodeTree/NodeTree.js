@@ -155,15 +155,16 @@ async onNodeSelect({eventlet: {key}}) {
   return {selectedNodeId: key};
 },
 
-async onDrop({eventlet: {key: container, value: {id}}, graph, nodeTypes, layout}, state, {service}) {
+async onDrop({eventlet: {key: container, value: {id}}, graph, nodeTypes, layoutId}, state, {service}) {
   //log('onDrop:', key, container);
   const node = graph.nodes[id];
   const nodeType = nodeTypes[node.type];
   const hostIds = this.getParticleNames(nodeType).map(particleName => this.hostId(node, particleName));
   await service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
+  ((graph.layout ??= {})[layoutId] ??= {})[`${id}:Container`] = container;
   return {
     selectedNodeId: id,
-    layout: {...layout, [`${id}:Container`]: container}
+    graph
   };
 },
 

@@ -23,8 +23,8 @@ export const RecipeBuilder = {
     return `${id ? `${id}${this.idDelim}` : ''}${name}`;
   },
 
-  construct({graph, nodeTypes, layout}) {
-    return this.recipesForGraph({graph, nodeTypes, layout}, this.state)
+  construct(inputs) {
+    return this.recipesForGraph(inputs, this.state);
   },
 
   recipesForGraph(inputs, state) {
@@ -44,7 +44,7 @@ export const RecipeBuilder = {
     return recipes;
   },
 
-  recipeForNode(node, {graph, nodeTypes, layout}, state) {
+  recipeForNode(node, {graph, nodeTypes, layoutId}, state) {
     const rawNodeType = nodeTypes?.[node?.type] ?? nodeTypes?.LibrarianNode;
     const nodeType = this.flattenNodeType(rawNodeType);
     log('recipeForNode', node, nodeType);
@@ -56,7 +56,7 @@ export const RecipeBuilder = {
         name: this.encodeFullNodeId(node, graph, this.connectorDelim),
         custom: nodeType.$meta?.custom
       },
-      ...this.buildParticleSpecs(node, nodeType, layout, state)
+      ...this.buildParticleSpecs(node, nodeType, graph?.layout?.[layoutId], state)
     };
   },
 
@@ -82,6 +82,7 @@ export const RecipeBuilder = {
     };
     entries(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
       assign(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`));
+      flattened[particleId].$slots[slotId] = {};
     });
     return flattened;
   },
@@ -129,7 +130,7 @@ export const RecipeBuilder = {
 
   buildParticleSpecs(node, nodeType, layout, {storeMap}) {
     const specs = {};
-    const containerId = this.constructId(node.id, 'Container')
+    const containerId = this.constructId(node.id, 'Container');
     const container = layout?.[containerId] || this.defaultContainer;
     const names = this.getParticleNames(nodeType) || [];
     for (const particleName of names) {

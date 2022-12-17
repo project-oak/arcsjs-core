@@ -47,6 +47,7 @@ flattenParticleSpec(particleId, particleSpec, $container) {
   };
   entries(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
     assign(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`));
+    flattened[particleId].$slots[slotId] = {};
   });
   return flattened;
 },

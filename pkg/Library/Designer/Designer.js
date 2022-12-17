@@ -14,12 +14,10 @@ async initialize(inputs, state) {
   state.stores = {};
 },
 
-async update({recipes, selectedNodeId, layout}, state, {service}) {
+async update({recipes, selectedNodeId}, state, {service}) {
   recipes ??= [];
   // reset selection state
   state.selectedNodeId = selectedNodeId;
-  // reset layout state
-  state.layout = layout;
   await this.removeOldRecipes(recipes, state, service);
   await this.renewRecipes(recipes, state, service);
 },
@@ -138,11 +136,11 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-render({graph, nodeTypes, categories}, {selectedNodeId, recipes, layout}) {
+render({graph, nodeTypes, categories, layoutId}, {selectedNodeId, recipes}) {
   const node = graph?.nodes?.[selectedNodeId];
   const nodeType = nodeTypes?.[node?.type];
   const ids = this.particleIdsForNode(node, graph, recipes);
-  const rects = this.getRects(graph, recipes, layout);
+  const rects = this.getRects(graph, recipes, layoutId);
   return {
     rects,
     selectedKeys: ids,
@@ -165,8 +163,8 @@ getParticleNamesForNode(node, graph, recipes) {
   }
 },
 
-getRects(graph, recipes, layout) {
-  const rectMap = (id, node) => ({id, position: layout?.[node.id]});
+getRects(graph, recipes, layoutId) {
+  const rectMap = (id, node) => ({id, position: graph.layout?.[layoutId]?.[node.id]});
   const nodeMap = node => this.particleIdsForNode(node, graph, recipes).map(id => rectMap(id, node));
   return values(graph?.nodes).map(nodeMap).flat();
 },
@@ -184,15 +182,15 @@ onNodeDelete({eventlet: {key}, graph}, state) {
   };
 },
 
-onNodePosition({eventlet: {key, value}, graph, layout}, state) {
+onNodePosition({eventlet: {key, value}, graph, layoutId}, state) {
   const node = this.findNodeByParticle(key, graph, state.recipes);
   if (!node) {
     return this.selectNode(null, state);
   }
+  ((graph.layout ??= {})[layoutId] ??= {})[node.id] = value;
   //console.log('caching layout rect', node.id, value);
-  layout = state.layout = {...layout, [node.id]: value};
   return {
-    layout,
+    graph,
     ...this.selectNode(node.id, state)
   };
 },
@@ -219,13 +217,12 @@ colorByCategory(category, categories) {
   return categories?.[category]?.color || 'lightblue';
 },
 
-onDrop({eventlet: {value: {id: type, position}}, graph, newNodeInfos}) {
+onDrop({eventlet: {value: {id: type, position}}, graph, newNodeInfos, layoutId}) {
   if (graph) {
     return {
       newNodeInfos: [...(newNodeInfos || []), {
         type,
-        // Note: `previewLayout` shouldn't be hardcoded
-        previewLayout: position
+        [layoutId]: position
       }]
     };
   }
