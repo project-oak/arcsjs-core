@@ -4,8 +4,17 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
+
+let url;
+if (import.meta.url.includes('localhost')) {
+  url = `http://localhost:9888/0.4.5`;
+  // url = `http://localhost/gob/arcsjs-core/pkg`;
+} else {
+  url = `https://arcsjs.web.app/0.4.5`;
+}
+
 globalThis.config = {
-  arcsPath: '..',
+  arcsPath: url,
   aeon: 'graphrunner/0.0.1',
   // theme: 'dark',
   logFlags: {

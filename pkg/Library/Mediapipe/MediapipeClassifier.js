@@ -10,15 +10,17 @@ export const MediapipeClassifier = {
     await this.semaphore;
     // TODO(sjmiles): account for an apparent failure of
     // the mediapipe loader to be re-entrant over some
-    // unknown period of time (allowing 3s atm)
+    // unknown period of time (allowing 1s atm)
     return this.semaphore = new Promise(resolve => {
       (async () => {
         const module = await import(path);
-        setTimeout(() => resolve(module), 3000);
+        resolve(module);
+        //setTimeout(() => resolve(module), 1000);
       })();
     });
   },
   async classify(classifier, testImage) {
+    console.log('**@%$&@$@(%*&@) CLASSIFY');
     if (this.busy) {
       return {};
     }

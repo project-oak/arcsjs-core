@@ -133,8 +133,8 @@ const NodeEditor = {
   }
 };
 
-const Inspector = {
-  Inspector: {
+const ObjectInspector = {
+  ObjectInspector: {
     $kind: '$library/NodeInspector/ObjectInspector',
     $staticInputs: {customInspectors},
     $inputs: [{data: 'inspectorData'}],
@@ -324,7 +324,7 @@ export const NodegraphRecipe = {
       toolbar: GraphToolbar,
       preview: Preview,
       editor: NodeEditor,
-      inspector: Inspector,
+      inspector: ObjectInspector,
       tree: NodeTree,
     }
   }
