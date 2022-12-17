@@ -27,7 +27,7 @@ export const FaceMeshSticker = {
     }
   },
   FaceSticker: {
-    $kind: 'Mediapipe/FaceSticker',
+    $kind: 'Fx/FaceSticker',
     $inputs: ['data', 'sticker', 'index'],
     $outputs: ['outputImage']
   }

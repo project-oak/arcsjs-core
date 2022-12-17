@@ -5,8 +5,8 @@
  * license that can be found in the LICENSE file.
 */
 import {logFactory, App, LocalStoragePersistor} from '../arcs.js';
-import * as services from '../services.js';
 import {nodeTypes, NodegraphRecipe} from './NodegraphRecipe.js';
+import * as services from '../services.js';
 
 const log = logFactory(true, 'Nodegraph', 'navy');
 

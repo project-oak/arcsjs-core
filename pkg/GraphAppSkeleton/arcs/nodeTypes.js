@@ -16,7 +16,7 @@ const etc = await load([
   'NodeCatalog/NodeCatalogNode.js',
   'NodeInspector/NodeInspectorNode.js',
   'Mediapipe/PoseNode.js',
-  'Mediapipe/DetectRaisedHandNode.js'
+  'Fx/DetectRaisedHandNode.js'
 ]);
 
 const nodeTypes = {

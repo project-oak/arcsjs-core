@@ -176,11 +176,11 @@ export class ParticleApi {
    *
    * State is a mutable dictionary available to all lifecycle methods.
    *
-   * Tools is a dictionary of useful functions for lifecycle methods. 
+   * Tools is a dictionary of useful functions for lifecycle methods.
    * Contains `{service, invalidate, output}`.
    *
    * `update` may return an object containing data for the output channel.
-   * For example, if we wanted to update `Person` and `Address` data we could 
+   * For example, if we wanted to update `Person` and `Address` data we could
    * return:
    *
    * ```
@@ -417,7 +417,7 @@ export class Particle {
   maybeRender() {
     if (this.template) {
       const {inputs, state} = this.internal;
-      if (this.impl?.shouldRender?.(inputs, state) !== false) {
+      if (!this.implements('shouldRender') || this.impl?.shouldRender?.(inputs, state)) {
         if (this.implements('render')) {
           return this.impl.render(inputs, state);
         } else {

@@ -5,9 +5,9 @@
  * license that can be found in the LICENSE file.
  */
 import {logFactory, LocalStoragePersistor} from './arcs/arcs.js';
+import {GraphApp as App} from './Library/GraphApp.js';
 import {nodeTypes} from './arcs/nodeTypes.js';
 import {services} from './arcs/services.js';
-import {GraphApp as App} from './Library/GraphApp.js';
 import {graph} from './graph.js';
 
 const log = logFactory(true, 'GraphApp', 'navy');

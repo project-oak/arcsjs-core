@@ -8,11 +8,13 @@ import {App, RecipeBuilder} from '../arcs/arcs.js';
 import {GraphRecipe} from './GraphRecipe.js';
 
 export const GraphApp = class extends App {
-  constructor(paths) {
-    super(paths);
-    this.recipes = [GraphRecipe];
-  }
+  // constructor(paths) {
+  //   super(paths);
+  // }
   async spinup() {
+    // the GraphRecipe actually wants only the layouts
+    GraphRecipe.main.$staticInputs.graph = this.graph;
+    this.recipes = [GraphRecipe];
     await super.spinup();
     await this.addGraph(this.graph);
   }
@@ -36,8 +38,9 @@ export const GraphApp = class extends App {
       await this.arcs.removeRecipes('user', this.lastRecipes);
       this.lastRecipes = null;
     }
-    const layoutId = 'previewLayout';
     RecipeBuilder.defaultContainer = 'main#root';
+    // the RecipeBuilder actually wants only the containers
+    const layoutId = 'preview';
     const recipes = RecipeBuilder.construct({graph, layoutId, nodeTypes: this.nodeTypes});
     await this.arcs.addRecipes('user', recipes);
   }
