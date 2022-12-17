@@ -36,8 +36,9 @@ export const GraphApp = class extends App {
       await this.arcs.removeRecipes('user', this.lastRecipes);
       this.lastRecipes = null;
     }
-    const layout = graph?.position?.previewLayout;
-    const recipes = RecipeBuilder.construct({graph, layout, nodeTypes: this.nodeTypes});
+    const layoutId = 'previewLayout';
+    RecipeBuilder.defaultContainer = 'main#root';
+    const recipes = RecipeBuilder.construct({graph, layoutId, nodeTypes: this.nodeTypes});
     await this.arcs.addRecipes('user', recipes);
   }
 };

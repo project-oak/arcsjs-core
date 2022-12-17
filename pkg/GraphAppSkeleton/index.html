@@ -50,3 +50,34 @@
 <script src="../third_party/pixijs/pixi-plugins/pixi-spine.js"></script> -->
 
 <script type="module" src="./index.js"></script>
+
+<!-- <video id="videoElement" style="width: 120px;"></video>
+<canvas id="canvasElement" width="1280px" height="720px" style="width: 120px;"></canvas> -->
+
+<!-- <script src="../third_party/mediapipe/camera_utils.js" crossorigin="anonymous"></script>
+<script type="module">
+  const root = `../third_party/mediapipe/pose`;
+  const locateFile = file => `${root}/${file}`
+  await import(locateFile('pose.js'));
+  const {videoElement} = window;
+  function onResults(results) {
+    console.log(results);
+  }
+  const pose = new Pose({locateFile});
+  pose.setOptions({
+    modelComplexity: 0,
+    smoothLandmarks: true,
+    enableSegmentation: false,
+    smoothSegmentation: true,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
+  });
+  pose.onResults(onResults);
+  globalThis.pose = pose;
+  // const camera = new Camera(videoElement, {
+  //   onFrame: () => pose.send({image: videoElement}),
+  //   width: 640,
+  //   height: 480
+  // });
+  // camera.start();
+</script> -->

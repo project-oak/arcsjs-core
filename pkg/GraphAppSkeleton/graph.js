@@ -24,6 +24,24 @@ export const graph = {
         image: ["CameraNode1:frame"]
       }
     },
+    PoseDetector: {
+      id: "PoseNode1",
+      type: "PoseNode",
+      displayName: "Pose Detection",
+      connections: {
+        image: ["CameraNode1:frame"]
+      }
+    },
+    "DetectRaisedHandNode1": {
+      "id": "DetectRaisedHandNode1",
+      "type": "DetectRaisedHandNode",
+      "displayName": "Detect Raised Hands",
+      "connections": {
+        "pose": [
+          "PoseNode1:pose"
+        ]
+      }
+    },
     DisplayNode1: {
       id: "DisplayNode1",
       type: "DisplayNode",
@@ -32,10 +50,10 @@ export const graph = {
       }
     }
   },
-  position: {
-    previewLayout:  {
-      "CameraNode1:Container": "main#form",
-      "DisplayNode1:Container": "main#form"
-    }
-  }
+  // layout: {
+  //   previewLayout:  {
+  //     "CameraNode1:Container": "main#root",
+  //     "DisplayNode1:Container": "main#root"
+  //   }
+  // }
 };

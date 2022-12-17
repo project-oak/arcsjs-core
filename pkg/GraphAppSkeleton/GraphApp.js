@@ -15,8 +15,8 @@ const log = logFactory(true, 'GraphApp', 'navy');
 export const GraphApp = class extends App {
   constructor(paths) {
     super(paths);
-    this.services = services;
     this.persistor = new LocalStoragePersistor('user');
+    this.services = services;
     this.nodeTypes = nodeTypes;
     this.graph = graph;
     log('Welcome!');

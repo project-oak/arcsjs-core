@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 
-<script src="../../third_party/mediapipe/camera_utils.js" crossorigin="anonymous"></script>
+<script src="../../../third_party/mediapipe/camera_utils.js" crossorigin="anonymous"></script>
 
 <style>
   #videoElement {
-    display: none;
+    /* display: none; */
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-  }
-  #videoElement.selfie {
-    transform: scale(-1, 1);
+    /* right: 0; */
+    /* bottom: 0; */
+    height: 240px;
   }
 </style>
 
@@ -21,7 +19,7 @@
 <canvas id="canvasElement" width="1280px" height="720px"></canvas>
 
 <script type="module">
-  const root = `../../third_party/mediapipe/pose`;
+  const root = `../../../third_party/mediapipe/pose`;
   const locateFile = file => `${root}/${file}`
   await import(locateFile('pose.js'));
 
@@ -33,21 +31,26 @@
 
   const pose = new Pose({locateFile});
   pose.setOptions({
-    staticImageMode: false, // optimize with frame coherence, or not
-    maxNumFaces: 1,
-    modelComplexity: 1, // 0, 1, 2
+    //staticImageMode: false, // optimize with frame coherence, or not
+    // maxNumFaces: 1,
+    // modelComplexity: 1, // 0, 1, 2
+    // smoothLandmarks: true,
+    // minDetectionConfidence: 0.5,
+    // minTrackingConfidence: 0.5
+    //
+    modelComplexity: 0,
     smoothLandmarks: true,
+    enableSegmentation: false,
+    smoothSegmentation: true,
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5
   });
   pose.onResults(onResults);
   //
   const camera = new Camera(videoElement, {
-    onFrame: async () => {
-      await pose.send({image: videoElement});
-    },
-    width: 1280,
-    height: 720
+    onFrame: () => pose.send({image: videoElement}),
+    width: 640,
+    height: 480
   });
   camera.start();
 </script>

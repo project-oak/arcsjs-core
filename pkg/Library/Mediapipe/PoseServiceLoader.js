@@ -30,6 +30,7 @@ globalThis.requirePose = async () => {
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5
     });
+    pose.initialize();
   }
   //
   return pose;

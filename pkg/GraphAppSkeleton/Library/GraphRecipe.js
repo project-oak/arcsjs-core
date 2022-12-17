@@ -6,9 +6,9 @@
  */
 export const GraphRecipe = {
   $meta: {
-    description: 'Arcs Graph Recipe'
+    description: 'Graph Recipe'
   },
   main: {
-    $kind: '$app/Main'
+    $kind: '$app/Library/Main'
   }
 };

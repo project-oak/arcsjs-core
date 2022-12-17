@@ -21,6 +21,6 @@ template: html`
   <h3>Graph App</h3>
 </div>
 
-<div flex row frame="form"></div>
+<div flex row frame="root"></div>
 `
 });

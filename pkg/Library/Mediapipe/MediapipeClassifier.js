@@ -20,7 +20,6 @@ export const MediapipeClassifier = {
     });
   },
   async classify(classifier, testImage) {
-    console.log('**@%$&@$@(%*&@) CLASSIFY');
     if (this.busy) {
       return {};
     }

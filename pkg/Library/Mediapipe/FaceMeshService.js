@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 import {Resources} from '../App/Resources.js';
-import {loadImage} from '../Media/ImageLoader.js';
+// import {loadImage} from '../Media/ImageLoader.js';
 import {MediapipeClassifier} from './MediapipeClassifier.js';
 import '../../third_party/mediapipe/drawing_utils.js';
 
@@ -101,13 +101,6 @@ export const FaceMeshService = {
       const ctx = realTarget.getContext('2d');
       FaceMeshModel.renderFace(ctx, {faceLandmarks});
     }
-  },
-  async renderHands({data, target}) {
-    const realTarget = Resources.get(target);
-    if (data && realTarget) {
-      const ctx = realTarget.getContext('2d');
-      FaceMeshModel.renderHands(ctx, data);
-    }
   }
 };
 
@@ -130,17 +123,6 @@ export const FaceMeshModel = {
     });
     this.getFaceMesh = () => facemesh;
     return facemesh;
-  },
-  renderHands(ctx, {rightHandLandmarks, leftHandLandmarks}) {
-    const radius = data => lerp(data.from.z, -0.15, .1, 10, 1);
-    drawLandmarks(ctx, rightHandLandmarks, {
-      color: 'white', fillColor: 'rgb(0,217,231)',
-      lineWidth: 1, radius
-    });
-    drawLandmarks(ctx, leftHandLandmarks, {
-      color: 'white', fillColor: 'rgb(217,231,0)',
-      lineWidth: 1, radius
-    });
   },
   renderFace(ctx, {faceLandmarks}) {
     const h = mpHolistic;
