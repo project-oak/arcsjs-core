@@ -4,24 +4,32 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-export const MultilineTextFieldNode = {
+export const BooleanFieldNode = {
   $meta: {
-    id: 'Text',
-    category: 'Field'
+    id: 'BooleanFieldNode',
+    displayName: 'Boolean Field',
+    category: 'Fields'
   },
   $stores: {
     label: {
       $type: 'String',
-      $value: 'text field'
+      $value: 'boolean field'
     },
     value: {
+      $type: 'Boolean'
+    },
+    moar: {
+      $type: 'String',
+      $value: 'value'
+    },
+    moar2: {
       $type: 'String',
       $value: 'value'
     }
   },
   field: {
-    $kind: '$library/Fields/MultilineTextField',
+    $kind: '$library/Fields/BooleanField',
     $inputs: ['label', 'value'],
-    $outputs: ['label', 'value']
+    $outputs: ['label', 'value', 'moar', 'moar2']
   }
 };

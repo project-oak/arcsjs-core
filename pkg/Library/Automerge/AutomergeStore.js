@@ -1,12 +1,9 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
-
 import {Automerge} from '../../third_party/automerge/automerge.js';
 import {Store} from '../core/Store.js';
 import {deepCopy} from '../utils/object.js';
@@ -29,14 +26,14 @@ export class AutomergeStore extends Store {
   set data(data) {
     this.change(doc => doc.data = data);
   }
-  private initDefaultStateDoc(state) {
+  initDefaultStateDoc(state) {
     //return from({data: state});
     return load(getLastLocalChange(change(init('0000'), {time: 0}, doc => doc.data = state)));
   }
   get pojo() {
     return deepCopy(this.data);
   }
-  protected change(mutator) {
+  change(mutator) {
     if (!this.crdt) {
       throw 'null crdt';
     }

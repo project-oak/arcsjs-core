@@ -6,6 +6,6 @@
  */
 import './config.js';
 import {quickStart} from './arcs/arcs.js';
-import {GraphApp} from './GraphApp.js';
+import {SkeletonApp} from './SkeletonApp.js';
 
-quickStart(GraphApp, import.meta.url);
+quickStart(SkeletonApp, import.meta.url);

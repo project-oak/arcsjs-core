@@ -1,38 +1,25 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 
 // Network is a highlander attachment for Runtime
 
-import {Runtime} from '../../core/ts/Runtime.js';
-import {debounce, asyncTask} from '../../core/ts/utils/task.js';
-import {logFactory} from '../../core/ts/utils/log.js';
-import {Automerge} from '../../core/third_party/automerge/automerge.js';
-import {AutomergeStore} from './AutomergeStore.js';
+//import {Runtime} from '../Library/Core/core.js';
+import {logFactory, debounce, asyncTask} from '../Library/Core/utils.js';
+import {Automerge} from '../../third_party/automerge/automerge.js';
+//import {AutomergeStore} from './AutomergeStore.js';
 
 const peerUpdateDebounceGapMs = 100;
 const simulatedNetworkLatencyMs = 100;
 
 const {values} = Object;
 
-const stringToMessage = (syncString: string) => {
+const stringToMessage = syncString => {
   return new Uint8Array(JSON.parse(`[${atob(syncString)}]`));
 };
-
-// const stringToMessage = (syncString: string) => {
-//   const raw = atob(syncString);
-//   const {length} = raw;
-//   const uint8s = new Uint8Array(new ArrayBuffer(length));
-//   for (let i=0; i<length; i++) {
-//     uint8s[i] = raw.charCodeAt(i);
-//   }
-//   return uint8s;
-// };
 
 const messageToString = (syncMessage) => {
   return btoa(syncMessage);
@@ -45,8 +32,8 @@ export class AutomergeNetwork {
   log;
   log2;
   nid;
-  runtime: Runtime;
-  shares: Record<string, unknown>;
+  runtime;
+  shares;
   constructor(nid, runtime) {
     this.shares = {};
     this.nid = nid;
@@ -76,7 +63,7 @@ export class AutomergeNetwork {
     const key = `${this.nid}_${storeId}_updatePeersDebounceKey`;
     this[key] = debounce(this[key], () => this.updatePeers(storeId), peerUpdateDebounceGapMs);
   }
-  private initShare(storeId, peerId) {
+  initShare(storeId, peerId) {
     this.runtime.endpoint?.ring(peerId);
     return {
       storeId,
@@ -84,8 +71,8 @@ export class AutomergeNetwork {
       syncState: Automerge.initSyncState()
     };
   }
-  private updatePeer(share) {
-    const store = this.runtime.stores[share.storeId] as AutomergeStore;
+  updatePeer(share) {
+    const store = this.runtime.stores[share.storeId];
     if (store) {
       const [nextSyncState, syncMessage] = Automerge.generateSyncMessage(store.crdt, share.syncState);
       share.syncState = nextSyncState;
@@ -94,7 +81,7 @@ export class AutomergeNetwork {
       }
     }
   }
-  private send(share, syncMessage) {
+  send(share, syncMessage) {
     // TODO(sjmiles): endpoint a la Firebase is too stoopid to handle syncMessage properly :(
     // becuase syncMessage is not utf-8 compatible
     const syncString = messageToString(syncMessage);
@@ -110,11 +97,11 @@ export class AutomergeNetwork {
       }
     }
   }
-  private receive(peerId, {storeId, syncString}) {
+  receive(peerId, {storeId, syncString}) {
     // endpoint a la Firebase is too stoopid to handle syncMessage properly :(
     const syncMessage = stringToMessage(syncString);
     this.log2(`receive sync for [${storeId}] from [${peerId}]`); //, syncMessage);
-    const store = this.runtime.stores[storeId] as AutomergeStore;
+    const store = this.runtime.stores[storeId];
     const share = this.shares[storeId]?.[peerId];
     if (store && share) {
       const [nextCrdt, nextSyncState] = Automerge.receiveSyncMessage(store.crdt, share.syncState, syncMessage);
@@ -124,7 +111,7 @@ export class AutomergeNetwork {
       this.log.warn(`receive: store [${storeId}] doesn't exist`);
     }
   }
-  private updateCrdt(storeId, store, crdt) {
+  updateCrdt(storeId, store, crdt) {
     // ensure everybody has the same crdt
     if (store.crdt !== crdt) {
       store.setCrdt(crdt);
@@ -133,7 +120,7 @@ export class AutomergeNetwork {
       this.invalidatePeers(storeId);
     }
   }
-  private updatePeers(storeId) {
+  updatePeers(storeId) {
     this.log(`updatePeers`, storeId);
     const shares = this.shares[storeId];
     if (shares) {

@@ -20,6 +20,7 @@ globalThis.config = {
     app: true,
     //recipe: true,
     //arc: true,
+    //code: true,
     particles: true,
     //storage: true,
     //surfaces: true,

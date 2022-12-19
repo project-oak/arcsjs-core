@@ -4,7 +4,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {nodeTypes, categories} from './nodeTypes.js';
+import {nodeTypes, categories} from '../nodeTypes.js';
 import {GraphToolbarRecipe} from './GraphToolbarRecipe.js';
 import {NodeEditorRecipe} from './NodeEditorRecipe.js';
 import {RecipeBuilderRecipe} from './RecipeBuilderRecipe.js';
@@ -53,7 +53,7 @@ const NodeTreeRecipe = {
   }
 };
 
-export const NodeCreator = {
+export const NodeCreatorRecipe = {
   combiner: {
     $kind: '$library/NodeGraph/NodeTypesCombiner',
     $inputs: ['builtinNodeTypes', 'selectedGraph'],
@@ -127,10 +127,8 @@ export const NodegraphRecipe = {
       editor: NodeEditorRecipe,
       inspector: InspectorRecipe,
       tree: NodeTreeRecipe,
-      other: {
-        RecipeBuilderRecipe,
-        NodeCreatorRecipe
-      }
+      builder: RecipeBuilderRecipe,
+      creator: NodeCreatorRecipe
     }
   },
 };

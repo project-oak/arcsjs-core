@@ -8,7 +8,4 @@ import './config.js';
 import {quickStart} from './arcs.js';
 import {NodegraphApp} from './Library/NodegraphApp.js';
 
-quickStart(NodegraphApp, import.meta.url, {
-  //$labs: `$app/../Library`,
-  //$nodegraph: `$library/NodeGraph`
-});
+quickStart(NodegraphApp, import.meta.url);

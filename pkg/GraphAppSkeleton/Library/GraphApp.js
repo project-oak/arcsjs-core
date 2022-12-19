@@ -9,6 +9,11 @@ import {GraphRecipe} from './GraphRecipe.js';
 
 export const GraphApp = class extends App {
   async spinup() {
+    this.log.groupCollapsed('Boot flavors');
+    this.log('paths', this.paths);
+    this.log('nodeTypes', this.nodeTypes);
+    this.log('services', this.services);
+    this.log.groupEnd();
     this.layoutId ??= 'preview';
     this.configure(this.graph, this.layoutId);
     await super.spinup();
