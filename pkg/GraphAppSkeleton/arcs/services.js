@@ -15,8 +15,8 @@ const Library = `${globalThis.config.arcsPath}/Library`;
 const load = async paths => (await Promise.all(paths.map(p => import(`${Library}/${p}`)))).reduce((e, m) =>({...e, ...m}),{});
 
 const modules = await load([
-  'Mediapipe/PoseService.js'
-  // 'App/HistoryService.js',
+  'Mediapipe/PoseService.js',
+  'App/HistoryService.js'
   // 'NewMedia/MediaService.js',
   // 'Goog/GoogleApisService.js',
   // 'Mediapipe/FaceMeshService.js',

@@ -15,11 +15,12 @@ export const DisplayNode = {
       $type: 'Pojo'
     },
     textStyle: {
-      $type: 'CssStyle'
+      $type: 'CssStyle',
+      value: 'padding: 8px;'
     }
   },
   text: {
-    $kind: '$library/Fields/TextObject',
+    $kind: '$library/Data/Display',
     $inputs: ['text', 'textStyle']
   }
 };

@@ -13,7 +13,7 @@ const globalStores = [
   'nodeId',
 ];
 
-const RecipeBuilderRecipe = {
+export const RecipeBuilderRecipe = {
   candidateFinder: {
     $kind: '$library/RecipeBuilder/CandidateFinder',
     $inputs: [

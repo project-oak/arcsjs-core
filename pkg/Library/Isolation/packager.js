@@ -51,7 +51,15 @@ const collectDecls = proto => {
 };
 
 const rewriteFuncs = funcs => funcs.map(([n, f]) => {
-  return f;
+  let func = String(f);
+  // ios/Safari
+  if (func.startsWith('function ')) {
+    func = func.slice(9);
+  } else if (func.startsWith('async function ')) {
+    func = `async ${func.slice(15)}`;
+  }
+  //log(func);
+  return func;
 });
 
 const rewriteConsts = consts => consts.map(([n, p]) => {

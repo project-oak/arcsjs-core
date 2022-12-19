@@ -9,7 +9,7 @@ import * as packager from './packager.js';
 import {SafeObject} from './safe-object.js';
 
 const {logFactory, Paths} = core;
-const log = logFactory('isolation', 'vanilla', 'goldenrod');
+const log = logFactory(logFactory.flags.code, 'isolation', 'vanilla', 'goldenrod');
 
 const {deepEqual} = core.utils;
 
@@ -81,6 +81,7 @@ const requireImplFactory = async (kind, implCode) => {
   if (typeof proto === 'object') {
     // repackage the code to eliminate closures
     const module = packager.packageProtoFactory(proto, kind);
+    //log(module);
     const factory = (0, eval)(module);
     log.groupCollapsed(`repackaged factory for [${kind}]`);
     log(factory);

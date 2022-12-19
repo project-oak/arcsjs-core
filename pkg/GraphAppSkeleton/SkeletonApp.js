@@ -5,14 +5,14 @@
  * license that can be found in the LICENSE file.
  */
 import {logFactory, LocalStoragePersistor} from './arcs/arcs.js';
-import {GraphApp as App} from './Library/GraphApp.js';
-import {nodeTypes} from './arcs/nodeTypes.js';
+import {GraphApp} from './Library/GraphApp.js';
+import {nodeTypes} from '../Library/NodeTypes/nodeTypes.js';
 import {services} from './arcs/services.js';
 import {graph} from './graph.js';
 
-const log = logFactory(true, 'GraphApp', 'navy');
+const log = logFactory(true, 'SkeletonApp', 'navy');
 
-export const GraphApp = class extends App {
+export const SkeletonApp = class extends GraphApp {
   constructor(paths) {
     super(paths);
     this.persistor = new LocalStoragePersistor('user');

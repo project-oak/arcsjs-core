@@ -23,7 +23,8 @@ export const App = class {
   constructor(paths, root) {
     this.paths = paths;
     this.root = root || globalThis.document?.body;
-    log(JSON.stringify(paths, null, '  '));
+    this.log = log;
+    //log(JSON.stringify(paths, null, '  '));
   }
   get arcs() {
     return Arcs;
