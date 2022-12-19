@@ -9,6 +9,6 @@ export const GraphRecipe = {
     description: 'Graph Recipe'
   },
   main: {
-    $kind: '$app/Library/Graph'
+    $kind: '$app/Library/Main'
   }
 };

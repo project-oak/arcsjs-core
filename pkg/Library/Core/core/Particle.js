@@ -406,7 +406,7 @@ export class Particle {
     maybeRender() {
         if (this.template) {
             const { inputs, state } = this.internal;
-            if (this.impl?.shouldRender?.(inputs, state) !== false) {
+            if (!this.implements('shouldRender') || this.impl?.shouldRender?.(inputs, state)) {
                 if (this.implements('render')) {
                     return this.impl.render(inputs, state);
                 }

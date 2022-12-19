@@ -22,7 +22,7 @@ export const DetectRaisedHandNode = {
     }
   },
   DetectRaisedHand: {
-    $kind: 'Mediapipe/DetectRaisedHand',
+    $kind: 'Fx/DetectRaisedHand',
     $inputs: ['pose'],
     $outputs: ['raisedHands']
   }

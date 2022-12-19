@@ -18,6 +18,7 @@ const GRID_SIZE = 8;
 export class DesignerLayout extends DragDrop {
   static get observedAttributes() {
     return [
+      'disabled',
       'selected',
       'rects',
       'color',
@@ -31,7 +32,7 @@ export class DesignerLayout extends DragDrop {
     // new objects should be checked for rational geometry
     // TODO(sjmiles): this simply does not work, it is unexplained
     this.observer = new MutationObserver(() => {
-      console.warn('mutationObserver has observed!');
+      //console.warn('mutationObserver has observed!');
       this.updateGeometry();
     });
     this.observer.observe(this, {childList: true});
@@ -241,12 +242,12 @@ export class DesignerLayout extends DragDrop {
     if (this.target && this.dragStarted) {
       this.dragStarted = false;
       log('drag terminated');
-      setTimeout(() => {
+      //setTimeout(() => {
         log('fire update-box', this.target.id);
         this.fire('update-box');
         log('firePosition', this.target.id);
         this.firePosition(this.target);
-      }, 100);
+      //}, 100);
     }
   }
   //
@@ -275,7 +276,7 @@ export class DesignerLayout extends DragDrop {
     });
   }
   restyleSelection() {
-    this.boxer.hidden = !this.target;
+    this.boxer.hidden = (this.disabled!=null) || !this.target;
     if (this.target) {
       this.setBoxStyle(this.boxer, this.getRect(this.target));
     }
