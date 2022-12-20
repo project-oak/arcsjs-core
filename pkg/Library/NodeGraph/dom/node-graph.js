@@ -247,8 +247,15 @@ export class NodeGraph extends Xen.Async {
   }
 
   // called when committed a change to a rectangle (low freq)
-  onUpdatePosition({currentTarget: {value: rect}}) {
-    this.fire('node-moved');
+  // onUpdatePosition({currentTarget: {value: rect}}) {
+  //   this.fire('node-moved');
+  // }
+  onUpdatePosition({currentTarget: {target, value}}) {
+    if (target?.key && value) {
+      this.key = target.key;
+      this.value = value;
+      this.fire('node-moved');
+    }
   }
 
   onNodeDblClicked(event) {
