@@ -17,7 +17,7 @@ export const BarDisplayNode =  {
     },
   },
   jsonDisplay: {
-    $kind: '$library/Display/BarDisplay',
+    $kind: '$library/Data/BarDisplay',
     $inputs: ['results']
   }
 };
