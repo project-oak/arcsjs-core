@@ -7,15 +7,14 @@ body {
   overflow: hidden;
 }
 [screen] {
-  width: 336px;
-  height: 480px;
+  width: 80vw; /*336px;*/
+  height: 80vh; /*480px;*/
   border: 1px dotted darkorange;
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: scroll;
 }
 [image] {
-  width: 320px;
   height: 5000px;
   /* magicpattern.design */
   background-color: #e5e5f7;
