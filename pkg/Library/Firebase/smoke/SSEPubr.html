@@ -1,0 +1,18 @@
+<!doctype html>
+
+<link href="./index.css" rel="stylesheet">
+
+<div screen id="bscreen">
+  <div image></div>
+</div>
+
+<script type="module">
+  import {SsePubSub} from '../SsePubSub.js';
+  SsePubSub.open('https://arcsjs-core.firebaseio.com');
+  window.bscreen.onscroll = () => {
+    SsePubSub.debounce(
+      value => SsePubSub.pub('/scroll/y.json', value),
+      window.bscreen.scrollTop
+    );
+  };
+</script>
