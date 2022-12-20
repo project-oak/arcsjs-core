@@ -25,24 +25,31 @@ const typeInfo = {
 };
 
 const nodeList = {
+  // NOTE: these stores are connected to _globalStores_, hence should not be
+  // inspected - atm Node Inspector doesn't support global stores.
   $stores: {
     nodeTypes: {
       $type: 'Pojo',
-      noinspect: true
+      noinspect: true,
+      nodisplay: true
     },
     categories: {
       $type: 'Pojo',
-      noinspect: true
+      noinspect: true,
+      nodisplay: true
     },
     newNodeInfos: {
-      $type: '[Pojo]'
+      $type: '[Pojo]',
+      nodisplay: true
     },
     selectedGraph: {
-      $type: 'Pojo'
+      $type: 'Pojo',
+      nodisplay: true
     },
     hoveredNodeType: {
       $type: 'Pojo',
-      noinspect: true
+      noinspect: true,
+      nodisplay: true
     }
   },
   NodeList: {
