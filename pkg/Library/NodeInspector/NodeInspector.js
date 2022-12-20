@@ -120,7 +120,7 @@ async constructProps(node, inputs, state, service) {
   if (stores) {
     for(let [name, store] of entries(stores)) {
       const prop = await this.computeProp(node, {name, store}, inputs, state, service);
-      const bindingProp = await this.renderBinding(node, name, candidates[node.id][name], graph, nodeTypes, service);
+      const bindingProp = await this.renderBinding(node, name, candidates?.[node.id]?.[name], graph, nodeTypes, service);
       props.push(prop);
       if (bindingProp) {
         if (bindingProp?.length > 0) {
