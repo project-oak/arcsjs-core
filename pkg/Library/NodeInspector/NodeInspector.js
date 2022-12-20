@@ -118,15 +118,15 @@ async constructProps(node, inputs, state, service) {
   const nodeType = node && nodeTypes[node.type];
   const stores = nodeType?.$stores;
   if (stores) {
-    for(let [name, store] of entries(stores)) {
+    for (let [name, store] of entries(stores)) {
       const prop = await this.computeProp(node, {name, store}, inputs, state, service);
-      const bindingProp = await this.renderBinding(node, name, candidates?.[node.id]?.[name], graph, nodeTypes, service);
       props.push(prop);
-      if (bindingProp) {
-        if (bindingProp?.length > 0) {
-          prop.disabled = true;
+      if (candidates?.[node.id]) {
+        const bindingProp = await this.renderBinding(node, name, candidates[node.id][name], graph, nodeTypes, service);
+        if (bindingProp) {
+          prop.disabled = bindingProp.length > 0;
+          props.push(bindingProp);
         }
-        props.push(bindingProp);
       }
     }
   }

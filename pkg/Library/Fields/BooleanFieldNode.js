@@ -17,19 +17,11 @@ export const BooleanFieldNode = {
     },
     value: {
       $type: 'Boolean'
-    },
-    moar: {
-      $type: 'String',
-      $value: 'value'
-    },
-    moar2: {
-      $type: 'String',
-      $value: 'value'
     }
   },
   field: {
     $kind: '$library/Fields/BooleanField',
     $inputs: ['label', 'value'],
-    $outputs: ['label', 'value', 'moar', 'moar2']
+    $outputs: ['label', 'value']
   }
 };

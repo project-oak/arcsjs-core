@@ -10,4 +10,4 @@
 export * from './SelfieSegmentationNode.js';
 export * from './FaceMeshNode.js';
 export * from './FaceMeshFaceNode.js';
-export * from './FaceMeshStickerNode.js';
+export * from '../Fx/FaceMeshStickerNode.js';
