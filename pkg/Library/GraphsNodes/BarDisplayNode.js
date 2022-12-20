@@ -4,23 +4,20 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-export const DisplayNode = {
+export const BarDisplayNode =  {
   $meta: {
-    id: 'DisplayNode',
-    displayName: 'Display',
+    id: 'BarDisplayNode',
+    displayName: 'Bar Display',
     category: 'Fields'
   },
   $stores: {
-    text: {
+    results: {
       $type: 'Pojo',
-      connection: true
+      noinspect: true
     },
-    textStyle: {
-      $type: 'CssStyle'
-    }
   },
-  text: {
-    $kind: '$library/GraphsNodes/TextObject',
-    $inputs: ['text', 'textStyle']
+  jsonDisplay: {
+    $kind: '$library/Display/BarDisplay',
+    $inputs: ['results']
   }
 };
