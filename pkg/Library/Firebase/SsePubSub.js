@@ -56,5 +56,17 @@ export const SsePubSub = {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(value)
     });
+  },
+  debounce(setter, value, ms) {
+    const debounce = this.debounce;
+    debounce.value = value;
+    const commit = () => {
+      debounce.timer = false;
+      setter(debounce.value);
+    };
+    if (!debounce.timer) {
+      debounce.timer = true;
+      setTimeout(commit, ms || 50);
+    };
   }
 };

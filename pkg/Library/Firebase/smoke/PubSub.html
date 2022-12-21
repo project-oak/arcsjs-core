@@ -1,0 +1,28 @@
+<!doctype html>
+
+<link rel="stylesheet" href="./index.css">
+
+<div screen id="ascreen">
+  <div image></div>
+</div>
+
+<div style="width: 48px;"></div>
+
+<div screen id="bscreen">
+  <div image></div>
+</div>
+
+<script type="module">
+  import {SsePubSub} from '../SsePubSub.js';
+  SsePubSub.open('https://arcsjs-core.firebaseio.com');
+  //
+  const setScrollTop = top => {
+    window.ascreen.scrollTop = top;
+  };
+  SsePubSub.subscribe('/scroll/y', setScrollTop);
+  //
+  window.bscreen.onscroll = e => {
+    const remoteScroll = value => SsePubSub.pub('/scroll/y.json', value);
+    SsePubSub.debounce(remoteScroll, window.bscreen.scrollTop, 40);
+  };
+</script>
