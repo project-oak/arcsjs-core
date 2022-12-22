@@ -26,7 +26,9 @@ const etc = await load([
   'Pixabay/PixabayNode.js',
   'Mediapipe/FaceMeshNode.js',
   'Mediapipe/FaceMeshFaceNode.js', // rename to FaceMeshDisplayNode
-  'Fx/FaceMeshStickerNode.js'
+  'Fx/FaceMeshStickerNode.js',
+  'OpenAi/OpenAiGpt3TextNode.js',
+  'OpenAi/OpenAiImageNode.js'
 ]);
 
 const nodeTypes = {

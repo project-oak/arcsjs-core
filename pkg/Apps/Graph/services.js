@@ -26,7 +26,8 @@ const modules = await load([
   'Threejs/ThreejsService.js',
   'Shader/ShaderService.js',
   'TensorFlow/TensorFlowService.js',
-  'TensorFlow/CocoSsdService.js'
+  'TensorFlow/CocoSsdService.js',
+  'OpenAi/OpenAiService.js'
 ]);
 
 export const {HistoryService} = modules;
@@ -42,3 +43,4 @@ export const {GoogleApisService} = modules;
 export const {ArcService} = modules;
 export const {RecipeBuilderService} = modules;
 export const {PoseService} = modules;
+export const {OpenAiService} = modules;
