@@ -19,6 +19,6 @@ template: html`
     font-size: 1em;
   }
 </style>
-<div flex xen:style="{{style}}" row$="{{isRow}}" column$="{{isColumn}}" center$="{{center}}" frame="container"></div>
+<div flex xen:style="{{style}}" row$="{{isRow}}" column$="{{isColumn}}" center$="{{center}}" frame="Container"></div>
 `
 });

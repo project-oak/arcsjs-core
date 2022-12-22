@@ -25,7 +25,8 @@ export const PanelNode = {
     $kind: "Layout/Panel",
     $inputs: ['layout', 'center', 'style'],
     $slots: {
-      container: {}
+      Container: {
+      }
     }
   }
 };

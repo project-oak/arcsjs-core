@@ -23,8 +23,8 @@ export const SplitPanelNode = {
     $kind: "Layout/SplitPanel",
     $inputs: ['layout', 'center', 'style'],
     $slots: {
-      topLeft: {},
-      bottomRight: {}
+      FirstContainer: {},
+      SecondContainer: {}
     }
   }
 };

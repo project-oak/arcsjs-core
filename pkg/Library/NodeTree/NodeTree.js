@@ -17,7 +17,7 @@ async update(input, state, tools) {
   const selectCandidate = this.updateSelectedNodeId(input, state);
   // best not to output unless we did something
   // TODO(sjmiles): this is not ergonomic, perhaps dirty-checking output can
-  // prevent update waterfall with small perf cost for automation.
+  // prevent update waterfall with small perf cost?
   if (selectCandidate != input.selectedNodeId) {
     return {selectedNodeId: selectCandidate};
   }
@@ -26,9 +26,8 @@ async update(input, state, tools) {
 updateSelectedNodeId({graph, selectedNodeId}, state) {
   let candidate = selectedNodeId;
   // when switching graphs, we reset some state
-  const meta = graph?.$meta;
-  if (meta?.name !== state.selectedGraphName) {
-    state.selectedGraphName = meta?.name;
+  if (graph?.$meta?.name !== state.selectedGraphName) {
+    state.selectedGraphName = graph?.$meta?.name;
     candidate = null;
   }
   return candidate;
@@ -42,7 +41,7 @@ render({graph, categories, selectedNodeId, nodeTypes}) {
 },
 
 renderGraphNodes(nodes, nodeTypes, nodeId, categories) {
-  const rootContainer = this.makeContainerModel('main', 'runner');
+  const rootContainer = this.makeContainerModel('main', 'graph');
   const graph = {name: 'Root', icon: 'settings', graphNodes: [rootContainer], isContainer: 'true'};
   const graphNodes = values(nodes).map(node => {
     const {id, displayName, type} = node;
@@ -74,12 +73,18 @@ getHostId(node) {
 },
 
 containersForNode(node, nodeType) {
-  const containers = [];
+  let containers = [];
   for (const hostName of this.getHostNames(nodeType)) {
     const slots = nodeType[hostName].$slots;
-    keys(slots).forEach(slotName => containers.push(
-      this.makeContainerModel(this.hostId(node, hostName), slotName)
-    ));
+    if (keys(slots).length) {
+      //log('--- containersForNode');
+      //entries(slots).forEach(([name, slot]) => log(name, ': ', Boolean(slot.$isContainer)));
+      //const allow = (name, slot) => slot.$isContainer;
+      const allow = (name, slot) => name.toLowerCase().includes('container');
+      //log(keys(slots));
+      const allowed = keys(slots).filter(key => allow(key, slots[key]));
+      containers = allowed.map(key => this.makeContainerModel(this.hostId(node, hostName), key));
+    }
   }
   return containers;
 },
