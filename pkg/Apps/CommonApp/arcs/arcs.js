@@ -18,7 +18,6 @@ export const {
   Paths,
   logFactory,
   App,
-  //RecipeBuilder,
   Resources,
   Params,
   Xen,
@@ -30,7 +29,6 @@ export const {
 } = await load([
   // Main thread things
   'Core/utils.js',
-  //'Graphs/RecipeBuilder.js',
   'App/Worker/App.js',
   'App/Resources.js',
   'App/Params.js',
