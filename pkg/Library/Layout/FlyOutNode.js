@@ -19,7 +19,7 @@
     $inputs: ['show'],
     $outputs: ['show'],
     $slots: {
-      flyout: {}
+      FlyoutContainer: {}
     }
   }
 };

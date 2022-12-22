@@ -13,16 +13,16 @@
 </div>
 
 <script type="module">
-  import {SsePubSub} from '../SsePubSub.js';
-  SsePubSub.open('https://arcsjs-core.firebaseio.com');
+  import {SSEPubSub} from '../SSEPubSub.js';
+  const pubSub = new SSEPubSub('https://arcsjs-core.firebaseio.com');
   //
   const setScrollTop = top => {
     window.ascreen.scrollTop = top;
   };
-  SsePubSub.subscribe('/scroll/y', setScrollTop);
+  pubSub.subscribe('/scroll/y', setScrollTop);
   //
   window.bscreen.onscroll = e => {
-    const remoteScroll = value => SsePubSub.pub('/scroll/y.json', value);
-    SsePubSub.debounce(remoteScroll, window.bscreen.scrollTop, 40);
+    const remoteScroll = value => pubSub.publish('/scroll/y.json', value);
+    pubSub.debounce(remoteScroll, window.bscreen.scrollTop, 40);
   };
 </script>

@@ -14,8 +14,8 @@ render({layout, style}) {
 },
 template: html`
 <split-panel xen:style="{{style}}" flex row$="{{vertical}}" column$="{{horizontal}}" vertical="{{vertical}}">
-  <div flex column frame="topLeft" slot="top"></div>
-  <div flex column frame="bottomRight" slot="bottom"></div>
+  <div flex column frame="FirstContainer" slot="top"></div>
+  <div flex column frame="SecondContainer" slot="bottom"></div>
 </split-panel>
 `
 });

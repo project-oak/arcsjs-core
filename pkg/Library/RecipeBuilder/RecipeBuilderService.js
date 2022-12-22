@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 import {logFactory} from '../Core/core.js';
-import {RecipeBuilder} from '../Graphs/RecipeBuilder.js';
+import {RecipeBuilder} from './RecipeBuilder.js';
 
 const log = logFactory(logFactory.flags.services || logFactory.flags.RecipeBuilderService, 'RecipeBuilderService', 'pink', 'black');
 

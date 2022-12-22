@@ -18,6 +18,7 @@ const GRID_SIZE = 8;
 export class DesignerLayout extends DragDrop {
   static get observedAttributes() {
     return [
+      'statical',
       'disabled',
       'selected',
       'rects',
@@ -36,6 +37,11 @@ export class DesignerLayout extends DragDrop {
       this.updateGeometry();
     });
     this.observer.observe(this, {childList: true});
+  }
+  _setValueFromAttribute(name, value) {
+    // hook for type coercion (attributes are always String valued,
+    // or null; Boolean values are often ''/null).
+    this[name] = (name === 'statical') ? (typeof value === 'string') : value;
   }
   update() {
     this.updateGeometry();
@@ -62,10 +68,12 @@ export class DesignerLayout extends DragDrop {
     }
   }
   position(id, position) {
-    const child = this.getChildById(id);
-    if (child) {
-      const defaultPosition = {l: 64, t: 64, w: 240, h: 180};
-      this.setBoxStyle(child, position ?? defaultPosition);
+    if (!this.statical) {
+      const child = this.getChildById(id);
+      if (child) {
+        const defaultPosition = {l: 64, t: 64, w: 240, h: 180};
+        this.setBoxStyle(child, position ?? defaultPosition);
+      }
     }
   }
   getChildById(id) {
@@ -91,7 +99,7 @@ export class DesignerLayout extends DragDrop {
   getActiveElement({activeElement}) {
     return activeElement?.shadowRoot ? this.getActiveElement(activeElement.shadowRoot) : activeElement;
   }
-  render({color}) {
+  render({color, statical}) {
     const styleOverrides = `
       [edge] {
         border-color: ${color}
@@ -101,7 +109,8 @@ export class DesignerLayout extends DragDrop {
       }
     `;
     return {
-      styleOverrides
+      statical,
+      //styleOverrides
     };
   }
   getTargetKey(target) {
@@ -157,14 +166,15 @@ export class DesignerLayout extends DragDrop {
     });
   }
   /**/
-  // deselect when clicking empty backgroud
   onContainerDown(e) {
+    // deselect when clicking empty background
     this.select(null);
     this.firePosition(null);
   }
   //
   // implement drag-drop handlers
   doDown(e) {
+    this.target = this.getEventTarget(e);
     // dom target
     const attrs = e.target.attributes;
     const edges = ['top', 'right', 'bottom', 'left'];
@@ -181,13 +191,11 @@ export class DesignerLayout extends DragDrop {
       }
       // component target
       this.dragKind = 'move';
-      this.target = this.getEventTarget(e);
     } else {
       // resize target
       this.dragKind = 'resize';
       this.dragFrom = from;
     }
-    //
     e.stopPropagation();
     //
     this.rect = this.target && this.getRect(this.target);
@@ -200,7 +208,7 @@ export class DesignerLayout extends DragDrop {
     this.firePosition(this.target);
   }
   doMove(dx, dy) {
-    if (this.dragRect && this.target) {
+    if (this.dragRect && this.target && !this.statical) {
       // grid-snap
       const snap = rect => DragDrop.snap(rect, GRID_SIZE);
       // perform drag operation
@@ -272,13 +280,16 @@ export class DesignerLayout extends DragDrop {
     assign(elt.style, {
       transform: `translate(${l}px, ${t}px)`,
       width: `${!(w>0) ? 64 : w}px`,
-      height: `${!(h>0) ? 64 : h}px`
+      height: `${!(h>0) ? 64 : h}px`,
+      display: `${w <=0 || h <=0 ? 'none' : ''}`
     });
   }
   restyleSelection() {
-    this.boxer.hidden = (this.disabled!=null) || !this.target;
+    this.boxer.hidden = (this.disabled != null) || !this.target;
     if (this.target) {
-      this.setBoxStyle(this.boxer, this.getRect(this.target));
+      const {l, t, w, h} = this.getRect(this.target);
+      const rect = {l: l+4, t: t+4, w: w-8, h: h-8};
+      this.setBoxStyle(this.boxer, rect);
     }
   }
   get template() {
@@ -302,16 +313,21 @@ export class DesignerLayout extends DragDrop {
   [container] {
     position: absolute;
     inset: 0;
+    display: flex;
+    flex-direction: column;
   }
   ::slotted(*) {
-    position: absolute;
     outline: 1px dotted lightblue !important;
+  }
+  slot:not([statical])::slotted(*) {
+    position: absolute;
   }
   [boxer] {
     pointer-events: none;
     position: absolute;
     background-color: transparent;
     box-sizing: border-box;
+    padding: 2px;
     transform: translate(-1000px, 0);
     z-index: 100;
   }
@@ -344,7 +360,7 @@ export class DesignerLayout extends DragDrop {
   [edge] {
     pointer-events: all;
     position: absolute;
-    border: 2px solid lightblue;
+    border: 1px dotted #6200eed6;
   }
   [top][edge], [bottom][edge] {
     left: var(--offset);
@@ -375,7 +391,7 @@ export class DesignerLayout extends DragDrop {
 </style>
 <style>${'{{styleOverrides}}'}</style>
 <div container on-pointerdown="onDown">
-  <slot on-pointerdown="onDown" on-pointerup="onUp" on-slotchange="onSlotChange"></slot>
+  <slot statical$="{{statical}}" on-pointerdown="onDown" on-pointerup="onUp" on-slotchange="onSlotChange"></slot>
 </div>
 <div boxer on-pointerdown="onDown">
   <div top edge></div>
