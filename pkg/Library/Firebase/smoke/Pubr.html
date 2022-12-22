@@ -8,7 +8,7 @@
 </div>
 
 <script type="module">
-  import {SSEPubSub} from '../SSEPubSubNg.js';
+  import {SSEPubSub} from '../SSEPubSub.js';
   const pubSub = new SSEPubSub('https://arcsjs-core.firebaseio.com');
   window.bscreen.onscroll = () => {
     pubSub.debounce(
