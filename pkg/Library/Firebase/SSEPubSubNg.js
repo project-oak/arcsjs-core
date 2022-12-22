@@ -6,38 +6,33 @@
  */
 const defaultUrl = 'https://arcsjs-core.firebaseio.com';
 
-let url;
-let source;
-
-const subs = [];
-
-export const SsePubSub = {
-  pub(path, value) {
+export const SSEPubSub = class {
+  constructor(url, channel) {
+    this.subs = [];
+    if (!channel) {
+      channel = (new URL(document.URL)).searchParams.get('id') ?? 'open';
+    }
+    this.url = `${url || defaultUrl}/${channel}`;
+    console.warn(`using "${channel}" channel`);
+  }
+  publish(path, value) {
     //console.log(`(pub) ${url}${path}`);
-    return fetch(`${url}${path}`, {
+    return fetch(`${this.url}${path}`, {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(value)
     });
-  },
-  open(url_, channel) {
-    if (!source) {
-      url = url_ || defaultUrl;
-      if (!channel) {
-        channel = (new URL(document.URL)).searchParams.get('id') ?? 'open';
-      }
-      url = `${url}/${channel}`;
-      console.warn(`using "${channel}" channel`);
-      source = new EventSource(`${url}/.json`, {
+  }
+  subscribe(path, signal) {
+    if (!this.source) {
+      this.source = new EventSource(`${this.url}/.json`, {
         //withCredentials: true
       });
-      source.addEventListener('put', e => this.onPut(e.data));
-      source.addEventListener('patch', e => this.onPatch(e.data));
+      this.source.addEventListener('put', e => this.onPut(e.data));
+      this.source.addEventListener('patch', e => this.onPatch(e.data));
     }
-  },
-  subscribe(path, signal) {
-    subs.push({path, signal});
-  },
+    this.subs.push({path, signal});
+  }
   onPut(json) {
     try {
       const put = JSON.parse(json);
@@ -45,7 +40,7 @@ export const SsePubSub = {
       this.notify(put);
     } catch(x) {
     }
-  },
+  }
   onPatch(json) {
     try {
       const patch = JSON.parse(json);
@@ -53,15 +48,15 @@ export const SsePubSub = {
       this.notify(patch);
     } catch(x) {
     }
-  },
+  }
   notify(change) {
-    subs.forEach(({path, signal}) => {
+    this.subs.forEach(({path, signal}) => {
       if (path === change.path) {
         //console.log('signalling');
         signal(change.data);
       }
     });
-  },
+  }
   debounce(setter, value, ms = 50) {
     const debounce = this.debounce;
     debounce.value = value;

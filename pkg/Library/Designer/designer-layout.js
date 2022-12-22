@@ -288,7 +288,7 @@ export class DesignerLayout extends DragDrop {
     this.boxer.hidden = (this.disabled != null) || !this.target;
     if (this.target) {
       const {l, t, w, h} = this.getRect(this.target);
-      const rect = {l: l+2, t: t+2, w: w-4, h: h-4};
+      const rect = {l: l+4, t: t+4, w: w-8, h: h-8};
       this.setBoxStyle(this.boxer, rect);
     }
   }
@@ -360,7 +360,7 @@ export class DesignerLayout extends DragDrop {
   [edge] {
     pointer-events: all;
     position: absolute;
-    border: 2px solid #FF1012e0;
+    border: 1px dotted #6200eed6;
   }
   [top][edge], [bottom][edge] {
     left: var(--offset);
