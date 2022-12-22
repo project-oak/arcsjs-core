@@ -4,7 +4,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-const URL = 'https://arcsjs-core.firebaseio.com';
+const defaultUrl = 'https://arcsjs-core.firebaseio.com';
 
 let url;
 let source;
@@ -12,20 +12,33 @@ let source;
 const subs = [];
 
 export const SsePubSub = {
-  open(_url) {
+  pub(path, value) {
+    //console.log(`(pub) ${url}${path}`);
+    return fetch(`${url}${path}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(value)
+    });
+  },
+  open(url_, channel) {
     if (!source) {
-      url = _url ?? URL;
+      url = url_ || defaultUrl;
+      if (!channel) {
+        channel = (new URL(document.URL)).searchParams.get('id') ?? 'open';
+      }
+      url = `${url}/${channel}`;
+      console.warn(`using "${channel}" channel`);
       source = new EventSource(`${url}/.json`, {
         //withCredentials: true
       });
-      source.addEventListener('put', e => this.put(e.data));
-      source.addEventListener('patch', e => this.patch(e.data));
+      source.addEventListener('put', e => this.onPut(e.data));
+      source.addEventListener('patch', e => this.onPatch(e.data));
     }
   },
   subscribe(path, signal) {
     subs.push({path, signal});
   },
-  put(json) {
+  onPut(json) {
     try {
       const put = JSON.parse(json);
       //console.log('(put)', put);
@@ -33,7 +46,7 @@ export const SsePubSub = {
     } catch(x) {
     }
   },
-  patch(json) {
+  onPatch(json) {
     try {
       const patch = JSON.parse(json);
       //console.log('(patch)', patch);
@@ -49,15 +62,7 @@ export const SsePubSub = {
       }
     });
   },
-  pub(path, value) {
-    //console.log(`(pub) ${url}${path}`);
-    return fetch(`${url}${path}`, {
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(value)
-    });
-  },
-  debounce(setter, value, ms) {
+  debounce(setter, value, ms = 50) {
     const debounce = this.debounce;
     debounce.value = value;
     const commit = () => {
@@ -66,7 +71,7 @@ export const SsePubSub = {
     };
     if (!debounce.timer) {
       debounce.timer = true;
-      setTimeout(commit, ms || 50);
+      setTimeout(commit, ms);
     };
   }
 };

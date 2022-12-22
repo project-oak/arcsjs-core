@@ -1,10 +1,8 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 ({
 idDelimiter: '$$',
@@ -238,17 +236,22 @@ template: html`
   designer-layout {
     height: auto !important;
   }
+  [frame="graph"] {
+    border: 2px dashed #850d67;
+  }
 </style>
 <div bar frame="chooser"></div>
 <drop-target flex row on-target-drop="onDrop">
-  <designer-layout flex scrolling column
-                    frame="graph"
+  <!-- <div flex column frame="graph"></div> -->
+  <designer-layout flex Xscrolling column frame="graph"
+                    statical
                     on-position="onNodePosition"
                     on-delete="onNodeDelete"
                     selected="{{selectedKeys}}"
                     rects="{{rects}}"
                     color="{{color}}"
-                    hidebox="{{hideBox}}">
+                    Xhidebox="{{hideBox}}"
+                    >
   </designer-layout>
 </drop-target>
 `

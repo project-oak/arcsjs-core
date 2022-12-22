@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 import {logFactory} from '../Core/core.js';
-import {RecipeBuilder} from '../Graphs/RecipeBuilder.js';
+import {RecipeBuilder} from '../RecipeBuilder/RecipeBuilder.js';
 
 const log = logFactory(logFactory.flags.services || logFactory.flags.ArcService, 'RecipeService', 'tomato');
 
@@ -36,15 +36,15 @@ export const ArcService = {
     }
   },
   //
-  async addParticle({user, arc, meta, code}, arcs) {//runtime, host, {name, meta, code}) {
+  async addParticle({user, arc, meta, code}, arcs) {
     await arcs.createParticle(user, arc, meta, code);
     return true;
   },
-  async destroyParticle({arc, name}, arcs) {//runtime, host, {name, meta, code}) {
+  async destroyParticle({arc, name}, arcs) {
     await arcs.destroyParticle(name, arc);
     return true;
   },
-  async updateParticle({arc, kind, code}, arcs) { //runtime, host, {kind, code}) {
+  async updateParticle({arc, kind, code}, arcs) {
     await arcs.updateParticle(arc, kind, code);
     return true;
   },

@@ -11,7 +11,7 @@
 
 //const root = `${globalThis.config.arcsPath}/third_party/mediapipe/pose`;
 const root = `../third_party/mediapipe/pose`;
-const locateFile = file => `${root}/${file}`;
+const locateFile = file => `../${root}/${file}`;
 
 let pose;
 

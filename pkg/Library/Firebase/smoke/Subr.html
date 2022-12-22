@@ -9,7 +9,7 @@
 
 <script type="module">
   import {SsePubSub} from '../SsePubSub.js';
-  SsePubSub.open('https://arcsjs-core.firebaseio.com');
+  SsePubSub.open(`https://arcsjs-core.firebaseio.com`);
   SsePubSub.subscribe('/scroll/y', top => {
     window.ascreen.scrollTop = top;
   });

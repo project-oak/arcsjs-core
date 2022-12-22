@@ -99,7 +99,7 @@ template: html`
   :host {
     /* theme variables */
     /* --nodelist-bg: #f8f9fa; */
-    --nodelist-bg: var(--node-list-bg, var(--theme-color-bg-2));
+    --nodelist-bg: var(--node-list-bg, var(--theme-color-bg-0));
     --nodelist-container-fg: var(--nodelist-container-fg, var(--theme-color-fg-3));
     --nodelist-container-hi: var(--nodelist-container-hi, var(--theme-color-bg-3));
     background-color: var(--nodelist-bg);

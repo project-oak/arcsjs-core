@@ -31,10 +31,6 @@ updateSelectedNodeId({graph, selectedNodeId}, state) {
     state.selectedGraphName = meta?.name;
     candidate = null;
   }
-  // select any first node by default
-  // if (!selectedNode) {
-  //   candidate = graph?.nodes?.[0];
-  // }
   return candidate;
 },
 
