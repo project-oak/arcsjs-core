@@ -9,7 +9,7 @@ shouldRender({mediaDevices}) {
   return Boolean(mediaDevices && mediaDevices.length);
 },
 render({mediaDevices, mediaDeviceState}) {
-  const {isCameraEnabled, isMicEnabled, isAudioEnabled, videoDeviceId, audioInputDeviceId, audioOutputDeviceId} = mediaDeviceState;
+  const {isCameraEnabled, isMicEnabled, isAudioEnabled, videoDeviceId, audioInputDeviceId, audioOutputDeviceId} = mediaDeviceState || {};
   const showCamera = String(isCameraEnabled !== undefined);
   const showSpeaker = String(isAudioEnabled !== undefined);
   const cameraEnabled = Boolean(isCameraEnabled);

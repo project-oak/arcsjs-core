@@ -4,7 +4,6 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {DeviceUxRecipe} from '../Media/DeviceUxRecipe.js';
 
 export const AudioNode = {
   $meta: {
@@ -15,15 +14,18 @@ export const AudioNode = {
   $stores: {
     mediaDevices: {
       $type: '[JSON]',
-      connection: true,
       noinspect: true,
-      nodisplay: true
+      // nodisplay: true
     },
     mediaDeviceState: {
       $type: 'MedaDeviceState',
-      connection: true,
       noinspect: true,
-      nodisplay: true
+      // nodisplay: true,
+      $value: {
+        isCameraEnabled: false,
+        isMicEnabled: false,
+        isAudioEnabled: false
+      }
     },
     transcript: {
       $type: 'String',
@@ -40,7 +42,16 @@ export const AudioNode = {
     $outputs: ['transcript', 'mediaDeviceState'],
     $slots: {
       device: {
-        deviceUx: DeviceUxRecipe.deviceUx,
+        deviceUx: {
+          $kind: 'Media/DeviceUx',
+          $inputs: ['mediaDevices', 'mediaDeviceState'],
+          $outputs: ['mediaDeviceState']
+        },
+        defaultStream: {
+          $kind: 'Media/MediaStream',
+          $inputs: ['mediaDeviceState'],
+          $outputs: ['mediaDevices']
+        }
       },
       transcript: {
         textCapture: {

@@ -32,7 +32,8 @@ export const InspectorRecipe = {
     $inputs: [
       'selectedNodeId',
       {graph: 'selectedGraph'},
-      {data: 'inspectorData'}
+      {data: 'inspectorData'},
+      'nodeTypes'
     ],
     $outputs: [
       'selectedNodeId',

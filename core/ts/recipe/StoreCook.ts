@@ -106,4 +106,12 @@ export class StoreCook {
       shareid: `${meta.name}:${meta.arcid}:${meta.uid}`
     };
   }
+  static specToMeta(name: String, spec) {
+    return {
+      name,
+      type: spec.$type,
+      tags: spec.$tags,
+      value: spec.$value
+    };
+  }
 }

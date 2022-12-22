@@ -178,10 +178,10 @@ class DataItem extends Xen.Base {
     if (Array.isArray(value)) {
       return `[${value.slice(0, 5).map(elem => this.previewValue(elem)).join(',')}]`;
     } else if (!value) {
-      return value == null ? 'null' : 'undefined';
+      return value == false ? 'false' : value == null ? 'null' : 'undefined';
     } else if (typeof value === 'object') {
       return `{${Object.keys(value)
-          .filter(k => value[k])
+          .filter(k => value[k] !== undefined)
           .slice(0, 5)
           .map(k => `${k}: ${this.previewValue(value[k])}`)}}`;
     } else if (typeof value === 'string') {

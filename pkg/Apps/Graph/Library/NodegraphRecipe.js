@@ -112,7 +112,7 @@ export const NodegraphRecipe = {
     },
     nodeTypes: {
       $type: 'Pojo',
-      $value: nodeTypes
+      $value: {}
     },
     newNodeInfos: {
       $type: '[Pojo]'

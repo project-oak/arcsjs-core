@@ -15,8 +15,7 @@ export const FaceMeshFace = {
     data: {
       $type: 'FaceData',
       nomonitor: true,
-      noinspect: true,
-      connection: true
+      noinspect: true
     },
     outputImage: {
       $type: 'Image',

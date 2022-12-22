@@ -10,14 +10,14 @@
 
 inspectorDelimiter: '$$',
 
-async update({selectedNodeId, graph, data}, state, {service, output}) {
+async update({selectedNodeId, graph, data, nodeTypes}, state, {service, output}) {
   if (data && selectedNodeId && this.dataChanged(data, state.data)) {
     if (state.data?.key === data?.key) {
       if (data?.shouldDelete) {
         output(this.deleteNode(selectedNodeId, graph));
         state.data = null;
       } else {
-        output(this.updateValues(selectedNodeId, graph, data, state, service));
+        output(this.updateValues(selectedNodeId, graph, data, nodeTypes, state, service));
         state.data = data;
       }
     } else {
@@ -31,13 +31,14 @@ dataChanged(data, oldData) {
   return JSON.stringify(data) !== JSON.stringify(oldData);
 },
 
-updateValues(selectedNodeId, graph, data, state, service) {
+updateValues(selectedNodeId, graph, data, nodeTypes, state, service) {
   let changed = false;
   let node = graph.nodes[selectedNodeId];
+  const nodeType = nodeTypes[node.type];
   data?.props?.forEach((prop, index) => {
     if (prop && !prop.store.noinspect) {
       const currentValue = state.data?.props?.[index]?.value;
-      const updatedNode = this.updatePropValue(prop, currentValue, node, service);
+      const updatedNode = this.updatePropValue(prop, currentValue, node, nodeType, service);
       if (updatedNode) {
         node = updatedNode;
         changed = true;
@@ -53,13 +54,13 @@ updateValues(selectedNodeId, graph, data, state, service) {
   }
 },
 
-updatePropValue(prop, currentValue, node, service) {
+updatePropValue(prop, currentValue, node, nodeType, service) {
   if (JSON.stringify(prop.value) !== JSON.stringify(currentValue)) {
     // Note: setting entire prop value (not granular by inner props).
     const newValue = this.formatPropValue(prop);
     if (prop.name.endsWith('-connection')) {
       const propName = prop.name.substring(0, prop.name.length - '-connection'.length);
-      return this.updateConnection(propName, newValue, node, service);
+      return this.updateConnection(propName, newValue, node, nodeType, service);
     } else {
       return this.updatePropInNode(prop.name, newValue, node, service);
     }
@@ -75,14 +76,15 @@ formatPropValue({value, store: {$type}}) {
   return value;
 },
 
-updateConnection(name, value, node, service) {
+updateConnection(name, value, node, nodeType, service) {
   const props = {...node.props};
   const connections = {...node.connections};
   if (value?.length > 0) {
     delete props[name];
-    this.updateStoreValue(this.fullStoreId(node, name), undefined, service);
+    this.removeStore(this.fullStoreId(node, name), service);
     connections[name] = value;
   } else {
+    this.addStore(this.fullStoreId(node, name), nodeType.$stores[name], service);
     delete connections[name];
   }
   return {
@@ -112,6 +114,14 @@ fullStoreId({id}, storeId) {
 
 updateStoreValue(storeId, value, service) {
   return service({kind: 'StoreService', msg: 'UpdateStoreValue', data: {storeId, value}});
+},
+
+addStore(storeId, store, service) {
+  return service({kind: 'StoreService', msg: 'AddStore', data: {storeId, store}});
+},
+
+removeStore(storeId, service) {
+  return service({kind: 'StoreService', msg: 'RemoveStore', data: {storeId}});
 },
 
 deleteNode(key, graph) {
