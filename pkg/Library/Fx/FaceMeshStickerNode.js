@@ -9,8 +9,7 @@ export const FaceMeshSticker = {
     data: {
       $type: 'FaceData',
       nomonitor: true,
-      noinspect: true,
-      connection: true
+      noinspect: true
     },
     index: {
       $type: 'Number',
@@ -22,8 +21,7 @@ export const FaceMeshSticker = {
       nomonitor: true
     },
     sticker: {
-      $type: 'Image',
-      connection: true
+      $type: 'Image'
     }
   },
   FaceSticker: {

@@ -20,7 +20,13 @@ const etc = await load([
   'NodeCatalog/NodeCatalogNode.js',
   'NodeInspector/NodeInspectorNode.js',
   'Mediapipe/PoseNode.js',
-  'Fx/DetectRaisedHandNode.js'
+  'Fx/DetectRaisedHandNode.js',
+  'NewMedia/AudioNode.js',
+  'Shader/FragmentShaderNode.js',
+  'Pixabay/PixabayNode.js',
+  'Mediapipe/FaceMeshNode.js',
+  'Mediapipe/FaceMeshFaceNode.js', // rename to FaceMeshDisplayNode
+  'Fx/FaceMeshStickerNode.js'
 ]);
 
 const nodeTypes = {

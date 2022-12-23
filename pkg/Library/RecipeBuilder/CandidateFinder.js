@@ -7,8 +7,8 @@
 ({
 
 async update({graph, nodeTypes, globalStores}, state) {
-  if (graph && this.graphChanged(graph, state.graph)) {
-    state.graph = graph;
+  if (this.graphChanged(graph, state.graph) || this.nodeTypesChanged(nodeTypes, state.nodeTypes)) {
+    assign(state, {graph, nodeTypes});
     return {
       candidates: this.findCandidates(graph, nodeTypes, globalStores)
     };
@@ -16,8 +16,13 @@ async update({graph, nodeTypes, globalStores}, state) {
 },
 
 graphChanged(graph, oldGraph) {
-  return graph.$meta.id !== oldGraph?.$meta?.id ||
-         keys(graph.nodes).length !== keys(oldGraph?.nodes).length;
+  return graph &&
+      (graph.$meta.id !== oldGraph?.$meta?.id ||
+      keys(graph.nodes).length !== keys(oldGraph?.nodes).length);
+},
+
+nodeTypesChanged(nodeTypes, oldNodeTypes) {
+  return keys(nodeTypes).length !== keys(oldNodeTypes).length;
 },
 
 findCandidates(graph, nodeTypes, globalStores) {

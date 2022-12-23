@@ -78,6 +78,6 @@ const removeStore = (storeId, runtime) => {
 };
 
 const addStore = async({storeId, store}, runtime, host) => {
-  await StoreCook.realizeStore(runtime, host.arc, {name: storeId, ...store});
+  await StoreCook.realizeStore(runtime, host.arc, StoreCook.specToMeta(storeId, store));
   return true;
 };

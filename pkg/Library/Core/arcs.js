@@ -1034,6 +1034,14 @@ var StoreCook = class {
       shareid: `${meta.name}:${meta.arcid}:${meta.uid}`
     };
   }
+  static specToMeta(name, spec) {
+    return {
+      name,
+      type: spec.$type,
+      tags: spec.$tags,
+      value: spec.$value
+    };
+  }
 };
 
 // js/recipe/ParticleCook.js

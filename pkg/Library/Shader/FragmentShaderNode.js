@@ -50,27 +50,22 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     },
     image: {
       $type: 'Image',
-      connection: true,
       nomonitor: true
     },
     image2: {
       $type: 'Image',
-      connection: true,
       nomonitor: true
     },
     image3: {
       $type: 'Image',
-      connection: true,
       nomonitor: true
     },
     image4: {
       $type: 'Image',
-      connection: true,
       nomonitor: true
     },
     audio: {
-      $type: `AudioStream`,
-      connection: true
+      $type: `AudioStream`
     },
     outputImage: {
       $type: 'Image',
