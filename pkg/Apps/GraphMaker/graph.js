@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 
-export const graph = 
+export const graph =
 {
   "$meta": {
     "name": "unripe-annual",
@@ -80,10 +80,10 @@ export const graph =
         "w": 680,
         "h": 392
       },
-      "NodeCatalogNode1:Container": "SplitPanelNode1:panel#topLeft",
-      "SplitPanelNode2:Container": "SplitPanelNode1:panel#bottomRight",
-      "SplitPanelNode3:Container": "SplitPanelNode2:panel#bottomRight",
-      "NodeInspectorNode1:Container": "SplitPanelNode3:panel#topLeft"
+      "NodeCatalogNode1:Container": "SplitPanelNode1:panel#FirstContainer",
+      "SplitPanelNode2:Container": "SplitPanelNode1:panel#SecondContainer",
+      "SplitPanelNode3:Container": "SplitPanelNode2:panel#SecondContainer",
+      "NodeInspectorNode1:Container": "SplitPanelNode3:panel#FirstContainer"
     },
     "nodegraph": {
       "SplitPanelNode1": {
