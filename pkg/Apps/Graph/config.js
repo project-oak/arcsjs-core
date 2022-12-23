@@ -6,8 +6,9 @@
  */
 
 let url;
-if (import.meta.url.includes('localhost')) {
+if (import.meta.url.includes('localhost:9888')) {
   url = `http://localhost:9888/0.4.5`;
+} else if (import.meta.url.includes('localhost')) {
   url = `http://localhost/gob/arcsjs-core/pkg`;
 } else {
   url = `https://arcsjs.web.app/0.4.5`;
