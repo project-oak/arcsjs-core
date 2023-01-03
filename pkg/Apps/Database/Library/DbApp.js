@@ -6,10 +6,8 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {App} from '../../Library/App/Worker/App.js';
-import {LocalStoragePersistor} from '../../Library/LocalStorage/LocalStoragePersistor.js';
+import {logFactory, App, LocalStoragePersistor} from '../conf/arcs.js';
 import {DbRecipe} from './DbRecipe.js';
-import {logFactory} from '../../Library/Core/utils.min.js';
 
 const log = logFactory(true, 'Db', 'navy');
 
