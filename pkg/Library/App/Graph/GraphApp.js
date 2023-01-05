@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 import {App} from '../Worker/App.js';
-import {RecipeBuilder} from '../../RecipeBuilder/RecipeBuilder.js';
+// import {RecipeBuilder} from '../../RecipeBuilder/RecipeBuilder.js';
 
 export const GraphApp = class extends App {
   async spinup() {
@@ -37,20 +37,16 @@ export const GraphApp = class extends App {
     }
   }
   async removeGraph(graph) {
-    const recipes = RecipeBuilder.construct({graph, nodeTypes: this.nodeTypes});
-    this.arcs.removeRecipes('user', recipes);
+    this.arcs.removeGraph('user', graph, this.nodeTypes);
   }
   async addGraph(graph, layoutId) {
-    if (this.lastRecipes) {
-      await this.arcs.removeRecipes('user', this.lastRecipes);
-      this.lastRecipes = null;
+    if (this.lastGraph) {
+      await this.removeGraph(this.lastGraph);
+      this.lastGraph = null;
     }
-    RecipeBuilder.defaultContainer = 'main#root';
-    // n.b. the RecipeBuilder wants the nodes and the containers from the layout,
-    // but not the rectangles
-    const recipes = RecipeBuilder.construct({graph, layoutId, nodeTypes: this.nodeTypes});
-    await this.arcs.addRecipes('user', recipes);
+    await this.arcs.addGraph('user', graph, this.nodeTypes);
   }
+
   logInfo() {
     this.log.groupCollapsed('Boot flavors');
     this.log('paths', this.paths);

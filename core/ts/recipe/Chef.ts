@@ -16,7 +16,120 @@ import {Recipe} from './types.js';
 
 const log = logFactory(logFactory.flags.recipe, 'Chef', '#087f23');
 
+const {assign, create} = Object;
+const entries = (o):any[] => Object.entries(o ?? Object);
+const keys = (o):any[] => Object.keys(o ?? Object);
+const values = (o):any[] => Object.values(o ?? Object);
+const nob = () => create(null);
+
 export class Chef {
+  // static async executeG(graph: any, layoutId: any, nodeTypes: any, runtime: Runtime, arc: Arc) {
+  //   log(`EXECUTE GRAPH`);
+  //   /////////////////////////////////////////////////////
+  //   const layout = graph.layout?.[layoutId];
+  //   const stores = [];
+  //   const storeMap = {};
+  //   values(graph.nodes).forEach(({id, type, connections, props})=> {
+  //     const nodeType = Chef.flattenNodeType(nodeTypes[type]) as any;
+  //     // TODO(mariakleiner): flatten nodetype
+  //     entries(nodeType.$stores).forEach(([name, store]) => {
+  //       storeMap[name] = [];
+  //       // const store = {...}
+  //       if (connections?.[name]) {
+  //         connections[name].forEach?.(connId => storeMap[name].push({id: connId, tags: store.$tags}));
+  //       } else {
+  //         const storeId = `${id ? `${id}:` : ''}${name}`;
+  //         const value = props?.[name] || store.$value;
+  //         stores.push({
+  //           name: storeId,
+  //           tags: store.$tags, // collect tags from all connected stores
+  //           type: store.$type,
+  //           value
+  //         });
+  //         storeMap[name].push({id: storeId});
+  //       }
+  //     });
+  //   });
+  //   log(`STORES: ${JSON.stringify(stores)}`);
+  //   await StoreCook.execute(runtime, arc, stores);
+  //   /////////////////////////////////////////////////////
+  //   const particles = [];
+  //   values(graph.nodes).forEach(({id, type, connections, props}) => {
+  //     const nodeType = Chef.flattenNodeType(nodeTypes[type]);
+  //     const containerId = `${id ? `${id}:` : ''}Container`;
+  //     const defaultContainer = layout?.[containerId] || 'main#graph';
+
+  //     const decodeBinding = value => {
+  //       if (typeof value === 'string') {
+  //         return {key: value, binding: ''};
+  //       } else {
+  //         const [key, binding] = entries(value)[0];
+  //         return {key, binding};
+  //       }
+  //     };
+    
+  //     keys(nodeType).forEach(name => {
+  //       if (!name.startsWith('$')) {
+  //         const particleId = `${id ? `${id}:` : ''}${name}`;
+  //         const spec = nodeType[name];
+  //         const resolveIoGroup = bindings => {
+  //           return bindings?.map(coded => {
+  //             const {key, binding} = decodeBinding(coded);
+  //             const task = (store, index) => ({[`${key}${index === 0 ? '' : index}`]: store});
+  //             return storeMap[binding || key]?.map(({id}, i) => task(id, i));
+  //           }).flat().filter(i=>i);
+  //         };        
+  //         //
+  //         const particle = {
+  //           id: particleId,
+  //           container: spec.$container ? `${id}:${spec.$container}` : defaultContainer,
+  //           spec: {
+  //             $kind: spec.$kind,
+  //             $staticInputs: props,
+  //             $inputs: resolveIoGroup(spec.$inputs),
+  //             $outputs: resolveIoGroup(spec.$outputs),
+  //             $slots: { /* TODO */ }
+  //           }
+  //         };
+  //         particles.push(particle); 
+  //       }    
+  //     });
+  //   });
+  //   log(`PARTICLES: ${JSON.stringify(particles)}`);
+  //   await ParticleCook.execute(runtime, arc, particles);
+  // }
+
+  // static flattenNodeType(nodeType: any, $container?: any) {
+  //   const flattened = {};
+  //   keys(nodeType).forEach(key => {
+  //     if (key.startsWith('$')) {
+  //       flattened[key] = nodeType[key];
+  //     } else {
+  //       assign(flattened, Chef.flattenParticleSpec(key, nodeType[key], $container));
+  //     }
+  //   });
+  //   return flattened;
+  // }
+
+  // static flattenParticleSpec(particleId: any, particleSpec: any, $container: any) {
+  //   const flattened = {
+  //     [particleId]: {
+  //       ...particleSpec,
+  //       $slots: {},
+  //       ...($container && {$container})
+  //     }
+  //   };
+  //   entries(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
+  //     assign(flattened, Chef.flattenNodeType(slotRecipe, `${particleId}#${slotId}`));
+  //     flattened[particleId].$slots[slotId] = {};
+  //   });
+  //   return flattened;
+  // }
+
+  // static async evacipateG(graph: Object, nodeTypes: Object, runtime: Runtime, arc: Arc) {
+  //   log(`EVACIPATE GRAPH`);
+  // }
+
   static async execute(recipe: Recipe, runtime: Runtime, arc: Arc) {
     if (arc instanceof Promise) {
       log.error('`arc` must be an Arc, not a Promise. Make sure `boostrapArc` is awaited.');

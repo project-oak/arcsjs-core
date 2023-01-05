@@ -31,13 +31,13 @@ export const RecipeBuilderRecipe = {
       'candidates',
     ],
     $outputs: [{graph: 'selectedGraph'}]
-  },
-  recipeBuilder: {
-    $kind: '$library/RecipeBuilder/RecipeBuilderParticle',
-    $inputs: [
-      'nodeTypes',
-      {graph: 'selectedGraph'}
-    ],
-    $outputs: ['recipes']
   }
+  // recipeBuilder: {
+  //   $kind: '$library/RecipeBuilder/RecipeBuilderParticle',
+  //   $inputs: [
+  //     'nodeTypes',
+  //     {graph: 'selectedGraph'}
+  //   ],
+  //   $outputs: ['recipes']
+  // }
 };

@@ -14,6 +14,7 @@ export * from '../js/core/Arc.js';
 export * from '../js/core/Host.js';
 export * from '../js/core/Decorator.js';
 export * from '../js/recipe/Chef.js';
+export * from '../js/recipe/Graphinator.js';
 export * from '../js/recipe/ParticleCook.js';
 export * from '../js/recipe/StoreCook.js';
 export * from '../js/recipe/RecipeParser.js';

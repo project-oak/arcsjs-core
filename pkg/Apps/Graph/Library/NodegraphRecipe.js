@@ -12,11 +12,33 @@ import {InspectorRecipe} from './InspectorRecipe.js';
 
 export {nodeTypes};
 
-const Preview = {
+// const Preview = {
+//   designer: {
+//     $kind: '$library/Designer/Designer',
+//     $inputs: [
+//       'recipes',
+//       {graph: 'selectedGraph'},
+//       'selectedNodeId',
+//       'nodeTypes',
+//       'categories',
+//       'newNodeInfos'
+//     ],
+//     $staticInputs: {
+//       layoutId: 'preview'
+//     },
+//     $outputs: [
+//       {graph: 'selectedGraph'},
+//       'selectedNodeId',
+//       'newNodeInfos'
+//     ]
+//   }
+// };
+
+const PreviewNew = {
   designer: {
-    $kind: '$library/Designer/Designer',
+    $kind: '$library/Designer/DesignerNew',
     $inputs: [
-      'recipes',
+      // 'recipes',
       {graph: 'selectedGraph'},
       'selectedNodeId',
       'nodeTypes',
@@ -102,10 +124,10 @@ export const NodegraphRecipe = {
     inspectorData: {
       $type: 'Pojo'
     },
-    recipes: {
-      $type: '[Pojo]',
-      $value: []
-    },
+    // recipes: {
+    //   $type: '[Pojo]',
+    //   $value: []
+    // },
     categories: {
       $type: 'Pojo',
       $value: categories
@@ -121,7 +143,8 @@ export const NodegraphRecipe = {
   main: {
     $kind: '$library/NodeGraph/Nodegraph',
     $slots: {
-      preview: Preview,
+      // preview: Preview,
+      preview: PreviewNew,
       catalog: nodeTypes.NodeCatalogNode,
       toolbar: GraphToolbarRecipe,
       editor: NodeEditorRecipe,

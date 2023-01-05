@@ -6,7 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {Paths, Runtime, Arc, Decorator, Chef, logFactory, utils} from '../../Core/core.js';
+import {Paths, Runtime, Arc, Decorator, Chef, Graphinator, logFactory, utils} from '../../Core/core.js';
 import {MessageBus} from './MessageBus.js';
 import {RecipeService} from '../RecipeService.js';
 import {StoreService} from '../StoreService.js';
@@ -205,19 +205,28 @@ const handlers = {
       }
     }
   },
-  addRecipe: async ({arc, recipe}) => {
-    return Chef.execute(recipe, user, await requireArc(arc));
-  },
+  // addRecipe: async ({arc, recipe}) => {
+  //   return Chef.execute(recipe, user, await requireArc(arc));
+  // },
   addRecipes: async ({arc, recipes}) => {
     const realArc = await requireArc(arc);
     return Chef.executeAll(recipes, user, realArc);
   },
-  removeRecipe: async ({arc, recipe}) => {
-    return Chef.evacipate(recipe, user, await requireArc(arc));
+  // removeRecipe: async ({arc, recipe}) => {
+  //   return Chef.evacipate(recipe, user, await requireArc(arc));
+  // },
+  // removeRecipes: async ({arc, recipes}) => {
+  //   const realArc = await requireArc(arc);
+  //   return Chef.evacipateAll(recipes, user, realArc);
+  // },
+  addGraph: async ({arc, graph, layoutId, nodeTypes}) => {
+    const graphinator = new Graphinator(nodeTypes, user, await requireArc(arc));
+    return graphinator.execute(graph, layoutId); //, nodeTypes, user, await requireArc(arc));
   },
-  removeRecipes: async ({arc, recipes}) => {
-    const realArc = await requireArc(arc);
-    return Chef.evacipateAll(recipes, user, realArc);
+  removeGraph: async ({arc, graph, nodeTypes}) => {
+    const graphinator = new Graphinator(nodeTypes, user, await requireArc(arc));
+    return graphinator.evacipate(graph);
+    // return Chef.evacipate(graph, nodeTypes, user, await requireArc(arc));
   },
   setStoreData: async ({arc, storeKey, data}) => {
     const realArc = getArc(arc);

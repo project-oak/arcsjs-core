@@ -20,7 +20,7 @@ globalThis.config = {
   //theme: 'dark',
   logFlags: {
     app: true,
-    //recipe: true,
+    recipe: true,
     //arc: true,
     particles: true,
     //storage: true,

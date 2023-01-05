@@ -136,10 +136,12 @@ arcs.createParticle   = (name, arc, meta, code)   => socket.sendVibration({kind:
 arcs.destroyParticle  = (name, arc)               => socket.sendVibration({kind: 'destroyParticle', name, arc});
 arcs.updateParticle   = (particle, code, arc)     => socket.sendVibration({kind: 'updateParticle', particle, code, arc});
 arcs.setInputs        = (arc, particle, inputs)   => socket.sendVibration({kind: 'setInputs', arc, particle, inputs});
-arcs.addRecipe        = (arc, recipe)             => socket.sendVibration({kind: 'addRecipe', recipe, arc});
+// arcs.addRecipe        = (arc, recipe)             => socket.sendVibration({kind: 'addRecipe', recipe, arc});
 arcs.addRecipes       = (arc, recipes)            => socket.sendVibration({kind: 'addRecipes', recipes, arc});
-arcs.removeRecipe     = (arc, recipe)             => socket.sendVibration({kind: 'removeRecipe', recipe, arc});
-arcs.removeRecipes    = (arc, recipes)            => socket.sendVibration({kind: 'removeRecipes', recipes, arc});
+// arcs.removeRecipe     = (arc, recipe)             => socket.sendVibration({kind: 'removeRecipe', recipe, arc});
+// arcs.removeRecipes    = (arc, recipes)            => socket.sendVibration({kind: 'removeRecipes', recipes, arc});
+arcs.removeGraph      = (arc, graph, nodeTypes)   => socket.sendVibration({kind: 'removeGraph', graph, nodeTypes, arc});
+arcs.addGraph         = (arc, graph, layoutId, nodeTypes)   => socket.sendVibration({kind: 'addGraph', graph, layoutId, nodeTypes, arc});
 arcs.set              = (arc, storeKey, data)     => socket.sendVibration({kind: 'setStoreData', arc, storeKey, data});
 arcs.setOpaqueData    = (key, data)               => socket.sendVibration({kind: 'setOpaqueData', key, data});
 
