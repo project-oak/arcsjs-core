@@ -21,16 +21,15 @@ const values = (o):any[] => Object.values(o ?? Object);
 
 const defaultContainer = 'main#graph';
 const idDelim = ':';
-const connectorDelim = '$$';
 
 
 export class Graphinator {
   nodeTypes: any;
-  allStoreSpecs: [];
+  storeTags: any;
 
   constructor(nodeTypes: any, protected runtime: Runtime, protected arc: Arc) {
     this.nodeTypes = {};
-    this.allStoreSpecs = [];
+    this.storeTags = {};
     keys(nodeTypes).forEach(t => this.nodeTypes[t] = this.flattenNodeType(nodeTypes[t]));
   }
 
@@ -62,54 +61,48 @@ export class Graphinator {
   }
 
   async execute(graph: any, layoutId: any) {
-    log(`EXECUTE GRAPH`);
-    /////////////////////////////////////////////////////
     const layout = graph.layout?.[layoutId];
     const stores = [];
     const particles = [];
-    // const storeMap = {};
     values(graph.nodes).forEach(node => {
       const connsMap = {};
-      this.prepareStores(node, this.nodeTypes[node.type], stores, connsMap); //, storeMap);
+      this.prepareStores(node, this.nodeTypes[node.type], stores, connsMap);
       this.prepareParticles(node, layout, connsMap, particles);
     });
-    /////////////////////////////////////////////////////
-    // values(graph.nodes).forEach(node => { //({id, type, connections, props}) => {
-    //   this.prepareParticles(node, layout, storeMap, particles);
-    // });
 
-    /////////////////////////////////////////////////////
-
-    // TODO(mariakleiner): propagate tags from connected stores onto realized stores
-    // this.retagStoreSpecs(state.storeMap, allSpecs);
-    log(`STORES: ${JSON.stringify(stores)}`);
-    log(`PARTICLES: ${JSON.stringify(particles)}`);
-
+    this.retagStoreSpecs(stores);
+    log(`Stores: ${JSON.stringify(stores)}`);
     await StoreCook.execute(this.runtime, this.arc, stores);
+
+    log(`Particles: ${JSON.stringify(particles)}`);
     await ParticleCook.execute(this.runtime, this.arc, particles);
   }
 
-  prepareStores({id, connections, props}, nodeType, stores, connsMap) { //storeMap) {
+  prepareStores({id, connections, props}, nodeType, stores, connsMap) {
     entries(nodeType.$stores).forEach(([name, store]) => {
-      connsMap[name] = {}; //storeMap[name] = [];
+      connsMap[name] = [];
       const storeId = this.constructId(id, name);
-      const storeProps = props?.[name];
+      const storeValue = props?.[name] || store.$value;
       const storeConns = connections?.[name];
-      this.prepareStore(storeId, store, storeProps, storeConns, stores, connsMap[name]); //storeMap[name]);
+      this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
     });
   }
-  prepareStore(storeId, {$type, $value, $tags}, propValue, connections, stores, storeEntry) {
+  prepareStore(storeId, {$type: type, $tags}, value, connections, stores, storeEntry) {
     if (connections) {
-      connections.forEach?.(connId => storeEntry.push({id: connId, tags: $tags}));
+      connections?.forEach?.(connId => this.addStore(connId, $tags, storeEntry)); 
     } else {
-      stores.push({
-        name: storeId,
-        tags: $tags,
-        type: $type,
-        value: propValue || $value
-      });
-      storeEntry.push({id: storeId});
+      stores.push({name: storeId, type, value});
+      this.addStore(storeId, $tags, storeEntry);
     }
+  }
+
+  addStore(storeId, tags, storeEntry) {
+    storeEntry.push({id: storeId});
+    this.storeTags[storeId] = [...(this.storeTags[storeId] || []), tags];
+  }
+
+  retagStoreSpecs(stores) {
+    stores.forEach(store => store.tags = this.storeTags[store.name]);
   }
 
   resolveIoGroup(bindings, storeMap) {

@@ -1125,10 +1125,12 @@ var Graphinator = class {
   runtime;
   arc;
   nodeTypes;
+  storeTags;
   constructor(nodeTypes, runtime, arc) {
     this.runtime = runtime;
     this.arc = arc;
     this.nodeTypes = {};
+    this.storeTags = {};
     keys5(nodeTypes).forEach((t) => this.nodeTypes[t] = this.flattenNodeType(nodeTypes[t]));
   }
   flattenNodeType(nodeType, $container) {
@@ -1157,43 +1159,45 @@ var Graphinator = class {
     return flattened;
   }
   async execute(graph, layoutId) {
-    log7(`EXECUTE GRAPH`);
     const layout = graph.layout?.[layoutId];
     const stores = [];
-    const storeMap = {};
-    values4(graph.nodes).forEach((node) => {
-      this.prepareStores(node, this.nodeTypes[node.type], stores, storeMap);
-    });
-    log7(`STORES: ${JSON.stringify(stores)}`);
-    await StoreCook.execute(this.runtime, this.arc, stores);
     const particles = [];
     values4(graph.nodes).forEach((node) => {
-      this.prepareParticles(node, layout, storeMap, particles);
+      const connsMap = {};
+      this.prepareStores(node, this.nodeTypes[node.type], stores, connsMap);
+      this.prepareParticles(node, layout, connsMap, particles);
     });
-    log7(`PARTICLES: ${JSON.stringify(particles)}`);
+    this.retagStoreSpecs(stores);
+    log7(`Stores: ${JSON.stringify(stores)}`);
+    await StoreCook.execute(this.runtime, this.arc, stores);
+    log7(`Particles: ${JSON.stringify(particles)}`);
     await ParticleCook.execute(this.runtime, this.arc, particles);
   }
-  prepareStores({ id, connections, props }, nodeType, stores, storeMap) {
+  prepareStores({ id, connections, props }, nodeType, stores, connsMap) {
     entries5(nodeType.$stores).forEach(([name, store]) => {
-      storeMap[name] = [];
+      connsMap[name] = [];
       const storeId = this.constructId(id, name);
-      const storeProps = props?.[name];
+      const storeValue = props?.[name] || store.$value;
       const storeConns = connections?.[name];
-      this.prepareStore(storeId, store, storeProps, storeConns, stores, storeMap[name]);
+      this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
     });
   }
-  prepareStore(storeId, { $type, $value, $tags }, propValue, connections, stores, storeEntry) {
+  prepareStore(storeId, { $type: type, $tags }, value, connections, stores, storeEntry) {
     if (connections) {
-      connections.forEach?.((connId) => storeEntry.push({ id: connId, tags: $tags }));
-    } else {
-      stores.push({
-        name: storeId,
-        tags: $tags,
-        type: $type,
-        value: propValue || $value
+      connections?.forEach?.((connId) => {
+        this.addStore(connId, $tags, storeEntry);
       });
-      storeEntry.push({ id: storeId });
+    } else {
+      stores.push({ name: storeId, type, value });
+      this.addStore(storeId, $tags, storeEntry);
     }
+  }
+  addStore(storeId, tags, storeEntry) {
+    storeEntry.push({ id: storeId });
+    this.storeTags[storeId] = [...this.storeTags[storeId] || [], tags];
+  }
+  retagStoreSpecs(stores) {
+    stores.forEach((store) => store.tags = this.storeTags[store.name]);
   }
   resolveIoGroup(bindings, storeMap) {
     return bindings?.map((coded) => {
