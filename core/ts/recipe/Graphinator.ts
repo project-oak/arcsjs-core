@@ -66,32 +66,36 @@ export class Graphinator {
     /////////////////////////////////////////////////////
     const layout = graph.layout?.[layoutId];
     const stores = [];
-    const storeMap = {};
+    const particles = [];
+    // const storeMap = {};
     values(graph.nodes).forEach(node => {
-      this.prepareStores(node, this.nodeTypes[node.type], stores, storeMap);
+      const connsMap = {};
+      this.prepareStores(node, this.nodeTypes[node.type], stores, connsMap); //, storeMap);
+      this.prepareParticles(node, layout, connsMap, particles);
     });
-    log(`STORES: ${JSON.stringify(stores)}`);
+    /////////////////////////////////////////////////////
+    // values(graph.nodes).forEach(node => { //({id, type, connections, props}) => {
+    //   this.prepareParticles(node, layout, storeMap, particles);
+    // });
+
+    /////////////////////////////////////////////////////
 
     // TODO(mariakleiner): propagate tags from connected stores onto realized stores
     // this.retagStoreSpecs(state.storeMap, allSpecs);
+    log(`STORES: ${JSON.stringify(stores)}`);
+    log(`PARTICLES: ${JSON.stringify(particles)}`);
 
     await StoreCook.execute(this.runtime, this.arc, stores);
-    /////////////////////////////////////////////////////
-    const particles = [];
-    values(graph.nodes).forEach(node => { //({id, type, connections, props}) => {
-      this.prepareParticles(node, layout, storeMap, particles);
-    });
-    log(`PARTICLES: ${JSON.stringify(particles)}`);
     await ParticleCook.execute(this.runtime, this.arc, particles);
   }
 
-  prepareStores({id, connections, props}, nodeType, stores, storeMap) {
+  prepareStores({id, connections, props}, nodeType, stores, connsMap) { //storeMap) {
     entries(nodeType.$stores).forEach(([name, store]) => {
-      storeMap[name] = [];
+      connsMap[name] = {}; //storeMap[name] = [];
       const storeId = this.constructId(id, name);
       const storeProps = props?.[name];
       const storeConns = connections?.[name];
-      this.prepareStore(storeId, store, storeProps, storeConns, stores, storeMap[name]);
+      this.prepareStore(storeId, store, storeProps, storeConns, stores, connsMap[name]); //storeMap[name]);
     });
   }
   prepareStore(storeId, {$type, $value, $tags}, propValue, connections, stores, storeEntry) {
