@@ -1142,18 +1142,18 @@ var Graphinator = class {
     this.storeTags = {};
     keys5(nodeTypes).forEach((t) => this.nodeTypes[t] = this.flattenNodeType(nodeTypes[t]));
   }
-  flattenNodeType(nodeType, $container) {
-    const flattened = {};
+  flattenNodeType(nodeType, $container, flatNodeType) {
+    flatNodeType ??= {};
     keys5(nodeType).forEach((key2) => {
       if (key2.startsWith("$")) {
-        flattened[key2] = { ...flattened[key2] || {}, ...nodeType[key2] };
+        flatNodeType[key2] = { ...nodeType[key2], ...flatNodeType[key2] || {} };
       } else {
-        assign3(flattened, this.flattenParticleSpec(key2, nodeType[key2], $container));
+        assign3(flatNodeType, this.flattenParticleSpec(key2, nodeType[key2], $container, flatNodeType));
       }
     });
-    return flattened;
+    return flatNodeType;
   }
-  flattenParticleSpec(particleId, particleSpec, $container) {
+  flattenParticleSpec(particleId, particleSpec, $container, flatNodeType) {
     const flattened = {
       [particleId]: {
         ...particleSpec,
@@ -1162,7 +1162,7 @@ var Graphinator = class {
       }
     };
     entries5(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
-      assign3(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`));
+      assign3(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`, flatNodeType));
       flattened[particleId].$slots[slotId] = {};
     });
     return flattened;
@@ -1234,7 +1234,7 @@ var Graphinator = class {
     const spec = nodeType[particleName];
     return {
       id: particleId,
-      container: spec.$container ? `${id}:${spec.$container}` : container,
+      container: this.resolveContainer(id, spec.$container, container),
       spec: {
         $kind: spec.$kind,
         $staticInputs: props,
@@ -1246,6 +1246,9 @@ var Graphinator = class {
   }
   constructId(id, name) {
     return `${id ? `${id}${idDelim}` : ""}${name}`;
+  }
+  resolveContainer(id, containerName, defaultContainer2) {
+    return containerName === "undefined" ? void 0 : containerName ? this.constructId(id, containerName) : defaultContainer2;
   }
   async realizeParticles(particles) {
     const newParticles = particles.filter(({ id }) => !this.arc.hosts[id]);

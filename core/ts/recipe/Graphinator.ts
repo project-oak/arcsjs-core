@@ -20,7 +20,6 @@ const entries = (o):any[] => Object.entries(o ?? Object);
 const keys = (o):any[] => Object.keys(o ?? Object);
 const values = (o):any[] => Object.values(o ?? Object);
 
-
 const defaultContainer = 'main#graph';
 const idDelim = ':';
 
@@ -34,29 +33,29 @@ export class Graphinator {
     keys(nodeTypes).forEach(t => this.nodeTypes[t] = this.flattenNodeType(nodeTypes[t]));
   }
 
-  flattenNodeType(nodeType: any, $container?: any) {
-    const flattened = {};
+  flattenNodeType(nodeType: any, $container?: any, flatNodeType?: any) {
+    flatNodeType ??= {};
     keys(nodeType).forEach(key => {
       if (key.startsWith('$')) {
-        flattened[key] = {...(flattened[key] || {}), ...nodeType[key]};
+        flatNodeType[key] = {...nodeType[key], ...(flatNodeType[key] || {})};
       } else {
-        assign(flattened, this.flattenParticleSpec(key, nodeType[key], $container));
+        assign(flatNodeType, this.flattenParticleSpec(key, nodeType[key], $container, flatNodeType));
       }
     });
-    return flattened;
+    return flatNodeType;
   }
 
-  flattenParticleSpec(particleId: any, particleSpec: any, $container: any) {
+  flattenParticleSpec(particleId: any, particleSpec: any, $container: any, flatNodeType) {
     const flattened = {
-        [particleId]: {
-        ...particleSpec,
-        $slots: {},
-        ...($container && {$container})
-        }
+      [particleId]: {
+      ...particleSpec,
+      $slots: {},
+      ...($container && {$container})
+      }
     };
     entries(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
-        assign(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`));
-        flattened[particleId].$slots[slotId] = {};
+      assign(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`, flatNodeType));
+      flattened[particleId].$slots[slotId] = {};
     });
     return flattened;
   }
@@ -137,7 +136,7 @@ export class Graphinator {
     //
     return {
       id: particleId,
-      container: spec.$container ? `${id}:${spec.$container}` : container,
+      container: this.resolveContainer(id, spec.$container, container), //spec.$container ? `${id}:${spec.$container}` : container,
       spec: {
         $kind: spec.$kind,
         $staticInputs: props,
@@ -150,6 +149,14 @@ export class Graphinator {
 
   constructId(id, name) {
     return `${id ? `${id}${idDelim}` : ''}${name}`;
+  }
+
+  resolveContainer(id, containerName, defaultContainer) {
+    // TODO: (mariakleiner): rework, so that default container is empty
+    // and all node type's top container is `main#runner`?
+    return containerName === 'undefined'
+      ? undefined
+      : containerName ? this.constructId(id, containerName) : defaultContainer;
   }
 
   async realizeParticles(particles) {

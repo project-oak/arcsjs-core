@@ -21,11 +21,12 @@ export const NodegraphApp = class extends App {
     this.services = services;
     this.persistor = new LocalStoragePersistor('user');
     // this.recipes = [NodegraphRecipe];
-    this.graph = {$meta: {id: 'nodegraph-app', name: 'nodegraph-app'}, nodes: [{id: '', type: 'NodegraphRecipe'}]};
+    this.graph = {$meta: {id: 'nodegraph-app', name: 'nodegraph-app'}, nodes: [{type: 'NodegraphRecipe'}]};
     log('Welcome!');
   }
   async spinup() {
     await super.spinup();
+    // TODO(mariakleiner): runGraph in App base class implementation!
     await this.arcs.runGraph('user', this.graph, this.layoutId, {NodegraphRecipe});
   }
   async onservice(user, host, request) {

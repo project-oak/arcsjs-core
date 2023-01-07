@@ -143,6 +143,7 @@ export const NodegraphRecipe = {
   },
   main: {
     $kind: '$library/NodeGraph/Nodegraph',
+    $container: 'undefined',
     $slots: {
       // preview: Preview,
       preview: PreviewNew,
