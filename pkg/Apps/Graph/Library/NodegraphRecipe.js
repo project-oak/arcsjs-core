@@ -98,7 +98,8 @@ export const NodeCreatorRecipe = {
 
 export const NodegraphRecipe = {
   $meta: {
-    description: 'Node Editor Recipe'
+    description: 'Node Editor Recipe',
+    id: 'NodegraphRecipe'
   },
   $stores: {
     graphs: {

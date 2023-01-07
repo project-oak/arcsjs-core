@@ -219,7 +219,7 @@ const handlers = {
   //   const realArc = await requireArc(arc);
   //   return Chef.evacipateAll(recipes, user, realArc);
   // },
-  addGraph: async ({arc, graph, layoutId, nodeTypes}) => {
+  runGraph: async ({arc, graph, layoutId, nodeTypes}) => {
     const graphinator = new Graphinator(nodeTypes, user, await requireArc(arc));
     return graphinator.execute(graph, layoutId); //, nodeTypes, user, await requireArc(arc));
   },

@@ -1022,6 +1022,12 @@ var StoreCook = class {
     runtime.removeStore(meta.name);
     arc.removeStore(meta.name);
   }
+  static async removeStores(runtime, arc, storeNames) {
+    storeNames.forEach((name) => {
+      runtime.removeStore(name);
+      arc.removeStore(name);
+    });
+  }
   static constructMeta(runtime, arc, rawMeta) {
     const meta = {
       ...rawMeta,
@@ -1075,6 +1081,9 @@ var ParticleCook = class {
   }
   static async derealizeParticle(runtime, arc, node) {
     arc.removeHost(node.id);
+  }
+  static async removeParticles(arc, particleIds) {
+    particleIds.forEach((id) => arc.removeHost(id));
   }
 };
 
@@ -1137,7 +1146,7 @@ var Graphinator = class {
     const flattened = {};
     keys5(nodeType).forEach((key2) => {
       if (key2.startsWith("$")) {
-        flattened[key2] = nodeType[key2];
+        flattened[key2] = { ...flattened[key2] || {}, ...nodeType[key2] };
       } else {
         assign3(flattened, this.flattenParticleSpec(key2, nodeType[key2], $container));
       }
@@ -1168,10 +1177,10 @@ var Graphinator = class {
       this.prepareParticles(node, layout, connsMap, particles);
     });
     this.retagStoreSpecs(stores);
-    log7(`Stores: ${JSON.stringify(stores)}`);
+    log7("Executing graph: ", stores, particles);
     await StoreCook.execute(this.runtime, this.arc, stores);
-    log7(`Particles: ${JSON.stringify(particles)}`);
-    await ParticleCook.execute(this.runtime, this.arc, particles);
+    await this.realizeParticles(particles);
+    return particles.map(({ id }) => id);
   }
   prepareStores({ id, connections, props }, nodeType, stores, connsMap) {
     entries5(nodeType.$stores).forEach(([name, store]) => {
@@ -1184,9 +1193,7 @@ var Graphinator = class {
   }
   prepareStore(storeId, { $type: type, $tags }, value, connections, stores, storeEntry) {
     if (connections) {
-      connections?.forEach?.((connId) => {
-        this.addStore(connId, $tags, storeEntry);
-      });
+      connections?.forEach?.((connId) => this.addStore(connId, $tags, storeEntry));
     } else {
       stores.push({ name: storeId, type, value });
       this.addStore(storeId, $tags, storeEntry);
@@ -1218,10 +1225,8 @@ var Graphinator = class {
     const nodeType = this.nodeTypes[node.type];
     const containerId = this.constructId(node.id, "Container");
     const container = layout?.[containerId] || defaultContainer;
-    keys5(nodeType).forEach((name) => {
-      if (!name.startsWith("$")) {
-        particles.push(this.prepareParticle(node, name, container, nodeType, storeMap));
-      }
+    this.getNodeParticleNames(nodeType).forEach((name) => {
+      particles.push(this.prepareParticle(node, name, container, nodeType, storeMap));
     });
   }
   prepareParticle({ id, props }, particleName, container, nodeType, storeMap) {
@@ -1242,8 +1247,49 @@ var Graphinator = class {
   constructId(id, name) {
     return `${id ? `${id}${idDelim}` : ""}${name}`;
   }
-  async evacipateG(graph) {
-    log7(`EVACIPATE GRAPH`);
+  async realizeParticles(particles) {
+    const newParticles = particles.filter(({ id }) => !this.arc.hosts[id]);
+    const runningParticles = particles.filter(({ id }) => this.arc.hosts[id]);
+    await ParticleCook.execute(this.runtime, this.arc, newParticles);
+    runningParticles.forEach((particle) => this.updateParticleHosts(particle));
+  }
+  updateParticleHosts({ id, container, spec }) {
+    const host = this.arc.hosts[id];
+    if (host.container !== container) {
+      host.meta.container = container;
+      Object.values(this.arc.hosts).forEach((host2) => host2.rerender());
+    }
+    const meta = ParticleCook.specToMeta(spec);
+    meta.container = container;
+    if (!deepEqual(meta, host.meta)) {
+      host.meta = meta;
+      this.arc.updateHost(host);
+    }
+  }
+  async evacipate(graph) {
+    log7("Evacipating graph", graph);
+    await StoreCook.removeStores(this.runtime, this.arc, this.getStoreNames(graph));
+    await ParticleCook.removeParticles(this.arc, this.getParticleNames(graph));
+  }
+  getParticleNames(graph) {
+    const names = [];
+    values4(graph.nodes).forEach(({ id, type }) => {
+      this.getNodeParticleNames(this.nodeTypes[type]).forEach((name) => names.push(this.constructId(id, name)));
+    });
+    return names;
+  }
+  getNodeParticleNames(nodeType) {
+    return keys5(nodeType).filter((id) => !id.startsWith("$"));
+  }
+  getStoreNames(graph) {
+    const names = [];
+    values4(graph.nodes).forEach(({ id, type }) => {
+      const nodeType = this.nodeTypes[type];
+      keys5(nodeType.$stores).forEach((storeId) => {
+        names.push(this.constructId(id, storeId));
+      });
+    });
+    return names;
   }
 };
 

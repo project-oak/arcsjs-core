@@ -20,16 +20,21 @@ export const NodegraphApp = class extends App {
     // services.RecipeBuilderService.nodeTypes = nodeTypes;
     this.services = services;
     this.persistor = new LocalStoragePersistor('user');
-    this.recipes = [NodegraphRecipe];
+    // this.recipes = [NodegraphRecipe];
+    this.graph = {$meta: {id: 'nodegraph-app', name: 'nodegraph-app'}, nodes: [{id: '', type: 'NodegraphRecipe'}]};
     log('Welcome!');
+  }
+  async spinup() {
+    await super.spinup();
+    await this.arcs.runGraph('user', this.graph, this.layoutId, {NodegraphRecipe});
   }
   async onservice(user, host, request) {
     switch (request?.msg) {
       case 'RemoveGraph':
         await this.removeGraph(request.data.graph);
         return true;
-      case 'AddGraph':
-        await this.addGraph(request.data.graph);
+      case 'RunGraph':
+        await this.runGraph(request.data.graph);
         return true;
       default: break;
     }
@@ -37,11 +42,11 @@ export const NodegraphApp = class extends App {
   async removeGraph(graph) {
     this.arcs.removeGraph('user', graph, this.nodeTypes);
   }
-  async addGraph(graph) {
+  async runGraph(graph) {
     if (this.lastGraph) {
       await this.removeGraph(this.lastGraph);
       this.lastGraph = null;
     }
-    await this.arcs.addGraph('user', graph, this.layoutId, this.nodeTypes);
+    return this.arcs.runGraph('user', graph, this.layoutId, this.nodeTypes);
   }
 };

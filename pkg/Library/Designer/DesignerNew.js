@@ -6,25 +6,26 @@
  */
 ({
 async update({graph}, state, {service}) {
+  if (state.graph && graph?.$meta?.id !== state.graph?.$meta?.id) {
+    await service({msg: 'RemoveGraph', data: {graph: state.graph}});
+  }
   if (graph && !deepEqual(graph, state.graph)) {
-    if (state.graph) {
-      await service({msg: 'RemoveGraph', data: {graph: state.graph}});  
-    }
-    await service({msg: 'AddGraph', data: {graph}});
+    // state.particleIds = 
+    await service({msg: 'RunGraph', data: {graph}});
   }
   state.graph = graph;
 },
 
-getParticleNames(recipe) {
-  const notKeyword = name => !name.startsWith('$');
-  return recipe && keys(recipe).filter(notKeyword);
-},
+// getParticleNames(recipe) {
+//   const notKeyword = name => !name.startsWith('$');
+//   return recipe && keys(recipe).filter(notKeyword);
+// },
 
-render({graph, nodeTypes, categories, layoutId}, {selectedNodeId, recipes}) {
+render({graph, nodeTypes, categories, layoutId}, {selectedNodeId}) {//, recipes}) {
   const node = graph?.nodes?.[selectedNodeId];
   const nodeType = nodeTypes?.[node?.type];
-  const ids = this.particleIdsForNode(node, graph, recipes);
-  const rects = this.getRects(graph, recipes, layoutId);
+  const ids = this.particleIdsForNode(node, graph, nodeTypes); //, recipes);
+  const rects = this.getRects(graph, nodeTypes,/*recipes,*/ layoutId);
   return {
     rects,
     selectedKeys: ids,
@@ -32,24 +33,29 @@ render({graph, nodeTypes, categories, layoutId}, {selectedNodeId, recipes}) {
   };
 },
 
-particleIdsForNode(node, graph, recipes) {
+particleIdsForNode(node, graph, nodeTypes) {  //, recipes) {
   return node
     && !this.isUIHidden(node)
-    && this.getParticleNamesForNode(node, graph, recipes)
+    && this.getParticleNamesForNode(node, graph, nodeTypes) //, recipes)
     || []
     ;
 },
 
-getParticleNamesForNode(node, graph, recipes) {
+getParticleNamesForNode(node, graph, nodeTypes) { //, recipes) {
   if (graph) {
-    const recipe = recipes?.[this.encodeFullNodeId(node, graph)];
-    return this.getParticleNames(recipe);
+    const nodeType = nodeTypes[node.type];
+    return keys(nodeType)
+      .filter(key => !key.startsWith('$'))
+      .map(key => `${node.id}:${key}`);
+    // const recipe = recipes?.[this.encodeFullNodeId(node, graph)];
+    // return this.getParticleNames(recipe);
+
   }
 },
 
-getRects(graph, recipes, layoutId) {
+getRects(graph, /*recipes,*/nodeTypes, layoutId) {
   const rectMap = (id, node) => ({id, position: graph.layout?.[layoutId]?.[node.id]});
-  const nodeMap = node => this.particleIdsForNode(node, graph, recipes).map(id => rectMap(id, node));
+  const nodeMap = node => this.particleIdsForNode(node, graph, /*recipes*/nodeTypes).map(id => rectMap(id, node));
   return values(graph?.nodes).map(nodeMap).flat();
 },
 
@@ -58,25 +64,27 @@ isUIHidden(node) {
 },
 
 onNodeDelete({eventlet: {key}, graph}, state) {
-  const node = this.findNodeByParticle(key, graph, state.recipes);
-  delete graph.nodes[node.id];
-  return {
-    graph,
-    ...this.selectNode(null, state)
-  };
+  // TODO(mariakleiner): update to not use RECIPES
+  // const node = this.findNodeByParticle(key, graph, state.recipes);
+  // delete graph.nodes[node.id];
+  // return {
+  //   graph,
+  //   ...this.selectNode(null, state)
+  // };
 },
 
 onNodePosition({eventlet: {key, value}, graph, layoutId}, state) {
-  const node = this.findNodeByParticle(key, graph, state.recipes);
-  if (!node) {
-    return this.selectNode(null, state);
-  }
-  ((graph.layout ??= {})[layoutId] ??= {})[node.id] = value;
-  //console.log('caching layout rect', node.id, value);
-  return {
-    graph,
-    ...this.selectNode(node.id, state)
-  };
+  // TODO(mariakleiner): update to not use RECIPES
+  // const node = this.findNodeByParticle(key, graph, state.recipes);
+  // if (!node) {
+  //   return this.selectNode(null, state);
+  // }
+  // ((graph.layout ??= {})[layoutId] ??= {})[node.id] = value;
+  // //console.log('caching layout rect', node.id, value);
+  // return {
+  //   graph,
+  //   ...this.selectNode(node.id, state)
+  // };
 },
 
 selectNode(id, state) {

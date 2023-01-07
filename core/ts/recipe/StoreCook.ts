@@ -94,6 +94,12 @@ export class StoreCook {
     runtime.removeStore(meta.name);
     arc.removeStore(meta.name);
   }
+  static async removeStores(runtime: Runtime, arc: Arc, storeNames: string[]) {
+    storeNames.forEach(name => {
+      runtime.removeStore(name);
+      arc.removeStore(name);  
+    });
+  }
   static constructMeta(runtime: Runtime, arc: Arc, rawMeta: StoreMeta): StoreMeta {
     const meta = {
       ...rawMeta,

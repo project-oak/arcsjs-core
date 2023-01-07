@@ -141,7 +141,7 @@ arcs.addRecipes       = (arc, recipes)            => socket.sendVibration({kind:
 // arcs.removeRecipe     = (arc, recipe)             => socket.sendVibration({kind: 'removeRecipe', recipe, arc});
 // arcs.removeRecipes    = (arc, recipes)            => socket.sendVibration({kind: 'removeRecipes', recipes, arc});
 arcs.removeGraph      = (arc, graph, nodeTypes)   => socket.sendVibration({kind: 'removeGraph', graph, nodeTypes, arc});
-arcs.addGraph         = (arc, graph, layoutId, nodeTypes)   => socket.sendVibration({kind: 'addGraph', graph, layoutId, nodeTypes, arc});
+arcs.runGraph         = (arc, graph, layoutId, nodeTypes)   => socket.sendVibration({kind: 'runGraph', graph, layoutId, nodeTypes, arc});
 arcs.set              = (arc, storeKey, data)     => socket.sendVibration({kind: 'setStoreData', arc, storeKey, data});
 arcs.setOpaqueData    = (key, data)               => socket.sendVibration({kind: 'setOpaqueData', key, data});
 

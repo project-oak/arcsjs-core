@@ -49,4 +49,7 @@ export class ParticleCook {
   static async derealizeParticle(runtime: Runtime, arc, node: ParticleNode) {
     arc.removeHost(node.id);
   }
+  static async removeParticles(arc, particleIds: string[]) {
+    particleIds.forEach(id => arc.removeHost(id));
+  }
 }
