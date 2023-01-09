@@ -11,7 +11,6 @@ import {quickStart} from './conf/arcs.js';
 import {DbApp} from './Library/DbApp.js';
 
 quickStart(DbApp, import.meta.url, {
-  $library: `$app/../Library`,
   $config: `$app/conf/config.js`,
   $db: `$app/Library`
 });
