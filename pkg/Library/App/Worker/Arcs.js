@@ -137,7 +137,7 @@ arcs.destroyParticle  = (name, arc)               => socket.sendVibration({kind:
 arcs.updateParticle   = (particle, code, arc)     => socket.sendVibration({kind: 'updateParticle', particle, code, arc});
 arcs.setInputs        = (arc, particle, inputs)   => socket.sendVibration({kind: 'setInputs', arc, particle, inputs});
 // arcs.addRecipe        = (arc, recipe)             => socket.sendVibration({kind: 'addRecipe', recipe, arc});
-arcs.addRecipes       = (arc, recipes)            => socket.sendVibration({kind: 'addRecipes', recipes, arc});
+// arcs.addRecipes       = (arc, recipes)            => socket.sendVibration({kind: 'addRecipes', recipes, arc});
 // arcs.removeRecipe     = (arc, recipe)             => socket.sendVibration({kind: 'removeRecipe', recipe, arc});
 // arcs.removeRecipes    = (arc, recipes)            => socket.sendVibration({kind: 'removeRecipes', recipes, arc});
 arcs.runGraph         = (arc, graph, nodeTypes, layoutInfo)   => socket.sendVibration({kind: 'runGraph', arc, graph, nodeTypes, layoutInfo});

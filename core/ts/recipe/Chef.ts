@@ -16,12 +16,6 @@ import {Recipe} from './types.js';
 
 const log = logFactory(logFactory.flags.recipe, 'Chef', '#087f23');
 
-const {assign, create} = Object;
-const entries = (o):any[] => Object.entries(o ?? Object);
-const keys = (o):any[] => Object.keys(o ?? Object);
-const values = (o):any[] => Object.values(o ?? Object);
-const nob = () => create(null);
-
 export class Chef {
   static async execute(recipe: Recipe, runtime: Runtime, arc: Arc) {
     if (arc instanceof Promise) {

@@ -1089,7 +1089,6 @@ var ParticleCook = class {
 
 // js/recipe/Chef.js
 var log6 = logFactory(logFactory.flags.recipe, "Chef", "#087f23");
-var { assign: assign2, create: create4 } = Object;
 var Chef = class {
   static async execute(recipe, runtime, arc) {
     if (arc instanceof Promise) {
@@ -1124,7 +1123,7 @@ var Chef = class {
 
 // js/recipe/Graphinator.js
 var log7 = logFactory(logFactory.flags.recipe, "Chef", "#087f23");
-var { assign: assign3, create: create5 } = Object;
+var { assign: assign2, create: create4 } = Object;
 var entries5 = (o) => Object.entries(o ?? Object);
 var keys5 = (o) => Object.keys(o ?? Object);
 var values4 = (o) => Object.values(o ?? Object);
@@ -1147,7 +1146,7 @@ var Graphinator = class {
       if (key2.startsWith("$")) {
         flatNodeType[key2] = { ...nodeType[key2], ...flatNodeType[key2] || {} };
       } else {
-        assign3(flatNodeType, this.flattenParticleSpec(key2, nodeType[key2], $container, flatNodeType));
+        assign2(flatNodeType, this.flattenParticleSpec(key2, nodeType[key2], $container, flatNodeType));
       }
     });
     return flatNodeType;
@@ -1161,7 +1160,7 @@ var Graphinator = class {
       }
     };
     entries5(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
-      assign3(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`, flatNodeType));
+      assign2(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`, flatNodeType));
       flattened[particleId].$slots[slotId] = {};
     });
     return flattened;
@@ -1247,13 +1246,13 @@ var Graphinator = class {
     return `${id ? `${id}${idDelim}` : ""}${name}`;
   }
   resolveContainer(id, containerName, defaultContainer) {
-    return containerName === "undefined" ? void 0 : containerName ? this.constructId(id, containerName) : defaultContainer;
+    return containerName ? this.constructId(id, containerName) : defaultContainer;
   }
   async realizeParticles(particles) {
-    const newParticles = particles.filter(({ id }) => !this.arc.hosts[id]);
     const runningParticles = particles.filter(({ id }) => this.arc.hosts[id]);
-    await ParticleCook.execute(this.runtime, this.arc, newParticles);
     runningParticles.forEach((particle) => this.updateParticleHosts(particle));
+    const newParticles = particles.filter(({ id }) => !this.arc.hosts[id]);
+    await ParticleCook.execute(this.runtime, this.arc, newParticles);
   }
   updateParticleHosts({ id, container, spec }) {
     const host = this.arc.hosts[id];

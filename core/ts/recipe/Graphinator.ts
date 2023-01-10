@@ -135,7 +135,7 @@ export class Graphinator {
     //
     return {
       id: particleId,
-      container: this.resolveContainer(id, spec.$container, container), //spec.$container ? `${id}:${spec.$container}` : container,
+      container: this.resolveContainer(id, spec.$container, container),
       spec: {
         $kind: spec.$kind,
         $staticInputs: props,
@@ -151,18 +151,14 @@ export class Graphinator {
   }
 
   resolveContainer(id, containerName, defaultContainer) {
-    // TODO: (mariakleiner): rework, so that default container is empty
-    // and all node type's top container is `main#runner`?
-    return containerName === 'undefined'
-      ? undefined
-      : containerName ? this.constructId(id, containerName) : defaultContainer;
+    return containerName ? this.constructId(id, containerName) : defaultContainer;
   }
 
   async realizeParticles(particles) {
-    const newParticles = particles.filter(({id}) => !this.arc.hosts[id]);
     const runningParticles = particles.filter(({id}) => this.arc.hosts[id]);
-    await ParticleCook.execute(this.runtime, this.arc, newParticles);
     runningParticles.forEach(particle => this.updateParticleHosts(particle));
+    const newParticles = particles.filter(({id}) => !this.arc.hosts[id]);
+    await ParticleCook.execute(this.runtime, this.arc, newParticles);
   }
 
   updateParticleHosts({id, container, spec}) {

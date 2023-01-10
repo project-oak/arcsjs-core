@@ -38,23 +38,19 @@ export const ArcService = {
     }
   },
   //
-  // async addParticle({user, arc, meta, code}, arcs) {
-  //   await arcs.createParticle(user, arc, meta, code);
-  //   return true;
-  // },
-  // async destroyParticle({arc, name}, arcs) {
-  //   await arcs.destroyParticle(name, arc);
-  //   return true;
-  // },
-  // async updateParticle({arc, kind, code}, arcs) {
-  //   await arcs.updateParticle(arc, kind, code);
-  //   return true;
-  // },
-  // async addGraph({arc, graph}, arcs) {
-  //   const recipes = RecipeBuilder.construct({graph, nodeTypes: this.nodeTypes});
-  //   loginate(this.nodeTypes, recipes);
-  //   return arcs.addRecipes(arc, recipes);
-  // },
+  async addParticle({user, arc, meta, code}, arcs) {
+    await arcs.createParticle(user, arc, meta, code);
+    return true;
+  },
+  async destroyParticle({arc, name}, arcs) {
+    await arcs.destroyParticle(name, arc);
+    return true;
+  },
+  async updateParticle({arc, kind, code}, arcs) {
+    await arcs.updateParticle(arc, kind, code);
+    return true;
+  },
+  //
   async runGraph({graph}, arcs) {
     if (this.lastGraph) {
       await this.removeGraph(this.lastGraph);
