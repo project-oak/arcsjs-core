@@ -219,14 +219,13 @@ const handlers = {
   //   const realArc = await requireArc(arc);
   //   return Chef.evacipateAll(recipes, user, realArc);
   // },
-  runGraph: async ({arc, graph, layoutId, nodeTypes}) => {
+  runGraph: async ({arc, graph, nodeTypes, layoutInfo}) => {
     const graphinator = new Graphinator(nodeTypes, user, await requireArc(arc));
-    return graphinator.execute(graph, layoutId); //, nodeTypes, user, await requireArc(arc));
+    return graphinator.execute(graph, layoutInfo || {});
   },
   removeGraph: async ({arc, graph, nodeTypes}) => {
     const graphinator = new Graphinator(nodeTypes, user, await requireArc(arc));
     return graphinator.evacipate(graph);
-    // return Chef.evacipate(graph, nodeTypes, user, await requireArc(arc));
   },
   setStoreData: async ({arc, storeKey, data}) => {
     const realArc = getArc(arc);

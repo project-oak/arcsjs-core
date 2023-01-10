@@ -20,7 +20,6 @@ const entries = (o):any[] => Object.entries(o ?? Object);
 const keys = (o):any[] => Object.keys(o ?? Object);
 const values = (o):any[] => Object.values(o ?? Object);
 
-const defaultContainer = 'main#graph';
 const idDelim = ':';
 
 export class Graphinator {
@@ -60,14 +59,14 @@ export class Graphinator {
     return flattened;
   }
 
-  async execute(graph: any, layoutId: any) {
+  async execute(graph: any, {id: layoutId, defaultContainer}) {
     const layout = graph.layout?.[layoutId];
     const stores = [];
     const particles = [];
     values(graph.nodes).forEach(node => {
       const connsMap = {};
       this.prepareStores(node, this.nodeTypes[node.type], stores, connsMap);
-      this.prepareParticles(node, layout, connsMap, particles);
+      this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
     });
     this.retagStoreSpecs(stores);
 
@@ -121,7 +120,7 @@ export class Graphinator {
     }
   }
 
-  prepareParticles(node, layout, storeMap, particles) {
+  prepareParticles(node, layout, defaultContainer, storeMap, particles) {
     const nodeType = this.nodeTypes[node.type];
     const containerId = this.constructId(node.id, 'Container');
     const container = layout?.[containerId] || defaultContainer;

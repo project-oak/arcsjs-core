@@ -1128,7 +1128,6 @@ var { assign: assign3, create: create5 } = Object;
 var entries5 = (o) => Object.entries(o ?? Object);
 var keys5 = (o) => Object.keys(o ?? Object);
 var values4 = (o) => Object.values(o ?? Object);
-var defaultContainer = "main#graph";
 var idDelim = ":";
 var Graphinator = class {
   runtime;
@@ -1167,14 +1166,14 @@ var Graphinator = class {
     });
     return flattened;
   }
-  async execute(graph, layoutId) {
+  async execute(graph, { id: layoutId, defaultContainer }) {
     const layout = graph.layout?.[layoutId];
     const stores = [];
     const particles = [];
     values4(graph.nodes).forEach((node) => {
       const connsMap = {};
       this.prepareStores(node, this.nodeTypes[node.type], stores, connsMap);
-      this.prepareParticles(node, layout, connsMap, particles);
+      this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
     });
     this.retagStoreSpecs(stores);
     log7("Executing graph: ", stores, particles);
@@ -1221,7 +1220,7 @@ var Graphinator = class {
       return { key: key2, binding };
     }
   }
-  prepareParticles(node, layout, storeMap, particles) {
+  prepareParticles(node, layout, defaultContainer, storeMap, particles) {
     const nodeType = this.nodeTypes[node.type];
     const containerId = this.constructId(node.id, "Container");
     const container = layout?.[containerId] || defaultContainer;
@@ -1247,8 +1246,8 @@ var Graphinator = class {
   constructId(id, name) {
     return `${id ? `${id}${idDelim}` : ""}${name}`;
   }
-  resolveContainer(id, containerName, defaultContainer2) {
-    return containerName === "undefined" ? void 0 : containerName ? this.constructId(id, containerName) : defaultContainer2;
+  resolveContainer(id, containerName, defaultContainer) {
+    return containerName === "undefined" ? void 0 : containerName ? this.constructId(id, containerName) : defaultContainer;
   }
   async realizeParticles(particles) {
     const newParticles = particles.filter(({ id }) => !this.arc.hosts[id]);

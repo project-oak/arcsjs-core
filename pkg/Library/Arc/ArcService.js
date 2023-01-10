@@ -12,6 +12,8 @@ const log = logFactory(logFactory.flags.services || logFactory.flags.ArcService,
 export const ArcService = {
   // must be attached to the service by owner
   nodeTypes: {},
+  layoutInfo: {},
+  // TODO(marakleiner): refactor to not use RecipeBuilder!
   async addNamedGraph({arcName, graphName, defaultContainer}, arcs) {
     if (arcName && graphName) {
       log('addGraph', arcName);
@@ -36,21 +38,31 @@ export const ArcService = {
     }
   },
   //
-  async addParticle({user, arc, meta, code}, arcs) {
-    await arcs.createParticle(user, arc, meta, code);
-    return true;
+  // async addParticle({user, arc, meta, code}, arcs) {
+  //   await arcs.createParticle(user, arc, meta, code);
+  //   return true;
+  // },
+  // async destroyParticle({arc, name}, arcs) {
+  //   await arcs.destroyParticle(name, arc);
+  //   return true;
+  // },
+  // async updateParticle({arc, kind, code}, arcs) {
+  //   await arcs.updateParticle(arc, kind, code);
+  //   return true;
+  // },
+  // async addGraph({arc, graph}, arcs) {
+  //   const recipes = RecipeBuilder.construct({graph, nodeTypes: this.nodeTypes});
+  //   loginate(this.nodeTypes, recipes);
+  //   return arcs.addRecipes(arc, recipes);
+  // },
+  async runGraph({graph}, arcs) {
+    if (this.lastGraph) {
+      await this.removeGraph(this.lastGraph);
+      this.lastGraph = null;
+    }
+    return arcs.runGraph('user', graph, this.nodeTypes, this.layoutInfo);
   },
-  async destroyParticle({arc, name}, arcs) {
-    await arcs.destroyParticle(name, arc);
-    return true;
-  },
-  async updateParticle({arc, kind, code}, arcs) {
-    await arcs.updateParticle(arc, kind, code);
-    return true;
-  },
-  async addGraph({arc, graph}, arcs) {
-    const recipes = RecipeBuilder.construct({graph, nodeTypes: this.nodeTypes});
-    loginate(this.nodeTypes, recipes);
-    return arcs.addRecipes(arc, recipes);
+  async removeGraph({graph}, arcs) {
+    arcs.removeGraph('user', graph, this.nodeTypes);
   }
 };

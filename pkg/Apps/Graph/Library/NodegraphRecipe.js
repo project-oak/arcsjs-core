@@ -12,33 +12,10 @@ import {InspectorRecipe} from './InspectorRecipe.js';
 
 export {nodeTypes};
 
-// const Preview = {
-//   designer: {
-//     $kind: '$library/Designer/Designer',
-//     $inputs: [
-//       'recipes',
-//       {graph: 'selectedGraph'},
-//       'selectedNodeId',
-//       'nodeTypes',
-//       'categories',
-//       'newNodeInfos'
-//     ],
-//     $staticInputs: {
-//       layoutId: 'preview'
-//     },
-//     $outputs: [
-//       {graph: 'selectedGraph'},
-//       'selectedNodeId',
-//       'newNodeInfos'
-//     ]
-//   }
-// };
-
-const PreviewNew = {
+const Preview = {
   designer: {
-    $kind: '$library/Designer/DesignerNew',
+    $kind: '$library/Designer/Designer',
     $inputs: [
-      // 'recipes',
       {graph: 'selectedGraph'},
       'selectedNodeId',
       'nodeTypes',
@@ -75,7 +52,7 @@ const NodeTreeRecipe = {
   }
 };
 
-export const NodeCreatorRecipe = {
+const NodeCreatorRecipe = {
   combiner: {
     $kind: '$library/NodeGraph/NodeTypesCombiner',
     $inputs: ['builtinNodeTypes', 'selectedGraph'],
@@ -96,7 +73,7 @@ export const NodeCreatorRecipe = {
   }
 };
 
-export const NodegraphRecipe = {
+const NodegraphRecipe = {
   $meta: {
     description: 'Node Editor Recipe',
     id: 'NodegraphRecipe'
@@ -125,10 +102,6 @@ export const NodegraphRecipe = {
     inspectorData: {
       $type: 'Pojo'
     },
-    // recipes: {
-    //   $type: '[Pojo]',
-    //   $value: []
-    // },
     categories: {
       $type: 'Pojo',
       $value: categories
@@ -143,10 +116,8 @@ export const NodegraphRecipe = {
   },
   main: {
     $kind: '$library/NodeGraph/Nodegraph',
-    $container: 'undefined',
     $slots: {
-      // preview: Preview,
-      preview: PreviewNew,
+      preview: Preview,
       catalog: nodeTypes.NodeCatalogNode,
       toolbar: GraphToolbarRecipe,
       editor: NodeEditorRecipe,
@@ -157,3 +128,15 @@ export const NodegraphRecipe = {
     }
   },
 };
+
+export const NodegraphGraph = {
+  $meta: {
+    id: 'nodegraph-app',
+    name: 'nodegraph-app'
+  },
+  nodes: [{
+    type: 'NodegraphRecipe'
+  }]
+};
+
+export const nodegraphNodeTypes = {NodegraphRecipe};
