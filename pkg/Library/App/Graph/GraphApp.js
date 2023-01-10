@@ -10,7 +10,7 @@ const GraphRecipe = {
   $meta: {name: 'GraphRecipe', id: 'GraphRecipe'},
   main: {
     // n.b. the GraphRecipe actually only wants the rectangles from the graph layouts
-    $kind: '$app/Library/Graph'
+    $kind: '$library/App/Graph/Graph'
   }
 };
 
