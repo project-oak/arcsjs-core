@@ -96,7 +96,7 @@ export class Graphinator {
 
   addStore(storeId, tags, storeEntry) {
     storeEntry.push({id: storeId});
-    this.storeTags[storeId] = [...(this.storeTags[storeId] || []), tags];
+    this.storeTags[storeId] = [...(this.storeTags[storeId] || []), ...(tags || [])];
   }
 
   retagStoreSpecs(stores) {

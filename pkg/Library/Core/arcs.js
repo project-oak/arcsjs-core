@@ -1199,7 +1199,7 @@ var Graphinator = class {
   }
   addStore(storeId, tags, storeEntry) {
     storeEntry.push({ id: storeId });
-    this.storeTags[storeId] = [...this.storeTags[storeId] || [], tags];
+    this.storeTags[storeId] = [...this.storeTags[storeId] || [], ...tags || []];
   }
   retagStoreSpecs(stores) {
     stores.forEach((store) => store.tags = this.storeTags[store.name]);
