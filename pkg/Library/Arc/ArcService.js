@@ -5,13 +5,15 @@
  * license that can be found in the LICENSE file.
  */
 import {logFactory} from '../Core/core.js';
-import {RecipeBuilder} from '../RecipeBuilder/RecipeBuilder.js';
+// import {RecipeBuilder} from '../RecipeBuilder/RecipeBuilder.js';
 
 const log = logFactory(logFactory.flags.services || logFactory.flags.ArcService, 'RecipeService', 'tomato');
 
 export const ArcService = {
   // must be attached to the service by owner
   nodeTypes: {},
+  layoutInfo: {},
+  // TODO(marakleiner): refactor to not use RecipeBuilder!
   async addNamedGraph({arcName, graphName, defaultContainer}, arcs) {
     if (arcName && graphName) {
       log('addGraph', arcName);
@@ -48,9 +50,15 @@ export const ArcService = {
     await arcs.updateParticle(arc, kind, code);
     return true;
   },
-  async addGraph({arc, graph}, arcs) {
-    const recipes = RecipeBuilder.construct({graph, nodeTypes: this.nodeTypes});
-    loginate(this.nodeTypes, recipes);
-    return arcs.addRecipes(arc, recipes);
+  //
+  async runGraph({graph}, arcs) {
+    if (this.lastGraph) {
+      await this.removeGraph(this.lastGraph);
+      this.lastGraph = null;
+    }
+    return arcs.runGraph('user', graph, this.nodeTypes, this.layoutInfo);
+  },
+  async removeGraph({graph}, arcs) {
+    arcs.removeGraph('user', graph, this.nodeTypes);
   }
 };

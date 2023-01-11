@@ -8,13 +8,15 @@
  */
 import {Arcs} from './Arcs.js';
 //import {loadCss} from '../../Dom/dom.js';
-import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
+import {DevToolsRecipe, DevToolsGraph} from '../../DevTools/DevToolsRecipe.js';
 import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
 import {themeRules} from '../theme.js';
 
 // n.b. lives in 'top' context
 
 const log = logFactory(true, 'App', 'darkorange');
+
+const {assign} = Object;
 
 export const App = class {
   static get Arcs() {
@@ -38,11 +40,16 @@ export const App = class {
     });
     //await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     this.composer = await Arcs.createComposer(this.root || document.body);
-    // TODO(sjmiles): pick a syntax
-    const recipes = [DevToolsRecipe, ...(this.recipes ?? this.recipes ?? [])];
-    await Arcs.addRecipes('user', recipes);
+    assign(this.nodeTypes, {DevToolsRecipe});
+    this.graphs = [DevToolsGraph, ...(this.graphs ?? [])];
+
+    await this.runGraphs();
+
     // TODO(sjmiles): fix
     return new Promise(resolve => setTimeout(resolve, 250));
+  }
+  runGraphs() {
+    return Promise.all(this.graphs.map(graph => Arcs.runGraph('user', graph, this.nodeTypes)));
   }
   render(packet) {
     // figure out which composer for this packet

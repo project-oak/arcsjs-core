@@ -36,18 +36,25 @@ export const GraphApp = class extends App {
     }
   }
   async removeGraph(graph) {
-    const recipes = RecipeBuilder.construct({graph, nodeTypes: this.nodeTypes});
-    this.arcs.removeRecipes('user', recipes);
+    // const recipes = RecipeBuilder.construct({graph, nodeTypes: this.nodeTypes});
+    // this.arcs.removeRecipes('user', recipes);
+    this.arcs.removeGraph('user', graph, this.nodeTypes);
   }
   async addGraph(graph, layoutId) {
-    if (this.lastRecipes) {
-      await this.arcs.removeRecipes('user', this.lastRecipes);
-      this.lastRecipes = null;
+    // if (this.lastRecipes) {
+    //   await this.arcs.removeRecipes('user', this.lastRecipes);
+    //   this.lastRecipes = null;
+    // }
+    if (this.lastGraph) {
+      await this.removeGraph(this.lastGraph);
+      this.lastGraph = null;
     }
-    RecipeBuilder.defaultContainer = 'main#root';
-    // the RecipeBuilder wants the nodes and the containers from the layout,
-    // but not the rectangles
-    const recipes = RecipeBuilder.construct({graph, layoutId, nodeTypes: this.nodeTypes});
-    await this.arcs.addRecipes('user', recipes);
+    await this.arcs.addGraph('user', graph, layoutId, this.nodeTypes); // layoutId???
+    // RecipeBuilder.defaultContainer = 'main#root';
+    // // the RecipeBuilder wants the nodes and the containers from the layout,
+    // // but not the rectangles
+    // const recipes = RecipeBuilder.construct({graph, layoutId, nodeTypes: this.nodeTypes});
+    // await this.arcs.addRecipes('user', recipes);
+
   }
 };

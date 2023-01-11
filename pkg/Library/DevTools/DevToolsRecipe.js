@@ -19,3 +19,13 @@ export const DevToolsRecipe = {
     $inputs: ['graphs']
   }
 };
+
+export const DevToolsGraph = {
+  $meta: {
+    id: 'dev-tools',
+    name: 'dev-tools'
+  },
+  nodes: [{
+    type: 'DevToolsRecipe'
+  }]
+};

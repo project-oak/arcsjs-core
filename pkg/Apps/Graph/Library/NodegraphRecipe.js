@@ -16,7 +16,6 @@ const Preview = {
   designer: {
     $kind: '$library/Designer/Designer',
     $inputs: [
-      'recipes',
       {graph: 'selectedGraph'},
       'selectedNodeId',
       'nodeTypes',
@@ -53,7 +52,7 @@ const NodeTreeRecipe = {
   }
 };
 
-export const NodeCreatorRecipe = {
+const NodeCreatorRecipe = {
   combiner: {
     $kind: '$library/NodeGraph/NodeTypesCombiner',
     $inputs: ['builtinNodeTypes', 'selectedGraph'],
@@ -74,9 +73,10 @@ export const NodeCreatorRecipe = {
   }
 };
 
-export const NodegraphRecipe = {
+const NodegraphRecipe = {
   $meta: {
-    description: 'Node Editor Recipe'
+    description: 'Node Editor Recipe',
+    id: 'NodegraphRecipe'
   },
   $stores: {
     graphs: {
@@ -101,10 +101,6 @@ export const NodegraphRecipe = {
     },
     inspectorData: {
       $type: 'Pojo'
-    },
-    recipes: {
-      $type: '[Pojo]',
-      $value: []
     },
     categories: {
       $type: 'Pojo',
@@ -132,3 +128,15 @@ export const NodegraphRecipe = {
     }
   },
 };
+
+export const NodegraphGraph = {
+  $meta: {
+    id: 'nodegraph-app',
+    name: 'nodegraph-app'
+  },
+  nodes: [{
+    type: 'NodegraphRecipe'
+  }]
+};
+
+export const nodegraphNodeTypes = {NodegraphRecipe};

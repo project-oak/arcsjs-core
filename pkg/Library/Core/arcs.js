@@ -62,9 +62,9 @@ var logFactory = (enable, preamble, bg = "", color = "") => {
   const debugLoggers = fromEntries(logKinds.map((kind) => [kind, _logFactory(enable, preamble, bg, color, kind)]));
   const errorLoggers = fromEntries(errKinds.map((kind) => [kind, _logFactory(true, preamble, bg, color, kind)]));
   const loggers = { ...debugLoggers, ...errorLoggers };
-  const log8 = loggers.log;
-  Object.assign(log8, loggers);
-  return log8;
+  const log9 = loggers.log;
+  Object.assign(log9, loggers);
+  return log9;
 };
 logFactory.flags = globalThis.config?.logFlags || {};
 
@@ -1022,6 +1022,12 @@ var StoreCook = class {
     runtime.removeStore(meta.name);
     arc.removeStore(meta.name);
   }
+  static async removeStores(runtime, arc, storeNames) {
+    storeNames.forEach((name) => {
+      runtime.removeStore(name);
+      arc.removeStore(name);
+    });
+  }
   static constructMeta(runtime, arc, rawMeta) {
     const meta = {
       ...rawMeta,
@@ -1076,6 +1082,9 @@ var ParticleCook = class {
   static async derealizeParticle(runtime, arc, node) {
     arc.removeHost(node.id);
   }
+  static async removeParticles(arc, particleIds) {
+    particleIds.forEach((id) => arc.removeHost(id));
+  }
 };
 
 // js/recipe/Chef.js
@@ -1109,6 +1118,180 @@ var Chef = class {
     for (const recipe of recipes) {
       await this.evacipate(recipe, runtime, arc);
     }
+  }
+};
+
+// js/recipe/Graphinator.js
+var log7 = logFactory(logFactory.flags.recipe, "Chef", "#087f23");
+var { assign: assign2, create: create4 } = Object;
+var entries5 = (o) => Object.entries(o ?? Object);
+var keys5 = (o) => Object.keys(o ?? Object);
+var values4 = (o) => Object.values(o ?? Object);
+var idDelim = ":";
+var Graphinator = class {
+  runtime;
+  arc;
+  nodeTypes;
+  storeTags;
+  constructor(nodeTypes, runtime, arc) {
+    this.runtime = runtime;
+    this.arc = arc;
+    this.nodeTypes = {};
+    this.storeTags = {};
+    keys5(nodeTypes).forEach((t) => this.nodeTypes[t] = this.flattenNodeType(nodeTypes[t]));
+  }
+  flattenNodeType(nodeType, $container, flatNodeType) {
+    flatNodeType ??= {};
+    keys5(nodeType).forEach((key2) => {
+      if (key2.startsWith("$")) {
+        flatNodeType[key2] = { ...nodeType[key2], ...flatNodeType[key2] || {} };
+      } else {
+        assign2(flatNodeType, this.flattenParticleSpec(key2, nodeType[key2], $container, flatNodeType));
+      }
+    });
+    return flatNodeType;
+  }
+  flattenParticleSpec(particleId, particleSpec, $container, flatNodeType) {
+    const flattened = {
+      [particleId]: {
+        ...particleSpec,
+        $slots: {},
+        ...$container && { $container }
+      }
+    };
+    entries5(particleSpec.$slots || {}).forEach(([slotId, slotRecipe]) => {
+      assign2(flattened, this.flattenNodeType(slotRecipe, `${particleId}#${slotId}`, flatNodeType));
+      flattened[particleId].$slots[slotId] = {};
+    });
+    return flattened;
+  }
+  async execute(graph, { id: layoutId, defaultContainer }) {
+    const layout = graph.layout?.[layoutId];
+    const stores = [];
+    const particles = [];
+    values4(graph.nodes).forEach((node) => {
+      const connsMap = {};
+      this.prepareStores(node, this.nodeTypes[node.type], stores, connsMap);
+      this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
+    });
+    this.retagStoreSpecs(stores);
+    log7("Executing graph: ", stores, particles);
+    await StoreCook.execute(this.runtime, this.arc, stores);
+    await this.realizeParticles(particles);
+    return particles.map(({ id }) => id);
+  }
+  prepareStores({ id, connections, props }, nodeType, stores, connsMap) {
+    entries5(nodeType.$stores).forEach(([name, store]) => {
+      connsMap[name] = [];
+      const storeId = this.constructId(id, name);
+      const storeValue = props?.[name] || store.$value;
+      const storeConns = connections?.[name];
+      this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
+    });
+  }
+  prepareStore(storeId, { $type: type, $tags }, value, connections, stores, storeEntry) {
+    if (connections) {
+      connections?.forEach?.((connId) => this.addStore(connId, $tags, storeEntry));
+    } else {
+      stores.push({ name: storeId, type, value });
+      this.addStore(storeId, $tags, storeEntry);
+    }
+  }
+  addStore(storeId, tags, storeEntry) {
+    storeEntry.push({ id: storeId });
+    this.storeTags[storeId] = [...this.storeTags[storeId] || [], ...tags || []];
+  }
+  retagStoreSpecs(stores) {
+    stores.forEach((store) => store.tags = this.storeTags[store.name]);
+  }
+  resolveIoGroup(bindings, storeMap) {
+    return bindings?.map((coded) => {
+      const { key: key2, binding } = this.decodeBinding(coded);
+      const task = (store, index) => ({ [`${key2}${index === 0 ? "" : index}`]: store });
+      return storeMap[binding || key2]?.map(({ id }, i) => task(id, i));
+    }).flat().filter((i) => i);
+  }
+  decodeBinding(value) {
+    if (typeof value === "string") {
+      return { key: value, binding: "" };
+    } else {
+      const [key2, binding] = entries5(value)[0];
+      return { key: key2, binding };
+    }
+  }
+  prepareParticles(node, layout, defaultContainer, storeMap, particles) {
+    const nodeType = this.nodeTypes[node.type];
+    const containerId = this.constructId(node.id, "Container");
+    const container = layout?.[containerId] || defaultContainer;
+    this.getNodeParticleNames(nodeType).forEach((name) => {
+      particles.push(this.prepareParticle(node, name, container, nodeType, storeMap));
+    });
+  }
+  prepareParticle({ id, props }, particleName, container, nodeType, storeMap) {
+    const particleId = this.constructId(id, particleName);
+    const spec = nodeType[particleName];
+    const $staticInputs = Object.assign({}, props || {}, spec.$staticInputs || {});
+    return {
+      id: particleId,
+      container: this.resolveContainer(id, spec.$container, container),
+      spec: {
+        $kind: spec.$kind,
+        $staticInputs,
+        $inputs: this.resolveIoGroup(spec.$inputs, storeMap),
+        $outputs: this.resolveIoGroup(spec.$outputs, storeMap),
+        $slots: {}
+      }
+    };
+  }
+  constructId(id, name) {
+    return `${id ? `${id}${idDelim}` : ""}${name}`;
+  }
+  resolveContainer(id, containerName, defaultContainer) {
+    return containerName ? this.constructId(id, containerName) : defaultContainer;
+  }
+  async realizeParticles(particles) {
+    const runningParticles = particles.filter(({ id }) => this.arc.hosts[id]);
+    runningParticles.forEach((particle) => this.updateParticleHosts(particle));
+    const newParticles = particles.filter(({ id }) => !this.arc.hosts[id]);
+    await ParticleCook.execute(this.runtime, this.arc, newParticles);
+  }
+  updateParticleHosts({ id, container, spec }) {
+    const host = this.arc.hosts[id];
+    if (host.container !== container) {
+      host.meta.container = container;
+      Object.values(this.arc.hosts).forEach((host2) => host2.rerender());
+    }
+    const meta = ParticleCook.specToMeta(spec);
+    meta.container = container;
+    if (!deepEqual(meta, host.meta)) {
+      host.meta = meta;
+      this.arc.updateHost(host);
+    }
+  }
+  async evacipate(graph) {
+    log7("Evacipating graph", graph);
+    await StoreCook.removeStores(this.runtime, this.arc, this.getStoreNames(graph));
+    await ParticleCook.removeParticles(this.arc, this.getParticleNames(graph));
+  }
+  getParticleNames(graph) {
+    const names = [];
+    values4(graph.nodes).forEach(({ id, type }) => {
+      this.getNodeParticleNames(this.nodeTypes[type]).forEach((name) => names.push(this.constructId(id, name)));
+    });
+    return names;
+  }
+  getNodeParticleNames(nodeType) {
+    return keys5(nodeType).filter((id) => !id.startsWith("$"));
+  }
+  getStoreNames(graph) {
+    const names = [];
+    values4(graph.nodes).forEach(({ id, type }) => {
+      const nodeType = this.nodeTypes[type];
+      keys5(nodeType.$stores).forEach((storeId) => {
+        names.push(this.constructId(id, storeId));
+      });
+    });
+    return names;
   }
 };
 
@@ -1176,7 +1359,7 @@ var Paths = globalThis["Paths"] = new PathMapper(root);
 Paths.add(globalThis.config?.paths);
 
 // js/isolation/code.js
-var log7 = logFactory(logFactory.flags.code, "code", "gold", "#333");
+var log8 = logFactory(logFactory.flags.code, "code", "gold", "#333");
 var defaultParticleBasePath = "$arcs/core/Particle.js";
 var requireParticleImplCode = async (kind, options) => {
   const code = options?.code || await fetchParticleCode(kind);
@@ -1186,7 +1369,7 @@ var fetchParticleCode = async (kind) => {
   if (kind) {
     return await maybeFetchParticleCode(kind);
   }
-  log7.error(`fetchParticleCode: empty 'kind'`);
+  log8.error(`fetchParticleCode: empty 'kind'`);
 };
 var maybeFetchParticleCode = async (kind) => {
   const path = pathForKind(kind);
@@ -1198,7 +1381,7 @@ var maybeFetchParticleCode = async (kind) => {
       throw "";
     }
   } catch (x) {
-    log7.error(`could not locate implementation for particle "${kind}" [${path}]`);
+    log8.error(`could not locate implementation for particle "${kind}" [${path}]`);
   }
 };
 var pathForKind = (kind) => {
@@ -1216,7 +1399,7 @@ var pathForKind = (kind) => {
 var requireParticleBaseCode = async (sourcePath) => {
   if (!requireParticleBaseCode.source) {
     const path = Paths.resolve(sourcePath || defaultParticleBasePath);
-    log7("particle base code path: ", path);
+    log8("particle base code path: ", path);
     const response = await fetch(path);
     const moduleText = await response.text() + "\n//# sourceURL=" + path + "\n";
     requireParticleBaseCode.source = moduleText.replace(/export /g, "");
@@ -1319,6 +1502,7 @@ export {
   DataStore,
   Decorator,
   EventEmitter,
+  Graphinator,
   Host,
   Parser,
   ParticleCook,
@@ -1332,16 +1516,16 @@ export {
 };
 /**
  * @license
- * Copyright (c) 2022 Google LLC All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
- */
-/**
- * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
+ */
+/**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
  */
 //# sourceMappingURL=arcs.js.map

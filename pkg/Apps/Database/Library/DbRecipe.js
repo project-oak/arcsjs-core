@@ -1,6 +1,7 @@
 import {petProps as props, pets as records, petFormParticleKind as formParticleKind} from './pets.js';
 
-export const DbRecipe = {
+//export
+const DbRecipe = {
   $meta: {
     description: 'Arcs Database Recipe'
   },
@@ -58,4 +59,16 @@ export const DbRecipe = {
       }
     }
   }
+};
+
+export const dbNodeTypes = {DbRecipe};
+
+export const dbGraph = {
+  $meta: {
+    id: 'database-app',
+    name: 'database-app'
+  },
+  nodes: [{
+    type: 'DbRecipe'
+  }]
 };

@@ -3,8 +3,6 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import 'https://arcsjs.web.app/lib/corsFix.js';
-
 // use Library path from configuration
 const Library = `${globalThis.config.arcsPath}/Library`;
 
