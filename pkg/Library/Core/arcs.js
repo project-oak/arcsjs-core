@@ -1230,12 +1230,13 @@ var Graphinator = class {
   prepareParticle({ id, props }, particleName, container, nodeType, storeMap) {
     const particleId = this.constructId(id, particleName);
     const spec = nodeType[particleName];
+    const $staticInputs = Object.assign({}, props || {}, spec.$staticInputs || {});
     return {
       id: particleId,
       container: this.resolveContainer(id, spec.$container, container),
       spec: {
         $kind: spec.$kind,
-        $staticInputs: props,
+        $staticInputs,
         $inputs: this.resolveIoGroup(spec.$inputs, storeMap),
         $outputs: this.resolveIoGroup(spec.$outputs, storeMap),
         $slots: {}
