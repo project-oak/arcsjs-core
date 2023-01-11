@@ -6,7 +6,7 @@
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
  */
-import {GraphApp } from '../../../Library/App/Graph/GraphApp.js';
+import {GraphApp} from '../../../Library/App/Graph/GraphApp.js';
 import {logFactory, LocalStoragePersistor} from '../conf/arcs.js';
 import {dbNodeTypes, dbGraph} from './DbRecipe.js';
 
