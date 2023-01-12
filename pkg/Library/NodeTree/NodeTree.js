@@ -34,98 +34,51 @@ updateSelectedNodeId({graph, selectedNodeId}, state) {
 },
 
 render({graph, categories, selectedNodeId, nodeTypes, layoutId}) {
-  const nodes = graph?.nodes;
-  const graphNodes = this.renderContainers(graph.nodes, graph.layout[layoutId], nodeTypes, selectedNodeId);
-  log(graphNodes);
-  return {
-    graphNodes: this.renderGraphNodes(nodes, nodeTypes, selectedNodeId, categories)
-  };
+  const graphNodes = this.renderContainers(graph?.nodes, graph?.layout?.[layoutId], selectedNodeId, nodeTypes, categories);
+  return {graphNodes};
 },
 
-renderContainers(nodes, layout, nodeTypes, selectedNodeId, container) {
-  // const containers = [];
-  // values(nodes).forEach(node => {
-  //   const {id, displayName, type} = node;
-  //   const nodeType = nodeTypes[type];
-  //   containers.push(...this.containersForNode(node, nodeType));
-  //   // this.renderContainers(nodes, nodeTypes, `${node}${slotId}`);
-  //   // TODO: START HERE!!!
-  // });
-  // return containers;
+renderContainers(nodes, layout, selectedNodeId, nodeTypes, categories) {
+  const rootContainer = this.makeContainerModel('main', 'root');
+  const rootNodes = values(nodes).filter(({id}) => this.isRootContainer(layout?.[`${id}:Container`]));
+  rootContainer.graphNodes = this.makeNodesModels(rootNodes, nodes, layout, selectedNodeId, nodeTypes, categories);
+  return [rootContainer];
+},
 
-  const rootContainer = this.makeContainerModel('main', 'graph');
-  const graph = {name: 'Root', icon: 'settings', graphNodes: [rootContainer], isContainer: 'true'};
-
-  const rootNodes = values(nodes).filter(({id}) => !layout[`${id}:Container`]);
-  values(rootNodes).forEach(node => {
-  // values(nodes).forEach(node => {
-    const {id, displayName, type} = node;
-    // const containerId = `${id}:Container`;
-    // if (!layout[containerId]) {
-    const nodeType = nodeTypes[type];
-    const nodeModel = {
-      id,
-      displayName,
-      icon: /*category.icon ||*/ 'settings',
-      color: /*category.color ||*/ 'crimson',
-      bgColor: /*category.bgColor ||*/ 'gray',
-      selected: id == selectedNodeId,
-      isContainer: 'false',
-      graphNodes: []
-    };
-    rootContainer.graphNodes.push(nodeModel);
-    // rootContainers.push(...this.containersForNode(node, nodeType));
-    const containers = this.containersForNode(node, nodeType);
-    containers.forEach(container => {
-      nodeModel.graphNodes.push(container);
-      // container.graphNodes = [];
+makeNodesModels(currentNodes, allNodes, layout, selectedNodeId, nodeTypes, categories) {
+  return values(currentNodes).map(node => {
+    const nodeModel = this.makeNodeModel(node, nodeTypes, categories, selectedNodeId);
+    nodeModel.graphNodes = this.containersForNode(node, nodeTypes[node.type]);
+    nodeModel.graphNodes.forEach(container => {
+      const innerNodes = [];
       entries(layout).forEach(([nodeId, containerId]) => {
         if (container.id === containerId) {
-          const innerNode = nodes[nodeId.split(':')[0]]; //nodes[nodeId];
-          const innerContainers = this.containersForNode(innerNode, nodeTypes[innerNode.type]);
-          container.graphNodes.push({
-            id: innerNode.id,
-            displayName: innerNode.displayName,
-            icon: /*category.icon ||*/ 'settings',
-            color: /*category.color ||*/ 'crimson',
-            bgColor: /*category.bgColor ||*/ 'gray',
-            selected: innerNode.id == selectedNodeId,
-            isContainer: 'false',
-            graphNodes: innerContainers
-          });
+          innerNodes.push(allNodes?.[nodeId.split(':')[0]]);
         }
       });
+      container.graphNodes = this.makeNodesModels(innerNodes, allNodes, layout, selectedNodeId, nodeTypes, categories);
     });
-    //}
+    return nodeModel;
   });
-  return [graph]; // rootContainers;
 },
 
-renderGraphNodes(nodes, nodeTypes, nodeId, categories) {
-  const rootContainer = this.makeContainerModel('main', 'graph');
-  const graph = {name: 'Root', icon: 'settings', graphNodes: [rootContainer], isContainer: 'true'};
-  const graphNodes = values(nodes).map(node => {
-    const {id, displayName, type} = node;
-    const nodeType = nodeTypes[type];
-    const categoryName = nodeType?.$meta?.category;
-    const category = categories?.[categoryName] || 0;
-    const containers = this.containersForNode(node, nodeType);
-    return {
-      id,
-      displayName,
-      icon: category.icon || 'settings',
-      color: category.color || 'crimson',
-      bgColor: category.bgColor || 'gray',
-      selected: id == nodeId,
-      isContainer: 'false',
-      graphNodes: containers
-    };
-  });
-  graphNodes?.forEach(gn => {
-    const parent = graph;
-    parent.graphNodes.push(gn);
-  });
-  return [graph];
+isRootContainer(container) {
+  return !container  || (container === 'main#graph');
+},
+
+makeNodeModel({id, displayName, type}, nodeTypes, categories, selectedNodeId) {
+  const nodeType = nodeTypes[type];
+  const category = categories?.[nodeType?.$meta?.category] || 0;
+  return {
+    id,
+    displayName: displayName || id,
+    icon: category.icon || 'settings',
+    color: category.color || 'crimson',
+    bgColor: category.bgColor || 'gray',
+    selected: id == selectedNodeId,
+    isContainer: 'false',
+    graphNodes: []
+  }
 },
 
 getHostId(node) {
@@ -160,8 +113,7 @@ makeContainerModel(hostId, slotName) {
     icon: 'apps',
     id: `${hostId}#${slotName}`,
     name: slotName,
-    isContainer: 'true',
-    graphNodes: []
+    isContainer: 'true'
   };
 },
 
@@ -239,7 +191,6 @@ template: html`
       </drop-target>
     </div>
     <div containers repeat="node_t">{{graphNodes}}</div>
-    <!-- <div repeat="node_t">{{inner}}</div> --> 
   </div>
 </template>
 `
