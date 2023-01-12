@@ -135,13 +135,13 @@ export class Graphinator {
     const $staticInputs = Object.assign({}, props || {}, spec.$staticInputs || {});
     return {
       id: particleId,
-      container: this.resolveContainer(id, spec.$container, container),
       spec: {
         $kind: spec.$kind,
         $staticInputs,
         $inputs: this.resolveIoGroup(spec.$inputs, storeMap),
         $outputs: this.resolveIoGroup(spec.$outputs, storeMap),
-        $slots: {}
+        $slots: {},
+        $container: this.resolveContainer(id, spec.$container, container)
       }
     };
   }
@@ -159,16 +159,30 @@ export class Graphinator {
     runningParticles.forEach(particle => this.updateParticleHosts(particle));
     const newParticles = particles.filter(({id}) => !this.arc.hosts[id]);
     await ParticleCook.execute(this.runtime, this.arc, newParticles);
+    const removedParticles = this.findRemovedParticles(particles);
+    await ParticleCook.evacipate(this.runtime, this.arc, removedParticles);
   }
 
-  updateParticleHosts({id, container, spec}) {
+  findRemovedParticles(particles) {
+    const runningGraphParticleIds = keys(this.arc.hosts).filter(id => {
+      const container = this.arc.hosts[id].meta.container;
+      if (container === 'main#graph') {
+        return true;
+      }
+      const containerParticle = container?.split('#')?.[0];
+      return particles.some(({id}) => id === containerParticle);
+    });
+    const removedParticleIds = runningGraphParticleIds.filter(id => !particles.some(({id:graphId}) => id === graphId));
+    return removedParticleIds.map(id => ({id}));
+  }
+
+  updateParticleHosts({id, spec}) {
     const host = this.arc.hosts[id];
-    if (host.container !== container) {
-      host.meta.container = container;
+    if (host.container !== spec.$container) {
+      host.meta.container = spec.$container;
       Object.values(this.arc.hosts).forEach(host => host.rerender());
     }
     const meta = ParticleCook.specToMeta(spec);
-    meta.container = container;
     if (!deepEqual(meta, host.meta)) {
       host.meta = meta;
       this.arc.updateHost(host);
