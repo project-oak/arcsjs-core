@@ -126,7 +126,21 @@ removeStore(storeId, service) {
 
 deleteNode(key, graph) {
   delete graph.nodes[key];
+  this.deleteNodeFromLayout(graph.layout, key);
   return {graph, selectedNodeId: null};
+},
+
+deleteNodeFromLayout(layouts, nodeId) {
+  keys(layouts).forEach(layoutId => {
+    const layout = layouts[layoutId];
+    delete layout[nodeId];
+    delete layout[`${nodeId}:Container`];
+    keys(layout).forEach(id => {
+      if ((typeof layout[id] === 'string') && layout[id]?.startsWith(nodeId)) {
+        delete layout[id];
+      }
+    });
+  });
 }
 
 });

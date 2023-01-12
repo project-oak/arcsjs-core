@@ -244,13 +244,24 @@ deleteSelectedNode({selectedNodeId}, {graph}) {
 
 deleteNode(nodeId, graph, selectedNodeId) {
   delete graph.nodes[nodeId];
-  keys(graph.layout).forEach(layoutId => {
-    delete graph.layout[layoutId][nodeId];
-  });
+  this.deleteNodeFromLayout(graph.layout, nodeId);
   return {
     graph,
     selectedNodeId: (nodeId === selectedNodeId) ? null : selectedNodeId
   };
+},
+
+deleteNodeFromLayout(layouts, nodeId) {
+  keys(layouts).forEach(layoutId => {
+    const layout = layouts[layoutId];
+    delete layout[nodeId];
+    delete layout[`${nodeId}:Container`];
+    keys(layout).forEach(id => {
+      if ((typeof layout[id] === 'string') && layout[id]?.startsWith(nodeId)) {
+        delete layout[id];
+      }
+    });
+  });
 },
 
 duplicateSelectedNode({selectedNodeId, newNodeInfos}, {graph}) {

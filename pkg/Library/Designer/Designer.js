@@ -59,11 +59,25 @@ onNodeDelete({eventlet: {key}, graph}, state) {
   // TODO(mariakleiner): update to not use RECIPES
   // const node = this.findNodeByParticle(key, graph, state.recipes);
   // delete graph.nodes[node.id];
+  // this.deleteNodeFromLayout(graph.layout, node.id);
   // return {
   //   graph,
   //   ...this.selectNode(null, state)
   // };
 },
+
+// deleteNodeFromLayout(layouts, nodeId) {
+//   keys(layouts).forEach(layoutId => {
+//     const layout = layouts[layoutId];
+//     delete layout[nodeId];
+//     delete layout[`${nodeId}:Container`];
+//     keys(layout).forEach(id => {
+//       if ((typeof layout[id] === 'string') && layout[id]?.startsWith(nodeId)) {
+//         delete layout[id];
+//       }
+//     });
+//   });
+// },
 
 onNodePosition({eventlet: {key, value}, graph, layoutId}, state) {
   // TODO(mariakleiner): update to not use RECIPES
