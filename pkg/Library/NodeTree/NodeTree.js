@@ -160,6 +160,8 @@ template: html`
     cursor: pointer;
     margin: 8px;
     font-size: 0.9em;
+    border: 1px solid grey;
+    padding: 4px;
   }
   [bar] {
     height: 28px;
