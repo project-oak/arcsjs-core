@@ -16,7 +16,7 @@ export const NodegraphApp = class extends App {
     services.ArcService.nodeTypes = nodeTypes;
     services.ArcService.layoutInfo = {
       id: 'preview',
-      defaultContainer: 'main#graph'
+      defaultContainer: 'designer#graph'
     };
     this.services = services;
     this.persistor = new LocalStoragePersistor('user');

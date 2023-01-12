@@ -1,10 +1,8 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 import {Composer} from './Composer.js';
 import {Xen} from '../../Xen/xen-async.js';
@@ -33,7 +31,8 @@ export class XenComposer extends Composer {
     } else if (container && container !== 'root') {
       const [particle, slot] = container.split('#');
       const owner = deepQuerySelector(node, `#${sanitizeId(particle)}`);
-      node = !owner ? null : deepQuerySelector(owner, `[slot=${slot}], [frame=${slot}]`);
+      //node = !owner ? null : deepQuerySelector(owner, `[slot=${slot}], [frame=${slot}]`);
+      node = owner?.shadowRoot.querySelector(`[slot=${slot}], [frame=${slot}]`);
     }
     return node;
   }

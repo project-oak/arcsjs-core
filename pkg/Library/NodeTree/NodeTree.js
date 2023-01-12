@@ -1,14 +1,11 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 /* global mapBy */
 ({
-
 nameDelim: ':',
 
 async update(input, state, tools) {
@@ -39,7 +36,7 @@ render({graph, categories, selectedNodeId, nodeTypes, layoutId}) {
 },
 
 renderContainers(nodes, layout, selectedNodeId, nodeTypes, categories) {
-  const rootContainer = this.makeContainerModel('main', 'root');
+  const rootContainer = this.makeContainerModel('designer', 'root');
   const rootNodes = values(nodes).filter(({id}) => this.isRootContainer(layout?.[`${id}:Container`]));
   rootContainer.graphNodes = this.makeNodesModels(rootNodes, nodes, layout, selectedNodeId, nodeTypes, categories);
   return [rootContainer];
@@ -122,16 +119,19 @@ async onNodeSelect({eventlet: {key}}) {
 },
 
 async onDrop({eventlet: {key: container, value: {id}}, graph, nodeTypes, layoutId}, state, {service}) {
-  // crunch the numbers
+  // function for later
+  const setContainer = async (hostIds, container) => service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
+  // node being dropped
   const node = graph.nodes[id];
+  // collect info about this node
   const nodeType = nodeTypes[node.type];
   const hostNames = this.getHostNames(nodeType);
   const hostIds = hostNames.map(name => this.hostId(node, name));
-  // inform the render agent
-  const setContainer = async (hostIds, container) => service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
-  await setContainer(hostIds, container);
   // map the container layout, create objects as needed
   ((graph.layout ??= {})[layoutId] ??= {})[`${id}:Container`] = container;
+  // inform the render agent
+  // TODO(sjmiles): deprecate in favor of changing layout data
+  await setContainer(hostIds, container);
   // modified data
   return {
     selectedNodeId: id,
