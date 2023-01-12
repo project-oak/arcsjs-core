@@ -174,7 +174,10 @@ export class DesignerLayout extends DragDrop {
   //
   // implement drag-drop handlers
   doDown(e) {
-    this.target = this.getEventTarget(e);
+    if (e.target.id) {
+      // design target
+      this.target = this.getEventTarget(e);
+    }
     // dom target
     const attrs = e.target.attributes;
     const edges = ['top', 'right', 'bottom', 'left'];
