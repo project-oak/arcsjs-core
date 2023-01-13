@@ -24,7 +24,7 @@ globalThis.config = {
     //arc: true,
     particles: true,
     //storage: true,
-    //composer: true,
+    composer: true,
     services: true
   }
 };

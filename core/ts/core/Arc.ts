@@ -6,9 +6,9 @@
  */
 import {EventEmitter} from './EventEmitter.js';
 import {Host} from './Host.js';
-import {logFactory} from '../utils/log.js';
 import {Dictionary, ArcMeta} from './types.js';
 import {Store} from './Store.js';
+import {logFactory} from '../utils/log.js';
 
 const customLogFactory = (id: string) => logFactory(logFactory.flags.arc, `Arc (${id})`, 'slateblue');
 

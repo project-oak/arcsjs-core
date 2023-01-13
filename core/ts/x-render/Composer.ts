@@ -1,12 +1,9 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
-
 import {EventEmitter} from '../core/EventEmitter.js';
 import {logFactory} from '../utils/log.js';
 import {Slot} from '../recipe/types.js';
@@ -70,18 +67,12 @@ export class Composer extends EventEmitter {
         this.pendingPackets.push(packet);
         if ((++packet['pendCount'] % 1e4) === 0) {
           log.warn(`container [${container}] unavailable for slot [${id}] (x1e4)`);
-          // stubs out the slot
-          //this.slots[id] = 42;
         }
         return;
       }
       slot = this.generateSlot(id, template, parent);
       this.slots[id] = slot;
     }
-    // // skip stubs
-    //if (slot === 42) {
-    //  return;
-    //}
     //
     if (slot && model) {
       this.maybeReattachSlot(slot, container);

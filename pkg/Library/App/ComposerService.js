@@ -37,6 +37,7 @@ export const ComposerService = {
     }
   },
   rerender(arc) {
-    Object.values(arc.hosts).forEach(host => host.rerender());
+    // TODO(sjmiles): maybe we can be more selective?
+    arc.rerender();
   }
 };

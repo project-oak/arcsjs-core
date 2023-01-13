@@ -1,14 +1,11 @@
 /**
  * @license
- * Copyright 2022 Google LLC
- *
+ * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file or at
- * https://developers.google.com/open-source/licenses/bsd
+ * license that can be found in the LICENSE file.
  */
 /* global mapBy */
 ({
-
 nameDelim: ':',
 
 async update(input, state, tools) {
@@ -33,13 +30,14 @@ updateSelectedNodeId({graph, selectedNodeId}, state) {
   return candidate;
 },
 
-render({graph, categories, selectedNodeId, nodeTypes, layoutId}) {
-  const graphNodes = this.renderContainers(graph?.nodes, graph?.layout?.[layoutId], selectedNodeId, nodeTypes, categories);
+render({graph, layoutId, selectedNodeId, nodeTypes, categories}) {
+  const [nodes, layout] = [graph?.nodes, graph?.layout?.[layoutId]];
+  const graphNodes = this.renderContainers(nodes, layout, selectedNodeId, nodeTypes, categories);
   return {graphNodes};
 },
 
 renderContainers(nodes, layout, selectedNodeId, nodeTypes, categories) {
-  const rootContainer = this.makeContainerModel('main', 'root');
+  const rootContainer = this.makeContainerModel('designer', 'graph');
   const rootNodes = values(nodes).filter(({id}) => this.isRootContainer(layout?.[`${id}:Container`]));
   rootContainer.graphNodes = this.makeNodesModels(rootNodes, nodes, layout, selectedNodeId, nodeTypes, categories);
   return [rootContainer];
@@ -63,7 +61,7 @@ makeNodesModels(currentNodes, allNodes, layout, selectedNodeId, nodeTypes, categ
 },
 
 isRootContainer(container) {
-  return !container  || (container === 'main#graph');
+  return !container  || (container === 'designer#graph');
 },
 
 makeNodeModel({id, displayName, type}, nodeTypes, categories, selectedNodeId) {
@@ -91,11 +89,7 @@ containersForNode(node, nodeType) {
   for (const hostName of this.getHostNames(nodeType)) {
     const slots = nodeType[hostName].$slots;
     if (keys(slots).length) {
-      //log('--- containersForNode');
-      //entries(slots).forEach(([name, slot]) => log(name, ': ', Boolean(slot.$isContainer)));
-      //const allow = (name, slot) => slot.$isContainer;
-      const allow = (name, slot) => name.toLowerCase().includes('container');
-      //log(keys(slots));
+      const allow = name => name.toLowerCase().includes('container');
       const allowed = keys(slots).filter(key => allow(key, slots[key]));
       containers = allowed.map(key => this.makeContainerModel(this.hostId(node, hostName), key));
     }
@@ -110,7 +104,7 @@ getHostNames(nodeType) {
 
 makeContainerModel(hostId, slotName) {
   return {
-    icon: 'apps',
+    icon: 'folder',
     id: `${hostId}#${slotName}`,
     name: slotName,
     isContainer: 'true'
@@ -122,16 +116,19 @@ async onNodeSelect({eventlet: {key}}) {
 },
 
 async onDrop({eventlet: {key: container, value: {id}}, graph, nodeTypes, layoutId}, state, {service}) {
-  // crunch the numbers
+  // function for later
+  const setContainer = async (hostIds, container) => service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
+  // node being dropped
   const node = graph.nodes[id];
+  // collect info about this node
   const nodeType = nodeTypes[node.type];
   const hostNames = this.getHostNames(nodeType);
   const hostIds = hostNames.map(name => this.hostId(node, name));
-  // inform the render agent
-  const setContainer = async (hostIds, container) => service({kind: 'ComposerService', msg: 'setContainer', data: {hostIds, container}});
-  await setContainer(hostIds, container);
   // map the container layout, create objects as needed
   ((graph.layout ??= {})[layoutId] ??= {})[`${id}:Container`] = container;
+  // inform the render agent
+  // TODO(sjmiles): deprecate in favor of changing layout data
+  await setContainer(hostIds, container);
   // modified data
   return {
     selectedNodeId: id,
@@ -149,50 +146,76 @@ template: html`
     display: block;
     color: var(--theme-color-fg-0);
     background-color: var(--theme-color-bg-0);
-    --edge-border: 1px solid #555;
-    --mdc-icon-size: 18px;
-    --mdc-icon-button-size: 26px;
-  }
-  mwc-icon-button {
-    color: var(--theme-color-fg-1);
+    --border-color: var(--theme-color-bg-2);
+    padding-right: 6px;
   }
   [node] {
-    cursor: pointer;
-    margin: 8px;
-    font-size: 0.9em;
-    border: 1px solid grey;
+    border-left: 1px solid transparent;
+  }
+  [particle] {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: black;
+    padding: 2px;
+  }
+  [selected][particle] {
+    background-color: var(--theme-color-bg-3);
+  }
+  [selected] [particle] {
+    border-left: 1px solid var(--border-color);
+  }
+  [container] {
+    font-weight: normal;
+    font-size: 0.75rem;
+    color: inherit;
+  }
+  [selected] [container] {
+    background-color: var(--theme-color-bg-4);
+  }
+  drop-target {
     padding: 4px;
+    display: flex;
+    align-items: center;
   }
-  [bar] {
-    height: 28px;
-  }
-  [selected] {
-    background-color: var(--theme-color-bg-2);
-    border-radius: 4px;
+  [selected] [bar] {
+    border-left: 1px solid var(--border-color);
   }
   [name] {
     padding-left: 8px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  [containers] {
+  [containers], [nodes] {
     background-color: var(--theme-color-bg-0);
     overflow: hidden;
+    padding-left: 12px;
+  }
+  icon {
+    font-size: 16px;
+    width: 16px;
+    height: 21px;
+  }
+  draggable-item {
+    margin-bottom: 2px;
   }
 </style>
 
-<div flex scrolling repeat="node_t">{{graphNodes}}</div>
+<div flex scrolling repeat="container_t">{{graphNodes}}</div>
 
 <template node_t>
-  <div node selected$="{{selected}}" key="{{id}}" on-click="onNodeSelect">
-    <div bar>
+  <div particle node selected$="{{selected}}" key="{{id}}" on-click="onNodeSelect">
+    <draggable-item flex row key="{{id}}" name="{{displayName}}"></draggable-item>
+    <div containers repeat="container_t">{{graphNodes}}</div>
+  </div>
+</template>
+
+<template container_t>
+  <div container node selected$="{{selected}}" key="{{id}}" on-click="onNodeSelect">
+    <drop-target key="{{id}}"on-target-drop="onDrop">
       <icon>{{icon}}</icon>
-      <draggable-item flex row hide$="{{isContainer}}" key="{{id}}" name="{{displayName}}"> </draggable-item>
-      <drop-target clip row key="{{id}}" show$="{{isContainer}}" on-target-drop="onDrop">
-        <span flex name>{{name}}</span>
-      </drop-target>
-    </div>
-    <div containers repeat="node_t">{{graphNodes}}</div>
+      <span flex name>{{name}}</span>
+    </drop-target>
+    <div nodes repeat="node_t">{{graphNodes}}</div>
   </div>
 </template>
 `
