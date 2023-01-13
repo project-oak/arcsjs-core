@@ -8,48 +8,40 @@ import {Xen} from './Xen/xen-async.js';
 
 const template = Xen.Template.html`
 <style>
-  [container] {
-    position: relative;
+  :host {
+    display: block;
     cursor: grab;
-    padding: 9px 0 9px 30px;
     user-select: none;
+  }
+  [container] {
+    display: flex;
+    align-items: center;
+    padding: 6px;
   }
   [container][draggable="true"]:hover {
     background: var(--theme-color-bg-4);
   }
   [container][draggable="true"]:hover icon {
-    display: flex;
-    align-items: center;
+    display: inline-flex;
   }
   icon {
-    display: none;
+    display: inline-flex;
+    align-items: center;
     font-family: "Material Symbols Outlined";
     font-style: normal;
     font-feature-settings: "liga";
     -webkit-font-feature-settings: "liga";
     -webkit-font-smoothing: antialiased;
-    cursor: pointer;
-    user-select: none;
-    flex-shrink: 0;
-    vertical-align: middle;
-    overflow: hidden;
-    pointer-events: none;
-    height: 100%;
-    align-items: center;
-    top: 0;
-    left: 9px;
-    position: absolute;
   }
   [label] {
-    font-size: 12px;
-    font-weight: normal;
-    line-height: 14px;
-    text-transform: capitalize;
+    flex: 1;
+    font-size: 0.9em;
   }
 </style>
 
 <div container draggable="{{draggable}}" on-mouseenter="onEnter" on-mouseleave="onLeave" on-dragstart="onDragStart">
-  <icon>drag_indicator</icon>
+  <icon>{{icon}}</icon>
+  &nbsp;
   <div label on-click="onItemClick">{{name}}</div>
 </div>
 
@@ -71,32 +63,27 @@ const template = Xen.Template.html`
  */
 export class DraggableItem extends Xen.Async {
   static get observedAttributes() {
-    return ['key', 'name', 'disabled'];
+    return ['key', 'name', 'disabled', 'icon'];
   }
-
   get template() {
     return template;
   }
-
-  render({name, disabled}) {
+  render({name, icon, disabled}) {
     return {
+      icon: icon || 'build_circle',
       name,
       draggable: !disabled
     };
   }
-
   onItemClick(e) {
     this.fire('item-clicked');
   }
-
   onDragStart(e) {
     // This will hide the popup panel for the hovered item.
     this.fire('leave');
-    //console.log('[onDragStart]', this.key);
     //e.dataTransfer.setData('arcs/drag', this.key);
     e.dataTransfer.setData('text/plain', this.key);
   }
-
   onEnter(e) {
     // Get the distance between the item element and the top of the main
     // app container. This value will be used to position the popup panel that
@@ -105,7 +92,6 @@ export class DraggableItem extends Xen.Async {
     this.value = {top, left: left + width};
     this.fire('enter');
   }
-
   onLeave(e) {
     this.fire('leave');
   }
