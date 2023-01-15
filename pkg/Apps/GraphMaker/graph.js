@@ -103,8 +103,8 @@ export const graph = {
       "displayName": "Display",
       "connections": {},
       "props": {
-        "text": "AnnAppolis",
-        "textStyle": "background: lightblue; padding: 24px; font-size: 1.5em; font-weight: bold; height: auto !important; flex: none !important;"
+        "text": "Annappolis",
+        "textStyle": "padding: 20px; font-size: 1.5em; font-weight: bold; height: auto !important; flex: none !important;"
       }
     },
     "SplitPanelNode5": {
@@ -114,7 +114,7 @@ export const graph = {
       "connections": {},
       "props": {
         "endflex": true,
-        "divider": 76
+        "divider": 70
       }
     }
   },
