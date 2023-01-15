@@ -21,7 +21,7 @@ globalThis.config = {
   logFlags: {
     app: true,
     //recipe: true,
-    arc: true,
+    //arc: true,
     particles: true,
     //storage: true,
     //composer: true,
