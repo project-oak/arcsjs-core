@@ -17,6 +17,7 @@ const template = Xen.Template.html`
     display: flex;
     background-color: var(--theme-color-bg-3);
   }
+  /**/
   [resizer] {
     display: flex;
     align-items: center;
@@ -24,16 +25,19 @@ const template = Xen.Template.html`
     box-sizing: border-box;
   }
   [resizer]:not([vertical]) {
+    width: auto;
     height: var(--resizer-size);
     cursor: ns-resize;
   }
-  [vertical][resizer] {
+  [resizer][vertical] {
+    height: auto;
     width: var(--resizer-size);
     cursor: ew-resize;
   }
   [resizer]:hover, [resizer][dragging] {
     background-color: #e6e6e6;
   }
+  /**/
   [handle] {
     background-color: #ccc;
     border: 1px solid #eeeeee;
@@ -47,10 +51,11 @@ const template = Xen.Template.html`
     width: 40%;
     height: var(--handle-size);
   }
-  [startside] {
+  /**/
+  /* [startside] {
     min-height: 16px;
     min-width: 16px;
-  }
+  } */
   [startside], [endside] {
     display: flex;
     flex-direction: column;
@@ -63,15 +68,16 @@ const template = Xen.Template.html`
   <slot name="left"></slot>
   <slot name="top"></slot>
 </div>
+
 <div resizer vertical$="{{vertical}}" dragging$="{{dragging}}" on-pointerdown="onDown">
   <div handle vertical$="{{vertical}}" ></div>
 </div>
+
 <div endside xen:style="{{endStyle}}">
   <slot name="two"></slot>
   <slot name="right"></slot>
   <slot name="bottom"></slot>
 </div>
-
 `;
 
 export class SplitPanel extends DragDrop {
@@ -95,9 +101,8 @@ export class SplitPanel extends DragDrop {
   update({divider, endflex, vertical}, state) {
     divider = isNaN(Number(divider)) ? null : Number(divider);
     // attributes are "" for true, null for false
-    vertical = (vertical === '') || vertical;
-    state.vertical = vertical;
-    state.endflex = endflex;
+    state.vertical = (vertical === '') || vertical;
+    state.endflex = (endflex === '') || endflex;
     if (!state.divider) {
       // which direction are we splitting
       const ord = vertical ? 'offsetWidth' : 'offsetHeight';
@@ -121,9 +126,13 @@ export class SplitPanel extends DragDrop {
     return {
       [ordStyle]: {
         [ord]: `${divider}px`,
-        [offOrd]: null
+        [offOrd]: 'auto',
+        flex: 'none',
+        overflow: 'visible',
       },
-      [flexStyle] : {
+      [flexStyle]: {
+        width: 'auto',
+        height: 'auto',
         flex: 1,
         flexBasis: '0px',
         overflow: 'hidden'

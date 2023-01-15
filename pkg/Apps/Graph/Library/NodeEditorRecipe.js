@@ -14,7 +14,7 @@ export const NodeEditorRecipe = {
     },
   },
   Editor: {
-    $kind: '$library/NodeGraph/Editor',
+    $kind: '$library/Node/NodeEditor',
     $inputs: [
       {graph: 'selectedGraph'},
       'selectedNodeId',

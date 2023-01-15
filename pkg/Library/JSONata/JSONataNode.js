@@ -6,7 +6,8 @@
  */
 export const JSONataNode = {
   $meta: {
-    id: 'JSONata',
+    id: 'JSONataNode',
+    displayName: 'JSONata',
     category: 'Tools'
   },
   $stores: {

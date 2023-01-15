@@ -14,7 +14,7 @@ export {nodeTypes};
 
 const Preview = {
   designer: {
-    $kind: '$library/Designer/Designer',
+    $kind: '$library/Node/NodeDesigner',
     $inputs: [
       {graph: 'selectedGraph'},
       'selectedNodeId',
@@ -35,7 +35,7 @@ const Preview = {
 
 const NodeTreeRecipe = {
   NodeTree: {
-    $kind: '$library/NodeTree/NodeTree',
+    $kind: '$library/Node/NodeTree',
     $inputs: [
       {graph: 'selectedGraph'},
       'selectedNodeId',
@@ -54,12 +54,12 @@ const NodeTreeRecipe = {
 
 const NodeCreatorRecipe = {
   combiner: {
-    $kind: '$library/NodeGraph/NodeTypesCombiner',
+    $kind: '$library/Node/NodeTypesCombiner',
     $inputs: ['builtinNodeTypes', 'selectedGraph'],
     $outputs: [{results: 'nodeTypes'}, 'selectedGraph']
   },
   creator: {
-    $kind: '$library/NodeGraph/NodeCreator',
+    $kind: '$library/Node/NodeCreator',
     $inputs: [
       'newNodeInfos',
       'nodeTypes',

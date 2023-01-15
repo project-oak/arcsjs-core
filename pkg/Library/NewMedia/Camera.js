@@ -11,9 +11,8 @@ template: html`
     color: var(--theme-color-fg-2);
     background-color: var(--theme-color-bg-2);
     overflow: hidden;
-    /* position: relative; */
   }
-  [frame="capture"] {
+  [capture] {
     height: 0;
     overflow: hidden;
     visibility: false;
@@ -22,8 +21,11 @@ template: html`
 <!--
   Camera is a stream-view with bookends.
 -->
-<div frame="device"></div>
+<!-- device bookend -->
+<div><slot name="device"></slot></div>
+<!-- stream view -->
 <stream-view flex stream="{{stream}}"></stream-view>
-<div frame="capture"></div>
+<!-- capture bookend -->
+<div capture><slot name="capture"></slot></div>
 `
 });

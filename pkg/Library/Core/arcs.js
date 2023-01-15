@@ -148,16 +148,21 @@ var Arc = class extends EventEmitter {
   }
   computeInputs(host) {
     const inputs = nob();
-    const inputBindings = host.meta?.inputs;
-    if (inputBindings === "*") {
+    const bindings = host.meta?.inputs;
+    if (bindings === "*") {
       entries(this.stores).forEach(([name, store]) => inputs[name] = store.pojo);
     } else {
-      const staticInputs = host.meta?.staticInputs;
-      assign(inputs, staticInputs);
-      if (inputBindings) {
-        inputBindings.forEach((input) => input && this.computeInput(entries(input)[0], inputs));
-        this.log(`computeInputs(${host.id}) =`, inputs);
-      }
+      assign(inputs, host.meta?.staticInputs);
+      bindings?.filter((b) => b).forEach((b) => {
+        const [prop, binding] = entries(b).pop() || [];
+        if (prop && binding) {
+          const value = this.stores[binding]?.pojo;
+          if (value !== void 0) {
+            inputs[prop] = value;
+          }
+        }
+      });
+      this.log(`computeInputs(${host.id}) =`, inputs);
     }
     return inputs;
   }
@@ -1066,7 +1071,7 @@ var ParticleCook = class {
   }
   static specToMeta(spec) {
     if (spec.$bindings) {
-      console.warn(`Particle '${spec.$kind}' spec contains deprecated $bindings property (${JSON.stringify(spec.$bindings)})`);
+      log5.warn(`Particle '${spec.$kind}' spec contains deprecated $bindings property (${JSON.stringify(spec.$bindings)})`);
     }
     const { $kind: kind, $container: container, $staticInputs: staticInputs } = spec;
     const inputs = this.formatBindings(spec.$inputs);
@@ -1166,7 +1171,7 @@ var Graphinator = class {
     return flattened;
   }
   async execute(graph, { id: layoutId, defaultContainer }) {
-    const layout = graph.layout?.[layoutId];
+    const layout = graph.layout?.[layoutId || "preview"];
     const stores = [];
     const particles = [];
     values4(graph.nodes).forEach((node) => {

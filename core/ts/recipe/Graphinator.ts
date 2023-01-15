@@ -60,7 +60,7 @@ export class Graphinator {
   }
 
   async execute(graph: any, {id: layoutId, defaultContainer}) {
-    const layout = graph.layout?.[layoutId];
+    const layout = graph.layout?.[layoutId || 'preview'];
     const stores = [];
     const particles = [];
     values(graph.nodes).forEach(node => {

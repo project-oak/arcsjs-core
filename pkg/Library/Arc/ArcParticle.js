@@ -22,5 +22,5 @@ async buildArcWithGraph({arcName, graphName, defaultContainer}, state) {
 render() {
   return null;
 },
-template: html`<div flex column frame="arc"></div>`
+template: html`<slot name="arc"></slot>`
 })

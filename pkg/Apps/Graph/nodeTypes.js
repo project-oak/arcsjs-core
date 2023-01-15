@@ -4,4 +4,4 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-export {nodeTypes, categories} from '../../Library/NodeTypes/nodeTypes.js';
+export {nodeTypes, categories} from '../../Library/Node/nodeTypes.js';

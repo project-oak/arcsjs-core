@@ -32,7 +32,7 @@ export class ParticleCook {
   }
   static specToMeta(spec) {
     if (spec.$bindings) {
-      console.warn(`Particle '${spec.$kind}' spec contains deprecated $bindings property (${JSON.stringify(spec.$bindings)})`);
+      log.warn(`Particle '${spec.$kind}' spec contains deprecated $bindings property (${JSON.stringify(spec.$bindings)})`);
     }
     // TODO(sjmiles): impedance mismatch here is likely to cause problems
     const {$kind: kind, $container: container, $staticInputs: staticInputs} = spec;

@@ -26,15 +26,15 @@ template: html`
     background-color: var(--theme-color-bg-2);
     overflow: hidden;
   }
-  [frame="capture"] {
+  [capture] {
     height: 0;
     overflow: hidden;
     visibility: false;
   }
 </style>
 
-<div frame="device"></div>
+<div><slot name="device"></slot></div>
 <speech-recognizer enabled="{{micEnabled}}" on-transcript="onTranscript" on-end="onEnd"></speech-recognizer>
-<div frame="transcript"></div>
+<div><slot name="transcript"></slot></div>
 `
 });

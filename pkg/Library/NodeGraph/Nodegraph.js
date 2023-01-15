@@ -26,7 +26,7 @@ template: html`
   [left] > * {
     min-width: 250px;
   }
-  [frame="toolbar"] [toolbar] {
+  [toolbar] {
     padding: 0;
   }
   [nav] {
@@ -34,7 +34,7 @@ template: html`
   }
 </style>
 
-<div frame="device"></div>
+<div><slot name="device"></slot></div>
 
 <page-group flex column>
 
@@ -42,26 +42,22 @@ template: html`
   <div flex row>
     <split-panel vertical flex row divider="240" endflex="true">
       <div slot="left" flex column>
-        <div flex frame="catalog"></div>
+        <slot name="catalog"></slot>
       </div>
-      <!-- split -->
       <split-panel slot="right" vertical flex row divider="240">
         <div slot="left" flex column>
           <div nav toolbar>
-            <div flex frame="toolbar"></div>
+            <slot name="toolbar"></slot>
           </div>
           <split-panel flex column divider="480">
-            <div flex column frame="preview" slot="top"></div>
-            <!-- split -->
-            <div flex column frame="editor" slot="bottom"></div>
+            <slot slot="top" name="preview"></slot>
+            <slot slot="bottom" name="editor"></slot>
           </split-panel>
         </div>
-        <!-- split -->
         <div slot="right" flex column>
           <split-panel flex column>
-            <div flex column frame="inspector" slot="top"></div>
-            <!-- split -->
-            <div flex column frame="tree" slot="bottom"></div>
+            <slot slot="top" name="inspector"></slot>
+            <slot slot="bottom" name="tree"></slot>
           </split-panel>
         </div>
       </split-panel>
@@ -69,7 +65,7 @@ template: html`
   </div>
 
   <!-- page 2 -->
-  <div flex column frame="graphs"></div>
+  <div flex column><slot name="graphs"></slot></div>
 
 </page-group>
 `

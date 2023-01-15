@@ -31,20 +31,22 @@ export class XenComposer extends Composer {
     } else if (container && container !== 'root') {
       const [particle, slot] = container.split('#');
       const owner = deepQuerySelector(node, `#${sanitizeId(particle)}`);
-      //node = !owner ? null : deepQuerySelector(owner, `[slot=${slot}], [frame=${slot}]`);
-      node = owner?.shadowRoot.querySelector(`[slot=${slot}], [frame=${slot}]`);
+      node = owner;
+      //node = owner?.shadowRoot.querySelector(`[slot=${slot}], [frame=${slot}]`);
     }
     return node;
   }
-  generateSlot(id, template, parent) {
+  generateSlot(id, containerName, template, parent) {
     if (!parent) {
       throw Error('Cannot generateSlot without a parent node');
     }
-    const container = dom('div', {
-      style: 'flex: 1; display: flex; flex-direction: column; overflow: hidden;',
-      id: sanitizeId(id)
+    const container = dom('particle-host', {
+      //style: 'flex: 1; display: flex; Xflex-direction: column; overflow: hidden;',
+      //style: 'flex: 1; display: flex; overflow: hidden;',
+      id: sanitizeId(id),
+      slot: containerName?.split('#').pop()
     }, parent);
-    container.setAttribute('particle', id);
+    // container.setAttribute('particle', id);
     // TODO(sjmiles): a_ hack is for a_frame elements that cannot live in ShadowDOM
     const root = (!id.toLowerCase().startsWith('a_') && this.useShadowRoot) ? container.attachShadow({mode: `open`}) : container;
     const css = `/*injected by arcsjs composer*/${IconsCss}${XenCss}`;

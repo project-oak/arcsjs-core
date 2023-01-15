@@ -1,9 +1,12 @@
 /**
+ * @license
  * Copyright (c) 2022 Google LLC All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
+
 // use Library path from configuration
+
 const Library = `${globalThis.config.arcsPath}/Library`;
 
 // import modules from the ArcsJs Library
@@ -34,8 +37,9 @@ export const {
   'LocalStorage/LocalStoragePersistor.js',
   // DOM things
   'App/common-dom.js',
-  'Designer/designer-layout.js',
-  'Designer/selector-panel.js',
+  'Node/Dom/designer-layout.js',
+  'Node/Dom/selector-panel.js',
+  'Node/Dom/node-graph.js',
   // Raw Power
   'TensorFlow/TensorFlow.js',
   'PixiJs/pixi-view.js'

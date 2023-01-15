@@ -20,10 +20,7 @@ template: html`
     background-color: var(--theme-color-bg-0);
     ${globalThis.themeRules}
   }
-  designer-layout {
-    background: white;
-  }
 </style>
-<div flex column frame="root"></div>
+<slot name="root"></slot>
 `
 });

@@ -16,10 +16,10 @@ const GraphRecipe = {
 
 export const GraphApp = class extends App {
   async spinup() {
-    Object.assign(this.nodeTypes, {GraphRecipe});
+    this.nodeTypes.GraphRecipe = GraphRecipe;
     this.graphs = [
       this.graph,
-      this.configureGraph(this.graph)
+      //this.configureGraph(this.graph)
     ];
     this.logInfo();
     await super.spinup();

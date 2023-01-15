@@ -15,9 +15,8 @@ const template = Xen.Template.html`
   :host {
     display: flex;
     overflow: hidden;
-    font-size: 10px;
-    color: black;
-    /* background-color: black; */
+    /* font-size: 10px; */
+    /* color: black; */
   }
   * {
     box-sizing: border-box;
@@ -83,7 +82,7 @@ export class ImageResource extends Xen.Async {
         await this.updateImageCanvas(image);
       }
       image.canvas = this.canvasId;
-      log('firing canvas update for ', image);
+      //log('firing canvas update for ', image);
       this.value = image;
       this.fire('canvas');
       // this.updating = false;

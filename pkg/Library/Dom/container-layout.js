@@ -124,7 +124,8 @@ export class ContainerLayout extends DragDrop {
     this.fire('position');
   }
   updateOrders(target) {
-    const particleDivs = this.querySelectorAll('[particle]');
+    //const particleDivs = this.querySelectorAll('[particle]');
+    const particleDivs = this.querySelectorAll('[id]');
     particleDivs.forEach(div => {
       if (!this.rects?.find(rect => rect.id === div.id)) {
         div.style.zIndex = 98;
