@@ -64,8 +64,12 @@ export class Graphinator {
     const stores = [];
     const particles = [];
     values(graph.nodes).forEach(node => {
+      const nodeType = this.nodeTypes[node.type];
+      if (!nodeType) {
+        throw(`node.type "${node.type}" not found`);
+      }
       const connsMap = {};
-      this.prepareStores(node, this.nodeTypes[node.type], stores, connsMap);
+      this.prepareStores(node, nodeType, stores, connsMap);
       this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
     });
     this.retagStoreSpecs(stores);

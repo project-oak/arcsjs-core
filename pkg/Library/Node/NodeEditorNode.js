@@ -8,7 +8,7 @@ export const NodeEditorNode = {
   $meta: {
     id: 'NodeEditorNode',
     displayName: 'Node Editor',
-    category: 'Panels'
+    category: 'Designer'
   },
   $stores: {
     graph: {

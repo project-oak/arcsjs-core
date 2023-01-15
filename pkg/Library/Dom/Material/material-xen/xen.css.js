@@ -8,7 +8,7 @@ export const XenCss = `
 * {
   box-sizing: border-box;
 }
-particle-host, [particle] {
+par-ticle, [particle] {
   flex: 1;
   display: flex;
   flex-direction: column;

@@ -8,7 +8,7 @@ export const NodeInspectorNode = {
   $meta: {
     id: 'NodeInspectorNode',
     displayName: 'Node Inspector',
-    category: 'Panels'
+    category: 'Designer'
   },
   $stores: {
     inspectorData: {

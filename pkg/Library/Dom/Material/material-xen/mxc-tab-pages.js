@@ -11,7 +11,7 @@ const template = Xen.Template.html`
   :host {
     display: flex;
     flex-direction: column;
-    background-color: var(--theme-color-bg-2);
+    /* background-color: var(--theme-color-bg-2); */
   }
   /* mwc-tab-bar {
   } */

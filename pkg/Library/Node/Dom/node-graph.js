@@ -248,13 +248,10 @@ export class NodeGraph extends Xen.Async {
   }
 
   // called when committed a change to a rectangle (low freq)
-  // onUpdatePosition({currentTarget: {value: rect}}) {
-  //   this.fire('node-moved');
-  // }
-  onUpdatePosition({currentTarget: {target, value}}) {
-    if (target?.key && value) {
+  onUpdatePosition({currentTarget: {target, value: rect}}) {
+    if (target?.key && rect) {
       this.key = target.key;
-      this.value = value;
+      this.value = rect;
       this.fire('node-moved');
     }
   }
@@ -367,6 +364,7 @@ const template = Xen.Template.html`
 </style>
 
 <canvas layer1 width="2000" height="800"></canvas>
+
 <div layer0>
   <designer-layout
     rects="{{rects}}"
@@ -374,7 +372,8 @@ const template = Xen.Template.html`
     on-position="onUpdatePosition"
     on-update-box="onUpdateBox"
     on-delete="onNodeDelete"
-    repeat="node_t">{{nodes}}</designer-layout>
+    repeat="node_t"
+  >{{nodes}}</designer-layout>
 </div>
 
 <template node_t>

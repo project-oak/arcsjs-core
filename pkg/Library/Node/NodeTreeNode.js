@@ -8,7 +8,7 @@ export const NodeTreeNode = {
   $meta: {
     id: 'NodeTreeNode',
     displayName: 'Node Tree',
-    category: 'Panels'
+    category: 'Designer'
   },
   NodeTree: {
     $kind: '$library/Node/NodeTree',

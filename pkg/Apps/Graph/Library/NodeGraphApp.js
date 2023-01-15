@@ -5,7 +5,8 @@
  * license that can be found in the LICENSE file.
 */
 import {logFactory, App, LocalStoragePersistor} from '../arcs.js';
-import {nodeTypes, nodegraphNodeTypes, NodegraphGraph} from './NodegraphRecipe.js';
+import {nodegraphNodeTypes, NodegraphGraph} from './NodegraphRecipe.js';
+import {nodeTypes} from '../../../Library/Node/nodeTypes.js';
 import * as services from '../services.js';
 
 const log = logFactory(true, 'Nodegraph', 'navy');
@@ -13,15 +14,22 @@ const log = logFactory(true, 'Nodegraph', 'navy');
 export const NodegraphApp = class extends App {
   constructor(paths) {
     super(paths);
-    services.ArcService.nodeTypes = nodeTypes;
+    this.services = services;
+    this.persistor = new LocalStoragePersistor('user');
+    this.graphs = [NodegraphGraph];
+    this.nodeTypes = {...nodeTypes, ...nodegraphNodeTypes};
+    //
+    services.ArcService.nodeTypes = this.nodeTypes;
     services.ArcService.layoutInfo = {
       id: 'preview',
       defaultContainer: 'designer#graph'
     };
-    this.services = services;
-    this.persistor = new LocalStoragePersistor('user');
-    this.nodeTypes = nodegraphNodeTypes;
-    this.graphs = [NodegraphGraph];
+    //
     log('Welcome!');
+  }
+  async spinup() {
+    await super.spinup();
+    const {DevToolsRecipe, NodegraphRecipe, ...arcNodeTypes} = this.nodeTypes;
+    this.arcs.set('user', 'nodeTypes', arcNodeTypes);
   }
 };

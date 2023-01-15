@@ -31,7 +31,7 @@ const nodeList = {
     nodeTypes: {
       $type: 'Pojo',
       noinspect: true,
-      nodisplay: true
+      //nodisplay: true
     },
     categories: {
       $type: 'Pojo',
@@ -86,10 +86,16 @@ export const NodeCatalogNode = {
   $meta: {
     id: 'NodeCatalogNode',
     displayName: 'Node Catalog',
-    category: 'Panels'
+    category: 'Designer'
+  },
+  $stores: {
+    nodeTypes: {
+      type: '[NodeType]'
+    }
   },
   NodeCatalog: {
     $kind:'$library/Node/NodeCatalog',
+    $inputs: ['nodeTypes'],
     $slots: {
       nodeSearch,
       nodeList

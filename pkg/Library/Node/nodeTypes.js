@@ -8,30 +8,34 @@ const lib = `${globalThis.config.arcsPath}/Library`;
 export const load = async paths => (await Promise.all(paths.map(p => import(`${lib}/${p}`)))).reduce((e, m) =>({...e, ...m}),{});
 
 const etc = await load([
+  'Layout/LayoutNodes.js',
   'Data/DisplayNode.js',
   'Fields/BooleanFieldNode.js',
   'Fields/LineObjectNode.js',
   'Fields/MultilineTextFieldNode.js',
   'Fields/SelectFieldNode.js',
   'Fields/TextFieldNode.js',
-  'Fx/DetectRaisedHandNode.js',
-  'Fx/FaceMeshStickerNode.js',
+  /**/
+  'NewMedia/AudioNode.js',
   'GraphsNodes/ImageNode.js',
   'GraphsNodes/CameraNode.js',
-  'JSONata/JSONataNode.js',
-  'Layout/LayoutNodes.js',
+  'Pixabay/PixabayNode.js',
+  /**/
+  'Fx/DetectRaisedHandNode.js',
+  'Fx/FaceMeshStickerNode.js',
   'Mediapipe/PoseNode.js',
   'Mediapipe/FaceMeshNode.js',
   'Mediapipe/FaceMeshFaceNode.js', // rename to FaceMeshDisplayNode
-  'NewMedia/AudioNode.js',
+  'PixiJs/PixiJsNodes.js',
+  'Shader/FragmentShaderNode.js',
+  /**/
+  'JSONata/JSONataNode.js',
+  /**/
   'Node/NodeDesignerNode.js',
   'Node/NodeCatalogNode.js',
   'Node/NodeEditorNode.js',
   'Node/NodeTreeNode.js',
-  'Node/NodeInspectorNode.js',
-  'Pixabay/PixabayNode.js',
-  'PixiJs/PixiJsNodes.js',
-  'Shader/FragmentShaderNode.js'
+  'Node/NodeInspectorNode.js'
 ]);
 
 const nodeTypes = {

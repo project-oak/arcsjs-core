@@ -9,8 +9,10 @@
 import {Arcs} from './Arcs.js';
 //import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe, DevToolsGraph} from '../../DevTools/DevToolsRecipe.js';
+// import {NodeTypesNode} from '../../Node/NodeTypesNode.js';
 import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
 import {themeRules} from '../theme.js';
+import {NodeTypesNode} from '../../Node/NodeTypesNode.js';
 
 // n.b. lives in 'top' context
 
@@ -38,18 +40,42 @@ export const App = class {
       onservice: this.service.bind(this),
       injections: {themeRules, ...this.injections}
     });
+    //
     //await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     this.composer = await Arcs.createComposer(this.root || document.body);
-    assign(this.nodeTypes, {DevToolsRecipe});
-    this.graphs = [DevToolsGraph, ...(this.graphs ?? [])];
-
-    await this.runGraphs();
-
+    //
+    assign(this.nodeTypes, {
+      DevToolsRecipe,
+      NodeTypesNode
+    });
+    //
+    // const GlobalsGraph = {
+    //   $meta: {
+    //     id: 'GlobalsGraph'
+    //   },
+    //   $stores: {
+    //     nodeTypes: {
+    //       $type: 'Pojo',
+    //       $value: this.nodeTypes
+    //     }
+    //   }
+    // };
+    //
+    this.graphs = [
+      // GlobalsGraph,
+      DevToolsGraph,
+      ...(this.graphs ?? [])
+    ];
+    await this.runGraphs(this.graphs, this.nodeTypes);
     // TODO(sjmiles): fix
-    return new Promise(resolve => setTimeout(resolve, 250));
+    //return new Promise(resolve => setTimeout(resolve, 250));
   }
-  runGraphs() {
-    return Promise.all(this.graphs.map(graph => Arcs.runGraph('user', graph, this.nodeTypes)));
+  async runGraphs(graphs, nodeTypes) {
+    const grapher = graph => Arcs.runGraph('user', graph, nodeTypes);
+    for (const graph of graphs) {
+      await grapher(graph);
+    }
+    //return Promise.all(this.graphs.map(grapher));
   }
   render(packet) {
     // figure out which composer for this packet

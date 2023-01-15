@@ -21,28 +21,18 @@ export const graph = {
         "divider": 232
       }
     },
+    "NodeTypesNode1": {
+      "id": "NodeTypesNode1",
+      "type": "NodeTypesNode",
+      "displayName": "Node Types"
+    },
     "NodeCatalogNode1": {
       "id": "NodeCatalogNode1",
       "type": "NodeCatalogNode",
       "displayName": "Node Catalog",
       "connections": {
         "nodeTypes": [
-          "nodeTypes",
-          "NodeInspectorNode1undefinedinspectorData"
-        ],
-        "categories": [
-          "categories",
-          "NodeInspectorNode1undefinedinspectorData"
-        ],
-        "newNodeInfos": [
-          "NodeInspectorNode1undefinedinspectorData"
-        ],
-        "selectedGraph": [
-          "selectedGraph",
-          "NodeInspectorNode1undefinedinspectorData"
-        ],
-        "hoveredNodeType": [
-          "NodeInspectorNode1undefinedinspectorData"
+          "NodeTypesNode1:NodeTypes"
         ]
       }
     },
@@ -188,19 +178,19 @@ export const graph = {
       },
       "NodeDesignerNode1": {
         "l": 384,
-        "t": -784,
+        "t": 100,
         "w": 144,
         "h": 80
       },
       "NodeEditorNode1": {
-        "l": 198.00006103515625,
+        "l": 198,
         "t": 169,
         "w": 144,
         "h": 63.984375
       },
       "DisplayNode1": {
-        "l": 1376,
-        "t": 4232,
+        "l": 200,
+        "t": 200,
         "w": 144,
         "h": 80
       }

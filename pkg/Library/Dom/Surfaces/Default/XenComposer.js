@@ -40,7 +40,7 @@ export class XenComposer extends Composer {
     if (!parent) {
       throw Error('Cannot generateSlot without a parent node');
     }
-    const container = dom('particle-host', {
+    const container = dom('par-ticle', {
       //style: 'flex: 1; display: flex; Xflex-direction: column; overflow: hidden;',
       //style: 'flex: 1; display: flex; overflow: hidden;',
       id: sanitizeId(id),
