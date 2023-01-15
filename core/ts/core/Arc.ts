@@ -117,17 +117,17 @@ export class Arc extends EventEmitter {
       assign(inputs, host.meta?.staticInputs);
       // for all bindings, copy in non-undefined values
       bindings?.filter(b=>b).forEach(b => {
-        // extract key and value
+        // extract key and value for the binding
         const [prop, binding] = entries(b).pop() || [];
         if (prop && binding) {
+          // look for store data at this binding
           const value = this.stores[binding]?.pojo;
+          // if it's defined, capture it as input
           if (value !== undefined) {
             inputs[prop] = value;
           }
         }
       });
-      //bindings.fiter(i=>i).forEach(i => this.computeInput(entries(i)[0], inputs)
-      //bindings.forEach(input => input && this.computeInput(entries(input)[0], inputs));
       this.log(`computeInputs(${host.id}) =`, inputs);
     }
     return inputs;
