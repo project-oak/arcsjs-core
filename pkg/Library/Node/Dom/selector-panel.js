@@ -21,15 +21,11 @@ export class SelectorPanel extends DragDrop {
   }
   _didMount() {
     this.boxer = this._dom.$('[boxer]');
-    this.resizeObserver = new ResizeObserver((entries) => {
-      this.invalidate();
-    });
-    this.resizeObserver.observe(this);
+    this.resizeObserver = new ResizeObserver((entries) => this.invalidate());
     // TODO(sjmiles): need simple 'focus' somewhere, put keydown there, perhaps on `this`
     //document.addEventListener('keydown', event => this.onKeydown(event));
   }
   update({selected}) {
-    log('update', {selected});
     this.selectAll(selected);
   }
   render({color, statical}) {
@@ -59,35 +55,52 @@ export class SelectorPanel extends DragDrop {
     }
   }
   selectAll(ids) {
+    let observe = null;
     ids?.forEach(id => {
-      const elt = this.getAssignedElementId(id);
+      const elt = this.querySlotById(id);
       if (elt) {
         this.updateSelectionBox(elt);
+        observe = elt;
       }
     });
-  }
-  getAssignedElementId(id) {
-    const sid = this.sanitizeId(id);
-    const selector = `[id^="${sid}"]`;
-    const elts = this.shadowRoot.querySelector('slot').assignedElements({flatten: true});
-    let child = elts.find(elt => elt.matches(selector));
-    if (!child) {
-      elts.some(elt => child = elt.querySelector(selector));
+    if (this.lastObserved !== observe) {
+      //log('obs', observe);
+      if (this.lastObserved) {
+        this.resizeObserver.unobserve(this.lastObserved);
+      }
+      if (observe) {
+        this.resizeObserver.observe(observe);
+      }
+      this.lastObserved = observe;
     }
-    log(child, sid, elts);
-    return child;
-  }
-  sanitizeId(id) {
-    return id?.replace(/[)(:]/g, '_');
   }
   updateSelectionBox(target) {
     this.setBoxStyle(this.boxer, this.getTargetRect(target));
     this.boxer.hidden = false;
   }
+  querySlotById(id) {
+    const sid = this.sanitizeId(id);
+    const selector = `[id^="${sid}"]`;
+    const elts = this.shadowRoot.querySelector('slot').assignedElements({flatten: true});
+    // any assigned elements of the slot match directly?
+    let child = elts.find(elt => elt.matches(selector));
+    if (!child) {
+      // if not, look in the subtree of each assigned element
+      elts.some(elt => child = elt.querySelector(selector));
+    }
+    //log(child, sid, elts);
+    return child;
+  }
+  sanitizeId(id) {
+    return id?.replace(/[)(:]/g, '_');
+  }
   getTargetRect(target) {
-    const pRect = this.getBoundingClientRect();
+    // (local) ancestor frame in BoundingSpace
+    const aRect = this.getBoundingClientRect();
+    // target frame in BoundingSpace
     const tRect = target.getBoundingClientRect();
-    const [l, t, w, h] = [tRect.left - pRect.left, tRect.top - pRect.top, tRect.width, tRect.height];
+    // calculate the rect of target in local frame
+    const [l, t, w, h] = [tRect.left - aRect.left, tRect.top - aRect.top, tRect.width, tRect.height];
     return {l, t, w, h};
   }
   setBoxStyle(elt, {l, t, w, h}) {
