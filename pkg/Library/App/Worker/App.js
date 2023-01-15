@@ -9,7 +9,6 @@
 import {Arcs} from './Arcs.js';
 //import {loadCss} from '../../Dom/dom.js';
 import {DevToolsRecipe, DevToolsGraph} from '../../DevTools/DevToolsRecipe.js';
-// import {NodeTypesNode} from '../../Node/NodeTypesNode.js';
 import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
 import {themeRules} from '../theme.js';
 import {NodeTypesNode} from '../../Node/NodeTypesNode.js';
@@ -28,7 +27,6 @@ export const App = class {
     this.paths = paths;
     this.root = root || globalThis.document?.body;
     this.log = log;
-    //log(JSON.stringify(paths, null, '  '));
   }
   get arcs() {
     return Arcs;
@@ -48,34 +46,17 @@ export const App = class {
       DevToolsRecipe,
       NodeTypesNode
     });
-    //
-    // const GlobalsGraph = {
-    //   $meta: {
-    //     id: 'GlobalsGraph'
-    //   },
-    //   $stores: {
-    //     nodeTypes: {
-    //       $type: 'Pojo',
-    //       $value: this.nodeTypes
-    //     }
-    //   }
-    // };
-    //
     this.graphs = [
-      // GlobalsGraph,
       DevToolsGraph,
       ...(this.graphs ?? [])
     ];
     await this.runGraphs(this.graphs, this.nodeTypes);
-    // TODO(sjmiles): fix
-    //return new Promise(resolve => setTimeout(resolve, 250));
   }
   async runGraphs(graphs, nodeTypes) {
     const grapher = graph => Arcs.runGraph('user', graph, nodeTypes);
     for (const graph of graphs) {
       await grapher(graph);
     }
-    //return Promise.all(this.graphs.map(grapher));
   }
   render(packet) {
     // figure out which composer for this packet

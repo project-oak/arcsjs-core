@@ -4,14 +4,11 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-//import {nodeTypes, categories} from '../x-nodeTypes.js';
 import {NodeCatalogNode} from '../../../Library/Node/NodeCatalogNode.js';
 import {GraphToolbarRecipe} from './GraphToolbarRecipe.js';
 import {NodeEditorRecipe} from './NodeEditorRecipe.js';
 import {RecipeBuilderRecipe} from './RecipeBuilderRecipe.js';
 import {InspectorRecipe} from './InspectorRecipe.js';
-
-//export {nodeTypes};
 
 const Preview = {
   designer: {
