@@ -25,7 +25,7 @@ const etc = await load([
   'Fx/FaceMeshStickerNode.js',
   'Mediapipe/PoseNode.js',
   'Mediapipe/FaceMeshNode.js',
-  'Mediapipe/FaceMeshFaceNode.js', // rename to FaceMeshDisplayNode
+  'Mediapipe/FaceMeshDisplayNode.js',
   'PixiJs/PixiJsNodes.js',
   'Shader/FragmentShaderNode.js',
   /**/

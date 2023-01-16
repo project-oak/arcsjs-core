@@ -166,14 +166,6 @@ var Arc = class extends EventEmitter {
     }
     return inputs;
   }
-  computeInput([name, binding], inputs) {
-    const storeName = binding || name;
-    const store = this.stores[storeName];
-    if (store) {
-      inputs[name] = store.pojo;
-    } else {
-    }
-  }
   assignOutputs({ id, meta }, outputs) {
     const names = keys(outputs);
     if (meta?.outputs && names.length) {
@@ -1184,7 +1176,7 @@ var Graphinator = class {
       this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
     });
     this.retagStoreSpecs(stores);
-    log7("Executing graph", { graph, stores, particles });
+    log7("Executing", { graph, stores, particles });
     await StoreCook.execute(this.runtime, this.arc, stores);
     await this.realizeParticles(particles);
     return particles.map(({ id }) => id);
@@ -1538,16 +1530,16 @@ export {
 };
 /**
  * @license
- * Copyright (c) 2022 Google LLC All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
- */
-/**
- * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
+ */
+/**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
  */
 //# sourceMappingURL=arcs.js.map

@@ -7,8 +7,7 @@
 export const FaceMeshDisplay = {
   $meta: {
     id: 'FaceMeshDisplay',
-    displayName: 'Face Display',
-    description: 'Face Display',
+    displayName: 'Face Mesh Display',
     category: 'Mediapipe'
   },
   $stores: {
