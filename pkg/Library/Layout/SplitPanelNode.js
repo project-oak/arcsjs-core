@@ -11,6 +11,12 @@ export const SplitPanelNode = {
     category: 'Panels'
   },
   $stores: {
+    endflex: {
+      $type: 'Boolean',
+    },
+    divider: {
+      $type: 'Number',
+    },
     layout: {
       $type: 'String',
       values: ['vertical', 'horizontal']
@@ -20,8 +26,8 @@ export const SplitPanelNode = {
     }
   },
   panel: {
-    $kind: "Layout/SplitPanel",
-    $inputs: ['layout', 'center', 'style'],
+    $kind: 'Layout/SplitPanel',
+    $inputs: ['layout', 'center', 'style', 'endflex', 'divider'],
     $slots: {
       FirstContainer: {},
       SecondContainer: {}

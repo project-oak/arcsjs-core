@@ -9,7 +9,7 @@ export const PixiJsDemoNode = {
   $meta: {
     id: 'PixiJsDemoNode',
     displayName: 'PixiJs Multi Demo',
-    category: 'PixiJs'
+    category: 'Media'
   },
   $stores: {
     demoName: {
@@ -27,7 +27,7 @@ export const PixiTextureNode = {
   $meta: {
     id: 'PixiTextureNode',
     displayName: 'Pixi Texture',
-    category: 'PixiJs'
+    category: 'Media'
   },
   $stores: {
     demoName: {

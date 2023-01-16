@@ -71,6 +71,8 @@
 </style>
 
 <div scrim show$="{{showTools}}" on-click="onToggleFlyOverClick"></div>
-<div top flyout flex rows show$="{{showTools}}" frame="FlyoutContainer"></div>
+<div top flyout flex rows show$="{{showTools}}">
+  <slot name="FlyoutContainer"></slot>
+</div>
 `
 });

@@ -8,6 +8,12 @@ export const XenCss = `
 * {
   box-sizing: border-box;
 }
+par-ticle, [particle] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 [rows], [column], [columns], [row], [bar], [toolbar] {
   display: flex;
   align-items: stretch;

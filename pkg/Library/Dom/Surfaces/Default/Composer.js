@@ -56,8 +56,8 @@ export class Composer {
     // slot has a parent container
     const parent = this.findContainer(container);
     if (parent) {
-      // generate a slot `id` for `template` under `parent`
-      const slot = this.generateSlot(id, template, parent);
+      // generate a slot `id` for `container` in `template` under `parent`
+      const slot = this.generateSlot(id, container, template, parent);
       // memoize the container
       slot.container = container;
       // retain

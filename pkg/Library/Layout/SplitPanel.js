@@ -5,17 +5,27 @@
  * license that can be found in the LICENSE file.
  */
 ({
-render({layout, style}) {
+render({layout, style, endflex, divider}) {
   const vertical = layout === 'vertical';
   return {
     vertical,
-    horizontal: !vertical
+    horizontal: !vertical,
+    endflex,
+    divider
   };
 },
 template: html`
-<split-panel xen:style="{{style}}" flex row$="{{vertical}}" column$="{{horizontal}}" vertical="{{vertical}}">
-  <div flex column frame="FirstContainer" slot="top"></div>
-  <div flex column frame="SecondContainer" slot="bottom"></div>
+<split-panel
+  flex
+  xen:style="{{style}}"
+  row$="{{vertical}}"
+  column$="{{horizontal}}"
+  vertical="{{vertical}}"
+  endflex="{{endflex}}"
+  divider="{{divider}}"
+>
+  <slot name="FirstContainer" slot="one"></slot>
+  <slot name="SecondContainer" slot="two"></slot>
 </split-panel>
 `
 });

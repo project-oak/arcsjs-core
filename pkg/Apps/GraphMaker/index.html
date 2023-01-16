@@ -1,52 +1,12 @@
 <!doctype html>
-<!-- /**
- * @license
- * Copyright (c) 2022 Google LLC All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
- */ -->
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<!--
+ @license
+ Copyright (c) 2022 Google LLC All rights reserved.
+ Use of this source code is governed by a BSD-style
+ license that can be found in the LICENSE file.
+-->
 
-<title>GraphMaker! An ArcsJs Graph</title>
+<arcsjs-app-surface path="GraphMaker"></arcsjs-app-surface>
 
-<link rel="icon" href="../CommonApp/arcs/icon.png">
-<link rel="stylesheet" href="../../Library/Dom/Material/material-icon-font/icons.css">
-
-<style>
-  html, body {
-    height: 100%;
-  }
-  body {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  body, button, input {
-    font-family: 'Google Sans', sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-</style>
-
-<!-- ThreeJS -->
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<!-- <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script> -->
-<script type="importmap">
-{
-  "imports": {
-    "three": "../../third_party/threejs/three.module.js",
-    "three/addons/": "../../third_party/threejs/addons/"
-  }
-}
-</script>
-
-<script src="../../Library/Mediapipe/PoseServiceLoader.js"></script>
-
-<!-- PixiJs -->
-<!-- <script src="../third_party/pixijs/pixi.6.5.7.min.js"></script>
-<script src="../third_party/pixijs/pixi-plugins/pixi-spine.js"></script> -->
-
-<script type="module" src="./index.js"></script>
+<script type="module" src="../../Library/App/Common/config.js"></script>
+<script type="module" src="../../Library/App/arcsjs-app-surface.js"></script>

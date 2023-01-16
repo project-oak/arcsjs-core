@@ -10,6 +10,9 @@ export const PanelNode = {
     category: 'Panels'
   },
   $stores: {
+    cssStyle: {
+      $type: 'CssStyle'
+    },
     style: {
       $type: 'String'
     },
@@ -23,7 +26,7 @@ export const PanelNode = {
   },
   panel: {
     $kind: "Layout/Panel",
-    $inputs: ['layout', 'center', 'style'],
+    $inputs: ['layout', 'center', 'style', 'cssStyle'],
     $slots: {
       Container: {
       }

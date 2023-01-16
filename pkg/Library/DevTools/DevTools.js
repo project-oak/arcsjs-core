@@ -204,7 +204,9 @@
       <mwc-icon-button icon="refresh" on-click="onRefreshClick"></mwc-icon-button>
     </div>
     <!-- tabbed pages -->
-    <mxc-tab-pages dark flex tabs="Graphs,Stores,Particles,Resources,DOM,Charts,Tests" on-selected="onTabSelected">
+    <mxc-tab-pages dark flex tabs="Stores,Graphs,Particles,Resources,DOM,Charts,Tests" on-selected="onTabSelected">
+      <!-- Stores -->
+      <data-explorer flex scrolling object="{{stores}}" expand></data-explorer>
       <!-- Graphs -->
       <div flex scrolling>
         <div toolbar>
@@ -213,8 +215,6 @@
         </div>
         <code-mirror flex text="{{graphText}}" on-changes="onGraphCodeChanges"></code-mirror>
       </div>
-      <!-- Stores -->
-      <data-explorer flex scrolling object="{{stores}}" expand></data-explorer>
       <!-- Arcs -->
       <data-explorer flex scrolling object="{{particles}}" expand></data-explorer>
       <!-- Services -->

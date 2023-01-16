@@ -21,18 +21,22 @@ export const {
   // must be last
   ...etc
 } = await load([
+  // Main thread things
   'Core/utils.js',
   'App/Worker/App.js',
-  'App/common-dom.js',
-  'App/boot.js',
   'App/Resources.js',
   'App/Params.js',
   'App/HistoryService.js',
-  'Dom/Xen/xen-async.js',
-  'Dom/dom.js',
+  'App/boot.js',
   'LocalStorage/LocalStoragePersistor.js',
-  'Designer/designer-layout.js',
-  'NodeGraph/Dom/node-graph.js',
+  // DOM things
+  // 'Dom/Xen/xen-async.js',
+  // 'Dom/dom.js',
+  'App/common-dom.js',
+  'Node/Dom/designer-layout.js',
+  'Node/Dom/selector-panel.js',
+  'Node/Dom/node-graph.js',
+  // Raw Power
   'PixiJs/pixi-view.js',
   'TensorFlow/TensorFlow.js'
 ]);

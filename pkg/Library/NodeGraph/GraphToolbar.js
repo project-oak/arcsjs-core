@@ -84,12 +84,12 @@
       icon: 'add',
       title: 'New Graph',
       key: 'onNew',
-    }, {
+    },{
       icon: 'delete',
       title: 'Delete Graph',
       key: 'onDelete',
       // hidden: !isOwned
-    }, {
+    },{
       icon: 'content_copy',
       title: 'Duplicate Graph',
       key: 'onCloneClicked'
@@ -202,9 +202,13 @@
 <style>
   :host {
     flex: none !important;
+    --mdc-icon-button-size: 24px;
+    --mdc-icon-size: 18px;
+    --mdc-tab-height: 24px;
+    /* --mdc-typography-button-font-size: 0.875em; */
   }
   [toolbar] {
-    padding: 0;
+    padding: 0 0 0 6px;
   }
   [chooser], [rename] {
     font-size: 0.8rem;
@@ -224,11 +228,15 @@
 </style>
 
 <div toolbar>
-  <div chooser rows frame="chooser" display$="{{showChooser}}"></div>
-  <input rename type="text" value="{{name}}" display$="{{showRenameInput}}" autofocus on-change="onRename" on-blur="onRenameBlur">
+
   <mwc-icon-button title="Rename Graph" on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
+
+  <div chooser rows display$="{{showChooser}}"><slot name="chooser"></slot></div>
+  <input rename type="text" value="{{name}}" display$="{{showRenameInput}}" autofocus on-change="onRename" on-blur="onRenameBlur">
+
   <div column separator></div>
-  <div chooser rows frame="buttons"></div>
+
+  <div chooser rows><slot name="buttons"></slot></div>
 </div>
 `
 });

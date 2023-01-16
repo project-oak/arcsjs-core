@@ -103,19 +103,32 @@ export class Arc extends EventEmitter {
   // complement to `assignOutputs`
   protected computeInputs(host) {
     const inputs = nob();
-    const inputBindings = host.meta?.inputs;
-    if (inputBindings ===  '*') {
+    //
+    const bindings = host.meta?.inputs;
+    if (bindings === '*') {
       // TODO(sjmiles): we could make the contract that the bindAll inputs are
       // names (or names + meta) only. The Particle could look up values via
       // service (to reduce throughput requirements)
       entries(this.stores).forEach(([name, store]) => inputs[name] = store.pojo);
-    } else {
-      const staticInputs = host.meta?.staticInputs;
-      assign(inputs, staticInputs);
-      if (inputBindings) {
-        inputBindings.forEach(input => input && this.computeInput(entries(input)[0], inputs));
-        this.log(`computeInputs(${host.id}) =`, inputs);
-      }
+    }
+    //
+    else {
+      // start with staticInputs
+      assign(inputs, host.meta?.staticInputs);
+      // for all bindings, copy in non-undefined values
+      bindings?.filter(b=>b).forEach(b => {
+        // extract key and value for the binding
+        const [prop, binding] = entries(b).pop() || [];
+        if (prop && binding) {
+          // look for store data at this binding
+          const value = this.stores[binding]?.pojo;
+          // if it's defined, capture it as input
+          if (value !== undefined) {
+            inputs[prop] = value;
+          }
+        }
+      });
+      this.log(`computeInputs(${host.id}) =`, inputs);
     }
     return inputs;
   }

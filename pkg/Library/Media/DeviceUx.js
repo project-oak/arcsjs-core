@@ -109,6 +109,6 @@ template: html`
 </template>
 
 <div>{{devices}}</div>
-<div frame="micbox"></div>
+<slot name="micbox"></slot>
 `
 });

@@ -4,17 +4,15 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import {nodeTypes, categories} from '../nodeTypes.js';
+import {NodeCatalogNode} from '../../../Library/Node/NodeCatalogNode.js';
 import {GraphToolbarRecipe} from './GraphToolbarRecipe.js';
 import {NodeEditorRecipe} from './NodeEditorRecipe.js';
 import {RecipeBuilderRecipe} from './RecipeBuilderRecipe.js';
 import {InspectorRecipe} from './InspectorRecipe.js';
 
-export {nodeTypes};
-
 const Preview = {
   designer: {
-    $kind: '$library/Designer/Designer',
+    $kind: '$library/Node/NodeDesigner',
     $inputs: [
       {graph: 'selectedGraph'},
       'selectedNodeId',
@@ -35,7 +33,7 @@ const Preview = {
 
 const NodeTreeRecipe = {
   NodeTree: {
-    $kind: '$library/NodeTree/NodeTree',
+    $kind: '$library/Node/NodeTree',
     $inputs: [
       {graph: 'selectedGraph'},
       'selectedNodeId',
@@ -53,13 +51,13 @@ const NodeTreeRecipe = {
 };
 
 const NodeCreatorRecipe = {
-  combiner: {
-    $kind: '$library/NodeGraph/NodeTypesCombiner',
-    $inputs: ['builtinNodeTypes', 'selectedGraph'],
-    $outputs: [{results: 'nodeTypes'}, 'selectedGraph']
-  },
+  // combiner: {
+  //   $kind: '$library/Node/NodeTypesCombiner',
+  //   $inputs: ['builtinNodeTypes', 'selectedGraph'],
+  //   $outputs: [{results: 'nodeTypes'}, 'selectedGraph']
+  // },
   creator: {
-    $kind: '$library/NodeGraph/NodeCreator',
+    $kind: '$library/Node/NodeCreator',
     $inputs: [
       'newNodeInfos',
       'nodeTypes',
@@ -89,6 +87,9 @@ const NodegraphRecipe = {
       $tags: ['persisted'],
       $value: null
     },
+    designInfo: {
+      $type: 'DesignInfo'
+    },
     selectedNodeId: {
       $type: 'String'
     },
@@ -97,14 +98,14 @@ const NodegraphRecipe = {
     },
     builtinNodeTypes: {
       $type: 'Pojo',
-      $value: nodeTypes
+      //$value: nodeTypes
     },
     inspectorData: {
       $type: 'Pojo'
     },
     categories: {
       $type: 'Pojo',
-      $value: categories
+      //$value: categories
     },
     nodeTypes: {
       $type: 'Pojo',
@@ -118,7 +119,7 @@ const NodegraphRecipe = {
     $kind: '$library/NodeGraph/Nodegraph',
     $slots: {
       preview: Preview,
-      catalog: nodeTypes.NodeCatalogNode,
+      catalog: NodeCatalogNode,
       toolbar: GraphToolbarRecipe,
       editor: NodeEditorRecipe,
       inspector: InspectorRecipe,

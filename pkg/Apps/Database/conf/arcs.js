@@ -35,6 +35,7 @@ export const {
   // DOM things
   'App/common-dom.js',
   'Designer/designer-layout.js',
+  'Designer/selector-panel.js',
   // Raw Power
   'TensorFlow/TensorFlow.js',
   'PixiJs/pixi-view.js'

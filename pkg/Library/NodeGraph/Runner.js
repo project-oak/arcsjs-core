@@ -191,25 +191,26 @@ template: html`
   font-family: Google Sans, Roboto, sans-serif;
   ${themeRules || ''}
 }
-[frame="runner"] > * {
-  flex: none !important;
-}
 container-layout {
   height: auto !important;
 }
+container-layout > * {
+  flex: none !important;
+}
 </style>
 
-<div bar frame="chooser"></div>
+<div bar><slot name="chooser"></slot></div>
 
 <drop-target flex row on-drop="onDrop">
   <container-layout
-    flex scrolling column frame="runner"
+    flex scrolling column
     on-position="onNodePosition"
     on-delete="onNodeDelete"
     selected="{{selectedKeys}}"
     rects="{{rects}}"
     color="{{color}}"
     hidebox="{{hideBox}}">
+    <slot name="runner"></slot>
   </container-layout>
 </drop-target>
 

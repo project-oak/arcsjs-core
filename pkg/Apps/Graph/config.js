@@ -16,15 +16,17 @@ if (import.meta.url.includes('localhost:9888')) {
 
 globalThis.config = {
   arcsPath: url,
-  aeon: 'graph/0.4.4',
+  aeon: 'graph/0.4.5',
   //theme: 'dark',
   logFlags: {
     app: true,
-    //recipe: true,
     //arc: true,
+    //code: true,
+    //composer: true,
+    graph: true,
     particles: true,
+    //recipe: true,
+    services: true,
     //storage: true,
-    composer: true,
-    services: true
   }
 };

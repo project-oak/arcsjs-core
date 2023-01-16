@@ -8,13 +8,15 @@ import {customInspectors} from './customInspectors.js';
 
 export const InspectorRecipe = {
   Inspector: {
-    $kind: '$library/NodeInspector/ObjectInspector',
-    $staticInputs: {customInspectors},
+    $kind: '$library/Node/ObjectInspector',
+    $staticInputs: {
+      customInspectors
+    },
     $inputs: [{data: 'inspectorData'}],
     $outputs: [{data: 'inspectorData'}]
   },
   nodeInspector: {
-    $kind: '$library/NodeInspector/NodeInspector',
+    $kind: '$library/Node/NodeInspector',
     $staticInputs: {
       customInspectors,
       inspectorData: 'inspectorData',
@@ -28,7 +30,7 @@ export const InspectorRecipe = {
     $outputs: [{data: 'inspectorData'}]
   },
   nodeUpdater: {
-    $kind: '$library/NodeInspector/NodeUpdater',
+    $kind: '$library/Node/NodeUpdater',
     $inputs: [
       'selectedNodeId',
       {graph: 'selectedGraph'},

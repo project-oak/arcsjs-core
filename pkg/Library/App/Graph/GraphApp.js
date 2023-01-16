@@ -5,22 +5,29 @@
  * license that can be found in the LICENSE file.
  */
 import {App} from '../Worker/App.js';
+import {Paths} from '../../Core/utils.js';
 
 const GraphRecipe = {
   $meta: {name: 'GraphRecipe', id: 'GraphRecipe'},
   main: {
     // n.b. the GraphRecipe actually only wants the rectangles from the graph layouts
-    $kind: '$library/App/Graph/Graph'
+    $kind: '$library/App/Node/Graph'
   }
 };
 
 export const GraphApp = class extends App {
   async spinup() {
-    Object.assign(this.nodeTypes, {GraphRecipe});
+    this.nodeTypes.GraphRecipe = GraphRecipe;
     this.graphs = [
       this.graph,
-      this.configureGraph(this.graph)
+      //this.configureGraph(this.graph)
     ];
+    Paths.add(this.paths);
+    this.services.ArcService.nodeTypes = this.nodeTypes;
+    this.services.ArcService.layoutInfo = {
+      id: 'preview',
+      defaultContainer: this.defaultContainer || 'designer#graph'
+    };
     this.logInfo();
     await super.spinup();
   }

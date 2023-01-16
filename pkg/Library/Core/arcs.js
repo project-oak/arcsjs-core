@@ -148,16 +148,21 @@ var Arc = class extends EventEmitter {
   }
   computeInputs(host) {
     const inputs = nob();
-    const inputBindings = host.meta?.inputs;
-    if (inputBindings === "*") {
+    const bindings = host.meta?.inputs;
+    if (bindings === "*") {
       entries(this.stores).forEach(([name, store]) => inputs[name] = store.pojo);
     } else {
-      const staticInputs = host.meta?.staticInputs;
-      assign(inputs, staticInputs);
-      if (inputBindings) {
-        inputBindings.forEach((input) => input && this.computeInput(entries(input)[0], inputs));
-        this.log(`computeInputs(${host.id}) =`, inputs);
-      }
+      assign(inputs, host.meta?.staticInputs);
+      bindings?.filter((b) => b).forEach((b) => {
+        const [prop, binding] = entries(b).pop() || [];
+        if (prop && binding) {
+          const value = this.stores[binding]?.pojo;
+          if (value !== void 0) {
+            inputs[prop] = value;
+          }
+        }
+      });
+      this.log(`computeInputs(${host.id}) =`, inputs);
     }
     return inputs;
   }
@@ -1066,7 +1071,7 @@ var ParticleCook = class {
   }
   static specToMeta(spec) {
     if (spec.$bindings) {
-      console.warn(`Particle '${spec.$kind}' spec contains deprecated $bindings property (${JSON.stringify(spec.$bindings)})`);
+      log5.warn(`Particle '${spec.$kind}' spec contains deprecated $bindings property (${JSON.stringify(spec.$bindings)})`);
     }
     const { $kind: kind, $container: container, $staticInputs: staticInputs } = spec;
     const inputs = this.formatBindings(spec.$inputs);
@@ -1122,7 +1127,7 @@ var Chef = class {
 };
 
 // js/recipe/Graphinator.js
-var log7 = logFactory(logFactory.flags.recipe, "Chef", "#087f23");
+var log7 = logFactory(logFactory.flags.graph, "Graphinator", "#7f0823");
 var { assign: assign2, create: create4 } = Object;
 var entries5 = (o) => Object.entries(o ?? Object);
 var keys5 = (o) => Object.keys(o ?? Object);
@@ -1166,16 +1171,20 @@ var Graphinator = class {
     return flattened;
   }
   async execute(graph, { id: layoutId, defaultContainer }) {
-    const layout = graph.layout?.[layoutId];
+    const layout = graph.layout?.[layoutId || "preview"];
     const stores = [];
     const particles = [];
     values4(graph.nodes).forEach((node) => {
+      const nodeType = this.nodeTypes[node.type];
+      if (!nodeType) {
+        throw `node.type "${node.type}" not found`;
+      }
       const connsMap = {};
-      this.prepareStores(node, this.nodeTypes[node.type], stores, connsMap);
+      this.prepareStores(node, nodeType, stores, connsMap);
       this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
     });
     this.retagStoreSpecs(stores);
-    log7("Executing graph: ", stores, particles);
+    log7("Executing graph", { graph, stores, particles });
     await StoreCook.execute(this.runtime, this.arc, stores);
     await this.realizeParticles(particles);
     return particles.map(({ id }) => id);
