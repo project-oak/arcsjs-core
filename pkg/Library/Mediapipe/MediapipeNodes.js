@@ -9,5 +9,5 @@
 
 export * from './SelfieSegmentationNode.js';
 export * from './FaceMeshNode.js';
-export * from './FaceMeshFaceNode.js';
+export * from './FaceMeshFaceDisplay.js';
 export * from '../Fx/FaceMeshStickerNode.js';

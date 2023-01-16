@@ -67,7 +67,7 @@ export const MediapipeFaceMesh = {
   }
 };
 
-export const MediapipeFaceMeshFace = {
+export const MediapipeFaceMeshDisplay = {
   $meta: {
     id: 'FaceMesh',
     category: 'Effect'
@@ -85,8 +85,8 @@ export const MediapipeFaceMeshFace = {
       nomonitor: true
     }
   },
-  FaceMeshFace: {
-    $kind: 'Mediapipe/FaceMeshFace',
+  FaceMeshDisplay: {
+    $kind: 'Mediapipe/FaceMeshDisplay',
     $inputs: ['data'],
     $outputs: ['outputImage']
   }

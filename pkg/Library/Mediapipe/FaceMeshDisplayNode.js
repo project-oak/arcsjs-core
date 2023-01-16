@@ -4,9 +4,9 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-export const FaceMeshFace = {
+export const FaceMeshDisplay = {
   $meta: {
-    id: 'FaceMeshFace',
+    id: 'FaceMeshDisplay',
     displayName: 'Face Display',
     description: 'Face Display',
     category: 'Mediapipe'
@@ -23,8 +23,8 @@ export const FaceMeshFace = {
       nomonitor: true
     }
   },
-  FaceMeshFace: {
-    $kind: 'Mediapipe/FaceMeshFace',
+  FaceMeshDisplay: {
+    $kind: 'Mediapipe/FaceMeshDisplay',
     $inputs: ['data'],
     $outputs: ['outputImage']
   }
