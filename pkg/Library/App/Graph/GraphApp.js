@@ -18,15 +18,10 @@ const GraphNode = {
 
 export const GraphApp = class extends App {
   async spinup() {
-<<<<<<< HEAD
     this.nodeTypes.GraphNode = GraphNode;
     this.graphs = [
       this.graph
     ];
-=======
-    this.nodeTypes.GraphRecipe = GraphRecipe;
-    this.graphs = [this.graph];
->>>>>>> d255e03 (some post #232 and merge cleanups /updates)
     Paths.add(this.paths);
     this.services.ArcService.nodeTypes = this.nodeTypes;
     this.services.ArcService.layoutInfo = {
