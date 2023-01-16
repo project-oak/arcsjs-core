@@ -28,9 +28,11 @@
       state.renaming = false;
       assign(outputs, await this.chooseOrCreateGraph(graphs, service));
     }
-    assign(outputs, await this.handleEvent(inputs, state, tools));
-    assign(outputs, {icons: this.toolbarIcons(inputs)});
-    return outputs;
+    return {
+      ...outputs,
+      ...await this.handleEvent(inputs, state, tools),
+      icons: this.toolbarIcons(inputs)
+    };
   },
   async chooseOrCreateGraph(graphs, service) {
     if (graphs?.length > 0) {
@@ -40,13 +42,8 @@
     }
   },
   async updateSelectedGraphHistory(graph, service) {
-    return service({
-      kind: 'HistoryService',
-      msg: 'setSelectedGraph',
-      data: {
-        graph: graph?.$meta?.id
-      }
-    });
+    const id = graph?.$meta?.id;
+    return service({kind: 'HistoryService', msg: 'setSelectedGraph', data: {graph: id}});
   },
   resetMediaDeviceState(mediaDeviceState) {
     keys(mediaDeviceState).forEach(key => mediaDeviceState[key] = false);
@@ -237,6 +234,7 @@
   <div column separator></div>
 
   <div chooser rows><slot name="buttons"></slot></div>
+
 </div>
 `
 });
