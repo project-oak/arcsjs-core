@@ -132,16 +132,6 @@ export class Arc extends EventEmitter {
     }
     return inputs;
   }
-  protected computeInput([name, binding], inputs) {
-    const storeName = binding || name;
-    const store = this.stores[storeName];
-    if (store) {
-      inputs[name] = store.pojo;
-    } else {
-      // TODO(sjmiles): is this ok or not?
-      //this.log.warn(`computeInput: "${storeName}" (bound to "${name}") not found`);
-    }
-  }
   // complement to `computeInputs`
   assignOutputs({id, meta}, outputs) {
     const names = keys(outputs);
