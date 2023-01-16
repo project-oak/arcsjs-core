@@ -321,7 +321,6 @@ export class DesignerLayout extends DragDrop {
     position: absolute;
     background-color: transparent;
     box-sizing: border-box;
-    /* padding: 2px; */
     transform: translate(-1000px, 0);
     z-index: 100;
   }

@@ -10,26 +10,35 @@ export const NodeDesignerNode = {
     displayName: 'Node Designer',
     category: 'Designer'
   },
-  // $stores: {
+  $stores: {
+    selectedGraph: {
+      $type: 'Pojo'
+    },
+    selectedNodeId: {
+      $type: 'String'
+    },
+    nodeTypes: {
+      $type: 'Pojo',
+      $value: {}
+    },
+    categories: {
+      $type: 'Pojo'
+    },
   //   recipes,
-  //   selectedGraph,
-  //   selectedNodeId,
-  //   nodeTypes,
-  //   categories,
   //   previewLayout,
   //   newNodeInfos
-  // },
+  },
   designer: {
     $kind: '$library/Node/NodeDesigner',
-    // $inputs: [
+    $inputs: [
     //   'recipes',
-    //   {graph: 'selectedGraph'},
-    //   'selectedNodeId',
-    //   'nodeTypes',
-    //   'categories',
+      {graph: 'selectedGraph'},
+      'selectedNodeId',
+      'nodeTypes',
+      'categories',
     //   {layout: 'previewLayout'},
     //   'newNodeInfos'
-    // ],
+    ],
     // $outputs: [
     //   {graph: 'selectedGraph'},
     //   'selectedNodeId',

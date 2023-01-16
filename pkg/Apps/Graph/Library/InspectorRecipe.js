@@ -9,7 +9,9 @@ import {customInspectors} from './customInspectors.js';
 export const InspectorRecipe = {
   Inspector: {
     $kind: '$library/Node/ObjectInspector',
-    $staticInputs: {customInspectors},
+    $staticInputs: {
+      customInspectors
+    },
     $inputs: [{data: 'inspectorData'}],
     $outputs: [{data: 'inspectorData'}]
   },

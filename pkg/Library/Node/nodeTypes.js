@@ -35,7 +35,8 @@ const etc = await load([
   'Node/NodeCatalogNode.js',
   'Node/NodeEditorNode.js',
   'Node/NodeTreeNode.js',
-  'Node/NodeInspectorNode.js'
+  'Node/NodeInspectorNode.js',
+  'NodeGraph/GraphToolbarNode.js'
 ]);
 
 const nodeTypes = {

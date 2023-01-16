@@ -202,6 +202,10 @@
 <style>
   :host {
     flex: none !important;
+    --mdc-icon-button-size: 24px;
+    --mdc-icon-size: 18px;
+    --mdc-tab-height: 24px;
+    /* --mdc-typography-button-font-size: 0.875em; */
   }
   [toolbar] {
     padding: 0 0 0 6px;

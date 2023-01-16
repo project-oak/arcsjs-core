@@ -550,7 +550,9 @@ template: html`
 </template>
 
 <template custom_t>
-  <div flex prop-container frame$="{{container}}"></div>
+  <div flex prop-container>
+    <slot name="{{container}}"></slot>
+  </div>
 </template>
 `
 });

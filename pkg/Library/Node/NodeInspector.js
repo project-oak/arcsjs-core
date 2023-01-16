@@ -9,29 +9,35 @@ connectionDelimiter: ':',
 inspectorDelimiter: '$$',
 defaultInspectorDataProp: 'inspectorData',
 
-async update(inputs, state, {service, output, invalidate}) {
-  const {selectedNodeId, graph, nodeTypes, candidates} = inputs;
-  if (graph && selectedNodeId) {
-    if (selectedNodeId !== state.node?.id) {
-      assign(state, {data: null, hasMonitor: false});
-    }
-    const node = graph.nodes[selectedNodeId];
-    if (this.shouldConstructData(inputs, state)) {
-      await this.finagleCustomRecipes(state.recipes, service, false);
-      assign(state, {graph, node, candidates, recipes: []});
-      const data = await this.constructData(node, inputs, state, service);
-      await this.finagleCustomRecipes(state.recipes, service, true);
-      await output({data});
-    }
-    if (!state.hasMonitor && state.node) {
-      state.hasMonitor = true;
-      // calling async method without awaiting it, on purpose,
-      // which creates Special Circumstances, see below
-      this.monitorStores(state, nodeTypes, {service, invalidate});
-    }
+async update(inputs, state, tools) {
+  let result;
+  if (inputs.graph && inputs.selectedNodeId) {
+    result = this.updateNode(inputs, state, tools);
   } else {
     state.node = null;
-    return {data: null, nodeType: null};
+    result = {data: null, nodeType: null};
+  }
+  if (!state.hasMonitor && state.node) {
+    state.hasMonitor = true;
+    // calling async method without awaiting it, on purpose,
+    // which creates Special Circumstances, see below
+    this.monitorStores(state, inputs.nodeTypes, tools);
+  }
+  return result;
+},
+
+async updateNode(inputs, state, {service}) {
+  const {graph, selectedNodeId, nodeTypes, candidates} = inputs;
+  if (selectedNodeId !== state.node?.id) {
+    assign(state, {data: null, hasMonitor: false});
+  }
+  const node = graph.nodes[selectedNodeId];
+  if (this.shouldConstructData(inputs, state)) {
+    await this.finagleCustomRecipes(state.recipes, service, false);
+    assign(state, {graph, node, candidates, recipes: []});
+    const data = await this.constructData(node, inputs, state, service);
+    await this.finagleCustomRecipes(state.recipes, service, true);
+    return {data};
   }
 },
 
@@ -62,9 +68,13 @@ candidatesChanged(candidates, oldCandidates) {
 },
 
 async finagleCustomRecipes(recipes, service, finagle) {
-  return Promise.all(recipes?.map(
-    recipe => service({kind: 'RecipeService', msg: 'FinagleRecipe', data: {recipe, value: finagle}})
-  ) || []);
+  if (recipes) {
+    const finagler = recipe => service({kind: 'RecipeService', msg: 'FinagleRecipe', data: {recipe, value: finagle}});
+    for (const recipe of recipes) {
+      await finagler(recipe);
+    }
+  }
+  //return Promise.all(recipes?.map(finagle));
 },
 
 async monitorStores(state, nodeTypes, {service, invalidate}) {

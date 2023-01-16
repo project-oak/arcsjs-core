@@ -5,12 +5,13 @@
  * license that can be found in the LICENSE file.
  */
 import {App} from '../Worker/App.js';
+import {Paths} from '../../Core/utils.js';
 
 const GraphRecipe = {
   $meta: {name: 'GraphRecipe', id: 'GraphRecipe'},
   main: {
     // n.b. the GraphRecipe actually only wants the rectangles from the graph layouts
-    $kind: '$library/App/Graph/Graph'
+    $kind: '$library/App/Node/Graph'
   }
 };
 
@@ -21,6 +22,7 @@ export const GraphApp = class extends App {
       this.graph,
       //this.configureGraph(this.graph)
     ];
+    Paths.add(this.paths);
     this.logInfo();
     await super.spinup();
   }

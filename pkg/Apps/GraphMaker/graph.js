@@ -6,44 +6,52 @@
  */
 export const graph = {
   "$meta": {
-    "name": "illiterate-recommendation",
-    "id": "5435-1803-2113"
+    "name": "idolized-voice",
+    "id": "8291-2052-6799"
   },
   "nodes": {
-    "SplitPanelNode1": {
-      "id": "SplitPanelNode1",
-      "type": "SplitPanelNode",
-      "displayName": "Split Panel",
-      "connections": {},
-      "props": {
-        "layout": "vertical",
-        "endflex": true,
-        "divider": 232
-      }
-    },
-    "NodeTypesNode1": {
-      "id": "NodeTypesNode1",
-      "type": "NodeTypesNode",
-      "displayName": "Node Types"
-    },
     "NodeCatalogNode1": {
       "id": "NodeCatalogNode1",
       "type": "NodeCatalogNode",
       "displayName": "Node Catalog",
       "connections": {
         "nodeTypes": [
-          "NodeTypesNode1:NodeTypes"
+          "NodeTypesNode2:NodeTypes"
         ]
+      },
+      "props": {}
+    },
+    "SplitPanelNode1": {
+      "id": "SplitPanelNode1",
+      "type": "SplitPanelNode",
+      "displayName": "Main Panel",
+      "connections": {},
+      "props": {
+        "layout": "vertical"
       }
     },
     "SplitPanelNode2": {
       "id": "SplitPanelNode2",
       "type": "SplitPanelNode",
-      "displayName": "Split Panel 2",
+      "displayName": "Edit Panel",
+      "connections": {},
+      "props": {}
+    },
+    "SplitPanelNode3": {
+      "id": "SplitPanelNode3",
+      "type": "SplitPanelNode",
+      "displayName": "ColumnsPanel",
       "connections": {},
       "props": {
         "layout": "vertical"
       }
+    },
+    "SplitPanelNode4": {
+      "id": "SplitPanelNode4",
+      "type": "SplitPanelNode",
+      "displayName": "ToolsPanel",
+      "connections": {},
+      "props": {}
     },
     "NodeInspectorNode1": {
       "id": "NodeInspectorNode1",
@@ -52,26 +60,10 @@ export const graph = {
       "connections": {},
       "props": {}
     },
-    "NodeTreeNode1": {
-      "id": "NodeTreeNode1",
-      "type": "NodeTreeNode",
-      "displayName": "Node Tree"
-    },
-    "SplitPanelNode3": {
-      "id": "SplitPanelNode3",
-      "type": "SplitPanelNode",
-      "displayName": "Split Panel 3",
-      "connections": {},
-      "props": {
-        "layout": "horizontal",
-        "endflex": false,
-        "divider": 0
-      }
-    },
-    "SplitPanelNode4": {
-      "id": "SplitPanelNode4",
-      "type": "SplitPanelNode",
-      "displayName": "Split Panel 4",
+    "NodeTypesNode2": {
+      "id": "NodeTypesNode2",
+      "type": "NodeTypesNode",
+      "displayName": "Node Types",
       "connections": {},
       "props": {}
     },
@@ -87,113 +79,78 @@ export const graph = {
       "connections": {},
       "props": {}
     },
-    "DisplayNode1": {
-      "id": "DisplayNode1",
-      "type": "DisplayNode",
-      "displayName": "Display",
-      "connections": {},
-      "props": {
-        "text": "Annappolis",
-        "textStyle": "padding: 20px; font-size: 1.5em; font-weight: bold; height: auto !important; flex: none !important;"
-      }
-    },
-    "SplitPanelNode5": {
-      "id": "SplitPanelNode5",
-      "type": "SplitPanelNode",
-      "displayName": "Split Panel 5",
-      "connections": {},
-      "props": {
-        "endflex": true,
-        "divider": 70
-      }
+    "NodeTreeNode1": {
+      "id": "NodeTreeNode1",
+      "type": "NodeTreeNode",
+      "displayName": "Node Tree"
     }
   },
   "layout": {
-    "preview": {
-      "NodeCatalogNode1:Container": "SplitPanelNode1:panel#FirstContainer",
-      "SplitPanelNode2:Container": "SplitPanelNode1:panel#SecondContainer",
-      "NodeInspectorNode1:Container": "SplitPanelNode4:panel#FirstContainer",
-      "NodeTreeNode1:Container": "SplitPanelNode4:panel#SecondContainer",
-      "SplitPanelNode4:Container": "SplitPanelNode2:panel#SecondContainer",
-      "SplitPanelNode3:Container": "SplitPanelNode2:panel#FirstContainer",
-      "NodeDesignerNode1:Container": "SplitPanelNode3:panel#FirstContainer",
-      "NodeEditorNode1:Container": "SplitPanelNode3:panel#SecondContainer",
-      "SplitPanelNode1:Container": "SplitPanelNode5:panel#SecondContainer",
-      "DisplayNode1:Container": "SplitPanelNode5:panel#FirstContainer"
-    },
     "nodegraph": {
+      "NodeCatalogNode1": {
+        "l": 76,
+        "t": 116,
+        "w": 140,
+        "h": 60
+      },
       "SplitPanelNode1": {
-        "l": -1188,
-        "t": -2048,
-        "w": 144,
+        "l": 337,
+        "t": 18,
+        "w": 140,
         "h": 116
       },
-      "NodeCatalogNode1": {
-        "l": 22,
-        "t": 216,
-        "w": 128,
-        "h": 96
-      },
       "SplitPanelNode2": {
-        "l": 336,
-        "t": 3464,
-        "w": 144,
-        "h": 80
-      },
-      "NodeInspectorNode1": {
-        "l": 383,
-        "t": 75,
-        "w": 144,
-        "h": 112
-      },
-      "DesignerNode1": {
-        "l": 552,
-        "t": 48,
-        "w": 176,
-        "h": 112
-      },
-      "EditorNode1": {
-        "l": 384,
-        "t": 176,
-        "w": 144,
-        "h": 136
-      },
-      "NodeTreeNode1": {
-        "l": 198,
-        "t": 65,
-        "w": 144,
-        "h": 80
+        "l": 374,
+        "t": 51,
+        "w": 140,
+        "h": 116
       },
       "SplitPanelNode3": {
-        "l": 383,
-        "t": 215,
-        "w": 128,
+        "l": 415,
+        "t": 82,
+        "w": 140,
         "h": 116
       },
       "SplitPanelNode4": {
-        "l": 28,
-        "t": 75,
-        "w": 144,
+        "l": 447,
+        "t": 119,
+        "w": 140,
         "h": 116
       },
+      "NodeInspectorNode1": {
+        "l": 78,
+        "t": 192,
+        "w": 140,
+        "h": 60
+      },
+      "NodeTypesNode2": {
+        "l": 73,
+        "t": 42,
+        "w": 140,
+        "h": 60
+      },
       "NodeDesignerNode1": {
-        "l": 384,
-        "t": 100,
-        "w": 144,
-        "h": 80
+        "l": 77,
+        "t": 263,
+        "w": 140,
+        "h": 76
       },
       "NodeEditorNode1": {
-        "l": 198,
-        "t": 169,
-        "w": 144,
-        "h": 63.984375
-      },
-      "DisplayNode1": {
-        "l": 200,
-        "t": 200,
-        "w": 144,
-        "h": 80
+        "l": 79,
+        "t": 349,
+        "w": 140,
+        "h": 60
       }
+    },
+    "preview": {
+      "NodeCatalogNode1:Container": "SplitPanelNode1:panel#FirstContainer",
+      "SplitPanelNode2:Container": "SplitPanelNode3:panel#FirstContainer",
+      "SplitPanelNode3:Container": "SplitPanelNode1:panel#SecondContainer",
+      "SplitPanelNode4:Container": "SplitPanelNode3:panel#SecondContainer",
+      "NodeInspectorNode1:Container": "SplitPanelNode4:panel#FirstContainer",
+      "NodeDesignerNode1:Container": "SplitPanelNode2:panel#FirstContainer",
+      "NodeEditorNode1:Container": "SplitPanelNode2:panel#SecondContainer",
+      "NodeTreeNode1:Container": "SplitPanelNode4:panel#SecondContainer"
     }
   }
 };
