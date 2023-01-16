@@ -8,7 +8,7 @@
  */
 import {Arcs} from './Arcs.js';
 //import {loadCss} from '../../Dom/dom.js';
-import {DevToolsRecipe, DevToolsGraph} from '../../DevTools/DevToolsRecipe.js';
+import {DevToolsNode, DevToolsGraph} from '../../DevTools/DevToolsGraph.js';
 import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
 import {themeRules} from '../theme.js';
 import {NodeTypesNode} from '../../Node/NodeTypesNode.js';
@@ -43,7 +43,7 @@ export const App = class {
     this.composer = await Arcs.createComposer(this.root || document.body);
     //
     assign(this.nodeTypes, {
-      DevToolsRecipe,
+      DevToolsNode,
       NodeTypesNode
     });
     this.graphs = [

@@ -6,7 +6,7 @@
  */
 import {customInspectors} from './customInspectors.js';
 
-export const InspectorRecipe = {
+export const InspectorNode = {
   Inspector: {
     $kind: '$library/Node/ObjectInspector',
     $staticInputs: {
