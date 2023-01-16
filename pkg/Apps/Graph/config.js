@@ -20,11 +20,13 @@ globalThis.config = {
   //theme: 'dark',
   logFlags: {
     app: true,
-    //recipe: true,
     //arc: true,
-    particles: true,
-    //storage: true,
+    //code: true,
     //composer: true,
-    services: true
+    graph: true,
+    particles: true,
+    //recipe: true,
+    services: true,
+    //storage: true,
   }
 };

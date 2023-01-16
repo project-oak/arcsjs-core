@@ -1127,7 +1127,7 @@ var Chef = class {
 };
 
 // js/recipe/Graphinator.js
-var log7 = logFactory(logFactory.flags.recipe, "Chef", "#087f23");
+var log7 = logFactory(logFactory.flags.graph, "Graphinator", "#7f0823");
 var { assign: assign2, create: create4 } = Object;
 var entries5 = (o) => Object.entries(o ?? Object);
 var keys5 = (o) => Object.keys(o ?? Object);
@@ -1184,7 +1184,7 @@ var Graphinator = class {
       this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
     });
     this.retagStoreSpecs(stores);
-    log7("Executing graph: ", stores, particles);
+    log7("Executing graph", { graph, stores, particles });
     await StoreCook.execute(this.runtime, this.arc, stores);
     await this.realizeParticles(particles);
     return particles.map(({ id }) => id);

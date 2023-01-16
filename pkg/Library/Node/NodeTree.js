@@ -64,7 +64,7 @@ makeNodesModels(currentNodes, allNodes, layout, selectedNodeId, nodeTypes, categ
 },
 
 isRootContainer(container) {
-  return !container  || (container === 'designer#graph');
+  return !container || container.includes('#graph'); // === 'designer#graph';
 },
 
 makeNodeModel({id, displayName, type}, nodeTypes, categories, selectedNodeId) {
@@ -128,7 +128,12 @@ async onDrop({eventlet: {key: container, value: {id}}, graph, nodeTypes, layoutI
   const hostNames = this.getHostNames(nodeType);
   const hostIds = hostNames.map(name => this.hostId(node, name));
   // map the container layout, create objects as needed
-  ((graph.layout ??= {})[layoutId] ??= {})[`${id}:Container`] = container;
+  const containerId = `${id}:Container`;
+  ((graph.layout ??= {})[layoutId] ??= {})[containerId] = container;
+  // punt root
+  if (container === 'designer#graph') {
+    delete graph.layout[layoutId][containerId];
+  }
   // inform the render agent
   // TODO(sjmiles): deprecate in favor of changing layout data
   await setContainer(hostIds, container);

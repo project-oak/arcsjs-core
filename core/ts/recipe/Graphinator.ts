@@ -13,7 +13,7 @@ import {Runtime} from '../Runtime.js';
 import {StoreCook} from './StoreCook.js';
 import {ParticleCook} from './ParticleCook.js';
 
-const log = logFactory(logFactory.flags.recipe, 'Chef', '#087f23');
+const log = logFactory(logFactory.flags.graph, 'Graphinator', '#7f0823');
 
 const {assign, create} = Object;
 const entries = (o):any[] => Object.entries(o ?? Object);
@@ -73,8 +73,8 @@ export class Graphinator {
       this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
     });
     this.retagStoreSpecs(stores);
-
-    log('Executing graph: ', stores, particles);
+    log('Executing', {graph, stores, particles});
+    //log('Executing graph: ', stores, particles);
     await StoreCook.execute(this.runtime, this.arc, stores);
     await this.realizeParticles(particles);
     return particles.map(({id}) => id);

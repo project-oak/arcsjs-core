@@ -50,10 +50,10 @@ export const App = class {
       DevToolsGraph,
       ...(this.graphs ?? [])
     ];
-    await this.runGraphs(this.graphs, this.nodeTypes);
+    await this.runGraphs(this.graphs, this.nodeTypes, this.layoutInfo);
   }
-  async runGraphs(graphs, nodeTypes) {
-    const grapher = graph => Arcs.runGraph('user', graph, nodeTypes);
+  async runGraphs(graphs, nodeTypes, layoutInfo) {
+    const grapher = graph => Arcs.runGraph('user', graph, nodeTypes, layoutInfo);
     for (const graph of graphs) {
       await grapher(graph);
     }

@@ -8,14 +8,13 @@ import {Xen} from '../Dom/Xen/xen-async.js';
 import {dom, loadScript} from '../Dom/Dom.js';
 import {themeRules} from './theme.js';
 import {boot} from './Common/boot.js';
-import '../Mediapipe/PoseServiceLoader.js';
 import {Params} from './Params.js';
-//import {graph} from '../../Apps/GraphRunner/graph.js';
+import '../Mediapipe/PoseServiceLoader.js';
 
 const Library = `${globalThis.config?.arcsPath}/Library`;
 
 export const ArcsJsApp = class extends Xen.Async {
-  static getObservedAttributes() {
+  static get observedAttributes() {
     return ['path'];
   }
   get host() {
@@ -23,13 +22,8 @@ export const ArcsJsApp = class extends Xen.Async {
   }
   _didMount() {
     dom('link', {rel: 'icon', href: `${Library}/App/Common/arcs/icon.png`}, document.head);
-    // loadScript(`${Library}/Mediapipe/PoseServiceLoader.js`);
     loadScript(`${Library}/../third_party/pixijs/pixi.6.5.7.min.js`);
     //loadScript(`${library}/../third_party/pixijs/pixi-plugins/pixi-spine.js`);
-    //
-    // const graphs = JSON.parse(localStorage.getItem('user/graph/0.4.5/graphs'));
-    // const graph = graphs.find(g => g.$meta?.name === 'idolized-voice');
-    // boot(import.meta.url, {graph});
   }
   update({path}, state) {
     if (!state.running) {
@@ -38,7 +32,10 @@ export const ArcsJsApp = class extends Xen.Async {
       const graph = graphs.find(g => g?.$meta?.name === name);
       if (graph) {
         state.running = true;
-        boot(import.meta.url, {graph});
+        boot(import.meta.url, {
+          graph,
+          defaultContainer: 'NodeDesignerNode1_designer#graph'
+        });
       }
     }
   }
