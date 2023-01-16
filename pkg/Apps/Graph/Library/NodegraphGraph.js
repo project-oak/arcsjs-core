@@ -5,10 +5,10 @@
  * license that can be found in the LICENSE file.
  */
 import {NodeCatalogNode} from '../../../Library/Node/NodeCatalogNode.js';
-import {GraphToolbarRecipe} from './GraphToolbarRecipe.js';
-import {NodeEditorRecipe} from './NodeEditorRecipe.js';
-import {RecipeBuilderRecipe} from './RecipeBuilderRecipe.js';
-import {InspectorRecipe} from './InspectorRecipe.js';
+import {GraphToolbarNode} from './GraphToolbarNode.js';
+import {NodeEditorNode} from './NodeEditorNode.js';
+import {GraphBuilderNode} from './GraphBuilderNode.js';
+import {InspectorNode} from './InspectorNode.js';
 
 const Preview = {
   designer: {
@@ -31,7 +31,7 @@ const Preview = {
   }
 };
 
-const NodeTreeRecipe = {
+const NodeTreeNode = {
   NodeTree: {
     $kind: '$library/Node/NodeTree',
     $inputs: [
@@ -50,7 +50,7 @@ const NodeTreeRecipe = {
   }
 };
 
-const NodeCreatorRecipe = {
+const NodeCreatorNode = {
   // combiner: {
   //   $kind: '$library/Node/NodeTypesCombiner',
   //   $inputs: ['builtinNodeTypes', 'selectedGraph'],
@@ -71,10 +71,10 @@ const NodeCreatorRecipe = {
   }
 };
 
-const NodegraphRecipe = {
+const NodegraphNode = {
   $meta: {
-    description: 'Node Editor Recipe',
-    id: 'NodegraphRecipe'
+    description: 'Node Graph',
+    id: 'NodegraphNode'
   },
   $stores: {
     graphs: {
@@ -120,12 +120,12 @@ const NodegraphRecipe = {
     $slots: {
       preview: Preview,
       catalog: NodeCatalogNode,
-      toolbar: GraphToolbarRecipe,
-      editor: NodeEditorRecipe,
-      inspector: InspectorRecipe,
-      tree: NodeTreeRecipe,
-      builder: RecipeBuilderRecipe,
-      creator: NodeCreatorRecipe
+      toolbar: GraphToolbarNode,
+      editor: NodeEditorNode,
+      inspector: InspectorNode,
+      tree: NodeTreeNode,
+      builder: GraphBuilderNode,
+      creator: NodeCreatorNode
     }
   },
 };
@@ -136,8 +136,8 @@ export const NodegraphGraph = {
     name: 'nodegraph-app'
   },
   nodes: [{
-    type: 'NodegraphRecipe'
+    type: 'NodegraphNode'
   }]
 };
 
-export const nodegraphNodeTypes = {NodegraphRecipe};
+export const nodegraphNodeTypes = {NodegraphNode};

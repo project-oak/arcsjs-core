@@ -16,7 +16,6 @@ const load = async paths => (await Promise.all(paths.map(p => import(`${Library}
 const modules = await load([
   'App/HistoryService.js',
   'Arc/ArcService.js',
-  // 'RecipeBuilder/RecipeBuilderService.js',
   'Rtc/LobbyService.js',
   'Goog/GoogleApisService.js',
   'NewMedia/MediaService.js',
@@ -40,5 +39,4 @@ export const {CocoSsdService} = modules;
 export const {LobbyService} = modules;
 export const {GoogleApisService} = modules;
 export const {ArcService} = modules;
-export const {RecipeBuilderService} = modules;
 export const {PoseService} = modules;
