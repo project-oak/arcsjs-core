@@ -15,7 +15,7 @@ const Library = `${globalThis.config?.arcsPath}/Library`;
 
 export const ArcsJsApp = class extends Xen.Async {
   static get observedAttributes() {
-    return ['path'];
+    return ['path', 'graph'];
   }
   get host() {
     return this;
@@ -25,19 +25,30 @@ export const ArcsJsApp = class extends Xen.Async {
     loadScript(`${Library}/../third_party/pixijs/pixi.6.5.7.min.js`);
     //loadScript(`${library}/../third_party/pixijs/pixi-plugins/pixi-spine.js`);
   }
-  update({path}, state) {
-    if (!state.running) {
-      const name = path ?? Params.getParam('path');
-      const graphs = JSON.parse(localStorage.getItem('user/graph/0.4.5/graphs'));
-      const graph = graphs.find(g => g?.$meta?.name === name);
-      if (graph) {
-        state.running = true;
-        boot(import.meta.url, {
-          graph,
-          defaultContainer: 'NodeDesignerNode1_designer#graph'
-        });
-      }
+  shouldUpdate(inputs, state) {
+    return !state.running;
+  }
+  update({path, graph}, state) {
+    if (!graph) {
+      graph = this.maybeLoadStorageGraph(path ?? Params.getParam('path'));
     }
+    if (graph) {
+      state.running = true;
+      this.bootGraph(graph);
+    }
+  }
+  maybeLoadStorageGraph(path) {
+    const name = path;
+    if (name) {
+      const graphs = JSON.parse(localStorage.getItem('user/graph/0.4.5/graphs'));
+      return graphs.find(g => g?.$meta?.name === name);
+    }
+  }
+  bootGraph(graph) {
+    boot(import.meta.url, {
+      graph,
+      defaultContainer: 'NodeDesignerNode1_designer#graph'
+    });
   }
   get template() {
     return Xen.html`

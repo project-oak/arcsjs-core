@@ -18,10 +18,12 @@ export const GraphToolbarNode = {
       $type: 'Pojo'
     },
     icons: {
-      $type: '[Pojo]'
+      $type: '[Pojo]',
+      nodisplay: true
     },
     event: {
-      $type: 'String'
+      $type: 'String',
+      nodisplay: true
     }
   },
   graphToolbar: {
@@ -36,17 +38,17 @@ export const GraphToolbarNode = {
     },
     $outputs: [
       'graph',
-      'selectedNodeId',
+      //'selectedNodeId',
       'graphs',
       'icons',
-      'event'
+      //'event'
     ],
     $slots: {
       buttons: {
         GraphButtons: {
           $kind: '$library/NodeGraph/Toolbar',
           $inputs: ['icons'],
-          $outputs: ['event'],
+          $outputs: ['event']
         }
       },
       chooser: {

@@ -7,20 +7,20 @@
 import {App} from '../Worker/App.js';
 import {Paths} from '../../Core/utils.js';
 
-const GraphRecipe = {
-  $meta: {name: 'GraphRecipe', id: 'GraphRecipe'},
+const GraphNode = {
+  $meta: {
+    id: 'GraphNode'
+  },
   main: {
-    // n.b. the GraphRecipe actually only wants the rectangles from the graph layouts
     $kind: '$library/App/Node/Graph'
   }
 };
 
 export const GraphApp = class extends App {
   async spinup() {
-    this.nodeTypes.GraphRecipe = GraphRecipe;
+    this.nodeTypes.GraphNode = GraphNode;
     this.graphs = [
-      this.graph,
-      //this.configureGraph(this.graph)
+      this.graph
     ];
     Paths.add(this.paths);
     this.services.ArcService.nodeTypes = this.nodeTypes;
@@ -30,19 +30,6 @@ export const GraphApp = class extends App {
     };
     this.logInfo();
     await super.spinup();
-  }
-
-  configureGraph(graph, layoutId) {
-    return {
-      $meta: {
-        id: 'graph-graph',
-        name: 'graph-graph'
-      },
-      nodes: [{
-        type: 'GraphRecipe',
-        props: {graph, layoutId}
-      }]
-    };
   }
 
   logInfo() {
