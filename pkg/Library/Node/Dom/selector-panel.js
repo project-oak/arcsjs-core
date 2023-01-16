@@ -56,13 +56,18 @@ export class SelectorPanel extends DragDrop {
   }
   selectAll(ids) {
     let observe = null;
-    ids?.forEach(id => {
-      const elt = this.querySlotById(id);
-      if (elt) {
-        this.updateSelectionBox(elt);
-        observe = elt;
-      }
-    });
+    if (ids?.length) {
+      ids?.forEach(id => {
+        const elt = this.querySlotById(id);
+        if (elt) {
+          this.updateSelectionBox(elt);
+          observe = elt;
+        }
+      });
+    } else {
+      // hide selection
+      this.boxer.hidden = true;
+    }
     if (this.lastObserved !== observe) {
       //log('obs', observe);
       if (this.lastObserved) {
