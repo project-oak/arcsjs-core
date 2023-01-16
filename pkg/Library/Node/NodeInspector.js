@@ -27,7 +27,7 @@ async update(inputs, state, tools) {
 },
 
 async updateNode(inputs, state, {service}) {
-  const {graph, selectedNodeId, nodeTypes, candidates} = inputs;
+  const {graph, selectedNodeId, candidates} = inputs;
   if (selectedNodeId !== state.node?.id) {
     assign(state, {data: null, hasMonitor: false});
   }
@@ -47,7 +47,8 @@ shouldConstructData({selectedNodeId, graph, candidates}, state) {
     return this.graphChanged(graph, state.graph)
         || this.nodeChanged(node, state.node)
         || this.candidatesChanged(candidates?.[selectedNodeId], state.candidates?.[selectedNodeId])
-        || !state.hasMonitor;
+        || !state.hasMonitor
+        ;
   }
   return false;
 },
@@ -56,7 +57,8 @@ nodeChanged({key, connections, props, displayName}, node) {
   return node?.key !== key
       || node?.displayName !== displayName
       || JSON.stringify(node?.connections) != JSON.stringify(connections)
-      || JSON.stringify(node?.props) !== JSON.stringify(props);
+      || JSON.stringify(node?.props) !== JSON.stringify(props)
+      ;
 },
 
 graphChanged(graph, oldGraph) {

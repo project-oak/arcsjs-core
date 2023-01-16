@@ -292,7 +292,7 @@ template: html`
     background-color: var(--theme-color-bg-0);
     color: var(--theme-color-fg-4);
     position: relative;
-    overflow-y: auto;
+    overflow-y: auto !important;
   }
   [info-container] {
     border-bottom: 1px solid var(--theme-color-bg-3);

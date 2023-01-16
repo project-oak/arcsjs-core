@@ -55,13 +55,16 @@ const nodeList = {
   NodeList: {
     $kind: '$library/Node/NodeList',
     $inputs: [
-      'nodeTypes', 'categories', 'newNodeInfos',
+      'nodeTypes',
+      'categories',
+      //'newNodeInfos',
       {graph: 'selectedGraph'},
       {search: 'nodeSearch'}
     ],
     $outputs: [
       {graph: 'selectedGraph'},
-      'hoveredNodeType',  'newNodeInfos'
+      'hoveredNodeType',
+      'newNodeInfos'
     ],
     $slots: {
       typeInfo
@@ -91,11 +94,15 @@ export const NodeCatalogNode = {
   $stores: {
     nodeTypes: {
       type: '[NodeType]'
-    }
+    },
+    // newNodeInfos: {
+    //   $type: '[Pojo]'
+    // }
   },
   NodeCatalog: {
     $kind:'$library/Node/NodeCatalog',
-    $inputs: ['nodeTypes'],
+    $inputs: ['nodeTypes'/*, 'newNodeInfos'*/],
+    //$outputs: ['newNodeInfos'],
     $slots: {
       nodeSearch,
       nodeList

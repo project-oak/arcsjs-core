@@ -22,9 +22,9 @@ globalThis.config = {
     //recipe: true,
     //arc: true,
     //code: true,
+    //composer: true,
     particles: true,
     //storage: true,
-    //surfaces: true,
     //services: true
   }
 };

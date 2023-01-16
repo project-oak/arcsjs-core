@@ -10,8 +10,7 @@ edgeIdDelimeter: '$$',
 connectionDelimiter: ':',
 
 async update(inputs, state) {
-  const {graph} = inputs;
-  state.graph = this.parseGraph(graph);
+  state.graph = this.parseGraph(inputs.graph);
   const results = this.handleEvents(inputs, state);
   return {
     ...results,
@@ -105,7 +104,7 @@ renderGraphNodes(inputs, state) {
 },
 
 renderNode(node, {graph, categories, selectedNodeId, nodeTypes, layoutId}) {
-  const nodeType = nodeTypes[node.type];
+  const nodeType = nodeTypes?.[node.type];
   const layout = graph.layout?.[layoutId];
   const {category} = nodeType?.$meta || {category: 'n/a'};
   return {

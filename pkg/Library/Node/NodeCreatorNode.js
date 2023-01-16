@@ -4,39 +4,37 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-export const NodeTreeNode = {
+export const NodeCreatorNode = {
   $meta: {
-    id: 'NodeTreeNode',
-    displayName: 'Node Tree',
+    id: 'NodeCreatorNode',
+    displayName: 'Node Creator',
     category: 'Designer'
   },
   $stores: {
     graph: {
       $type: 'Pojo'
     },
-    selectedNodeId: {
-      $type: 'String'
-    },
     nodeTypes: {
-      $type: 'Pojo',
-      $value: {}
+      $type: 'Pojo'
     },
-    categories: {
+    newNodeInfos: {
       $type: 'Pojo'
     }
   },
-  NodeTree: {
-    $kind: '$library/Node/NodeTree',
+  // combiner: {
+  //   $kind: '$library/Node/NodeTypesCombiner',
+  //   $inputs: ['builtinNodeTypes', 'selectedGraph'],
+  //   $outputs: [{results: 'nodeTypes'}, 'selectedGraph']
+  // },
+  creator: {
+    $kind: '$library/Node/NodeCreator',
     $inputs: [
-      'graph',
-      'selectedNodeId',
+      'newNodeInfos',
       'nodeTypes',
-      'categories'
+      'graph'
     ],
-    $staticInputs: {
-      layoutId: 'preview'
-    },
     $outputs: [
+      'newNodeInfos',
       'graph',
       'selectedNodeId'
     ]

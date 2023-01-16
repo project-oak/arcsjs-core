@@ -23,6 +23,11 @@ export const GraphApp = class extends App {
       //this.configureGraph(this.graph)
     ];
     Paths.add(this.paths);
+    this.services.ArcService.nodeTypes = this.nodeTypes;
+    this.services.ArcService.layoutInfo = {
+      id: 'preview',
+      defaultContainer: this.defaultContainer || 'designer#graph'
+    };
     this.logInfo();
     await super.spinup();
   }

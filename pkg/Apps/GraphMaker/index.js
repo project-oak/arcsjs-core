@@ -6,10 +6,10 @@
  */
 import '../../Library/App/Common/config.js';
 import {boot} from '../../Library/App/Common/boot.js';
-// import {graph} from './graph.js';
 
 const graphs = JSON.parse(localStorage.getItem('user/graph/0.4.5/graphs'));
 const graph = graphs.find(g => g.$meta?.name === 'idolized-voice');
+
 if (graph) {
-  boot(import.meta.url, {graph});
+  boot(import.meta.url, {graph, defaultContainer: 'NodeDesignerNode1_designer#graph'});
 }

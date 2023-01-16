@@ -3,9 +3,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-
 ({
-
 async update({newNodeInfos, graph, nodeTypes}) {
   if (newNodeInfos?.length > 0) {
     let selectedNodeId;
@@ -30,7 +28,8 @@ async update({newNodeInfos, graph, nodeTypes}) {
 
 makeNewNode(graph, nodeType) {
   const {id: type, displayName: nodeTypeDisplayName} = nodeType.$meta;
-  const index = this.countNodesOfType(graph.nodes, type) + 1;
+  //const index = this.countNodesOfType(graph.nodes, type) + 1;
+  const index = Math.floor((Math.random() + 1)*1e4);
   const id = this.formatNodeId(type, index);
   const displayName = this.formatDisplayName(nodeTypeDisplayName || type, index);
   return {id, type, displayName};

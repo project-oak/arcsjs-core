@@ -6,26 +6,30 @@
  */
 ({
 async update({graph}, state, {service}) {
+  const arcService = (msg, graph) => service({kind: 'ArcService', msg, data:{graph}});
+  // if the old graph is not the input graph, remove it
   if (state.graph && graph?.$meta?.id !== state.graph?.$meta?.id) {
-    await service({kind: 'ArcService', msg: 'removeGraph', data: {graph: state.graph}});
+    await arcService('removeGraph', state.graph);
   }
+  // if the input graph is not the old graph, run it
   if (graph && !deepEqual(graph, state.graph)) {
-    // state.particleIds =
-    await service({kind: 'ArcService', msg: 'runGraph', data: {graph}});
+    await arcService('runGraph', graph);
   }
+  // remember the old graph
   state.graph = graph;
 },
 
 render({graph, nodeTypes, categories, layoutId, selectedNodeId}) {
+  // selected node
   const node = graph?.nodes?.[selectedNodeId];
-  //
-  //const selectedKeys = this.particleIdsForNode(node, graph, nodeTypes);
+  // make selection into array
   const selectedKeys = selectedNodeId ? [selectedNodeId] : null;
+  // collate rectangles
   const rects = this.getRects(graph, nodeTypes, layoutId);
-  //
+  // conjure color info
   const nodeType = nodeTypes?.[node?.type];
   const color = this.colorByCategory(nodeType?.$meta?.category, categories);
-  //
+  // send to template
   return {
     rects,
     selectedKeys,

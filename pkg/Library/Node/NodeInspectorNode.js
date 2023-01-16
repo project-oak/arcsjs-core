@@ -11,24 +11,43 @@ export const NodeInspectorNode = {
     category: 'Designer'
   },
   $stores: {
-    inspectorData: {
-      $type: 'JSON',
-      noinspect: true
+    graph: {
+      $type: 'Pojo'
+    },
+    selectedNodeId: {
+      $type: 'String'
+    },
+    candidates: {
+      $type: 'Pojo'
+    },
+    nodeTypes: {
+      $type: 'Pojo'
+    },
+    data: {
+      $type: 'Pojo',
+      //noinspect: true,
+      //nodisplay: true,
     }
   },
   objectInspector: {
     $kind: '$library/Node/ObjectInspector',
-    $inputs: [{data: 'inspectorData'}]
+    $inputs: [
+      'data'
+    ]
   },
   nodeInspector: {
     $kind: '$library/Node/NodeInspector',
-    $staticInputs: {inspectorData: 'inspectorData'},
+    $staticInputs: {
+      inspectorData: 'inspectorData'
+    },
     $inputs: [
-      //{graph: 'selectedGraph'},
-      //'selectedNodeId',
-      //'candidates',
-      //'nodeTypes'
+      'graph',
+      'selectedNodeId',
+      'candidates',
+      'nodeTypes'
     ],
-    $outputs: [{data: 'inspectorData'}]
+    $outputs: [
+      'data'
+    ]
   },
 };
