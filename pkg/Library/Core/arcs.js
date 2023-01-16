@@ -1261,7 +1261,7 @@ var Graphinator = class {
   findRemovedParticles(particles) {
     const runningGraphParticleIds = keys5(this.arc.hosts).filter((id) => {
       const container = this.arc.hosts[id].meta.container;
-      if (container === "main#graph") {
+      if (container === "designer#graph") {
         return true;
       }
       const containerParticle = container?.split("#")?.[0];

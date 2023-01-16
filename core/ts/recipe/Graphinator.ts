@@ -170,7 +170,7 @@ export class Graphinator {
   findRemovedParticles(particles) {
     const runningGraphParticleIds = keys(this.arc.hosts).filter(id => {
       const container = this.arc.hosts[id].meta.container;
-      if (container === 'main#graph') {
+      if (container === 'designer#graph') {
         return true;
       }
       const containerParticle = container?.split('#')?.[0];
