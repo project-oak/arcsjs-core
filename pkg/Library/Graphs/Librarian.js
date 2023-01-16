@@ -83,8 +83,8 @@ template: html`
 <style>
   :host {
     font-size: 0.75em;
-    width: 320px;
-    height: 240px;
+    /*width: 320px;
+    height: 240px;*/
     --mdc-icon-button-size: 24px;
     --mdc-icon-size: 12px;
     --mdc-tab-height: 24px;
