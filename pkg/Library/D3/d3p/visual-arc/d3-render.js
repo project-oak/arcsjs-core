@@ -68,7 +68,7 @@ const addGroupMarks = node => {
     .attr("opacity", "1.0")
     .attr("stroke-width", 0)
   ;
-  node.on("click", (event, d) => d?.onclick(d));
+  node.on("click", (event, d) => d?.onclick?.(d));
 };
 
 // create a root SVG node
