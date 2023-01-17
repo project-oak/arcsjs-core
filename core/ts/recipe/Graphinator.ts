@@ -87,9 +87,21 @@ export class Graphinator {
       const storeId = this.constructId(id, name);
       const propValue = props?.[name]?.value;
       const storeValue = propValue === undefined ? store.$value : propValue;
+      // const storeValue = this.prepareStoreValue(props?.[name], store.$value, id);
       const storeConns = props?.[name]?.connection;
       this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
     });
+  }
+
+  prepareStoreValue(propValue, storeValue, nodeId) {
+    if (propValue) {
+      return propValue;
+    }
+    // TODO(mariakleiner): this is hacky, improve!
+    if (storeValue === '${node.id}') {
+      return nodeId;
+    }
+    return storeValue;
   }
 
   prepareStore(storeId, {$type: type, $tags}, value, connections, stores, storeEntry) {

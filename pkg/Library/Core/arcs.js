@@ -1192,6 +1192,15 @@ var Graphinator = class {
       this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
     });
   }
+  prepareStoreValue(propValue, storeValue, nodeId) {
+    if (propValue) {
+      return propValue;
+    }
+    if (storeValue === "${node.id}") {
+      return nodeId;
+    }
+    return storeValue;
+  }
   prepareStore(storeId, { $type: type, $tags }, value, connections, stores, storeEntry) {
     if (connections?.length > 0) {
       connections?.forEach?.((connId) => this.addStore(connId, $tags, storeEntry));

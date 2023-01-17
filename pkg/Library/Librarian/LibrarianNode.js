@@ -13,12 +13,15 @@ export const LibrarianNode = {
   $stores: {
     nodeId: {
       $type: 'String',
+      $value: '${node.id}',
       noinspect: true,
-      value: 'node.id'
+      nodisplay: true
     },
     selectedGraph: {
       $type: 'JSON',
-      noinspect: true
+      // connection: true,
+      noinspect: true,
+      nodisplay: true
     },
   },
   librarian: {

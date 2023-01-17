@@ -6,11 +6,11 @@
  */
 
 const globalStores = [
-  'selectedNode',
+  'selectedNodeId',
   'selectedGraph',
   'nodeTypes',
   'categories',
-  'nodeId',
+  // 'nodeId',
 ];
 
 export const RecipeBuilderRecipe = {
