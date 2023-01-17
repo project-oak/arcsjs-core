@@ -5,6 +5,17 @@
  * license that can be found in the LICENSE file.
  */
 ({
+update({nodeId, graph}, state) {
+  if (!state.nodeId) {
+    state.nodeId = nodeId || keys(graph.custom)?.[0] || Math.floor((Math.random() + 1)*1e4);
+  //   if (nodeId) {
+  //     state.nodeId = nodeId;
+  //     if (keys(graph.custom).length > 0) {
+  //       state.nodeId = keys(graph.custom)[0]
+  //     }
+  //   }
+  }
+},
 async onCodeChanged({eventlet: {key, value}, graph, nodeId}) {
   if (graph) {
     const custom = this.requireCustom(graph, nodeId);
@@ -13,13 +24,14 @@ async onCodeChanged({eventlet: {key, value}, graph, nodeId}) {
   }
 },
 
-onSpecChanged({eventlet: {value}, graph, nodeId}, state) {
+onSpecChanged({eventlet: {value}, graph /*, nodeId*/}, state) {
+  const {nodeId} = state;
   try {
     const parsed = JSON.parse(value);
     state.error = '';
     const spec = this.simplifiedToSpec(parsed, nodeId);
     if (spec) {
-      const custom = this.requireCustom(graph, nodeId);
+      const custom = this.requireCustom(graph, nodeId); //spec.$meta.id); //nodeId);
       custom.spec = spec;
       return {graph};
     }
@@ -52,6 +64,7 @@ specToSimplified(spec) {
   const notKeyword = name => !name.startsWith('$');
   const particle = spec?.[keys(spec).filter(notKeyword)?.[0]];
   return {
+    //id: spec?.$meta?.id || Math.floor((Math.random() + 1)*1e4),
     displayName: spec?.$meta?.displayName || '',
     category: spec?.$meta?.category || 'Custom',
     $stores: spec?.$stores || {},
@@ -60,18 +73,18 @@ specToSimplified(spec) {
   };
 },
 
-simplifiedToSpec({displayName, category, $stores, $inputs, $outputs}, nodeId) {
+simplifiedToSpec({/*id,*/ displayName, category, $stores, $inputs, $outputs}, nodeId) {
   if (displayName) {
     return {
       $meta: {
-        id: nodeId,
+        id: nodeId, //id, //nodeId,
         displayName,
         category,
         custom: true
       },
       $stores,
       particle: {
-        $kind: nodeId,
+        $kind: nodeId, //`Particle${id}`, //nodeId,
         $inputs,
         $outputs
       }
