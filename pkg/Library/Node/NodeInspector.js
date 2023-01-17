@@ -186,18 +186,16 @@ async renderBinding(node, name, candidates, graph, nodeTypes, service) {
     const froms = candidates.map(candidate => this.renderCandidate(candidate, graph)).filter(from => from);
     const value = node.connections?.[name] || [];
     const store = nodeTypes[node.type].$stores[name];
-    const multiple = store.multiple;
-    const connectedValue = await this.constructConnectedValue(value, graph, nodeTypes, service);
     const skipConn = (store.nodisplay || (store.noinspect && !(froms.length > 0)));
     if (!skipConn) {
+      const connectedValue = await this.constructConnectedValue(value, graph, nodeTypes, service);
       return {
         name: `${name}-connection`,
         store: {
           ...store,
           $type: 'Connection',
           noinspect: store.nodisplay,
-          // noinspect: store.nodisplay,// || store.noinspect,
-          multiple,
+          multiple: store.multiple,
           values: froms
         },
         value,
@@ -224,11 +222,17 @@ constructInspectRecipe(inspector, nodeId, storeName, inspectorData) {
     }
   };
   this.getParticleNames(inspector).forEach(particleName => {
-    const particle = {...inspector[particleName]};
-    particle.$container = `Inspector#custom${this.sanitize(nodeId)}${storeName}`;
-    particle.$inputs = particle.$outputs = [{data: inspectorData}];
-    particle.$staticInputs = {key: nodeId, propName: storeName};
-    recipe[`${particleName}${this.inspectorDelimiter}${nodeId}`] = particle;
+    // lexical junk
+    const containerId = `Inspector#custom${this.sanitize(nodeId)}${storeName}`;
+    const particleId = `${particleName}${this.inspectorDelimiter}${nodeId}`;
+    // assemble particle info
+    recipe[particleId] = {
+      ...inspector[particleName],
+      $container: containerId,
+      $inputs: [{data: inspectorData}],
+      $outputs: [{data: inspectorData}],
+      $staticInputs: {key: nodeId, propName: storeName}
+    };
   });
   return recipe;
 },

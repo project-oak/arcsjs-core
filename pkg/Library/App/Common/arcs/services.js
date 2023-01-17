@@ -18,7 +18,7 @@ const modules = await load([
   'Mediapipe/PoseService.js',
   'App/HistoryService.js',
   'Arc/ArcService.js',
-  // 'NewMedia/MediaService.js',
+  // 'Media/MediaService.js',
   // 'Goog/GoogleApisService.js',
   // 'Mediapipe/FaceMeshService.js',
   // 'Mediapipe/SelfieSegmentationService.js',

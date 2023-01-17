@@ -19,7 +19,7 @@ const modules = await load([
   // 'RecipeBuilder/RecipeBuilderService.js',
   'Rtc/LobbyService.js',
   'Goog/GoogleApisService.js',
-  'NewMedia/MediaService.js',
+  'Media/MediaService.js',
   'Mediapipe/FaceMeshService.js',
   'Mediapipe/SelfieSegmentationService.js',
   'Mediapipe/PoseService.js',

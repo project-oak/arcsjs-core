@@ -11,14 +11,13 @@ const template = Xen.Template.html`
   :host {
     display: flex;
     flex-direction: column;
-    /* background-color: var(--theme-color-bg-2); */
+    background-color: var(--theme-color-bg-2);
   }
-  /* mwc-tab-bar {
-  } */
 </style>
 
 <!-- tabs -->
 <mwc-tab-bar activeindex="{{activeIndex:selected}}" on-change="MDCTabBar:activated=onTabActivated">{{tabs}}</mwc-tab-bar>
+
 <!-- content -->
 <slot></slot>
 
@@ -54,7 +53,8 @@ export class MxcTabPages extends Xen.Async {
     this.bar.addEventListener('mousedown', die, true);
   }
   childrenChanged() {
-    this.state = {children: [...this.children]};
+    const children = this.firstElementChild?.assignedElements?.() ?? this.children;
+    this.state = {children: [...children]};
   }
   update(inputs, state) {
     this.childrenChanged();
