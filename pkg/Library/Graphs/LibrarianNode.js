@@ -11,12 +11,12 @@ export const LibrarianNode = {
     category: 'Panels'
   },
   $stores: {
-    nodeId: {
-      $type: 'String',
-      $value: '${node.id}',
-      noinspect: true,
-      nodisplay: true
-    },
+    // nodeId: {
+    //   $type: 'String',
+    //   $value: '${node.id}',
+    //   noinspect: true,
+    //   nodisplay: true
+    // },
     selectedGraph: {
       $type: 'JSON',
       // connection: true,
@@ -27,7 +27,7 @@ export const LibrarianNode = {
   librarian: {
     $kind: '$library/Graphs/Librarian',
     $inputs: [
-      'nodeId',
+      // 'nodeId',
       {'graph': 'selectedGraph'}
     ],
     $outputs: [
