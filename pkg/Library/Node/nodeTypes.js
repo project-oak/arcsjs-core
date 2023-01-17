@@ -8,7 +8,9 @@ const lib = `${globalThis.config.arcsPath}/Library`;
 export const load = async paths => (await Promise.all(paths.map(p => import(`${lib}/${p}`)))).reduce((e, m) =>({...e, ...m}),{});
 
 const etc = await load([
+  'Arc/ArcNode.js',
   'Layout/LayoutNodes.js',
+  'Layout/MaterialTabPagesNode.js',
   'Data/DisplayNode.js',
   'Fields/BooleanFieldNode.js',
   'Fields/LineObjectNode.js',
@@ -16,9 +18,10 @@ const etc = await load([
   'Fields/SelectFieldNode.js',
   'Fields/TextFieldNode.js',
   /**/
-  'NewMedia/AudioNode.js',
-  'GraphsNodes/ImageNode.js',
-  'GraphsNodes/CameraNode.js',
+  'Media/ImageNode.js',
+  'Media/ImageCompositeNode.js',
+  'Media/CameraNode.js',
+  'Media/AudioNode.js',
   'Pixabay/PixabayNode.js',
   /**/
   'Fx/DetectRaisedHandNode.js',
@@ -26,10 +29,12 @@ const etc = await load([
   'Mediapipe/PoseNode.js',
   'Mediapipe/FaceMeshNode.js',
   'Mediapipe/FaceMeshDisplayNode.js',
+  'Mediapipe/SelfieSegmentationNode.js',
   'PixiJs/PixiJsNodes.js',
   'Shader/FragmentShaderNode.js',
   /**/
   'JSONata/JSONataNode.js',
+  'Librarian/LibrarianNode.js',
   /**/
   'Node/NodeDesignerNode.js',
   'Node/NodeCatalogNode.js',
@@ -38,8 +43,6 @@ const etc = await load([
   'Node/NodeInspectorNode.js',
   'Node/NodeCreatorNode.js',
   'NodeGraph/GraphToolbarNode.js',
-  /**/
-  'Graphs/LibrarianNode.js'
 ]);
 
 const nodeTypes = {

@@ -8,7 +8,7 @@ export const LibrarianNode = {
   $meta: {
     id: 'LibrarianNode',
     displayName: 'Librarian',
-    category: 'Panels'
+    category: 'Designer'
   },
   $stores: {
     nodeId: {

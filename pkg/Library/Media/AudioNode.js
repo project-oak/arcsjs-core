@@ -34,7 +34,7 @@ export const AudioNode = {
     }
   },
   audio: {
-    $kind: '$library/NewMedia/SpeechRecognizer',
+    $kind: '$library/Media/SpeechRecognizer',
     $staticInputs: {
       stream: 'default'
     },

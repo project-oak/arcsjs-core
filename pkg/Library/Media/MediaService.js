@@ -6,7 +6,7 @@
  */
 import {logFactory} from '../Core/core.js';
 import {Resources} from '../App/Resources.js';
-import {subscribeToStream, unsubscribeFromStream} from '../Media/media-stream/media-stream.js';
+import {subscribeToStream, unsubscribeFromStream} from './media-stream.js';
 
 const log = logFactory(logFactory.flags.services, 'MediaService', 'coral');
 

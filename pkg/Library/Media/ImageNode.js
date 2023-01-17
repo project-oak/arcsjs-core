@@ -4,21 +4,22 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-export const ImageCadenceNode = {
+export const ImageNode = {
   $meta: {
-    id: 'ImageCadence',
+    id: 'ImageNode',
+    displayName: 'Image',
     category: 'Media'
   },
   $stores: {
     image: {
       $type: 'Image',
-    },
-    frame: {
-      $type: 'Image',
+      $value: {
+        url: 'https://storage.googleapis.com/tfweb/testpics/strawberry2.jpeg',
+      }
     }
   },
-  field: {
-    $kind: '$library/NewMedia/Image',
+  image: {
+    $kind: '$library/Media/Image',
     $inputs: ['image'],
     $outputs: ['image']
   }

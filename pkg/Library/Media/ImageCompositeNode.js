@@ -85,7 +85,7 @@ export const ImageCompositeNode = {
     }
   },
   ImageComposite: {
-    $kind: '$library/NewMedia/ImageComposite',
+    $kind: '$library/Media/ImageComposite',
     $inputs: ['imageA', 'imageB', 'imageC', 'imageD', 'opA', 'opB', 'opC', 'opD'],
     $outputs: ['output']
   }

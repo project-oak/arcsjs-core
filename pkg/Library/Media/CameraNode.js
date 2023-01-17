@@ -43,7 +43,7 @@ export const CameraNode = {
     }
   },
   camera: {
-    $kind: '$library/NewMedia/Camera',
+    $kind: '$library/Media/Camera',
     $inputs: ['stream'],
     $outputs: ['stream', 'frame'],
     $slots: {
@@ -61,7 +61,7 @@ export const CameraNode = {
       },
       capture: {
         imageCapture: {
-          $kind: '$library/NewMedia/ImageCapture',
+          $kind: '$library/Media/ImageCapture',
           $inputs: ['stream', 'fps'],
           $outputs: ['frame']
         }

@@ -1261,9 +1261,6 @@ var Graphinator = class {
   findRemovedParticles(particles) {
     const runningGraphParticleIds = keys5(this.arc.hosts).filter((id) => {
       const container = this.arc.hosts[id].meta.container;
-      if (container === "designer#graph") {
-        return true;
-      }
       const containerParticle = container?.split("#")?.[0];
       return particles.some(({ id: id2 }) => id2 === containerParticle);
     });
@@ -1530,16 +1527,16 @@ export {
 };
 /**
  * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+/**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
- */
-/**
- * @license
- * Copyright (c) 2022 Google LLC All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
  */
 //# sourceMappingURL=arcs.js.map

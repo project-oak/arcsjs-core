@@ -30,7 +30,7 @@ export const ListenerNode = {
     }
   },
   SpeechRecognizer: {
-    $kind: '$library/NewMedia/SpeechRecognizer',
+    $kind: '$library/Media/SpeechRecognizer',
     $inputs: ['mediaDeviceState'],
     $outputs: ['transcript', 'mediaDeviceState'],
     $slots: {

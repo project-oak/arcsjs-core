@@ -5,10 +5,14 @@
  * license that can be found in the LICENSE file.
  */
 ({
-update({image, fps}) {
-  const frameMs = Math.abs(Math.floor(1000 / (fps || 30)));
-  setInterval(() => {
-    return {frame: {...image, version: Math.random()}};
-  }, frameMs);
-}
+  render({tabs}) {
+    return {
+      tabs
+    };
+  },
+  template: html`
+<mxc-tab-pages flex tabs="{{tabs}}">
+  <slot name="PagesContainer"></slot>
+</mxc-tab-pages>
+  `
 });
