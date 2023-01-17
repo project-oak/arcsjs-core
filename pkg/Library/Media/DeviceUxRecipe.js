@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-export const DeviceUxNode = {
+export const DeviceUxRecipe = {
   $meta: {
     description: 'Device Ux'
   },
@@ -38,7 +38,7 @@ export const DeviceUxNode = {
   }
 };
 
-export const SpeechNode = {
+export const SpeechRecipe = {
   $meta: {
     description: 'speech in/out'
   },

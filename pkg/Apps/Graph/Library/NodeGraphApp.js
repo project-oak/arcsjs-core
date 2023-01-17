@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE file.
 */
 import {logFactory, App, LocalStoragePersistor} from '../arcs.js';
-import {nodegraphNodeTypes, NodegraphGraph} from './NodegraphGraph.js';
+import {nodegraphNodeTypes, NodegraphGraph} from './NodegraphRecipe.js';
 import {nodeTypes} from '../../../Library/Node/nodeTypes.js';
 import * as services from '../services.js';
 
@@ -29,7 +29,7 @@ export const NodegraphApp = class extends App {
   }
   async spinup() {
     await super.spinup();
-    const {DevToolsNode, NodegraphNode, ...arcNodeTypes} = this.nodeTypes;
+    const {DevToolsRecipe, NodegraphRecipe, ...arcNodeTypes} = this.nodeTypes;
     this.arcs.set('user', 'nodeTypes', arcNodeTypes);
   }
 };

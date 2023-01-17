@@ -54,7 +54,7 @@ import '../Library/App/Worker/ArcsWorker.js';
 //   LocalStoragePersistor,
 //   DevToolsRecipe,
 //   DevToolsService,
-//   DeviceUxNode,
+//   DeviceUxRecipe,
 //   //RecipeService,
 //   //StoreUpdateService,
 // } = await importModules(async path => import(path), [
@@ -62,7 +62,7 @@ import '../Library/App/Worker/ArcsWorker.js';
 //   '$library/App/storage.js',
 //   '$library/DevTools/DevToolsRecipe.js',
 //   '$library/DevTools/DevToolsService.js',
-//   '$library/Media/DeviceUxNodes.js',
+//   '$library/Media/DeviceUxRecipe.js',
 //   //'$library/App/RecipeService.js',
 //   //'$library/NodeGraph/StoreUpdateService.js'
 // ]);

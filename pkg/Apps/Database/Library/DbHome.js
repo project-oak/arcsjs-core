@@ -25,15 +25,15 @@ template: html`
     padding: 100px;
     ${globalThis.themeRules}
   }
-  [name="chooser"] {
+  [frame="chooser"] {
     border: 1px solid grey;
     padding: 10px;
   }
-  [name="recordsViewer"] {
+  [frame="recordsViewer"] {
     border: 1px solid lightgreen;
     padding: 10px;
   }
-  [name="form"] {
+  [frame="form"] {
     border: 1px solid purple;
     padding: 10px;
   }
@@ -46,12 +46,11 @@ template: html`
 <br>
 <div toolbar>
   <div flex>
-    <slot name="navigator" xdisplay$="{{showDetails}}"></slot>
+    <div frame="navigator" xdisplay$="{{showDetails}}"></div>
   </div>  
 </div>
-<slot name="recordsViewer" display$="{{showRecords}}"></slot>
-<slot name="form" display$="{{showDetails}}"></slot>
-
+<div frame="recordsViewer" display$="{{showRecords}}"></div>
+<div frame="form" display$="{{showDetails}}"></div>
 <br>
 
 `
