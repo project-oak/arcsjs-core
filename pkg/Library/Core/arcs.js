@@ -1185,10 +1185,19 @@ var Graphinator = class {
     entries5(nodeType.$stores).forEach(([name, store]) => {
       connsMap[name] = [];
       const storeId = this.constructId(id, name);
-      const storeValue = props?.[name] || store.$value;
+      const storeValue = this.prepareStoreValue(props?.[name], store.$value, id);
       const storeConns = connections?.[name];
       this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
     });
+  }
+  prepareStoreValue(propValue, storeValue, nodeId) {
+    if (propValue) {
+      return propValue;
+    }
+    if (storeValue === "${node.id}") {
+      return nodeId;
+    }
+    return storeValue;
   }
   prepareStore(storeId, { $type: type, $tags }, value, connections, stores, storeEntry) {
     if (connections) {
