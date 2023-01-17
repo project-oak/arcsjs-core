@@ -82,10 +82,6 @@ template: html`
       padding: 10px;
       border: 1px dotted var(--theme-color-fg-2);
     }
-    [frame="new"] {
-      border: 1px solid pink;
-      /* height: 1000px; */
-    }
     img {
       height: 50px;
       width: 70px;
@@ -93,7 +89,6 @@ template: html`
     }
   </style>
   <div repeat="pet_t">{{pets}}</div>
-  <div frame="new"></div>
 
   <template pet_t>
     <div flex columns>
