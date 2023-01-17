@@ -34,8 +34,8 @@ export const {
   'LocalStorage/LocalStoragePersistor.js',
   // DOM things
   'App/common-dom.js',
-  'Node/Dom/designer-layout.js',
-  'Node/Dom/selector-panel.js',
+  'Designer/designer-layout.js',
+  'Designer/selector-panel.js',
   // Raw Power
   'TensorFlow/TensorFlow.js',
   'PixiJs/pixi-view.js'

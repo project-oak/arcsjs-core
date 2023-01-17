@@ -13,9 +13,9 @@ const globalStores = [
   'nodeId',
 ];
 
-export const GraphBuilderNode = {
+export const RecipeBuilderRecipe = {
   candidateFinder: {
-    $kind: '$library/GraphBuilder/CandidateFinder',
+    $kind: '$library/RecipeBuilder/CandidateFinder',
     $inputs: [
       {graph: 'selectedGraph'},
       'nodeTypes'
@@ -24,7 +24,7 @@ export const GraphBuilderNode = {
     $outputs: ['candidates']
   },
   connectionUpdater: {
-    $kind: '$library/GraphBuilder/ConnectionUpdater',
+    $kind: '$library/RecipeBuilder/ConnectionUpdater',
     $inputs: [
       {graph: 'selectedGraph'},
       'nodeTypes',
@@ -32,4 +32,12 @@ export const GraphBuilderNode = {
     ],
     $outputs: [{graph: 'selectedGraph'}]
   }
+  // recipeBuilder: {
+  //   $kind: '$library/RecipeBuilder/RecipeBuilderParticle',
+  //   $inputs: [
+  //     'nodeTypes',
+  //     {graph: 'selectedGraph'}
+  //   ],
+  //   $outputs: ['recipes']
+  // }
 };

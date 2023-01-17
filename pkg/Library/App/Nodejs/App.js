@@ -8,7 +8,7 @@
  */
 import {Arcs} from './Arcs.js';
 //import {loadCss} from '../../Dom/dom.js';
-import {DevToolsNode} from '../../DevTools/DevToolsNode.js';
+import {DevToolsRecipe} from '../../DevTools/DevToolsRecipe.js';
 import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
 import {themeRules} from '../theme.js';
 
@@ -37,7 +37,7 @@ export const App = class {
     });
     //await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
     // TODO(sjmiles): pick a syntax
-    const recipes = [DevToolsNode, ...(this.recipes ?? this.recipes ?? [])];
+    const recipes = [DevToolsRecipe, ...(this.recipes ?? this.recipes ?? [])];
     await Arcs.addRecipes('user', recipes);
   }
   async service({request}) {

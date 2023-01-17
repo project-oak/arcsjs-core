@@ -8,7 +8,7 @@
  */
 import {App} from '../Library/App/Worker/App.js';
 import {logFactory, makeName} from '../Library/Core/utils.min.js';
-import {DeviceUxNode} from '../Library/Media/DeviceUxNodes.js';
+import {DeviceUxRecipe} from '../Library/Media/DeviceUxRecipe.js';
 import '../Library/App/surface-imports.js';
 
 const log = logFactory(true, 'LibrarianApp', 'navy');
@@ -32,7 +32,7 @@ export const LibrarianApp = class extends App {
     super(path, root, options);
     //this.persistor = LocalStoragePersistor;
     this.services = [];
-    this.recipes = [DeviceUxNode, LibrarianRecipe];
+    this.recipes = [DeviceUxRecipe, LibrarianRecipe];
     log('Librarian lives!');
   }
   // application service
