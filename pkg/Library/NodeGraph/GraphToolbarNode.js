@@ -12,7 +12,8 @@ export const GraphToolbarNode = {
   },
   $stores: {
     graphs: {
-      $type: '[Pojo]'
+      $type: '[Pojo]',
+      noinspect: true
     },
     graph: {
       $type: 'Pojo'
@@ -24,7 +25,8 @@ export const GraphToolbarNode = {
       $type: '[Pojo]'
     },
     event: {
-      $type: 'String'
+      $type: 'String',
+      noinspect: true
     }
   },
   graphToolbar: {

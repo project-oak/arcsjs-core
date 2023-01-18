@@ -3,6 +3,7 @@ import './Xen/xen-async.js';
 import './multi-select.js';
 import './modal-view.js';
 import './fancy-image.js';
+import './fancy-input.js';
 import './multi-select.js';
 import './split-panel.js';
 import './draggable-item.js';
