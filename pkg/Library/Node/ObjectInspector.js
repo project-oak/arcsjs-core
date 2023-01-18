@@ -130,7 +130,8 @@ constructPropModel(key, prop, parent, template, state) {
         models: [{
           name: propConnKey, //`${prop.name}-connection`,
           key: propConnKey, //`${prop.name}-connection`,
-          ...prop.value.connection//this.formatSelectValues(prop.connected.values, prop.connected.value)
+          //...prop.value.connection//this.formatSelectValues(prop.connected.values, prop.connected.value)
+          value: this.formatSelectValues(prop.value.connection.values, prop.value.connection.value)
         }]
       };
       const checkedConn = Boolean(state.checkedConns?.[propConnKey]);//false;
@@ -272,7 +273,9 @@ updatePropValue(data, propNames, formatter) {
     const nonConnPropName = propName.substring(0, propName.length - '-connection'.length);
     const nonConnProp = data.props.find(p => p.name === nonConnPropName);
     const nonConnNewValue = formatter();
-    nonConnProp.connected.value = nonConnNewValue ? [nonConnNewValue] : nonConnNewValue;
+    // nonConnProp.connected.value = 
+    nonConnProp.value.connection.value =
+        nonConnNewValue ? [nonConnNewValue] : nonConnNewValue;
     return {data};
   } else {
     const prop = data.props.find(p => p.name === propName);
@@ -315,6 +318,13 @@ cloneValue(value) {
 },
 
 formatPropValueByType(currentValue, currentType, newValue) {
+  if (currentType === 'TypeWithConnection') {
+    return {
+      ...currentValue,      
+      // better way to determine actual property type?
+      property: this.formatPropValueByType(currentValue.property, typeof newValue, newValue),
+    }
+  }
   if (typeof currentValue === 'boolean') {
     return !currentValue;
   } else if ((typeof currentValue === 'number') || currentType === 'Number') {

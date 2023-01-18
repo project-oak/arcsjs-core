@@ -38,8 +38,8 @@ updateValues(selectedNodeId, graph, data, nodeTypes, state, service) {
   data?.props?.forEach((prop, index) => {
     if (prop && !prop.store.noinspect) {
       const currentValue = state.data?.props?.[index]?.value;
-      const currentConnValue = state.data?.props?.[index]?.connected?.value;
-      const updatedNode = this.updatePropValue(prop, currentValue, currentConnValue, node, nodeType, service);
+      // const currentConnValue = state.data?.props?.[index]?.connected?.value;
+      const updatedNode = this.updatePropValue(prop, currentValue, /*currentConnValue,*/ node, nodeType, service);
       if (updatedNode) {
         node = updatedNode;
         changed = true;
@@ -55,9 +55,14 @@ updateValues(selectedNodeId, graph, data, nodeTypes, state, service) {
   }
 },
 
-updatePropValue(prop, currentValue, currentConnValue, node, nodeType, service) {
+updatePropValue(prop, currentValue, /*currentConnValue,*/ node, nodeType, service) {
   if (prop.store?.$type === 'TypeWithConnection') {
-    return;
+    const innerProp = {...prop, store: prop.store.store, value: prop.value.property};
+    const innerCurrentValue = currentValue?.property || currentValue;
+    const propUpdated = this.updatePropValue(innerProp, innerCurrentValue, node, nodeType, service);
+    const connUpdated = this.updateConnection(prop.name, prop.value.connection.value, node, nodeType, service);
+    //false; //or false?
+    return propUpdated || connUpdated;
   }
 
   if (JSON.stringify(prop.value) !== JSON.stringify(currentValue)) {
@@ -69,8 +74,8 @@ updatePropValue(prop, currentValue, currentConnValue, node, nodeType, service) {
     // } else {
       return this.updatePropInNode(prop.name, newValue, node, service);
     // }
-  } else if (JSON.stringify(prop.connected?.value) !== JSON.stringify(currentConnValue)) {
-      return this.updateConnection(prop.name, prop.connected?.value, node, nodeType, service);
+  // } else if (JSON.stringify(prop.connected?.value) !== JSON.stringify(currentConnValue)) {
+  //   return this.updateConnection(prop.name, prop.connected?.value, node, nodeType, service);
   }
 },
 
