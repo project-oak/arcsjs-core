@@ -89,6 +89,7 @@ export class Graphinator {
       this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
     });
   }
+
   prepareStore(storeId, {$type: type, $tags}, value, connections, stores, storeEntry) {
     if (connections) {
       connections?.forEach?.(connId => this.addStore(connId, $tags, storeEntry));

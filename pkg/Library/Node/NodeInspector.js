@@ -12,7 +12,7 @@ defaultInspectorDataProp: 'inspectorData',
 async update(inputs, state, tools) {
   let result;
   if (inputs.graph && inputs.selectedNodeId) {
-    result = this.updateNode(inputs, state, tools);
+    result = await this.updateNode(inputs, state, tools);
   } else {
     state.node = null;
     result = {data: null, nodeType: null};
