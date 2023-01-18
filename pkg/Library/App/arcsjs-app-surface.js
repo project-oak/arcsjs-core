@@ -4,12 +4,12 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
+import '../Mediapipe/PoseServiceLoader.js';
 import {Xen} from '../Dom/Xen/xen-async.js';
 import {dom, loadScript} from '../Dom/Dom.js';
-import {themeRules} from './theme.js';
 import {boot} from './Common/boot.js';
+import {themeRules} from './theme.js';
 import {Params} from './Params.js';
-import '../Mediapipe/PoseServiceLoader.js';
 
 const Library = `${globalThis.config?.arcsPath}/Library`;
 
@@ -45,9 +45,11 @@ export const ArcsJsApp = class extends Xen.Async {
     }
   }
   bootGraph(graph) {
+    const nodeKey = Object.keys(graph.nodes).find(key => key.includes('NodeDesignerNode'));
+    const defaultContainer = `${nodeKey}_designer#graph`;
     boot(import.meta.url, {
       graph,
-      defaultContainer: 'NodeDesignerNode1_designer#graph'
+      defaultContainer
     });
   }
   get template() {

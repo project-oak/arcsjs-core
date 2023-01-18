@@ -89,6 +89,7 @@ export class Graphinator {
       this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
     });
   }
+
   prepareStore(storeId, {$type: type, $tags}, value, connections, stores, storeEntry) {
     if (connections?.length > 0) {
       connections?.forEach?.(connId => this.addStore(connId, $tags, storeEntry));
@@ -170,9 +171,9 @@ export class Graphinator {
   findRemovedParticles(particles) {
     const runningGraphParticleIds = keys(this.arc.hosts).filter(id => {
       const container = this.arc.hosts[id].meta.container;
-      // if (container === 'designer#graph') {
-      //   return true;
-      // }
+      if (container?.includes('designer#graph')) {
+        return true;
+      }
       const containerParticle = container?.split('#')?.[0];
       return particles.some(({id}) => id === containerParticle);
     });

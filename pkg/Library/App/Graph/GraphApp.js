@@ -5,38 +5,27 @@
  * license that can be found in the LICENSE file.
  */
 import {App} from '../Worker/App.js';
-import {Paths} from '../../Core/utils.js';
-
-const GraphNode = {
-  $meta: {
-    id: 'GraphNode'
-  },
-  main: {
-    $kind: '$library/App/Node/Graph'
-  }
-};
 
 export const GraphApp = class extends App {
   async spinup() {
-    this.nodeTypes.GraphNode = GraphNode;
-    this.graphs = [
-      this.graph
-    ];
-    Paths.add(this.paths);
-    this.services.ArcService.nodeTypes = this.nodeTypes;
-    this.services.ArcService.layoutInfo = {
-      id: 'preview',
-      defaultContainer: this.defaultContainer || 'designer#graph'
-    };
+    this.graphs = this.graphs ?? [this.graph];
+    Object.assign(this.services.ArcService, {
+      nodeTypes: this.nodeTypes,
+      layoutInfo: {
+        id: 'preview',
+        defaultContainer: this.defaultContainer || 'designer#graph'
+      }
+    });
     this.logInfo();
     await super.spinup();
   }
-
   logInfo() {
-    this.log.groupCollapsed('Boot flavors');
-    this.log('paths', this.paths);
-    this.log('nodeTypes', this.nodeTypes);
-    this.log('services', this.services);
-    this.log.groupEnd();
+    this.log(this);
+    // this.log.groupCollapsed('boot flavor');
+    // this.log('paths', this.paths);
+    // this.log('nodeTypes', this.nodeTypes);
+    // this.log('services', this.services);
+    // this.graphs('graphs', this.graphs);
+    // this.log.groupEnd();
   }
 };

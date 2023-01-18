@@ -7,11 +7,10 @@
  * https://developers.google.com/open-source/licenses/bsd
  */
 import {Arcs} from './Arcs.js';
-//import {loadCss} from '../../Dom/dom.js';
+import {Paths, logFactory, makeId, makeName} from '../../Core/utils.js';
 import {DevToolsRecipe, DevToolsGraph} from '../../DevTools/DevToolsRecipe.js';
-import {logFactory, makeId, makeName} from '../../Core/utils.min.js';
-import {themeRules} from '../theme.js';
 import {NodeTypesNode} from '../../Node/NodeTypesNode.js';
+import {themeRules} from '../theme.js';
 
 // n.b. lives in 'top' context
 
@@ -39,13 +38,13 @@ export const App = class {
       injections: {themeRules, ...this.injections}
     });
     //
-    //await loadCss(`${this.paths.$library ?? '.'}/Dom/Material/material-icon-font/icons.css`);
+    Paths.add(this.paths);
     this.composer = await Arcs.createComposer(this.root || document.body);
-    //
     assign(this.nodeTypes, {
       DevToolsRecipe,
       NodeTypesNode
     });
+    //
     this.graphs = [
       DevToolsGraph,
       ...(this.graphs ?? [])

@@ -132,6 +132,9 @@
       font-family: 'Google Sans', sans-serif;
       font-size: 14px;
     }
+    mxc-tab-pages {
+      background-color: inherit;
+    }
     data-explorer {
       padding: 8px;
     }

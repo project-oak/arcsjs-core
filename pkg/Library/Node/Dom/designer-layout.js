@@ -13,7 +13,7 @@ const log = logFactory(logFactory.flags['designer-layout'] || true, 'designer-la
 
 const {assign} = Object;
 
-const GRID_SIZE = 8;
+const GRID_SIZE = 16;
 
 export class DesignerLayout extends DragDrop {
   static get observedAttributes() {
@@ -176,16 +176,15 @@ export class DesignerLayout extends DragDrop {
       this.dragStarted = true;
       // we were here
       const rect = this.dragRect; //rectFromTarget(this.target);
-      // we are now here
-      const dragRect = this.doDrag(rect, dx, dy, this.dragKind, this.dragFrom);
+      // grid-snap
+      const rawRect = this.doDrag(rect, dx, dy, this.dragKind, this.dragFrom);
+      const dragRect = DragDrop.snap(rawRect, GRID_SIZE);
       // visual update asap
       this.setBoxStyle(this.boxer, dragRect);
       // data feedback
       this.value = dragRect;
       //log('fire update-box', this.target.id, this.value);
       this.fire('update-box');
-      // grid-snap
-      // const snap = rect => DragDrop.snap(rect, GRID_SIZE);
     }
   }
   doDrag({l, t, w, h}, dx, dy, dragKind, dragFrom) {
