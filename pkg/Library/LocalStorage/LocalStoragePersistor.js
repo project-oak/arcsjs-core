@@ -52,9 +52,9 @@ export const Persistor = class {
 // LocalStorage persistence for Store objects
 export const LocalStoragePersistor = class extends Persistor {
   upload(key, serial) {
-    localStorage.setItem(key, serial);
+    localStorage?.setItem(key, serial);
   }
   async download(key) {
-    return localStorage.getItem(key);
+    return localStorage?.getItem(key);
   }
 };
