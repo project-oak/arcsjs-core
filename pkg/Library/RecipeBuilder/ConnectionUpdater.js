@@ -84,9 +84,7 @@ updateGraphConnections(graph, nodeTypes, candidates) {
 
 updateNodeConnections(node, nodeType, candidates) {
   if (candidates) {
-    const initChanged = this.initializeConnections(node, nodeType, candidates);
-    const nodisplayChanged = this.updateNoDisplayConnections(node, nodeType, candidates);
-    return initChanged || nodisplayChanged;
+    return this.initializeConnections(node, nodeType, candidates);
   }
 },
 
@@ -109,17 +107,6 @@ initializeStoreConnection(store, node, storeCandidates, used) {
     node.connections[store] = [this.formatConnection(unusedCandidates[0])];
     used.push(unusedCandidates?.[0]);
   }
-},
-
-updateNoDisplayConnections(node, nodeType, candidates) {
-  return keys(nodeType?.$stores)
-    .map(store => {
-      if (candidates[store] && nodeType.$stores[store].nodisplay) {
-        node.connections[store] = candidates[store].map(this.formatConnection);
-        return true;
-      }
-    })
-    .some(changed => changed);
 },
 
 parseConnection(connection) {

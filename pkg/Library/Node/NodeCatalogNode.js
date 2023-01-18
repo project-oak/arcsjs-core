@@ -30,26 +30,21 @@ const nodeList = {
   $stores: {
     nodeTypes: {
       $type: 'Pojo',
-      noinspect: true,
-      //nodisplay: true
+      noinspect: true
     },
     categories: {
       $type: 'Pojo',
-      noinspect: true,
-      nodisplay: true
+      noinspect: true
     },
     newNodeInfos: {
-      $type: '[Pojo]',
-      nodisplay: true
+      $type: '[Pojo]'
     },
     selectedGraph: {
-      $type: 'Pojo',
-      nodisplay: true
+      $type: 'Pojo'
     },
     hoveredNodeType: {
       $type: 'Pojo',
-      noinspect: true,
-      nodisplay: true
+      noinspect: true
     }
   },
   NodeList: {

@@ -14,13 +14,11 @@ export const AudioNode = {
   $stores: {
     mediaDevices: {
       $type: '[JSON]',
-      noinspect: true,
-      // nodisplay: true
+      noinspect: true
     },
     mediaDeviceState: {
       $type: 'MedaDeviceState',
       noinspect: true,
-      // nodisplay: true,
       $value: {
         isCameraEnabled: false,
         isMicEnabled: false,

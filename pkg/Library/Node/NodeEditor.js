@@ -173,7 +173,7 @@ renderInputs(node, nodeType) {
 },
 
 getInputStores(nodeType) {
-  return entries(nodeType?.$stores).filter(([name, store]) => this.isInput(nodeType, name) && !store.nodisplay);
+  return entries(nodeType?.$stores).filter(([name, store]) => this.isInput(nodeType, name));
 },
 
 isInput(nodeType, storeName) {
@@ -185,7 +185,7 @@ renderOutputs(nodeType) {
 },
 
 getOutputStores(nodeType) {
-  return entries(nodeType?.$stores).filter(([name, store]) => this.isOutput(nodeType, name) && !store.nodisplay);
+  return entries(nodeType?.$stores).filter(([name, store]) => this.isOutput(nodeType, name));
 },
 
 isOutput(nodeType, storeName) {

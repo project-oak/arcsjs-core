@@ -90,7 +90,7 @@ export class Graphinator {
     });
   }
   prepareStore(storeId, {$type: type, $tags}, value, connections, stores, storeEntry) {
-    if (connections) {
+    if (connections?.length > 0) {
       connections?.forEach?.(connId => this.addStore(connId, $tags, storeEntry));
     } else {
       stores.push({name: storeId, type, value});

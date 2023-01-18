@@ -24,9 +24,7 @@ export const NodeInspectorNode = {
       $type: 'Pojo'
     },
     data: {
-      $type: 'Pojo',
-      //noinspect: true,
-      //nodisplay: true,
+      $type: 'Pojo'
     }
   },
   objectInspector: {
