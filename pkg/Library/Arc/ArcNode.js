@@ -15,6 +15,9 @@ export const ArcNode = {
       $type: 'String',
       $value: ''
     },
+    graph: {
+      $type: 'Graph'
+    },
     graphName: {
       $type: 'String',
       $value: '',
@@ -22,6 +25,6 @@ export const ArcNode = {
   },
   arc: {
     $kind: '$library/Arc/ArcParticle',
-    $inputs: ['arcName', 'graphName']
+    $inputs: ['arcName', 'graph', 'graphName']
   }
 };

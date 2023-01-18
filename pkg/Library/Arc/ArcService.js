@@ -12,8 +12,8 @@ export const ArcService = {
   // must be attached to the service by owner
   nodeTypes: {},
   layoutInfo: {},
-  async addNamedGraph({arcName, graphName, defaultContainer}, arcs) {
-    if (arcName && graphName) {
+  async addNamedGraph({arc, graphName, defaultContainer}, arcs) {
+    if (arc && graphName) {
       log('addNamedGraph', arcName);
       //
       const graphs = await arcs.get('user', 'graphs');
@@ -25,7 +25,7 @@ export const ArcService = {
       }
       //
       if (graph) {
-        arcs.runGraph(arcName, graph, this.nodeTypes, layoutInfo);
+        arcs.runGraph(arc, graph, this.nodeTypes, layoutInfo);
       } else {
         log(`no graph named "${graphName}"`);
       }
@@ -45,14 +45,18 @@ export const ArcService = {
   //   return true;
   // },
   //
-  async runGraph({graph}, arcs) {
+  async runGraph({arc, graph, defaultContainer}, arcs) {
     //if (this.lastGraph) {
       //await this.removeGraph(this.lastGraph);
       //this.lastGraph = null;
     //}
-    return arcs.runGraph('user', graph, this.nodeTypes, this.layoutInfo);
+    const layoutInfo = {...this.layoutInfo};
+    if (defaultContainer) {
+      layoutInfo.defaultContainer = defaultContainer;
+    }
+    return arcs.runGraph(arc || 'user', graph, this.nodeTypes, layoutInfo);
   },
-  async removeGraph({graph}, arcs) {
-    arcs.removeGraph('user', graph, this.nodeTypes);
+  async removeGraph({arc, graph}, arcs) {
+    arcs.removeGraph(arc || 'user', graph, this.nodeTypes);
   }
 };

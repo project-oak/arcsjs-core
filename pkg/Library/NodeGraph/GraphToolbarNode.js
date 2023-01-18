@@ -22,7 +22,8 @@ export const GraphToolbarNode = {
       $type: 'String'
     },
     icons: {
-      $type: '[Pojo]'
+      $type: '[Pojo]',
+      noinspect: true
     },
     event: {
       $type: 'String',
@@ -31,14 +32,14 @@ export const GraphToolbarNode = {
   },
   graphToolbar: {
     $kind: '$library/NodeGraph/GraphToolbar',
+    $staticInputs: {
+      publishPaths: {}
+    },
     $inputs: [
       'graph',
       'graphs',
       'event'
     ],
-    $staticInputs: {
-      publishPaths: {}
-    },
     $outputs: [
       'graph',
       'selectedNodeId',

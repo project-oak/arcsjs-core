@@ -6,18 +6,24 @@
  */
 ({
 initialize(inputs, state, {service}) {
+  state.addNamedGraph = async data => await service({kind: 'ArcService', msg: 'addNamedGraph', data});
   state.addGraph = async data => await service({kind: 'ArcService', msg: 'addNamedGraph', data});
 },
 shouldUpdate({arcName, graphName}, {arc}) {
   return arcName && graphName && !arc;
 },
-async update({arcName, graphName}, state) {
+async update({arcName, graph, graphName}, state) {
   state.arc = true;
-  await this.buildArcWithGraph({arcName, graphName, defaultContainer: 'ArcNode1:arc#arc'}, state)
+  await this.buildArcWithGraph({arcName, graph, graphName, defaultContainer: 'ArcNode1:arc#arc'}, state)
 },
-async buildArcWithGraph({arcName, graphName, defaultContainer}, state) {
-  const result = await state.addGraph({arcName, graphName, defaultContainer});
-  log(result);
+async buildArcWithGraph({arcName, graph, graphName, defaultContainer}, state) {
+  let result;
+  if (graph) {
+    result = state.addGraph({arc: arcName, graph, defaultContainer})
+  } else {
+    result = state.addNamedGraph({arc: arcName, graphName, defaultContainer});
+  }
+  log(await result);
 },
 render() {
   return null;
