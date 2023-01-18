@@ -17,6 +17,7 @@ const etc = await load([
   'Fields/MultilineTextFieldNode.js',
   'Fields/SelectFieldNode.js',
   'Fields/TextFieldNode.js',
+  'Fields/StaticTextNode.js',
   /**/
   'Media/ImageNode.js',
   'Media/ImageCompositeNode.js',

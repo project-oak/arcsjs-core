@@ -35,11 +35,12 @@ render({data, customInspectors}, state) {
     return {title: '', props: []};
   }
   let title = data?.title || '\\o/';
+  state.theProps = this.renderProps(data, customInspectors, state);
   return {
     showNothingToInspect: String(data == null),
     title,
     showDelete: String(Boolean(data?.props)),
-    props: this.renderProps(data, customInspectors, state)
+    props: state.theProps//this.renderProps(data, customInspectors, state)
   };
 },
 
@@ -61,7 +62,7 @@ renderProp(prop, parent, customInspectors, state) {
   };
 },
 
-chooseTemplate({store: {$type, values, range}, value}, isEditing, customInspectors) {
+chooseTemplate({store: {$type, values, range}, value, connected}, isEditing, customInspectors) {
   let template = {
     Boolean: 'checkbox_t',
     String: 'text_t',
@@ -79,6 +80,8 @@ chooseTemplate({store: {$type, values, range}, value}, isEditing, customInspecto
 
   if (customInspectors?.[$type]) {
     template = 'custom_t';
+  } else if (keys(connected)?.length > 0) {
+    template = 'prop_with_conn_t';
   } else if ($type === 'Number' && ['min', 'max', 'step'].every(key => keys(range || {}).some(k => k === key))) {
     template = 'range_t';
   } else if (['unimpl_t', 'text_t'].includes(template)) {
@@ -104,24 +107,45 @@ constructPropModel(key, prop, parent, template, state) {
     value
   };
   switch (template) {
+    case 'prop_with_conn_t': {
+      model = this.renderProp({...prop, connected: undefined}, parent, {}, state);
+      //prop.connected.value
+      //prop.connected.values
+      model.connection = {
+        $template: 'select_t',
+        models: [{
+          name: `${prop.name}-connection`,//'text-connection',
+          key: `${prop.name}-connection`, //'text-connection',
+          // displayName: 'text-connection',
+          value: this.formatSelectValues(prop.connected.values, prop.connected.value)
+          // [
+          //   {key: '', name: '', selected: false},
+          //   {key: 'TextFieldNode11887:label',name: 'Text Field 11887 - label',selected: false},
+          //   {key: 'TextFieldNode11887:value',name: 'Text Field 11887 - value',selected: true}
+          // ]
+        }]
+      }
+      break;
+    }
     case 'imageupload_t': {
       model.value ||= 'assets/icon.png';
       break;
     }
     case 'select_t': {
       const selected = model.value;
-      model.value = values.map(v => {
-        if (typeof v !== 'object') {
-          v = {key: v, name: v};
-        }
-        return {
-          ...v,
-          selected: selected && Array.isArray(selected) ? selected?.includes(v.key) : selected === v.key
-        };
-      });
-      model.disabled = model.value?.length === 0;
+      model.value = this.formatSelectValues(values, selected);
+      // model.value = values.map(v => {
+      //   if (typeof v !== 'object') {
+      //     v = {key: v, name: v};
+      //   }
+      //   return {
+      //     ...v,
+      //     selected: selected && Array.isArray(selected) ? selected?.includes(v.key) : selected === v.key
+      //   };
+      // });
+      model.disabled = model.value?.length === 1; //0;
       model.multiple = multiple;
-      model.value.splice(0, 0, {key: '', name: '', selected: !model.value.some(v => v.selected)});
+      // model.value.splice(0, 0, {key: '', name: '', selected: !model.value.some(v => v.selected)});
       break;
     }
     case 'range_t': {
@@ -170,6 +194,20 @@ constructPropModel(key, prop, parent, template, state) {
     }
   }
   return model;
+},
+
+formatSelectValues(values, selected) {
+  const formatted = values.map(v => {
+    if (typeof v !== 'object') {
+      v = {key: v, name: v};
+    }
+    return {
+      ...v,
+      selected: selected && Array.isArray(selected) ? selected?.includes(v.key) : selected === v.key
+    };
+  });
+  formatted.splice(0, 0, {key: '', name: '', selected: !formatted.some(v => v.selected)});
+  return formatted;
 },
 
 renderSubProp(parent, {name, value}, state) {
@@ -431,6 +469,15 @@ template: html`
 
 <template prop_t>
   <div prop>{{prop}}</div>
+</template>
+
+<template prop_with_conn_t>
+  <div style="border:1px solid red">
+    <div prop>{{prop}}</div>
+    <div>OR...</div>
+    <div prop>{{connection}}</div>
+    <hr>
+  </div>
 </template>
 
 <template unimpl_t>

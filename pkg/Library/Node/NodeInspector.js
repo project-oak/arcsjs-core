@@ -136,8 +136,9 @@ async constructProps(node, inputs, state, service) {
       if (candidates?.[node.id]) {
         const bindingProp = await this.renderBinding(node, name, candidates[node.id][name], graph, nodeTypes, service);
         if (bindingProp) {
-          prop.disabled = bindingProp.length > 0;
-          props.push(bindingProp);
+          prop.connected = {value: bindingProp.value, values: bindingProp.store.values};
+          // prop.disabled = bindingProp.length > 0;
+          props.push(bindingProp);  // WITHOUT THIS, UPDATING DOES NOT WORK :(
         }
       }
     }
@@ -186,8 +187,7 @@ async renderBinding(node, name, candidates, graph, nodeTypes, service) {
     const froms = candidates.map(candidate => this.renderCandidate(candidate, graph)).filter(from => from);
     const value = node.connections?.[name] || [];
     const store = nodeTypes[node.type].$stores[name];
-    const skipConn = store.noinspect && !(froms.length > 0);
-    if (!skipConn) {
+    if (froms.length > 0) {
       const connectedValue = await this.constructConnectedValue(value, graph, nodeTypes, service);
       return {
         name: `${name}-connection`,
