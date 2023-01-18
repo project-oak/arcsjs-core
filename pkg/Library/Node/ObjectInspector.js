@@ -75,13 +75,14 @@ chooseTemplate({store: {$type, values, range}, value, connected}, isEditing, cus
     boolean: 'checkbox_t',
     Select: 'select_t',
     'Pojo': 'textarea_t',
-    MultilineText: 'textarea_t'
+    MultilineText: 'textarea_t',
+    TypeWithConnection: 'prop_with_conn_t'
   }[$type] ?? 'unimpl_t';
 
   if (customInspectors?.[$type]) {
     template = 'custom_t';
-  } else if (keys(connected)?.length > 0) {
-    template = 'prop_with_conn_t';
+  // } else if (keys(connected)?.length > 0) {
+  //   template = 'prop_with_conn_t';
   } else if ($type === 'Number' && ['min', 'max', 'step'].every(key => keys(range || {}).some(k => k === key))) {
     template = 'range_t';
   } else if (['unimpl_t', 'text_t'].includes(template)) {
@@ -113,8 +114,15 @@ constructPropModel(key, prop, parent, template, state) {
   };
   switch (template) {
     case 'prop_with_conn_t': {
+      model = this.renderProp({
+          ...prop,
+          displayName: undefined,
+          /*connected: undefined*/
+          value: prop.value.property,
+          store: prop.store.store
+        }, parent, {}, state);
       const propDisplayName = prop.displayName || prop.name;
-      model = this.renderProp({...prop, displayName: undefined, connected: undefined}, parent, {}, state);
+    //   model = this.renderProp({...prop, displayName: undefined, connected: undefined}, parent, {}, state);
       delete model.prop?.models?.[0]?.displayName;
       const propConnKey = `${prop.name}-connection`;
       model.connection = {
@@ -122,7 +130,7 @@ constructPropModel(key, prop, parent, template, state) {
         models: [{
           name: propConnKey, //`${prop.name}-connection`,
           key: propConnKey, //`${prop.name}-connection`,
-          value: this.formatSelectValues(prop.connected.values, prop.connected.value)
+          ...prop.value.connection//this.formatSelectValues(prop.connected.values, prop.connected.value)
         }]
       };
       const checkedConn = Boolean(state.checkedConns?.[propConnKey]);//false;

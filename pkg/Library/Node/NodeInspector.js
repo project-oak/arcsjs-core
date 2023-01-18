@@ -136,7 +136,12 @@ async constructProps(node, inputs, state, service) {
       if (candidates?.[node.id]) {
         const bindingProp = await this.renderBinding(node, name, candidates[node.id][name], graph, nodeTypes, service);
         if (bindingProp) {
-          prop.connected = {value: bindingProp.value, values: bindingProp.store.values};
+          //prop.connected = {value: bindingProp.value, values: bindingProp.store.values};
+          prop.value = {
+            property: prop.value,
+            connection: {value: bindingProp.value, values: bindingProp.store.values}
+          };
+          prop.store = {$type: 'TypeWithConnection', store: prop.store};
           // prop.disabled = bindingProp.length > 0;
           // props.push(bindingProp);  // WITHOUT THIS, UPDATING DOES NOT WORK :(
         }

@@ -56,6 +56,10 @@ updateValues(selectedNodeId, graph, data, nodeTypes, state, service) {
 },
 
 updatePropValue(prop, currentValue, currentConnValue, node, nodeType, service) {
+  if (prop.store?.$type === 'TypeWithConnection') {
+    return;
+  }
+
   if (JSON.stringify(prop.value) !== JSON.stringify(currentValue)) {
     // Note: setting entire prop value (not granular by inner props).
     const newValue = this.formatPropValue(prop);
