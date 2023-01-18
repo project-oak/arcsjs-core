@@ -93,7 +93,7 @@
     }];
   },
   async handleEvent(inputs, state, tools) {
-    const {event, selectedNodeId} = inputs;
+    const {event, graph} = inputs;
     if (event !== state.event) {
       state.event = event;
       if (event) {
@@ -103,7 +103,7 @@
             ...await this[event](inputs, state, tools),
           };
         }
-        log(`Unhandled event '${event}' for ${selectedNodeId}`);
+        log(`Unhandled event '${event}' for ${graph?.$meta.name}`);
       }
     }
   },

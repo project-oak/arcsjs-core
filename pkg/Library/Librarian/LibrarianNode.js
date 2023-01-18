@@ -14,14 +14,11 @@ export const LibrarianNode = {
     nodeId: {
       $type: 'String',
       noinspect: true,
-      nodisplay: true,
       value: 'node.id'
     },
     selectedGraph: {
       $type: 'JSON',
-      connection: true,
-      noinspect: true,
-      nodisplay: true
+      noinspect: true
     },
   },
   librarian: {

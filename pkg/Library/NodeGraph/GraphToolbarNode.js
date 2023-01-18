@@ -17,13 +17,14 @@ export const GraphToolbarNode = {
     graph: {
       $type: 'Pojo'
     },
+    selectedNodeId: {
+      $type: 'String'
+    },
     icons: {
-      $type: '[Pojo]',
-      nodisplay: true
+      $type: '[Pojo]'
     },
     event: {
-      $type: 'String',
-      nodisplay: true
+      $type: 'String'
     }
   },
   graphToolbar: {
@@ -38,7 +39,7 @@ export const GraphToolbarNode = {
     },
     $outputs: [
       'graph',
-      //'selectedNodeId',
+      'selectedNodeId',
       'graphs',
       'icons',
       //'event'

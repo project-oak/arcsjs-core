@@ -18,8 +18,7 @@ export const DeviceUxRecipe = {
         // videoDeviceId
         // audioOutputDeviceId
       },
-      noinspect: true,
-      nodisplay: true
+      noinspect: true
     },
     mediaDevices: {
       $type: '[JSON]',

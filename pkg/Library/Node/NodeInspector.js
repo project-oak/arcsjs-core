@@ -186,7 +186,7 @@ async renderBinding(node, name, candidates, graph, nodeTypes, service) {
     const froms = candidates.map(candidate => this.renderCandidate(candidate, graph)).filter(from => from);
     const value = node.connections?.[name] || [];
     const store = nodeTypes[node.type].$stores[name];
-    const skipConn = (store.nodisplay || (store.noinspect && !(froms.length > 0)));
+    const skipConn = store.noinspect && !(froms.length > 0);
     if (!skipConn) {
       const connectedValue = await this.constructConnectedValue(value, graph, nodeTypes, service);
       return {
@@ -194,7 +194,8 @@ async renderBinding(node, name, candidates, graph, nodeTypes, service) {
         store: {
           ...store,
           $type: 'Connection',
-          noinspect: store.nodisplay,
+          // Should support not inspecting a connection?
+          // noinspect: nodisplay,
           multiple: store.multiple,
           values: froms
         },
