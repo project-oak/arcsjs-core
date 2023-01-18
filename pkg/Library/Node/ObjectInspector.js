@@ -17,7 +17,7 @@ dataPropsChanged(data, {data: oldData}) {
   return data?.key !== oldData?.key ||
     data?.title !== oldData?.title ||
     data?.props?.length !== oldData?.props?.length ||
-    data?.props?.some(({name}, index) => name !== oldData?.props?.[index].name);
+    data?.props?.some(({name}, index) => name !== oldData?.props?.[index].name || !deepEqual(data.props[index], oldData.props[index]));
 },
 
 async refreshRendering(state, output) {
@@ -96,6 +96,11 @@ chooseTemplate({store: {$type, values, range}, value, connected}, isEditing, cus
   return template;
 },
 
+onConnChecked({eventlet: {key}}, state) {
+  state.checkedConns ??= {};
+  state.checkedConns[key] = Boolean(!state.checkedConns[key]);
+},
+
 constructPropModel(key, prop, parent, template, state) {
   const {name, propId, store: {$type, values, range, multiple}, value, disabled, displayName} = prop;
   let model = {
@@ -108,23 +113,22 @@ constructPropModel(key, prop, parent, template, state) {
   };
   switch (template) {
     case 'prop_with_conn_t': {
-      model = this.renderProp({...prop, connected: undefined}, parent, {}, state);
-      //prop.connected.value
-      //prop.connected.values
+      const propDisplayName = prop.displayName || prop.name;
+      model = this.renderProp({...prop, displayName: undefined, connected: undefined}, parent, {}, state);
+      delete model.prop?.models?.[0]?.displayName;
+      const propConnKey = `${prop.name}-connection`;
       model.connection = {
         $template: 'select_t',
         models: [{
-          name: `${prop.name}-connection`,//'text-connection',
-          key: `${prop.name}-connection`, //'text-connection',
-          // displayName: 'text-connection',
+          name: propConnKey, //`${prop.name}-connection`,
+          key: propConnKey, //`${prop.name}-connection`,
           value: this.formatSelectValues(prop.connected.values, prop.connected.value)
-          // [
-          //   {key: '', name: '', selected: false},
-          //   {key: 'TextFieldNode11887:label',name: 'Text Field 11887 - label',selected: false},
-          //   {key: 'TextFieldNode11887:value',name: 'Text Field 11887 - value',selected: true}
-          // ]
         }]
-      }
+      };
+      const checkedConn = Boolean(state.checkedConns?.[propConnKey]);//false;
+      assign(model, {
+        showConn: String(checkedConn), showProp: String(!checkedConn), checkedConn, propConnKey, propDisplayName
+      });
       break;
     }
     case 'imageupload_t': {
@@ -134,18 +138,8 @@ constructPropModel(key, prop, parent, template, state) {
     case 'select_t': {
       const selected = model.value;
       model.value = this.formatSelectValues(values, selected);
-      // model.value = values.map(v => {
-      //   if (typeof v !== 'object') {
-      //     v = {key: v, name: v};
-      //   }
-      //   return {
-      //     ...v,
-      //     selected: selected && Array.isArray(selected) ? selected?.includes(v.key) : selected === v.key
-      //   };
-      // });
-      model.disabled = model.value?.length === 1; //0;
+      model.disabled = model.value?.length === 1;
       model.multiple = multiple;
-      // model.value.splice(0, 0, {key: '', name: '', selected: !model.value.some(v => v.selected)});
       break;
     }
     case 'range_t': {
@@ -266,9 +260,17 @@ async onEditObjectChange({eventlet: {key, value}, data}, state, {output}) {
 
 updatePropValue(data, propNames, formatter) {
   const propName = propNames.shift();
-  const prop = data.props.find(p => p.name === propName);
-  const newValue = this.formatNewValue(prop.value, prop.store.$type, propNames, formatter);
-  return this.setValueInProps(data, prop, newValue);
+  if (propName.endsWith('-connection')) {
+    const nonConnPropName = propName.substring(0, propName.length - '-connection'.length);
+    const nonConnProp = data.props.find(p => p.name === nonConnPropName);
+    const nonConnNewValue = formatter();
+    nonConnProp.connected.value = nonConnNewValue ? [nonConnNewValue] : nonConnNewValue;
+    return {data};
+  } else {
+    const prop = data.props.find(p => p.name === propName);
+    const newValue = this.formatNewValue(prop.value, prop.store.$type, propNames, formatter);
+    return this.setValueInProps(data, prop, newValue);
+  }
 },
 
 setValueInProps(data, prop, newValue) {
@@ -472,10 +474,14 @@ template: html`
 </template>
 
 <template prop_with_conn_t>
-  <div style="border:1px solid red">
-    <div prop>{{prop}}</div>
-    <div>OR...</div>
-    <div prop>{{connection}}</div>
+  <div Xstyle="border:1px solid red">
+    <span flex columns>
+      <span label flex>{{propDisplayName}}</span>
+      <input type="checkbox" checked="{{checkedConn}}" on-change="onConnChecked" key="{{propConnKey}}"/>
+      <i>connected</i>
+    </span>
+    <div prop display$="{{showProp}}">{{prop}}</div>
+    <div prop display$="{{showConn}}">{{connection}}</div>
     <hr>
   </div>
 </template>

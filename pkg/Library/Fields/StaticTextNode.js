@@ -13,13 +13,12 @@ export const StaticText = {
   $stores: {
     text: {
       $type: 'String',
-      $value: 'static text',
-      connection: true
+      $value: 'static text'
     },
     // textStyle: {
     //   $type: 'String',
     //   $value: 'font-weight: bold; color: red; font-size: 18px;',
-    //   connection: true
+    //   noinspect: true
     // }
   },
   text: {

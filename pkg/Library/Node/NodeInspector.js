@@ -138,7 +138,7 @@ async constructProps(node, inputs, state, service) {
         if (bindingProp) {
           prop.connected = {value: bindingProp.value, values: bindingProp.store.values};
           // prop.disabled = bindingProp.length > 0;
-          props.push(bindingProp);  // WITHOUT THIS, UPDATING DOES NOT WORK :(
+          // props.push(bindingProp);  // WITHOUT THIS, UPDATING DOES NOT WORK :(
         }
       }
     }
