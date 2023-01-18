@@ -225,12 +225,18 @@ template: html`
     border-radius: 6px;
   }
 </style>
+
 <div toolbar>
+
   <mwc-icon-button title="Rename Graph" on-click="onRenameClicked" display$="{{showRenameIcon}}" icon="edit"></mwc-icon-button>
+
   <div chooser rows display$="{{showChooser}}"><slot name="chooser"></slot></div>
   <fancy-input rename type="text" value="{{name}}" focus="{{showRenameInput}}" display$="{{showRenameInput}}" on-change="onRename" on-blur="onRenameBlur"></fancy-input>
+
   <div column separator></div>
+
   <div chooser rows><slot name="buttons"></slot></div>
+
 </div>
 `
 });
