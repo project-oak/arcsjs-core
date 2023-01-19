@@ -134,16 +134,13 @@ async constructProps(node, inputs, state, service) {
       const prop = await this.computeProp(node, {name, store}, inputs, state, service);
       props.push(prop);
       if (candidates?.[node.id]) {
-        const bindingProp = await this.renderBinding(node, name, candidates[node.id][name], graph, nodeTypes, service);
-        if (bindingProp) {
-          //prop.connected = {value: bindingProp.value, values: bindingProp.store.values};
-          prop.value = {
-            property: prop.value,
-            connection: {value: bindingProp.value, values: bindingProp.store.values}
-          };
-          prop.store = {$type: 'TypeWithConnection', store: prop.store};
-          // prop.disabled = bindingProp.length > 0;
-          // props.push(bindingProp);  // WITHOUT THIS, UPDATING DOES NOT WORK :(
+        const bindingValues = this.constructBindingValues(node, name, candidates[node.id][name], graph, nodeTypes, service);
+        if (bindingValues) {
+          assign(prop, {
+            value: {property: prop.value, connection: bindingValues}
+          }, {
+            store: {$type: 'TypeWithConnection', store: prop.store}
+          });
         }
       }
     }
@@ -187,26 +184,12 @@ getStoreValue(storeId, service) {
   return service({kind: 'StoreService', msg: 'GetStoreValue', data: {storeId}});
 },
 
-async renderBinding(node, name, candidates, graph, nodeTypes, service) {
+constructBindingValues(node, name, candidates, graph) {
   if (candidates) {
     const froms = candidates.map(candidate => this.renderCandidate(candidate, graph)).filter(from => from);
     const value = node.connections?.[name] || [];
-    const store = nodeTypes[node.type].$stores[name];
     if (froms.length > 0) {
-      const connectedValue = await this.constructConnectedValue(value, graph, nodeTypes, service);
-      return {
-        name: `${name}-connection`,
-        store: {
-          ...store,
-          $type: 'Connection',
-          // Should support not inspecting a connection?
-          // noinspect: nodisplay,
-          multiple: store.multiple,
-          values: froms
-        },
-        value,
-        connectedStore: {$type: store.$type, $value: connectedValue}
-      };
+      return {values: froms, value};
     }
   }
 },
@@ -248,17 +231,18 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-async constructConnectedValue(selected, graph, nodeTypes, service) {
-  return await Promise.all(selected?.map(
-    async ({from, storeName}) => {
-      const node = graph.nodes[from];
-      const nodeType = nodeTypes[node?.type];
-      if (nodeType) {
-        return await this.getBindingValue(storeName, nodeType.$stores[storeName], node, service);
-      }
-    }
-  ) || []);
-},
+// This breaks Shaders custom inspector.
+// async constructConnectedValue(selected, graph, nodeTypes, service) {
+//   return await Promise.all(selected?.map(
+//     async ({from, storeName}) => {
+//       const node = graph.nodes[from];
+//       const nodeType = nodeTypes[node?.type];
+//       if (nodeType) {
+//         return await this.getBindingValue(storeName, nodeType.$stores[storeName], node, service);
+//       }
+//     }
+//   ) || []);
+// },
 
 renderCandidate({from, storeName}, graph) {
   const node = graph.nodes[from];

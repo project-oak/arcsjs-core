@@ -81,8 +81,6 @@ chooseTemplate({store: {$type, values, range}, value, connected}, isEditing, cus
 
   if (customInspectors?.[$type]) {
     template = 'custom_t';
-  // } else if (keys(connected)?.length > 0) {
-  //   template = 'prop_with_conn_t';
   } else if ($type === 'Number' && ['min', 'max', 'step'].every(key => keys(range || {}).some(k => k === key))) {
     template = 'range_t';
   } else if (['unimpl_t', 'text_t'].includes(template)) {
@@ -97,11 +95,6 @@ chooseTemplate({store: {$type, values, range}, value, connected}, isEditing, cus
   return template;
 },
 
-onConnChecked({eventlet: {key}}, state) {
-  state.checkedConns ??= {};
-  state.checkedConns[key] = Boolean(!state.checkedConns[key]);
-},
-
 constructPropModel(key, prop, parent, template, state) {
   const {name, propId, store: {$type, values, range, multiple}, value, disabled, displayName} = prop;
   let model = {
@@ -114,30 +107,9 @@ constructPropModel(key, prop, parent, template, state) {
   };
   switch (template) {
     case 'prop_with_conn_t': {
-      model = this.renderProp({
-          ...prop,
-          displayName: undefined,
-          /*connected: undefined*/
-          value: prop.value.property,
-          store: prop.store.store
-        }, parent, {}, state);
-      const propDisplayName = prop.displayName || prop.name;
-    //   model = this.renderProp({...prop, displayName: undefined, connected: undefined}, parent, {}, state);
+      model = this.renderProp({...prop, value: prop.value.property, store: prop.store.store }, parent, {}, state);
       delete model.prop?.models?.[0]?.displayName;
-      const propConnKey = `${prop.name}-connection`;
-      model.connection = {
-        $template: 'select_t',
-        models: [{
-          name: propConnKey, //`${prop.name}-connection`,
-          key: propConnKey, //`${prop.name}-connection`,
-          //...prop.value.connection//this.formatSelectValues(prop.connected.values, prop.connected.value)
-          value: this.formatSelectValues(prop.value.connection.values, prop.value.connection.value)
-        }]
-      };
-      const checkedConn = Boolean(state.checkedConns?.[propConnKey]);//false;
-      assign(model, {
-        showConn: String(checkedConn), showProp: String(!checkedConn), checkedConn, propConnKey, propDisplayName
-      });
+      assign(model, this.formatConnectionSelect(prop, state));
       break;
     }
     case 'imageupload_t': {
@@ -213,6 +185,24 @@ formatSelectValues(values, selected) {
   return formatted;
 },
 
+formatConnectionSelect(prop, state) {
+  const key = `${prop.name}-connection`;
+  const displayName = prop.displayName || prop.name;
+  const {values, value} = prop.value.connection;
+  const checkedConn = Boolean(state.checkedConns?.[key] || value?.length > 0);
+  return  {
+    connection: {
+      $template: 'select_t',
+      models: [{key, name: key, value: this.formatSelectValues(values, value)}]
+    },
+    key,
+    displayName,
+    checkedConn,
+    showConn: String(checkedConn),
+    showProp: String(!checkedConn),
+  };
+},
+
 renderSubProp(parent, {name, value}, state) {
   const type = typeof value;
   return this.renderProp({name, store: {$type: type}, value}, parent, {}, state);
@@ -222,6 +212,14 @@ onPropChange({eventlet: {key, value}, data}) {
   const propNames = key.split(':');
   const formatter = (propValue, propType) => this.formatPropValueByType(propValue, propType, value);
   return this.updatePropValue(data, propNames, formatter);
+},
+
+onConnChecked({eventlet: {key}, data}, state) {
+  state.checkedConns ??= {};
+  state.checkedConns[key] = Boolean(!state.checkedConns[key]);
+  if (!state.checkedConns[key]) {
+    return this.onPropChange({eventlet: {key}, data}, state);
+  }
 },
 
 onAddItem({eventlet: {key, value}, data}) {
@@ -494,8 +492,10 @@ template: html`
 <template prop_with_conn_t>
   <div Xstyle="border:1px solid red">
     <span flex columns>
-      <span label flex>{{propDisplayName}}</span>
-      <input type="checkbox" checked="{{checkedConn}}" on-change="onConnChecked" key="{{propConnKey}}"/>
+      <!-- span label flex>{{propDisplayName}}</span -->
+      <span label flex>{{displayName}}</span>
+      <input type="checkbox" checked="{{checkedConn}}" on-change="onConnChecked" key="{{key}}"/>
+      <!--key="{{propConnKey}}"/> -->
       <i>connected</i>
     </span>
     <div prop display$="{{showProp}}">{{prop}}</div>
