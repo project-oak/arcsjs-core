@@ -15,7 +15,7 @@ export const NodeTypesNode = {
   $stores: {
     NodeTypes: {
       $type: 'Pojo',
-      $value: {...nodeTypes},
+      $value: nodeTypes,
       noinspect: true
     }
   },

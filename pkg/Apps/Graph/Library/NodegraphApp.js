@@ -19,11 +19,13 @@ export const NodegraphApp = class extends App {
     this.graphs = [NodegraphGraph];
     this.nodeTypes = {...nodeTypes, ...nodegraphNodeTypes};
     //
-    services.ArcService.nodeTypes = this.nodeTypes;
-    services.ArcService.layoutInfo = {
-      id: 'preview',
-      defaultContainer: 'designer#graph'
-    };
+    // Object.assign(services.ArcService, {
+    //   nodeTypes: this.nodeTypes,
+    //   layoutInfo: {
+    //     id: 'preview',
+    //     defaultContainer: 'designer#graph'
+    //   }
+    // });
     //
     log('Welcome!');
   }

@@ -15,20 +15,34 @@ export const ArcService = {
   async addNamedGraph({arc, graphName, defaultContainer}, arcs) {
     if (arc && graphName) {
       log('addNamedGraph', arcName);
-      //
       const graphs = await arcs.get('user', 'graphs');
       const graph = graphs.find(g => g?.$meta?.name === graphName); // ?? graphs?.[0];
-      //
+      if (graph) {
+        return this.addGraph({arc, graph, defaultContainer}, arcs);
+      } else {
+        log(`no graph named "${graphName}"`);
+      }
+      /*
       const layoutInfo = {...this.layoutInfo};
       if (defaultContainer) {
         layoutInfo.defaultContainer = defaultContainer;
       }
-      //
       if (graph) {
         arcs.runGraph(arc, graph, this.nodeTypes, layoutInfo);
       } else {
         log(`no graph named "${graphName}"`);
       }
+      */
+    }
+  },
+  async addGraph({arc, graph, defaultContainer}, arcs) {
+    if (arc && graph) {
+      log('addGraph', arc);
+      const layoutInfo = {...this.layoutInfo};
+      if (defaultContainer) {
+        layoutInfo.defaultContainer = defaultContainer;
+      }
+      arcs.runGraph(arc, graph, this.nodeTypes, layoutInfo);
     }
   },
   //

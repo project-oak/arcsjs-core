@@ -13,7 +13,7 @@ import {Params} from './Params.js';
 
 const Library = `${globalThis.config?.arcsPath}/Library`;
 
-export const ArcsJsApp = class extends Xen.Async {
+export const ArcsJsAppSurface = class extends Xen.Async {
   static get observedAttributes() {
     return ['path', 'graph'];
   }
@@ -47,6 +47,9 @@ export const ArcsJsApp = class extends Xen.Async {
   bootGraph(graph) {
     const nodeKey = Object.keys(graph.nodes).find(key => key.includes('NodeDesignerNode'));
     const defaultContainer = `${nodeKey}_designer#graph`;
+    // this.defaultContainer = defaultContainer;
+    // this.graph = graph;
+    // boot(import.meta.url);
     boot(import.meta.url, {
       graph,
       defaultContainer
@@ -88,4 +91,4 @@ export const ArcsJsApp = class extends Xen.Async {
   }
 };
 
-customElements.define('arcsjs-app-surface', ArcsJsApp);
+customElements.define('arcsjs-app-surface', ArcsJsAppSurface);

@@ -9,15 +9,15 @@
 // library seemed to be happier loaded from non-module
 // environment, and I didn't have time to investigate.
 
-//const root = `${globalThis.config.arcsPath}/third_party/mediapipe/pose`;
-const root = `../third_party/mediapipe/pose`;
-const locateFile = file => `../${root}/${file}`;
+const root = `${globalThis.config.arcsPath}/third_party/mediapipe/pose`;
+//const root = `../third_party/mediapipe/pose`;
+const locateFile = file => `${root}/${file}`;
 
 let pose;
 
 globalThis.requirePose = async () => {
   if (!globalThis.Pose) {
-    await import(`../${root}/pose.js`);
+    await import(locateFile('pose.js'));
   }
   //
   if (!pose) {

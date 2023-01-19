@@ -1169,11 +1169,12 @@ var Graphinator = class {
     values4(graph.nodes).forEach((node) => {
       const nodeType = this.nodeTypes[node.type];
       if (!nodeType) {
-        throw `node.type "${node.type}" not found`;
+        log7.warn(`node.type "${node.type}" not found`);
+      } else {
+        const connsMap = {};
+        this.prepareStores(node, nodeType, stores, connsMap);
+        this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
       }
-      const connsMap = {};
-      this.prepareStores(node, nodeType, stores, connsMap);
-      this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
     });
     this.retagStoreSpecs(stores);
     log7("Executing", { graph, stores, particles });

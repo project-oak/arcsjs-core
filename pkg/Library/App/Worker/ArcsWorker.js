@@ -8,6 +8,7 @@
  */
 import {Paths, Runtime, Arc, Decorator, Chef, Graphinator, logFactory, utils} from '../../Core/core.js';
 import {MessageBus} from './MessageBus.js';
+import {ArcService} from '../ArcService.js';
 import {RecipeService} from '../RecipeService.js';
 import {StoreService} from '../StoreService.js';
 import {ComposerService} from '../ComposerService.js';
@@ -71,6 +72,11 @@ const serviceHandler = async (arc, host, request) => {
 const handleRequest = async(arc, host, request) => {
   if (request?.msg === 'request-context') {
     return ({runtime: user});
+  }
+  if (request.kind === 'ArcService') {
+    const value = await ArcService(user, host, request);
+    log('ArcService', request, value);
+    return value;
   }
   if (request.kind === 'RecipeService') {
     const value = await RecipeService(user, host, request);

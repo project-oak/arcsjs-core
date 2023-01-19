@@ -17,7 +17,7 @@ const load = async paths => (await Promise.all(paths.map(p => import(`${Library}
 const modules = await load([
   'Mediapipe/PoseService.js',
   'App/HistoryService.js',
-  'Arc/ArcService.js',
+  // 'Arc/ArcService.js',
   // 'Media/MediaService.js',
   // 'Goog/GoogleApisService.js',
   // 'Mediapipe/FaceMeshService.js',

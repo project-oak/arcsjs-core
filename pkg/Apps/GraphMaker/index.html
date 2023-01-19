@@ -8,4 +8,13 @@
 <title>GraphMaker</title>
 <script type="module" src="./config.js"></script>
 <script type="module" src="../../Library/App/arcsjs-app-surface.js"></script>
+
 <arcsjs-app-surface path="GraphMaker"></arcsjs-app-surface>
+
+<script type="module">
+  setTimeout(async () => {
+    const {app} = globalThis;
+    const graphs = await app.arcs.get('user', 'graphs');
+    await app.arcs.set('user', 'GraphToolbarNode10357:graphs', graphs)
+  }, 2000);
+</script>
