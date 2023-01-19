@@ -231,19 +231,6 @@ getParticleNames(recipe) {
   return recipe && keys(recipe).filter(notKeyword);
 },
 
-// This breaks Shaders custom inspector.
-// async constructConnectedValue(selected, graph, nodeTypes, service) {
-//   return await Promise.all(selected?.map(
-//     async ({from, storeName}) => {
-//       const node = graph.nodes[from];
-//       const nodeType = nodeTypes[node?.type];
-//       if (nodeType) {
-//         return await this.getBindingValue(storeName, nodeType.$stores[storeName], node, service);
-//       }
-//     }
-//   ) || []);
-// },
-
 renderCandidate({from, storeName}, graph) {
   const node = graph.nodes[from];
   if (node) {

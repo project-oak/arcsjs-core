@@ -8,6 +8,9 @@
 
 async update({data}, state, {output}) {
   if (this.dataPropsChanged(data, state)) {
+    if (data?.key !== state.oldData?.key) {
+      state.checkedConns = {};
+    }
     await this.refreshRendering(state, output);
     state.data = data;
   }
@@ -35,12 +38,12 @@ render({data, customInspectors}, state) {
     return {title: '', props: []};
   }
   let title = data?.title || '\\o/';
-  state.theProps = this.renderProps(data, customInspectors, state);
+  state.renderedProps = this.renderProps(data, customInspectors, state);
   return {
     showNothingToInspect: String(data == null),
     title,
     showDelete: String(Boolean(data?.props)),
-    props: state.theProps//this.renderProps(data, customInspectors, state)
+    props: state.renderedProps
   };
 },
 
@@ -62,7 +65,7 @@ renderProp(prop, parent, customInspectors, state) {
   };
 },
 
-chooseTemplate({store: {$type, values, range}, value, connected}, isEditing, customInspectors) {
+chooseTemplate({store: {$type, values, range}, value}, isEditing, customInspectors) {
   let template = {
     Boolean: 'checkbox_t',
     String: 'text_t',
@@ -189,7 +192,8 @@ formatConnectionSelect(prop, state) {
   const key = `${prop.name}-connection`;
   const displayName = prop.displayName || prop.name;
   const {values, value} = prop.value.connection;
-  const checkedConn = Boolean(state.checkedConns?.[key] || value?.length > 0);
+  state.checkedConns[key] ??= ((value?.length > 0) || !prop.value.property);
+  const checkedConn = Boolean(state.checkedConns[key]);
   return  {
     connection: {
       $template: 'select_t',
@@ -215,7 +219,6 @@ onPropChange({eventlet: {key, value}, data}) {
 },
 
 onConnChecked({eventlet: {key}, data}, state) {
-  state.checkedConns ??= {};
   state.checkedConns[key] = Boolean(!state.checkedConns[key]);
   if (!state.checkedConns[key]) {
     return this.onPropChange({eventlet: {key}, data}, state);
@@ -271,9 +274,7 @@ updatePropValue(data, propNames, formatter) {
     const nonConnPropName = propName.substring(0, propName.length - '-connection'.length);
     const nonConnProp = data.props.find(p => p.name === nonConnPropName);
     const nonConnNewValue = formatter();
-    // nonConnProp.connected.value = 
-    nonConnProp.value.connection.value =
-        nonConnNewValue ? [nonConnNewValue] : nonConnNewValue;
+    nonConnProp.value.connection.value = nonConnNewValue ? [nonConnNewValue] : nonConnNewValue;
     return {data};
   } else {
     const prop = data.props.find(p => p.name === propName);
@@ -492,10 +493,8 @@ template: html`
 <template prop_with_conn_t>
   <div Xstyle="border:1px solid red">
     <span flex columns>
-      <!-- span label flex>{{propDisplayName}}</span -->
       <span label flex>{{displayName}}</span>
       <input type="checkbox" checked="{{checkedConn}}" on-change="onConnChecked" key="{{key}}"/>
-      <!--key="{{propConnKey}}"/> -->
       <i>connected</i>
     </span>
     <div prop display$="{{showProp}}">{{prop}}</div>

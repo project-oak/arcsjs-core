@@ -15,14 +15,14 @@ export const StaticText = {
       $type: 'String',
       $value: 'static text'
     },
-    // textStyle: {
-    //   $type: 'String',
-    //   $value: 'font-weight: bold; color: red; font-size: 18px;',
-    //   noinspect: true
-    // }
+    textStyle: {
+      $type: 'String',
+      $value: 'font-weight: bold; color: red; font-size: 18px;',
+      noinspect: true
+    }
   },
   text: {
     $kind: '$library/Fields/StaticText',
-    $inputs: ['text']//, 'textStyle']
+    $inputs: ['text', 'textStyle']
   }
 };

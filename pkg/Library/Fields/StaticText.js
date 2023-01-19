@@ -9,10 +9,7 @@ render({text, textStyle}) {
   if (text && !(typeof text === 'string')) {
     text = JSON.stringify(text, null, '  ');
   }
-  return {
-    text,
-    textStyle: textStyle || 'font-weight: bold; color: red; font-size: 18px; text-align: center; padding-top: 100px'
-  };
+  return {text, textStyle};
 },
 template: html`
 <style>
