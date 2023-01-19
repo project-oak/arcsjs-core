@@ -8,6 +8,9 @@
 
 async update({data}, state, {output}) {
   if (this.dataPropsChanged(data, state)) {
+    if (data?.key !== state.oldData?.key) {
+      state.checkedConns = {};
+    }
     await this.refreshRendering(state, output);
     state.data = data;
   }
@@ -17,7 +20,7 @@ dataPropsChanged(data, {data: oldData}) {
   return data?.key !== oldData?.key ||
     data?.title !== oldData?.title ||
     data?.props?.length !== oldData?.props?.length ||
-    data?.props?.some(({name}, index) => name !== oldData?.props?.[index].name);
+    data?.props?.some(({name}, index) => name !== oldData?.props?.[index].name || !deepEqual(data.props[index], oldData.props[index]));
 },
 
 async refreshRendering(state, output) {
@@ -35,11 +38,12 @@ render({data, customInspectors}, state) {
     return {title: '', props: []};
   }
   let title = data?.title || '\\o/';
+  state.renderedProps = this.renderProps(data, customInspectors, state);
   return {
     showNothingToInspect: String(data == null),
     title,
     showDelete: String(Boolean(data?.props)),
-    props: this.renderProps(data, customInspectors, state)
+    props: state.renderedProps
   };
 },
 
@@ -74,7 +78,8 @@ chooseTemplate({store: {$type, values, range}, value}, isEditing, customInspecto
     boolean: 'checkbox_t',
     Select: 'select_t',
     'Pojo': 'textarea_t',
-    MultilineText: 'textarea_t'
+    MultilineText: 'textarea_t',
+    TypeWithConnection: 'prop_with_conn_t'
   }[$type] ?? 'unimpl_t';
 
   if (customInspectors?.[$type]) {
@@ -104,24 +109,21 @@ constructPropModel(key, prop, parent, template, state) {
     value
   };
   switch (template) {
+    case 'prop_with_conn_t': {
+      model = this.renderProp({...prop, value: prop.value.property, store: prop.store.store }, parent, {}, state);
+      delete model.prop?.models?.[0]?.displayName;
+      assign(model, this.formatConnectionSelect(prop, state));
+      break;
+    }
     case 'imageupload_t': {
       model.value ||= 'assets/icon.png';
       break;
     }
     case 'select_t': {
       const selected = model.value;
-      model.value = values.map(v => {
-        if (typeof v !== 'object') {
-          v = {key: v, name: v};
-        }
-        return {
-          ...v,
-          selected: selected && Array.isArray(selected) ? selected?.includes(v.key) : selected === v.key
-        };
-      });
-      model.disabled = model.value?.length === 0;
+      model.value = this.formatSelectValues(values, selected);
+      model.disabled = model.value?.length === 1;
       model.multiple = multiple;
-      model.value.splice(0, 0, {key: '', name: '', selected: !model.value.some(v => v.selected)});
       break;
     }
     case 'range_t': {
@@ -172,6 +174,39 @@ constructPropModel(key, prop, parent, template, state) {
   return model;
 },
 
+formatSelectValues(values, selected) {
+  const formatted = values.map(v => {
+    if (typeof v !== 'object') {
+      v = {key: v, name: v};
+    }
+    return {
+      ...v,
+      selected: selected && Array.isArray(selected) ? selected?.includes(v.key) : selected === v.key
+    };
+  });
+  formatted.splice(0, 0, {key: '', name: '', selected: !formatted.some(v => v.selected)});
+  return formatted;
+},
+
+formatConnectionSelect(prop, state) {
+  const key = `${prop.name}-connection`;
+  const displayName = prop.displayName || prop.name;
+  const {values, value} = prop.value.connection;
+  state.checkedConns[key] ??= ((value?.length > 0) || !prop.value.property);
+  const checkedConn = Boolean(state.checkedConns[key]);
+  return  {
+    connection: {
+      $template: 'select_t',
+      models: [{key, name: key, value: this.formatSelectValues(values, value)}]
+    },
+    key,
+    displayName,
+    checkedConn,
+    showConn: String(checkedConn),
+    showProp: String(!checkedConn),
+  };
+},
+
 renderSubProp(parent, {name, value}, state) {
   const type = typeof value;
   return this.renderProp({name, store: {$type: type}, value}, parent, {}, state);
@@ -181,6 +216,13 @@ onPropChange({eventlet: {key, value}, data}) {
   const propNames = key.split(':');
   const formatter = (propValue, propType) => this.formatPropValueByType(propValue, propType, value);
   return this.updatePropValue(data, propNames, formatter);
+},
+
+onConnChecked({eventlet: {key}, data}, state) {
+  state.checkedConns[key] = Boolean(!state.checkedConns[key]);
+  if (!state.checkedConns[key]) {
+    return this.onPropChange({eventlet: {key}, data}, state);
+  }
 },
 
 onAddItem({eventlet: {key, value}, data}) {
@@ -228,9 +270,17 @@ async onEditObjectChange({eventlet: {key, value}, data}, state, {output}) {
 
 updatePropValue(data, propNames, formatter) {
   const propName = propNames.shift();
-  const prop = data.props.find(p => p.name === propName);
-  const newValue = this.formatNewValue(prop.value, prop.store.$type, propNames, formatter);
-  return this.setValueInProps(data, prop, newValue);
+  if (propName.endsWith('-connection')) {
+    const nonConnPropName = propName.substring(0, propName.length - '-connection'.length);
+    const nonConnProp = data.props.find(p => p.name === nonConnPropName);
+    const nonConnNewValue = formatter();
+    nonConnProp.value.connection.value = nonConnNewValue ? [nonConnNewValue] : nonConnNewValue;
+    return {data};
+  } else {
+    const prop = data.props.find(p => p.name === propName);
+    const newValue = this.formatNewValue(prop.value, prop.store.$type, propNames, formatter);
+    return this.setValueInProps(data, prop, newValue);
+  }
 },
 
 setValueInProps(data, prop, newValue) {
@@ -267,6 +317,13 @@ cloneValue(value) {
 },
 
 formatPropValueByType(currentValue, currentType, newValue) {
+  if (currentType === 'TypeWithConnection') {
+    return {
+      ...currentValue,      
+      // better way to determine actual property type?
+      property: this.formatPropValueByType(currentValue.property, typeof newValue, newValue),
+    }
+  }
   if (typeof currentValue === 'boolean') {
     return !currentValue;
   } else if ((typeof currentValue === 'number') || currentType === 'Number') {
@@ -431,6 +488,19 @@ template: html`
 
 <template prop_t>
   <div prop>{{prop}}</div>
+</template>
+
+<template prop_with_conn_t>
+  <div Xstyle="border:1px solid red">
+    <span flex columns>
+      <span label flex>{{displayName}}</span>
+      <input type="checkbox" checked="{{checkedConn}}" on-change="onConnChecked" key="{{key}}"/>
+      <i>connected</i>
+    </span>
+    <div prop display$="{{showProp}}">{{prop}}</div>
+    <div prop display$="{{showConn}}">{{connection}}</div>
+    <hr>
+  </div>
 </template>
 
 <template unimpl_t>

@@ -5,18 +5,25 @@
  * license that can be found in the LICENSE file.
  */
 ({
-async update({graph}, state, {service}) {
+async update({graph, layoutId}, state, {service}) {
   const arcService = (msg, graph) => service({kind: 'ArcService', msg, data:{graph}});
   // if the old graph is not the input graph, remove it
   if (state.graph && graph?.$meta?.id !== state.graph?.$meta?.id) {
     await arcService('removeGraph', state.graph);
   }
   // if the input graph is not the old graph, run it
-  if (graph && !deepEqual(graph, state.graph)) {
+  if (this.isGraphChanged(graph, layoutId, state.graph)) {
     await arcService('runGraph', graph);
   }
   // remember the old graph
   state.graph = graph;
+},
+
+isGraphChanged(graph, layoutId, currentGraph) {
+  const nodesEqual = (n1, n2) => keys(n1).length === keys(n2).length && entries(n1).every(([key, node]) => deepEqual(node, n2?.[key]));
+  return graph &&
+    (!nodesEqual(graph.nodes, currentGraph?.nodes) ||
+     !deepEqual(graph.layout?.[layoutId], currentGraph?.layout?.[layoutId]));
 },
 
 render({graph, nodeTypes, categories, layoutId, selectedNodeId}) {

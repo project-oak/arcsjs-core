@@ -55,15 +55,17 @@ updateValues(selectedNodeId, graph, data, nodeTypes, state, service) {
 },
 
 updatePropValue(prop, currentValue, node, nodeType, service) {
+  if (prop.store?.$type === 'TypeWithConnection') {
+    const innerProp = {...prop, store: prop.store.store, value: prop.value.property};
+    const innerCurrentValue = currentValue?.property || currentValue;
+    const propUpdated = this.updatePropValue(innerProp, innerCurrentValue, node, nodeType, service);
+    const connUpdated = this.updateConnection(prop.name, prop.value.connection.value, node, nodeType, service);
+    return propUpdated || connUpdated;
+  }
   if (JSON.stringify(prop.value) !== JSON.stringify(currentValue)) {
     // Note: setting entire prop value (not granular by inner props).
     const newValue = this.formatPropValue(prop);
-    if (prop.name.endsWith('-connection')) {
-      const propName = prop.name.substring(0, prop.name.length - '-connection'.length);
-      return this.updateConnection(propName, newValue, node, nodeType, service);
-    } else {
-      return this.updatePropInNode(prop.name, newValue, node, service);
-    }
+    return this.updatePropInNode(prop.name, newValue, node, service);
   }
 },
 
