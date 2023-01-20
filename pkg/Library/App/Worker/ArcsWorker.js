@@ -14,6 +14,7 @@ import {StoreService} from '../StoreService.js';
 import {ComposerService} from '../ComposerService.js';
 import {JSONataService} from '../../JSONata/JSONataService.js';
 import {deepCopy} from '../../Core/utils.min.js';
+import {NodeTypesNode} from '../../Node/NodeTypesNode.js';
 import '../../Isolation/vanilla.js';
 
 // n.b. lives in Worker context
@@ -229,11 +230,11 @@ const handlers = {
     log('runGraph', arc, graph, nodeTypes, layoutInfo);
     const realArc = await requireArc(arc);
     log('runGraph: creating graphinator w/ arc', realArc);
-    const graphinator = new Graphinator(nodeTypes, user, realArc);
+    const graphinator = new Graphinator({NodeTypesNode, ...nodeTypes}, user, realArc);
     return graphinator.execute(graph, layoutInfo || {});
   },
   removeGraph: async ({arc, graph, nodeTypes}) => {
-    const graphinator = new Graphinator(nodeTypes, user, await requireArc(arc));
+    const graphinator = new Graphinator({NodeTypesNode, ...nodeTypes}, user, await requireArc(arc));
     return graphinator.evacipate(graph);
   },
   setStoreData: async ({arc, storeKey, data}) => {

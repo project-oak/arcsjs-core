@@ -6,6 +6,9 @@
 ({
 update(inputs, state) {
   state.groups = this.groupByCategory(inputs);
+  state.nodeTypes = {
+    ...inputs.nodeTypes
+  }
 },
 
 groupByCategory({nodeTypes, search, categories}) {

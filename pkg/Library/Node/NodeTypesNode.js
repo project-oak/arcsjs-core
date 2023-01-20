@@ -6,6 +6,14 @@
  */
 import {nodeTypes} from './nodeTypes.js';
 
+nodeTypes.NodeTypesNode = {
+  $meta: {
+    id: 'NodeTypesNode',
+    displayName: 'Node Types',
+    category: 'Designer'
+  }
+};
+
 export const NodeTypesNode = {
   $meta: {
     id: 'NodeTypesNode',
@@ -13,14 +21,14 @@ export const NodeTypesNode = {
     category: 'Designer'
   },
   $stores: {
-    NodeTypes: {
+    nodeTypes: {
       $type: 'Pojo',
-      $value: nodeTypes,
-      //noinspect: true
+      value: nodeTypes
     }
   },
   NodeTypes: {
     $kind: '$library/Noop',
-    $outputs: ['NodeTypes']
+    //$inputs: ['nodeTypes'],
+    $outputs: ['nodeTypes']
   }
 };

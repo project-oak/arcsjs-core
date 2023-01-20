@@ -50,7 +50,8 @@ export const ArcsJsAppSurface = class extends Xen.Async {
     // this.defaultContainer = defaultContainer;
     // this.graph = graph;
     // boot(import.meta.url);
-    boot(import.meta.url, {
+    const url = document.URL;
+    boot(url, {
       graph,
       defaultContainer
     });
