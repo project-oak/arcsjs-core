@@ -5,9 +5,12 @@
  * license that can be found in the LICENSE file.
  */
 ({
-render(inputs) {
+render({flex, label, value}) {
+  const customRule = flex ? '' : ':host { flex: none !important; padding: 8px; }';
   return {
-    ...inputs,
+    flex,
+    label,
+    customRule
   };
 },
 onLabelChange({eventlet: {value}}) {
@@ -39,7 +42,7 @@ template: html`
     padding-right: 12px;
   }
 </style>
-
+<style>${'{{customRule}}'}</style>
 <div flex bar>
   <input label value="{{label}}" on-change="onLabelChange">
   <span delim>:</span>

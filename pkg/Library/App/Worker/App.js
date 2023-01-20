@@ -102,6 +102,8 @@ export const App = class {
   async appService({request}) {
     // magic special services
     switch (request?.msg) {
+      case 'getResource':
+        return Resources.get(request.resourceId);
       case 'makeName':
       case 'MakeName':
         return makeName();

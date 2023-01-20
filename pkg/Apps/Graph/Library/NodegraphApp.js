@@ -7,6 +7,7 @@
 import {logFactory, App, LocalStoragePersistor} from '../arcs.js';
 import {nodegraphNodeTypes, NodegraphGraph} from './NodegraphRecipe.js';
 import {nodeTypes} from '../../../Library/Node/nodeTypes.js';
+import {NodeTypesNode} from '../../../Library/Node/NodeTypesNode.js';
 import * as services from '../services.js';
 
 const log = logFactory(true, 'Nodegraph', 'navy');

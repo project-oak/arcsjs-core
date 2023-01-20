@@ -5,14 +5,7 @@
  * license that can be found in the LICENSE file.
  */
 import {nodeTypes} from './nodeTypes.js';
-
-nodeTypes.NodeTypesNode = {
-  $meta: {
-    id: 'NodeTypesNode',
-    displayName: 'Node Types',
-    category: 'Designer'
-  }
-};
+import {Resources} from '../App/Resources.js';
 
 export const NodeTypesNode = {
   $meta: {
@@ -23,12 +16,16 @@ export const NodeTypesNode = {
   $stores: {
     nodeTypes: {
       $type: 'Pojo',
-      value: nodeTypes
+      noinspect: true
     }
   },
   NodeTypes: {
-    $kind: '$library/Noop',
-    //$inputs: ['nodeTypes'],
+    $kind: '$library/Node/NodeTypesParticle',
+    $staticInputs: {
+      nodeTypesResource: Resources.allocate(nodeTypes)
+    },
     $outputs: ['nodeTypes']
   }
 };
+
+nodeTypes.NodeTypesNode = NodeTypesNode;

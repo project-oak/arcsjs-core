@@ -5,7 +5,6 @@
  * license that can be found in the LICENSE file.
  */
 import {Arc, Graphinator, logFactory} from '../Core/core.js';
-import {NodeTypesNode} from '../Node/NodeTypesNode.js';
 
 const log = logFactory(logFactory.flags.services || logFactory.flags.ArcService, 'ArcService', 'tomato');
 
@@ -46,7 +45,7 @@ Object.assign(ArcService, {
   async runGraph(runtime, host, {graph, nodeTypes, defaultContainer}, arc) {
     if (!nodeTypes) {
       log.warn('runGraph: `nodeTypes` is empty');
-    } else return (new Graphinator({NodeTypesNode, ...nodeTypes}, runtime, arc ?? host.arc))
+    } else return (new Graphinator(nodeTypes, runtime, arc ?? host.arc))
       .execute(graph, {
         id: 'preview',
         defaultContainer: `${host.id}#${defaultContainer}`
@@ -56,7 +55,7 @@ Object.assign(ArcService, {
   async removeGraph(runtime, host, {graph, nodeTypes}) {
     if (!nodeTypes) {
       log.warn('runGraph: `nodeTypes` is empty');
-    } else return (new Graphinator({NodeTypesNode, ...nodeTypes}, user, host.arc))
+    } else return (new Graphinator(nodeTypes, user, host.arc))
       .evacipate(graph);
   }
 });
