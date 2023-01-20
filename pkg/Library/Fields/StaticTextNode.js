@@ -17,8 +17,7 @@ export const StaticText = {
     },
     textStyle: {
       $type: 'String',
-      $value: 'font-weight: bold; color: red; font-size: 18px;',
-      noinspect: true
+      $value: 'font-weight: bold; color: red; font-size: 18px;'
     }
   },
   text: {

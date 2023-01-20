@@ -1120,7 +1120,7 @@ var Chef = class {
 
 // js/recipe/Graphinator.js
 var log7 = logFactory(logFactory.flags.graph, "Graphinator", "#7f0823");
-var { assign: assign2, create: create4 } = Object;
+var { assign: assign2 } = Object;
 var entries5 = (o) => Object.entries(o ?? Object);
 var keys5 = (o) => Object.keys(o ?? Object);
 var values4 = (o) => Object.values(o ?? Object);
@@ -1181,17 +1181,18 @@ var Graphinator = class {
     await this.realizeParticles(particles);
     return particles.map(({ id }) => id);
   }
-  prepareStores({ id, connections, props }, nodeType, stores, connsMap) {
+  prepareStores({ id, props }, nodeType, stores, connsMap) {
     entries5(nodeType.$stores).forEach(([name, store]) => {
       connsMap[name] = [];
       const storeId = this.constructId(id, name);
-      const storeValue = props?.[name] || store.$value;
-      const storeConns = connections?.[name];
+      const propValue = props?.[name]?.value;
+      const storeValue = propValue === void 0 ? store.$value : propValue;
+      const storeConns = props?.[name]?.connection;
       this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
     });
   }
   prepareStore(storeId, { $type: type, $tags }, value, connections, stores, storeEntry) {
-    if (connections) {
+    if (connections?.length > 0) {
       connections?.forEach?.((connId) => this.addStore(connId, $tags, storeEntry));
     } else {
       stores.push({ name: storeId, type, value });
@@ -1231,7 +1232,7 @@ var Graphinator = class {
   prepareParticle({ id, props }, particleName, container, nodeType, storeMap) {
     const particleId = this.constructId(id, particleName);
     const spec = nodeType[particleName];
-    const $staticInputs = Object.assign({}, props || {}, spec.$staticInputs || {});
+    const $staticInputs = Object.assign({}, spec.$staticInputs || {});
     return {
       id: particleId,
       spec: {
@@ -1530,16 +1531,16 @@ export {
 };
 /**
  * @license
- * Copyright (c) 2022 Google LLC All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
- */
-/**
- * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
+ */
+/**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
  */
 //# sourceMappingURL=arcs.js.map

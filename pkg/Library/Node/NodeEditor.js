@@ -126,11 +126,15 @@ renderGraphEdges(inputs, {graph}) {
   const {categories} = inputs;
   const edges = [];
   values(graph?.nodes).forEach(node => {
-    const connects = entries(node.connections).map(
-      ([name, connects]) => connects.map(conn => {
+    const connects = [];
+    entries(node.props).forEach(([name, prop]) => {
+      prop.connection?.forEach(conn => {
         const {from, storeName} = this.parseConnection(conn);
-        return {from, storeName, toStoreName: name};
-      })).flat();
+        connects.push({from, storeName, toStoreName: name});
+      });
+      
+    });
+    connects.flat();
     connects.forEach(connect => edges.push({
       from: {
         id: connect.from,
@@ -166,7 +170,7 @@ iconByCategory(category, categories) {
 renderInputs(node, nodeType) {
   return this.getInputStores(nodeType).map(([name, store]) => ({
     name,
-    ...(node.connections?.[name] || {}),
+    ...(node.props?.[name]?.connection || []),
     type: store.$type,
     multiple: store.multiple
   }));
@@ -265,13 +269,12 @@ deleteNodeFromLayout(layouts, nodeId) {
 
 duplicateSelectedNode({selectedNodeId, newNodeInfos}, {graph}) {
   if (graph && selectedNodeId) {
-    const {type, displayName, props, connections} = graph.nodes[selectedNodeId];
+    const {type, displayName, props} = graph.nodes[selectedNodeId];
     const newInfo = {
       type,
       nodeData: {
         displayName: this.duplicateDisplayName(displayName, graph),
         props: {...props},
-        connections: JSON.parse(JSON.stringify(connections))
       }
     };
     return {
