@@ -1,5 +1,6 @@
 <!doctype html>
 
+
 <script src="./config.js"></script>
 <script src="./arcs.js"></script>
 
@@ -7,4 +8,5 @@
   const Arcs = await globalThis.ArcsPromise;
   console.log(Arcs);
   const {NodegraphApp, quickStart} = Arcs;
+  quickStart(NodegraphApp, document.URL);
 </script>

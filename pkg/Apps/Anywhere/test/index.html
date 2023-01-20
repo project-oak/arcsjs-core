@@ -1,0 +1,19 @@
+<!doctype html>
+
+<script src="./config.js"></script>
+
+<script type="module">
+  const src = `${globalThis.config?.arcsPath}/Apps/Anywhere/arcs.js`;
+  document.head.appendChild(Object.assign(document.createElement('script'), {src})).onload = async () => {
+    const {ArcsPromise} = globalThis;
+    const Arcs = await ArcsPromise;
+    //
+    const {NodegraphApp, quickStart} = Arcs;
+    console.log(globalThis.Paths?.map);
+    //
+    const app = await quickStart(NodegraphApp, document.URL);
+    //
+    const {arcs} = app;
+    arcs.set('user', 'designInfo', 10);
+  };
+</script>

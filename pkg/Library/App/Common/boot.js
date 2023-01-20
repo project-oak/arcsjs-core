@@ -15,7 +15,7 @@ export const boot = (url, items, extraPaths) => {
     }
   };
   quickStart(LauncherApp, url, {
-    $app: '$root/Library/App/Common',
+    //$app: '$root/Library/App/Common',
     $config: '$app/config.js',
     ...extraPaths
   });

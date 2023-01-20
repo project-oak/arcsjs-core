@@ -4,12 +4,19 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-import 'https://arcsjs.web.app/0.4.5/Apps/Graph/config.js';
-import {quickStart} from 'https://arcsjs.web.app/0.4.5/Apps/Graph/arcs.js';
-import {NodegraphApp} from 'https://arcsjs.web.app/0.4.5/Apps/Graph/Library/NodegraphApp.js';
-import 'https://arcsjs.web.app/0.4.5/Library/Mediapipe/PoseServiceLoader.js';
+const src = `${globalThis.config?.arcsPath}/Apps/Anywhere/arcs.mjs`;
+console.log('arcs is here', src);
 
-globalThis.ArcsAnywhere = {
-  quickStart,
-  NodegraphApp
-};
+document.head.appendChild(Object.assign(document.createElement('script'), {type: 'module', src}));
+
+globalThis.ArcsPromise = new Promise(resolve => {
+  const waitFor = () => {
+    if (globalThis.ArcsAnywhere?.quickStart) {
+      resolve(globalThis.ArcsAnywhere);
+    } else {
+      //console.log('waiting...');
+      setTimeout(waitFor, 1000);
+    }
+  };
+  waitFor();
+});

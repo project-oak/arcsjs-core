@@ -226,7 +226,10 @@ const handlers = {
   //   return Chef.evacipateAll(recipes, user, realArc);
   // },
   runGraph: async ({arc, graph, nodeTypes, layoutInfo}) => {
-    const graphinator = new Graphinator(nodeTypes, user, await requireArc(arc));
+    log('runGraph', arc, graph, nodeTypes, layoutInfo);
+    const realArc = await requireArc(arc);
+    log('runGraph: creating graphinator w/ arc', realArc);
+    const graphinator = new Graphinator(nodeTypes, user, realArc);
     return graphinator.execute(graph, layoutInfo || {});
   },
   removeGraph: async ({arc, graph, nodeTypes}) => {
@@ -309,3 +312,5 @@ const flushQueue = async () => {
     //log(queue.length, 'task(s) in queue');
   }
 };
+
+WorkerBus.sendVibration({type: 'start'});

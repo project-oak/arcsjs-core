@@ -16,11 +16,11 @@ export const NodeTypesNode = {
     NodeTypes: {
       $type: 'Pojo',
       $value: nodeTypes,
-      noinspect: true
+      //noinspect: true
     }
   },
   NodeTypes: {
-    $kind: '$library/NoOp',
+    $kind: '$library/Noop',
     $outputs: ['NodeTypes']
   }
 };

@@ -47,12 +47,23 @@ export const App = class {
     assign(this.nodeTypes, {DevToolsRecipe});
     //
     log('running app graphs...');
-    await this.runGraphs(this.graphs, this.nodeTypes); //, this.layoutInfo);
+    return new Promise(resolve => {
+      // TODO(sjmiles): unhack this timeout
+      setTimeout(async () => {
+        await this.runGraphs(this.graphs, this.nodeTypes); //this.layoutInfo)
+        resolve();
+      }, 2000);
+    });
   }
   async runGraphs(graphs, nodeTypes, layoutInfo) {
     const grapher = graph => Arcs.runGraph('user', graph, nodeTypes, layoutInfo);
     for (const graph of graphs) {
-      await grapher(graph);
+      // TODO(sjmiles): unhack this timeout
+      await (new Promise(async resolve => {
+        await grapher(graph);
+        // give graph time to settle :(
+        setTimeout(resolve, 1000)
+      }));
     }
   }
   render(packet) {

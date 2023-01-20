@@ -41,7 +41,9 @@ arcs.blargTheWorker = async ({paths}) => {
 // n.b. vibrational paths are worker-relative
 
 const receiveVibrations = msg => {
-  if (msg.type === 'render') {
+  if (msg.type === 'start') {
+    arcs.spinup();
+  } else if (msg.type === 'render') {
     // channel vibrations to the local composer
     renderPacket(msg.packet);
   } else if (msg.type === 'service') {
@@ -85,19 +87,24 @@ const createComposer = async root => {
 
 arcs.init = async ({paths, onrender, onservice, injections}) => {
   log.log(paths, injections);
+  // connect app-supplied conduits
+  arcs.onrender = onrender;
+  arcs.onservice = onservice;
+  arcs.paths = paths;
+  arcs.injections = injections;
   // worker path is document relative
   const worker = await arcs.blargTheWorker({paths});
   // bus to worker
   socket = new MessageBus(worker);
   // listen to worker
   socket.receiveVibrations(receiveVibrations);
-  // connect app-supplied conduits
-  arcs.onrender = onrender;
-  arcs.onservice = onservice;
+};
+
+arcs.spinup = () => {
   // memoize paths
-  arcs.addPaths(paths);
+  arcs.addPaths(arcs.paths);
   // initialize particle scope
-  socket.sendVibration({kind: 'setInjections', injections});
+  socket.sendVibration({kind: 'setInjections', injections: arcs.injections});
   // initiate security procedures
   socket.sendVibration({kind: 'secureWorker'});
 };

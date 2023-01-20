@@ -9,7 +9,7 @@ shouldUpdate({nodeTypes}) {
   return !nodeTypes?.empty;
 },
 
-async update({graph, nodeTypes}, state, {service}) {
+async update({graph, layoutId, nodeTypes}, state, {service}) {
   const arcService = (msg, data) => service({kind: 'ArcService', msg, data});
   // if the old graph is not the input graph, remove it
   if (state.graph && graph?.$meta?.id !== state.graph?.$meta?.id) {

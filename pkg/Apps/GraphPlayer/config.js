@@ -20,12 +20,15 @@ globalThis.config = {
   logFlags: {
     app: true,
     arc: true,
+    arcs: true,
+    bus: true,
     //code: true,
     //composer: true,
     graph: true,
     particles: true,
     recipe: true,
     //storage: true,
-    services: true
+    services: true,
+    worker: true,
   }
 };
