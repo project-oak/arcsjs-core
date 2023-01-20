@@ -80,20 +80,15 @@ formatPropValue({value, store: {$type}}) {
 
 updateConnection(name, value, node, nodeType, service) {
   const props = {...node.props};
-  const connections = {...node.connections};
   if (value?.length > 0) {
-    delete props[name];
+    delete props[name].value;
     this.removeStore(this.fullStoreId(node, name), service);
-    connections[name] = value;
+    props[name].connection = value;
   } else {
     this.addStore(this.fullStoreId(node, name), nodeType.$stores[name], service);
-    delete connections[name];
+    delete props[name].connection;
   }
-  return {
-    ...node,
-    props,
-    connections
-  };
+  return {...node, props};
 },
 
 decodeConnectionValue(value) {
@@ -106,7 +101,7 @@ decodeConnectionValue(value) {
 
 updatePropInNode(name, value, node, service) {
   this.updateStoreValue(this.fullStoreId(node, name), value, service);
-  node.props = {...node.props, [name]: value};
+  node.props = {...node.props, [name]: {value}};
   return node;
 },
 

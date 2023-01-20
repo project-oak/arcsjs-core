@@ -15,7 +15,7 @@ import {ParticleCook} from './ParticleCook.js';
 
 const log = logFactory(logFactory.flags.graph, 'Graphinator', '#7f0823');
 
-const {assign, create} = Object;
+const {assign} = Object;
 const entries = (o):any[] => Object.entries(o ?? Object);
 const keys = (o):any[] => Object.keys(o ?? Object);
 const values = (o):any[] => Object.values(o ?? Object);
@@ -80,12 +80,13 @@ export class Graphinator {
     return particles.map(({id}) => id);
   }
 
-  prepareStores({id, connections, props}, nodeType, stores, connsMap) {
+  prepareStores({id, props}, nodeType, stores, connsMap) {
     entries(nodeType.$stores).forEach(([name, store]) => {
       connsMap[name] = [];
       const storeId = this.constructId(id, name);
-      const storeValue = props?.[name] || store.$value;
-      const storeConns = connections?.[name];
+      const propValue = props?.[name]?.value;
+      const storeValue = propValue === undefined ? store.$value : propValue;
+      const storeConns = props?.[name]?.connection;
       this.prepareStore(storeId, store, storeValue, storeConns, stores, connsMap[name]);
     });
   }
@@ -137,7 +138,7 @@ export class Graphinator {
   prepareParticle({id, props}, particleName, container, nodeType, storeMap) {
     const particleId = this.constructId(id, particleName);
     const spec = nodeType[particleName];
-    const $staticInputs = Object.assign({}, props || {}, spec.$staticInputs || {});
+    const $staticInputs = Object.assign({}, spec.$staticInputs || {});
     return {
       id: particleId,
       spec: {

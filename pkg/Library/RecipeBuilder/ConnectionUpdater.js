@@ -56,15 +56,16 @@ removeGraphOutdatedConnections(graph, candidates) {
 
 removeNodeOutdatedConnections(node, candidates) {
   let changed = false;
-  keys(node.connections).forEach(key => {
-    const conns = node.connections[key];
+  keys(node.props).forEach(key => {
+    const conns = node.props[key].connection;
+    const originalLength = conns?.length;
     const connCandidates = candidates[key];
-    if (connCandidates) {
-      node.connections[key] = conns.filter(conn => this.hasMatchingCandidate(conn, connCandidates));
-      if (node.connections[key].length === 0) {
-        delete node.connections[key];
+    if (conns && connCandidates) {
+      node.props[key].connection = conns.filter(conn => this.hasMatchingCandidate(conn, connCandidates));
+      if (node.props[key].connection.length === 0) {
+        delete node.props[key].connection;
       }
-      changed = changed || (node.connections[key]?.length === values.length);
+      changed = changed || (node.props[key]?.connection?.length !== originalLength);
     }
   });
   return changed;
@@ -89,10 +90,11 @@ updateNodeConnections(node, nodeType, candidates) {
 },
 
 initializeConnections(node, nodeType, candidates) {
-  if (!node.connections) {
+  if (!node.props) {
+    node.props ??= {};
     const used = [];
     keys(nodeType?.$stores).forEach(store => {
-      node.connections ??= {};
+      node.props[store] ??= {};
       this.initializeStoreConnection(store, node, candidates[store], used);
     });
     return true;
@@ -104,7 +106,7 @@ initializeStoreConnection(store, node, storeCandidates, used) {
   const isUsed = (candidate) => used.find(({from, storeName}) => candidate.from === from && candidate.storeName === storeName);
   const unusedCandidates = storeCandidates?.filter(candidate => !isUsed(candidate));
   if (unusedCandidates?.length === 1) {
-    node.connections[store] = [this.formatConnection(unusedCandidates[0])];
+    node.props[store].connection = [this.formatConnection(unusedCandidates[0])];
     used.push(unusedCandidates?.[0]);
   }
 },

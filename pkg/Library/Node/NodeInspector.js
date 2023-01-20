@@ -53,10 +53,9 @@ shouldConstructData({selectedNodeId, graph, candidates}, state) {
   return false;
 },
 
-nodeChanged({key, connections, props, displayName}, node) {
+nodeChanged({key, props, displayName}, node) {
   return node?.key !== key
       || node?.displayName !== displayName
-      || JSON.stringify(node?.connections) != JSON.stringify(connections)
       || JSON.stringify(node?.props) !== JSON.stringify(props)
       ;
 },
@@ -173,7 +172,7 @@ async computeBindingValue(name, store, node, service) {
 async getBindingValue(name, store, node, service) {
   const binding = this.fullStoreId(node, name);
   const storeValue = (await this.getStoreValue(binding, service))?.value;
-  return storeValue ?? node.props?.[name] ?? store.$value;
+  return storeValue ?? node.props?.[name]?.value ?? store.$value;
 },
 
 fullStoreId({id}, storeId) {
@@ -187,7 +186,7 @@ getStoreValue(storeId, service) {
 constructBindingValues(node, name, candidates, graph) {
   if (candidates) {
     const froms = candidates.map(candidate => this.renderCandidate(candidate, graph)).filter(from => from);
-    const value = node.connections?.[name] || [];
+    const value = node.props?.[name]?.connection || [];
     if (froms.length > 0) {
       return {values: froms, value};
     }
