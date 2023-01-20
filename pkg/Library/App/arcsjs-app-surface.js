@@ -47,9 +47,6 @@ export const ArcsJsAppSurface = class extends Xen.Async {
   bootGraph(graph) {
     const nodeKey = Object.keys(graph.nodes).find(key => key.includes('NodeDesignerNode'));
     const defaultContainer = `${nodeKey}_designer#graph`;
-    // this.defaultContainer = defaultContainer;
-    // this.graph = graph;
-    // boot(import.meta.url);
     const url = document.URL;
     boot(url, {
       graph,

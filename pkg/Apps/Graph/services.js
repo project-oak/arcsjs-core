@@ -11,12 +11,10 @@ const Library = `${globalThis.config.arcsPath}/Library`;
 
 // import modules from the ArcsJs Library
 // the 'load' function imports modules in parallel
-
 const load = async paths => (await Promise.all(paths.map(p => import(`${Library}/${p}`)))).reduce((e, m) =>({...e, ...m}),{});
+
 const modules = await load([
   'App/HistoryService.js',
-  //'Arc/ArcService.js',
-  // 'RecipeBuilder/RecipeBuilderService.js',
   'Rtc/LobbyService.js',
   'Goog/GoogleApisService.js',
   'Media/MediaService.js',
@@ -39,6 +37,4 @@ export const {TensorFlowService} = modules;
 export const {CocoSsdService} = modules;
 export const {LobbyService} = modules;
 export const {GoogleApisService} = modules;
-//export const {ArcService} = modules;
-export const {RecipeBuilderService} = modules;
 export const {PoseService} = modules;
