@@ -1169,11 +1169,12 @@ var Graphinator = class {
     values4(graph.nodes).forEach((node) => {
       const nodeType = this.nodeTypes[node.type];
       if (!nodeType) {
-        throw `node.type "${node.type}" not found`;
+        log7.warn(`node.type "${node.type}" not found`);
+      } else {
+        const connsMap = {};
+        this.prepareStores(node, nodeType, stores, connsMap);
+        this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
       }
-      const connsMap = {};
-      this.prepareStores(node, nodeType, stores, connsMap);
-      this.prepareParticles(node, layout, defaultContainer, connsMap, particles);
     });
     this.retagStoreSpecs(stores);
     log7("Executing", { graph, stores, particles });
@@ -1531,16 +1532,16 @@ export {
 };
 /**
  * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+/**
+ * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
- */
-/**
- * @license
- * Copyright (c) 2022 Google LLC All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
  */
 //# sourceMappingURL=arcs.js.map

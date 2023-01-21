@@ -288,6 +288,9 @@ const template = Xen.Template.html`
     position: relative;
     overflow: hidden;
   }
+  input {
+    font-size: 1em;
+  }
   [node] {
     position: absolute;
     min-width: 100px;

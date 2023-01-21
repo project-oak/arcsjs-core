@@ -5,7 +5,6 @@
  * license that can be found in the LICENSE file.
  */
 ({
-
 async update({graph, nodeTypes, globalStores}, state) {
   if (this.graphChanged(graph, state.graph) || this.nodeTypesChanged(nodeTypes, state.nodeTypes)) {
     assign(state, {graph, nodeTypes});
@@ -107,5 +106,4 @@ decodeBinding(value) {
     return {key, binding};
   }
 }
-
 });

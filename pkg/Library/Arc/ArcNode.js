@@ -15,13 +15,19 @@ export const ArcNode = {
       $type: 'String',
       $value: ''
     },
+    graph: {
+      $type: 'Graph'
+    },
     graphName: {
       $type: 'String',
       $value: '',
+    },
+    nodeTypes: {
+      $type: 'Pojo'
     }
   },
   arc: {
     $kind: '$library/Arc/ArcParticle',
-    $inputs: ['arcName', 'graphName']
+    $inputs: ['nodeTypes', 'arcName', 'graph', 'graphName']
   }
 };

@@ -8,11 +8,11 @@
 
 async update({data}, state, {output}) {
   if (this.dataPropsChanged(data, state)) {
-    if (data?.key !== state.oldData?.key) {
+    if (data?.key !== state.data?.key) {
       state.checkedConns = {};
     }
-    await this.refreshRendering(state, output);
     state.data = data;
+    await this.refreshRendering(state, output);
   }
 },
 
@@ -50,7 +50,8 @@ render({data, customInspectors}, state) {
 renderProps(data, customInspectors, state) {
   return data?.props
     ?.filter(prop => !prop.store.noinspect)
-    ?.map(prop => this.renderProp(prop, undefined, customInspectors, state));
+    ?.map(prop => this.renderProp(prop, null, customInspectors, state))
+    ;
 },
 
 renderProp(prop, parent, customInspectors, state) {
@@ -77,7 +78,7 @@ chooseTemplate({store: {$type, values, range}, value}, isEditing, customInspecto
     string: 'text_t',
     boolean: 'checkbox_t',
     Select: 'select_t',
-    'Pojo': 'textarea_t',
+    'Pojo': 'object_editor_t',
     MultilineText: 'textarea_t',
     TypeWithConnection: 'prop_with_conn_t'
   }[$type] ?? 'unimpl_t';
@@ -188,19 +189,24 @@ formatSelectValues(values, selected) {
   return formatted;
 },
 
-formatConnectionSelect(prop, state) {
-  const key = `${prop.name}-connection`;
-  const displayName = prop.displayName || prop.name;
-  const {values, value} = prop.value.connection;
-  state.checkedConns[key] ??= ((value?.length > 0) || !prop.value.property);
-  const checkedConn = Boolean(state.checkedConns[key]);
+formatConnectionSelect({name, displayName, value}, {checkedConns}) {
+  const key = `${name}-connection`;
+  const connection = {
+    $template: 'select_t',
+    models: [{
+      key,
+      name: key,
+      value: this.formatSelectValues(value.connection.values, value)
+    }]
+  };
+  if (checkedConns[key] == undefined) {
+    checkedConns[key] = (value.connection.value?.length > 0) || !value.property;
+  }
+  const checkedConn = Boolean(checkedConns[key]);
   return  {
-    connection: {
-      $template: 'select_t',
-      models: [{key, name: key, value: this.formatSelectValues(values, value)}]
-    },
+    displayName: displayName || name,
+    connection,
     key,
-    displayName,
     checkedConn,
     showConn: String(checkedConn),
     showProp: String(!checkedConn),
@@ -218,10 +224,10 @@ onPropChange({eventlet: {key, value}, data}) {
   return this.updatePropValue(data, propNames, formatter);
 },
 
-onConnChecked({eventlet: {key}, data}, state) {
-  state.checkedConns[key] = Boolean(!state.checkedConns[key]);
-  if (!state.checkedConns[key]) {
-    return this.onPropChange({eventlet: {key}, data}, state);
+onConnChecked({eventlet: {key}, data}, {checkedConns}) {
+  checkedConns[key] = !checkedConns[key];
+  if (!checkedConns[key]) {
+    return this.onPropChange({eventlet: {key}, data});
   }
 },
 
@@ -319,7 +325,7 @@ cloneValue(value) {
 formatPropValueByType(currentValue, currentType, newValue) {
   if (currentType === 'TypeWithConnection') {
     return {
-      ...currentValue,      
+      ...currentValue,
       // better way to determine actual property type?
       property: this.formatPropValueByType(currentValue.property, typeof newValue, newValue),
     }
@@ -491,15 +497,15 @@ template: html`
 </template>
 
 <template prop_with_conn_t>
-  <div Xstyle="border:1px solid red">
+  <div>
     <span flex columns>
       <span label flex>{{displayName}}</span>
-      <input type="checkbox" checked="{{checkedConn}}" on-change="onConnChecked" key="{{key}}"/>
+      <input type="checkbox" checked="{{checkedConn}}" on-change="onConnChecked" key="{{key}}">
       <i>connected</i>
     </span>
     <div prop display$="{{showProp}}">{{prop}}</div>
     <div prop display$="{{showConn}}">{{connection}}</div>
-    <hr>
+    <!-- <hr> -->
   </div>
 </template>
 

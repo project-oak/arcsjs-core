@@ -6,25 +6,15 @@
  license that can be found in the LICENSE file.
 -->
 <title>GraphPlayer</title>
-<script type="module" src="../../Library/App/Common/config.js"></script>
+<script type="module" src="./config.js"></script>
 <script type="module" src="../../Library/App/arcsjs-app-surface.js"></script>
-<arcsjs-app-surface id="AppConfig"></arcsjs-app-surface>
-<script type="module">
-  const graphs = JSON.parse(localStorage.getItem('user/graph/0.4.5/graphs') ?? '[]');
-  window.AppConfig.graph = {
-    "$meta": {
-      "name": "Flan",
-      "id": "5555-867-5309"
-    },
-    nodes: {
-      "GraphToolbarNode1": {
-        "id": "GraphToolbarNode1",
-        "type": "GraphToolbarNode",
-        "props": {
-          "graphs": graphs
-        }
-      }
-    }
-  };
 
+<arcsjs-app-surface path="GraphPlayer"></arcsjs-app-surface>
+
+<script type="module">
+  setTimeout(async () => {
+    const {app} = globalThis;
+    const graphs = await app.arcs.get('user', 'graphs');
+    await app.arcs.set('user', 'GraphToolbarNode10333:graphs', graphs)
+  }, 4000);
 </script>

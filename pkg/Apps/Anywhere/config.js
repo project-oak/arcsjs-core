@@ -4,19 +4,11 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-let url = import.meta.url;
-if (url.includes('localhost:9888')) {
-  url = `http://localhost:9888/0.4.5`;
-} else if (url.includes('localhost/gob')) {
-  url = `http://localhost/gob/arcsjs-core/pkg`;
-} else {
-  url = `https://arcsjs.web.app/0.4.5`;
-}
 
 globalThis.config = {
-  arcsPath: url,
-  aeon: 'common/0.4.5',
-  // theme: 'dark',
+  arcsPath: 'https://arcsjs.web.app/0.4.5',
+  aeon: 'graph/0.4.5',
+  //theme: 'dark',
   logFlags: {
     app: true,
     //arc: true,
@@ -25,7 +17,7 @@ globalThis.config = {
     graph: true,
     particles: true,
     //recipe: true,
+    services: true,
     //storage: true,
-    //services: true
   }
 };

@@ -5,15 +5,19 @@
  * license that can be found in the LICENSE file.
  */
 ({
-async update({graph, layoutId}, state, {service}) {
-  const arcService = (msg, graph) => service({kind: 'ArcService', msg, data:{graph}});
+shouldUpdate({nodeTypes}) {
+  return !nodeTypes?.empty;
+},
+
+async update({graph, layoutId, nodeTypes}, state, {service}) {
+  const arcService = (msg, data) => service({kind: 'ArcService', msg, data});
   // if the old graph is not the input graph, remove it
   if (state.graph && graph?.$meta?.id !== state.graph?.$meta?.id) {
     await arcService('removeGraph', state.graph);
   }
   // if the input graph is not the old graph, run it
   if (this.isGraphChanged(graph, layoutId, state.graph)) {
-    await arcService('runGraph', graph);
+    await arcService('runGraph', {graph, nodeTypes, defaultContainer: 'graph'});
   }
   // remember the old graph
   state.graph = graph;

@@ -18,13 +18,6 @@ export const NodegraphApp = class extends App {
     this.persistor = new LocalStoragePersistor('user');
     this.graphs = [NodegraphGraph];
     this.nodeTypes = {...nodeTypes, ...nodegraphNodeTypes};
-    //
-    services.ArcService.nodeTypes = this.nodeTypes;
-    services.ArcService.layoutInfo = {
-      id: 'preview',
-      defaultContainer: 'designer#graph'
-    };
-    //
     log('Welcome!');
   }
   async spinup() {

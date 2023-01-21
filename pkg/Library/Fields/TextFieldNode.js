@@ -11,6 +11,10 @@ export const TextFieldNode = {
     category: 'Fields'
   },
   $stores: {
+    flex: {
+      $type: 'Boolean',
+      $value: true
+    },
     label: {
       $type: 'String',
       $value: 'text field'
@@ -22,7 +26,7 @@ export const TextFieldNode = {
   },
   field: {
     $kind: '$library/Fields/TextField',
-    $inputs: ['label', 'value'],
+    $inputs: ['label', 'value', 'flex'],
     $outputs: ['label', 'value']
   }
 };

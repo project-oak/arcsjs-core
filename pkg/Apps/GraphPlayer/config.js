@@ -15,17 +15,20 @@ if (url.includes('localhost:9888')) {
 
 globalThis.config = {
   arcsPath: url,
-  aeon: 'common/0.4.5',
+  aeon: 'graph/0.4.5',
   // theme: 'dark',
   logFlags: {
     app: true,
     //arc: true,
+    arcs: true,
+    //bus: true,
     //code: true,
     //composer: true,
     graph: true,
     particles: true,
     //recipe: true,
     //storage: true,
-    //services: true
+    services: true,
+    //worker: true,
   }
 };

@@ -6,20 +6,22 @@
  */
 ({
 initialize(inputs, state, {service}) {
-  state.addGraph = async data => await service({kind: 'ArcService', msg: 'addNamedGraph', data});
+  state.addArcGraph = async data => await service({kind: 'ArcService', msg: 'addArcGraph', data});
 },
-shouldUpdate({arcName, graphName}, {arc}) {
-  return arcName && graphName && !arc;
+shouldUpdate({nodeTypes, arcName, graph, graphName}) {
+  return nodeTypes && arcName && (graph || graphName);
 },
-async update({arcName, graphName}, state) {
-  state.arc = true;
-  await this.buildArcWithGraph({arcName, graphName, defaultContainer: 'ArcNode1:arc#arc'}, state)
+async update({arcName, graph, nodeTypes}, state) {
+  if (keys(graph?.nodes).length) {
+    await this.buildArcWithGraph({arcName, graph, nodeTypes}, state);
+  }
 },
-async buildArcWithGraph({arcName, graphName, defaultContainer}, state) {
-  const result = await state.addGraph({arcName, graphName, defaultContainer});
-  log(result);
+async buildArcWithGraph({arcName, graph, nodeTypes}, state) {
+  const result = state.addArcGraph({arc: arcName, graph, nodeTypes, defaultContainer: 'arc'})
+  log(await result);
 },
 render() {
+  // TODO(sjmiles): otherwise the system tries to render `state.addArcGraph` and throws
   return null;
 },
 template: html`<slot name="arc"></slot>`

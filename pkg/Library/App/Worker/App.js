@@ -9,7 +9,6 @@
 import {Arcs} from './Arcs.js';
 import {Paths, logFactory, makeId, makeName} from '../../Core/utils.js';
 import {DevToolsRecipe, DevToolsGraph} from '../../DevTools/DevToolsRecipe.js';
-import {NodeTypesNode} from '../../Node/NodeTypesNode.js';
 import {themeRules} from '../theme.js';
 
 // n.b. lives in 'top' context
@@ -40,21 +39,31 @@ export const App = class {
     //
     Paths.add(this.paths);
     this.composer = await Arcs.createComposer(this.root || document.body);
-    assign(this.nodeTypes, {
-      DevToolsRecipe,
-      NodeTypesNode
-    });
     //
     this.graphs = [
       DevToolsGraph,
       ...(this.graphs ?? [])
     ];
-    await this.runGraphs(this.graphs, this.nodeTypes, this.layoutInfo);
+    assign(this.nodeTypes, {DevToolsRecipe});
+    //
+    log('running app graphs...');
+    return new Promise(resolve => {
+      // TODO(sjmiles): unhack this timeout
+      setTimeout(async () => {
+        await this.runGraphs(this.graphs, this.nodeTypes); //this.layoutInfo)
+        resolve();
+      }, 2000);
+    });
   }
   async runGraphs(graphs, nodeTypes, layoutInfo) {
     const grapher = graph => Arcs.runGraph('user', graph, nodeTypes, layoutInfo);
     for (const graph of graphs) {
-      await grapher(graph);
+      // TODO(sjmiles): unhack this timeout
+      await (new Promise(async resolve => {
+        await grapher(graph);
+        // give graph time to settle :(
+        setTimeout(resolve, 1000)
+      }));
     }
   }
   render(packet) {
@@ -93,6 +102,8 @@ export const App = class {
   async appService({request}) {
     // magic special services
     switch (request?.msg) {
+      case 'getResource':
+        return Resources.get(request.resourceId);
       case 'makeName':
       case 'MakeName':
         return makeName();

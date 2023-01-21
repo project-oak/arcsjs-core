@@ -7,15 +7,14 @@
 import {CommonApp} from './CommonApp.js';
 import {quickStart} from './arcs/arcs.js';
 
-export const boot = (url, items, extraPaths) => {
+export const boot = async (url, items, extraPaths) => {
   const LauncherApp = class extends CommonApp {
     constructor(paths) {
       super(paths);
       Object.assign(this, items);
     }
   };
-  quickStart(LauncherApp, url, {
-    $app: '$root/Library/App/Common',
+  return quickStart(LauncherApp, url, {
     $config: '$app/config.js',
     ...extraPaths
   });

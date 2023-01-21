@@ -29,6 +29,7 @@ export const {
   'App/HistoryService.js',
   'App/boot.js',
   'LocalStorage/LocalStoragePersistor.js',
+  'Mediapipe/PoseServiceLoader.js',
   // DOM things
   // 'Dom/Xen/xen-async.js',
   // 'Dom/dom.js',

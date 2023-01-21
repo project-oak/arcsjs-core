@@ -1,0 +1,31 @@
+<!doctype html>
+
+<script src="./config.js"></script>
+
+<script type="module">
+  const onload = async () => {
+    const {ArcsPromise} = globalThis;
+    const Arcs = await ArcsPromise;
+    const {boot} = Arcs;
+    //
+    const graph = {
+      $meta: {
+        id: 'graph'
+      },
+      $nodes: {
+      }
+    };
+    //
+    const app = await boot(import.meta.url, {graph});
+    //
+    const {arcs} = app;
+    arcs.set('user', 'designInfo', 42);
+  };
+  //
+  const src = `${globalThis.config?.arcsPath}/Apps/Anywhere/arcs.js`;
+  //
+  document.head.appendChild(Object.assign(document.createElement('script'), {
+    src,
+    onload
+  }));
+</script>
