@@ -1,0 +1,25 @@
+<!doctype html>
+
+<div>
+  <button id="button" onclick="goClick()">Go!</button>
+</div>
+
+<hr>
+
+<textarea style="width: 800px; height: 400px;" id="promptText">Fill a basin with water.</textarea>
+
+<hr>
+
+<pre id="result"></pre>
+
+<script type="module">
+  globalThis.goClick = async () => {
+    button.disabled = true;
+    const text = promptText.value;
+    const response = await fetch(`http://localhost:1234/?prompt=${text}`);
+    const output = await response?.text();
+    result.innerText = output;
+    button.disabled = false;
+    console.log(text, output);
+  };
+</script>
