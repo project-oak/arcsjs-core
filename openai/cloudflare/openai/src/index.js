@@ -63,7 +63,7 @@ const requestGeneration = async body => {
   return result.data?.[0]?.url;
 };
 
-const apiKey = "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";
+const apiKey = "_your_key_should_be_here";
 
 const complete = async text => {
   try {
