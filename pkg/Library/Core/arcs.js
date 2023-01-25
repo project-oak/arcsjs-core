@@ -1203,7 +1203,7 @@ var Graphinator = class {
   }
   prepareStore(storeId, { $type: type, $tags }, value, connections, stores, storeEntry) {
     if (connections?.length > 0) {
-      connections?.forEach?.((connId) => this.addStore(connId, $tags, storeEntry));
+      connections.forEach?.((connId) => this.addStore(connId, $tags, storeEntry));
     } else {
       stores.push({ name: storeId, type, value });
       this.addStore(storeId, $tags, storeEntry);
@@ -1541,16 +1541,16 @@ export {
 };
 /**
  * @license
- * Copyright (c) 2022 Google LLC All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
- */
-/**
- * @license
  * Copyright 2022 Google LLC
  *
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file or at
  * https://developers.google.com/open-source/licenses/bsd
+ */
+/**
+ * @license
+ * Copyright (c) 2022 Google LLC All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
  */
 //# sourceMappingURL=arcs.js.map
