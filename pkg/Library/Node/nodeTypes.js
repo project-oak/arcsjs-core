@@ -44,6 +44,10 @@ const etc = await load([
   'Node/NodeInspectorNode.js',
   'Node/NodeCreatorNode.js',
   'NodeGraph/GraphToolbarNode.js',
+  /**/
+  'OpenAi/OpenAiImageNode.js',
+  'OpenAi/OpenAiGpt3TextNode.js',
+  'OpenAi/OpenAiGpt3Node.js'
 ]);
 
 const nodeTypes = {
