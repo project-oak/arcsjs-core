@@ -1,0 +1,14 @@
+module m0 {
+  block b0 {
+    %0 = arcsjs.create_store[name: "Chooser.fonts", type: "List_Key"]()
+    %2 = arcsjs.create_store[name: "Chooser.suggested", type: "List_Key"]()
+    %1 = arcsjs.create_store[name: "Chooser.pickedFont", type: "FontKey"]()
+    %3 = arcsjs.create_store[name: "Chooser.downgrade_intent", type: "Intent"]()
+    %4 = sql.tag_transform[rule_name: "set_private"](%0)
+    %5 = arcsjs.particle[name: "Chooser.main", input_0: "fonts", input_1: "suggested"](%4, %2)
+    %6 = arcsjs.select_field[name: "pickedFont"](%5)
+    %7 = arcsjs.select_field[name: "downgrade_intent"](%5)
+    %8 = arcsjs.user_consent_to_downgrade[downgrade_from: "private", downgrade_to: "public"](%6, %7)
+    %9 = arcsjs.arcsjs_output[](%8)
+  }
+}
