@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "ArcsExtV3",
+  "version": "0.3.1",
+  "action": {
+    "default_icon": {
+      "32": "assets/logo_32x32.png"
+    },
+    "default_title": "Open Tools",
+    "default_popup": "jello.html"
+  },
+  "content_scripts": [{
+    "matches": ["http://localhost:9888/*"],
+    "js": ["content-script.js"]
+  }],
+  "content_security_policy": {
+    "sandbox": "sandbox allow-scripts; worker-src blob:; camera 'self';"
+  },
+  "sandbox": {
+    "pages": [
+      "deploy/librarian/index.html",
+      "viewer.html",
+      "hello.html"
+    ]
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "scripting",
+    "activeTab",
+    "storage"
+  ]
+}
