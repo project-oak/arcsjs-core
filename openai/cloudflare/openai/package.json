@@ -2,7 +2,7 @@
   "name": "openai",
   "version": "0.0.0",
   "devDependencies": {
-    "wrangler": "3.13.1"
+    "wrangler": "3.19.0"
   },
   "private": true,
   "scripts": {
