@@ -1,3 +1,5 @@
+***Note: This project is no longer being maintained***
+
 # ArcsJs-Core
 
 [![tests](https://github.com/project-oak/arcsjs-core/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/project-oak/arcsjs-core/actions/workflows/node.js.yml)
